@@ -480,3 +480,23 @@ status_t s1ap_send_s1_reset_ack(
 
     return rv;
 }
+
+status_t s1ap_send_connection_establishment_indication(
+        mme_enb_t *enb,
+        S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
+        S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
+	mme_ue_t *mme_ue)
+{
+    status_t rv;
+    pkbuf_t *s1apbuf = NULL;
+
+    d_assert(enb, return CORE_ERROR, "Null param");
+
+    rv = s1ap_build_connection_establishment_indication(&s1apbuf, mme_ue_s1ap_id, enb_ue_s1ap_id, mme_ue);
+    d_assert(rv == CORE_OK && s1apbuf, return CORE_ERROR, "s1ap build error");
+
+    rv = s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "s1ap send error");
+
+    return CORE_OK;
+}

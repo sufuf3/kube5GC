@@ -78,6 +78,12 @@ CORE_DECLARE(status_t) s1ap_build_s1_reset_ack(
         pkbuf_t **s1apbuf,
         S1AP_UE_associatedLogicalS1_ConnectionListRes_t *partOfS1_Interface);
 
+CORE_DECLARE(status_t) s1ap_build_connection_establishment_indication(
+        pkbuf_t **s1apbuf,
+        S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
+        S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
+	mme_ue_t *mme_ue);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
