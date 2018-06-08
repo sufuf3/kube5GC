@@ -392,6 +392,132 @@ void s1ap_handle_uplink_nas_transport(
         "s1ap_send_to_nas failed");
 }
 
+//add by YEE
+void s1ap_handle_nas_delivery_indication(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_NASDeliveryIndication_t *NASDeliveryIndication = NULL;
+
+    S1AP_NASDeliveryIndicationIEs_t *ie = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    
+    enb_ue_t *enb_ue = NULL;
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    NASDeliveryIndication = &initiatingMessage->value.choice.NASDeliveryIndication;
+    d_assert(NASDeliveryIndication, return,);
+
+    d_trace(3, "[MME] NAS DELIVERY INDICATION\n");
+    d_trace(3, "[MME] Sending to SCEF\n");
+
+    //retrieve data from packet
+    printf("protocolIE list count = %d\n",NASDeliveryIndication->protocolIEs.list.count);
+    for (i = 0; i < NASDeliveryIndication->protocolIEs.list.count; i++)
+    {
+        ie = NASDeliveryIndication->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                //ENB_UE_S1AP_ID = &ie->value.choice.eNB_UE_S1AP_ID;
+                break;
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    IP[%s] ENB_ID[%d]\n",
+            CORE_ADDR(enb->addr, buf), enb->enb_id);
+
+    d_assert(ENB_UE_S1AP_ID, return,);
+    enb_ue = enb_ue_find_by_enb_ue_s1ap_id(enb, *ENB_UE_S1AP_ID);
+    d_assert(enb_ue, return, "No UE Context[ENB_UE_S1AP_ID:%d]",
+            *ENB_UE_S1AP_ID);
+
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+            enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
+
+    /*d_assert(s1ap_send_to_nas(enb_ue,
+        S1AP_ProcedureCode_id_uplinkNASTransport, NAS_PDU) == CORE_OK,,
+        "s1ap_send_to_nas failed");*/
+}
+
+//add by YEE
+void s1ap_handle_nas_non_delivery_indication(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_NASNonDeliveryIndication_t *NASNonDeliveryIndication = NULL;
+
+    S1AP_NASNonDeliveryIndication_IEs_t *ie = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_NAS_PDU_t *NAS_PDU = NULL;
+    S1AP_Cause_t *Cause = NULL;
+
+    enb_ue_t *enb_ue = NULL;
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    NASNonDeliveryIndication = &initiatingMessage->value.choice.NASNonDeliveryIndication;
+    d_assert(NASNonDeliveryIndication, return,);
+
+    d_trace(3, "[MME] NAS NON DELIVERY INDICATION\n");
+    d_trace(3, "[MME] Sending to SCEF\n");
+
+    for (i = 0; i < NASNonDeliveryIndication->protocolIEs.list.count; i++)
+    {
+        ie = NASNonDeliveryIndication->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_NAS_PDU:
+                NAS_PDU = &ie->value.choice.NAS_PDU;
+                break;
+            case S1AP_ProtocolIE_ID_id_Cause:
+                Cause = &ie->value.choice.Cause;
+                break;
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    IP[%s] ENB_ID[%d]\n",
+            CORE_ADDR(enb->addr, buf), enb->enb_id);
+
+    d_assert(ENB_UE_S1AP_ID, return,);
+    enb_ue = enb_ue_find_by_enb_ue_s1ap_id(enb, *ENB_UE_S1AP_ID);
+    d_assert(enb_ue, return, "No UE Context[ENB_UE_S1AP_ID:%d]",
+            *ENB_UE_S1AP_ID);
+
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+            enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
+
+    d_assert(Cause, return,);
+    d_trace(5, "    Cause[Group:%d Cause:%d]\n",
+            Cause->present, Cause->choice.radioNetwork);
+
+    d_assert(s1ap_send_to_nas(enb_ue,
+        S1AP_ProcedureCode_id_NASNonDeliveryIndication, NAS_PDU) == CORE_OK,,
+        "s1ap_send_to_nas failed");
+}
+
 void s1ap_handle_ue_capability_info_indication(
         mme_enb_t *enb, s1ap_message_t *message)
 {

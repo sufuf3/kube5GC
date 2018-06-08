@@ -179,6 +179,16 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_handover_request_ack(enb, pdu);
                             break;
                         }
+                        case S1AP_ProcedureCode_id_NASDeliveryIndication:
+                        {//add by YEE
+                            s1ap_handle_nas_delivery_indication(enb, pdu);
+                            break;
+                        }
+                        case S1AP_ProcedureCode_id_NASNonDeliveryIndication:
+                        {//add by YEE
+                            s1ap_handle_nas_non_delivery_indication(enb, pdu);
+                            break;
+                        }
                         default:
                         {
                             d_warn("Not implemented(choice:%d, proc:%d)",
