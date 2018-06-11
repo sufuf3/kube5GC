@@ -15,6 +15,11 @@ extern "C" {
 CORE_DECLARE(status_t) s1ap_init(int sctp_streams, c_uint16_t port);
 CORE_DECLARE(status_t) s1ap_final();
 
+/***************Add by Steven********/
+CORE_DECLARE(status_t) s1ap_send_mme_configuration_update(
+    mme_enb_t *target_enb);
+/***************************************/
+
 CORE_DECLARE(status_t) s1ap_open();
 CORE_DECLARE(status_t) s1ap_close();
 

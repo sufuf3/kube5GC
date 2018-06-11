@@ -11,7 +11,7 @@
 #include "s1ap_conv.h"
 /***************Add by Steven ****************/
 // MME Configuration Update
-status_t s1ap_build_MME_configuration_update(pkbuf_t **pkbuf)
+status_t s1ap_build_mme_configuration_update(pkbuf_t **pkbuf)
 {
 	status_t rv;
 	int i,j;

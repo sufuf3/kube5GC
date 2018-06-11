@@ -56,6 +56,24 @@ static status_t s1ap_server_list(list_t *list, int type)
     return CORE_OK;
 }
 
+/*************Add by Steven*******************/
+status_t s1ap_send_mme_configuration_update(
+    mme_enb_t *target_enb)
+{
+    status_t rv;
+    pkbuf_t *s1apbuf = NULL;
+
+    rv = s1ap_build_mme_configuration_update(&s1apbuf);
+    d_assert(rv == CORE_OK && s1apbuf, return CORE_ERROR, "s1ap build error");
+
+     rv = s1ap_send_to_enb(target_enb, s1apbuf, S1AP_NON_UE_SIGNALLING);
+    d_assert(rv == CORE_OK,, "s1ap send error");
+
+    return CORE_OK;
+}
+
+/**************************************************/
+
 static status_t s1ap_delete_list(list_t *list)
 {
     sock_node_t *snode = NULL;
