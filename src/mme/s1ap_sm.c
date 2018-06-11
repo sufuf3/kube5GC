@@ -69,6 +69,28 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_s1_setup_request(enb, pdu);
                             break;
                         }
+                        /********************** Qiu *******************/
+                        case S1AP_ProcedureCode_id_WriteReplaceWarning :
+                        {
+                            printf("\nThe S1AP_ProcedureCode_id_WriteReplaceWarning message has been received.\n");
+                            break;
+                        }
+                        case S1AP_ProcedureCode_id_Kill :
+                        {
+                            printf("\nThe S1AP_ProcedureCode_id_Kill message has been received.\n");
+                            break;
+                        }
+                        case S1AP_ProcedureCode_id_PWSRestartIndication :
+                        {
+                            printf("\nThe S1AP_ProcedureCode_id_PWSRestartIndication message has been received.\n");
+                            break;
+                        }
+                        case S1AP_ProcedureCode_id_PWSFailureIndication :
+                        {
+                            printf("\nThe S1AP_ProcedureCode_id_PWSFailureIndication message has been received.\n");
+                            break;
+                        }
+                        /**********************************************/
                         case S1AP_ProcedureCode_id_initialUEMessage :
                         {
                             s1ap_handle_initial_ue_message(enb, pdu);

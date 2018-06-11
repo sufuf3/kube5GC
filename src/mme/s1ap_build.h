@@ -9,6 +9,10 @@ extern "C" {
 #endif /* __cplusplus */
 
 CORE_DECLARE(status_t) s1ap_build_setup_rsp(pkbuf_t **pkbuf);
+/******************** Qiu ********************/
+CORE_DECLARE(status_t) s1ap_build_write_replace_warning_request(pkbuf_t **pkbuf);
+CORE_DECLARE(status_t) s1ap_build_kill_request(pkbuf_t **pkbuf);
+/*********************************************/
 CORE_DECLARE(status_t) s1ap_build_setup_failure(
     pkbuf_t **pkbuf, S1AP_Cause_PR group, long cause, long time_to_wait);
 CORE_DECLARE(status_t) s1ap_build_downlink_nas_transport(

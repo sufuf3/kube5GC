@@ -162,7 +162,23 @@ void s1ap_handle_s1_setup_request(mme_enb_t *enb, s1ap_message_t *message)
     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,
             "s1ap_send_to_enb() failed");
 }
+/**************************** Qiu ***************************/
+void s1ap_handle_CBC_write_replace_warning_message(mme_enb_t *enb)
+{
+    pkbuf_t *s1apbuf = NULL;
+    d_trace(3, "[MME] S1 send write replace warning request\n");
+    d_assert(s1ap_build_write_replace_warning_request(&s1apbuf) == CORE_OK,return, "s1ap_build_write_replace_warning_request() failed");
+    d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,"s1ap_send_to_enb() failed");
 
+}
+void s1ap_handle_CBC_stop_warning_message(mme_enb_t *enb)
+{
+    pkbuf_t *s1apbuf = NULL;
+    d_trace(3, "[MME] S1 send kill request\n");
+    d_assert(s1ap_build_kill_request(&s1apbuf) == CORE_OK,return, "s1ap_build_kill_request() failed");
+    d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,"s1ap_send_to_enb() failed");
+}
+/************************************************************/
 void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
 {
     status_t rv;

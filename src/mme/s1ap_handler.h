@@ -12,6 +12,12 @@ extern "C" {
 //add by YEE
 CORE_DECLARE(void) s1ap_handle_nas_delivery_indication(
         mme_enb_t *enb, s1ap_message_t *message);
+/*******************Qiu********************/
+CORE_DECLARE(void) s1ap_handle_CBC_write_replace_warning_message(
+		mme_enb_t *enb);		
+CORE_DECLARE(void) s1ap_handle_CBC_stop_warning_message(
+		mme_enb_t *enb);
+/******************************************/
 CORE_DECLARE(void) s1ap_handle_nas_non_delivery_indication(
         mme_enb_t *enb, s1ap_message_t *message);
 
