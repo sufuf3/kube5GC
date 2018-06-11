@@ -211,6 +211,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_nas_non_delivery_indication(enb, pdu);
                             break;
                         }
+                        case S1AP_ProcedureCode_id_MMEConfigurationUpdate:
+                        {/*****Add by Steven Lee***/
+                            s1ap_handle_mme_configuration_update_acknowledge(enb, pdu);
+                            break;
+                        }
                         default:
                         {
                             d_warn("Not implemented(choice:%d, proc:%d)",
@@ -238,6 +243,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         case S1AP_ProcedureCode_id_HandoverResourceAllocation :
                         {
                             s1ap_handle_handover_failure(enb, pdu);
+                            break;
+                        }
+                        case S1AP_ProcedureCode_id_MMEConfigurationUpdate:
+                        {/*****Add by Steven Lee***/
+                            s1ap_handle_mme_configuration_update_failure(enb, pdu);
                             break;
                         }
                         default:

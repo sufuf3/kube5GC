@@ -162,6 +162,79 @@ void s1ap_handle_s1_setup_request(mme_enb_t *enb, s1ap_message_t *message)
     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,
             "s1ap_send_to_enb() failed");
 }
+
+/***********Add by Steven Lee*************/
+// Handle MME configuration Update Acknowledge
+void s1ap_handle_mme_configuration_update_acknowledge(
+		mme_enb_t * enb,s1ap_message_t * message)
+{
+	//status_t rv;
+    //char buf[CORE_ADDRSTRLEN];
+    //int i;
+
+    S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+	S1AP_MMEConfigurationUpdateAcknowledge_t *MMEConfigurationUpdateAcknowledge = NULL;
+	//S1AP_MMEConfigurationUpdateAcknowledgeIEs_t *ie = NULL;
+
+	d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+	successfulOutcome = message->choice.successfulOutcome;
+	MMEConfigurationUpdateAcknowledge = 
+		&successfulOutcome->value.choice.MMEConfigurationUpdateAcknowledge;
+
+	d_assert(MMEConfigurationUpdateAcknowledge, return,);
+
+	d_trace(3, "[MME] MME configuration update acknowledge\n");
+}
+/*******************************************************/
+/***********Add by Steven Lee************/
+// Handle MME Configuration Update Failure
+void s1ap_handle_mme_configuration_update_failure(
+		mme_enb_t *enb, s1ap_message_t *message)
+{
+	//status_t rv;
+	//char buf[CORE_ADDRSTRLEN];
+	int i;
+	// Beginning of Message Type
+	S1AP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
+	S1AP_MMEConfigurationUpdateFailure_t *MMEConfigurationUpdateFailure = NULL;
+
+	S1AP_MMEConfigurationUpdateFailureIEs_t *ie = NULL;
+	//S1AP_Cause_t *Cause = NULL;
+
+	d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+
+	unsuccessfulOutcome = message->choice.unsuccessfulOutcome;
+    d_assert(unsuccessfulOutcome, return,);
+
+	MMEConfigurationUpdateFailure = 
+		&unsuccessfulOutcome->value.choice.MMEConfigurationUpdateFailure;
+	d_assert(MMEConfigurationUpdateFailure, return,);
+
+	d_trace(3, "[MME] MME configuration update failure\n");
+	// End of Message Type
+	
+	for (i = 0; i < MMEConfigurationUpdateFailure->protocolIEs.list.count; i++)
+    {
+        ie = MMEConfigurationUpdateFailure->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_Cause:
+                //Cause = &ie->value.choice.Cause;
+		//printf("cause = %d\n",(int)Cause);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+/*************************************************************/
 /**************************** Qiu ***************************/
 void s1ap_handle_CBC_write_replace_warning_message(mme_enb_t *enb)
 {

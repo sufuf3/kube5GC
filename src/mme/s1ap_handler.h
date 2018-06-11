@@ -18,6 +18,12 @@ CORE_DECLARE(void) s1ap_handle_CBC_write_replace_warning_message(
 CORE_DECLARE(void) s1ap_handle_CBC_stop_warning_message(
 		mme_enb_t *enb);
 /******************************************/
+/*****Steven****/
+CORE_DECLARE(void) s1ap_handle_mme_configuration_update_acknowledge(
+	mme_enb_t * enb,s1ap_message_t * message);
+CORE_DECLARE(void) s1ap_handle_mme_configuration_update_failure(
+		mme_enb_t *enb, s1ap_message_t *message);
+/***************/
 CORE_DECLARE(void) s1ap_handle_nas_non_delivery_indication(
         mme_enb_t *enb, s1ap_message_t *message);
 

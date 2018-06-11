@@ -9,7 +9,116 @@
 #include "mme_kdf.h"
 #include "s1ap_build.h"
 #include "s1ap_conv.h"
+/***************Add by Steven ****************/
+// MME Configuration Update
+status_t s1ap_build_MME_configuration_update(pkbuf_t **pkbuf)
+{
+	status_t rv;
+	int i,j;
 
+	S1AP_S1AP_PDU_t pdu;
+
+
+	// MMEConfigurationUpdate is a part of initiatingMessage
+	S1AP_InitiatingMessage_t *initiatingMessage;
+	S1AP_MMEConfigurationUpdate_t *MMEConfigurationUpdate = NULL;
+	S1AP_MMEConfigurationUpdateIEs_t *ie = NULL;
+
+	/********************ie include*********************/
+	// Optional
+	// S1AP_MMEname_t *MMEname = NULL;
+	// S1AP_RelativeMMECapacity_t *RelativeMMECapacity = NULL;
+	 
+
+	// Mandatory
+	S1AP_ServedGUMMEIs_t *ServedGUMMEIs = NULL;
+	//S1AP_ServedDCNs_t *ServedDCNs = NULL;
+	/***************************************************/
+	/*S1AP_ServedPLMNs_t *ServedPLMNs = NULL;
+	S1AP_ServedGroupIDs_t *ServedGroupIDs = NULL;
+	S1AP_ServedMMECs_t *ServedMMECs = NULL;
+	S1AP_MME_Code_t *MME_Code = NULL;*/
+
+	memset(&pdu,0,sizeof(S1AP_S1AP_PDU_t));
+	pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+	pdu.choice.initiatingMessage = core_calloc(1,sizeof(S1AP_InitiatingMessage_t));
+	initiatingMessage = pdu.choice.initiatingMessage;//pointer point to it
+	initiatingMessage->procedureCode = S1AP_ProcedureCode_id_MMEConfigurationUpdate;
+	initiatingMessage->criticality = S1AP_Criticality_reject;
+	initiatingMessage->value.present = S1AP_InitiatingMessage__value_PR_MMEConfigurationUpdate;
+
+	MMEConfigurationUpdate = &initiatingMessage->value.choice.MMEConfigurationUpdate;
+
+	// allocate each IE
+	//S1AP_ProtocolIE_ID_id_ServedDCNs;
+	
+	// Gummeis
+	ie = core_calloc(1, sizeof(S1AP_MMEConfigurationUpdateIEs_t));
+    ASN_SEQUENCE_ADD(&MMEConfigurationUpdate->protocolIEs, ie);
+	ie->id = S1AP_ProtocolIE_ID_id_ServedGUMMEIs;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_S1SetupResponseIEs__value_PR_ServedGUMMEIs;
+	ServedGUMMEIs = &ie->value.choice.ServedGUMMEIs;
+
+	
+	for (i = 0; i < mme_self()->max_num_of_served_gummei; i++)
+    {
+        S1AP_ServedGUMMEIsItem_t *ServedGUMMEIsItem = NULL;
+        ServedGUMMEIsItem = (S1AP_ServedGUMMEIsItem_t *)
+            core_calloc(1, sizeof(S1AP_ServedGUMMEIsItem_t));
+
+        served_gummei_t *served_gummei = &mme_self()->served_gummei[i];
+        for (j = 0; j < served_gummei->num_of_plmn_id; j++)
+        {
+            S1AP_PLMNidentity_t *PLMNidentity = NULL;
+            PLMNidentity = (S1AP_PLMNidentity_t *)
+                core_calloc(1, sizeof(S1AP_PLMNidentity_t));
+            s1ap_buffer_to_OCTET_STRING(
+                    &served_gummei->plmn_id[j], PLMN_ID_LEN, PLMNidentity);
+            ASN_SEQUENCE_ADD(
+                    &ServedGUMMEIsItem->servedPLMNs.list, PLMNidentity);
+            d_trace(5, "    PLMN_ID[MCC:%d MNC:%d]\n",
+                plmn_id_mcc(&served_gummei->plmn_id[j]),
+                plmn_id_mnc(&served_gummei->plmn_id[j]));
+        }
+
+        for (j = 0; j < served_gummei->num_of_mme_gid; j++)
+        {
+            S1AP_MME_Group_ID_t *MME_Group_ID = NULL;
+            MME_Group_ID = (S1AP_MME_Group_ID_t *)
+                core_calloc(1, sizeof(S1AP_MME_Group_ID_t));
+            s1ap_uint16_to_OCTET_STRING(
+                    served_gummei->mme_gid[j], MME_Group_ID);
+            ASN_SEQUENCE_ADD(
+                    &ServedGUMMEIsItem->servedGroupIDs.list, MME_Group_ID);
+            d_trace(5, "    MME Group[%d]\n", served_gummei->mme_gid[j]);
+        }
+
+        for (j = 0; j < served_gummei->num_of_mme_code; j++)
+        {
+            S1AP_MME_Code_t *MME_Code = NULL ;
+            MME_Code = (S1AP_MME_Code_t *)
+                core_calloc(1, sizeof(S1AP_MME_Code_t));
+            s1ap_uint8_to_OCTET_STRING(served_gummei->mme_code[j], MME_Code);
+            ASN_SEQUENCE_ADD(&ServedGUMMEIsItem->servedMMECs.list, MME_Code);
+            d_trace(5, "    MME Code[%d]\n", served_gummei->mme_code[j]);
+        }
+        ASN_SEQUENCE_ADD(&ServedGUMMEIs->list, ServedGUMMEIsItem);
+	}
+	rv = s1ap_encode_pdu(pkbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+	
+}
+
+/******************************************/
 status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
 {
     status_t rv;
