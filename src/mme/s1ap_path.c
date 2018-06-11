@@ -500,3 +500,24 @@ status_t s1ap_send_connection_establishment_indication(
 
     return CORE_OK;
 }
+
+status_t s1ap_send_ue_information_transfer(
+	mme_ue_t *mme_ue,
+	S1AP_S_TMSI_t *S_TMSI)
+{
+    status_t rv;
+    pkbuf_t *s1apbuf = NULL;
+
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    d_assert(S_TMSI, return CORE_ERROR, "Null param");
+
+    /* build UE Information Transfer packet */
+    rv = s1ap_build_ue_information_transfer(&s1apbuf, mme_ue, S_TMSI);
+    d_assert(rv == CORE_OK && s1apbuf, return CORE_ERROR, "s1ap build error");
+
+    /* Send the packet */
+    rv = nas_send_to_enb(mme_ue, s1apbuf);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "s1ap send error");
+
+    return CORE_OK;
+}

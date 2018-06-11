@@ -2500,3 +2500,142 @@ status_t s1ap_build_connection_establishment_indication(pkbuf_t **s1apbuf,
     return CORE_OK;
 }
 
+status_t s1ap_build_ue_information_transfer(
+	pkbuf_t **s1apbuf,
+	mme_ue_t *mme_ue,
+	S1AP_S_TMSI_t *S_TMSI)
+{
+    status_t rv;
+				
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_UEInformationTransfer_t *UEInformationTransfer = NULL;
+
+    S1AP_UEInformationTransferIEs_t *ie = NULL;
+
+    d_trace(3, "[MME] UE information transfer\n");
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = S1AP_ProcedureCode_id_UEInformationTransfer;
+    initiatingMessage->criticality = S1AP_Criticality_reject;
+    initiatingMessage->value.present = S1AP_InitiatingMessage__value_PR_UEInformationTransfer;
+
+    UEInformationTransfer = &initiatingMessage->value.choice.UEInformationTransfer;
+
+    /* S-TMSI field */
+    ie = core_calloc(1, sizeof(S1AP_UEInformationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&UEInformationTransfer->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_S_TMSI;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_UEInformationTransferIEs__value_PR_S_TMSI;
+
+    memcpy(&ie->value.choice.S_TMSI, S_TMSI, sizeof(S1AP_S_TMSI_t));
+	
+    if (!mme_ue)
+    {
+	return CORE_ERROR;
+    }
+    else
+    {
+    	/* UE Level QoS Parameters field */
+	mme_sess_t *sess = NULL;
+	mme_bearer_t *bearer = NULL;
+	c_uint8_t lowest_priority = 99;
+	c_uint8_t ebi = -1;
+		
+	sess = mme_sess_first(mme_ue);
+	while(sess)
+	{
+	    bearer = mme_bearer_first(sess);
+	    while(bearer)
+	    {
+	        /* Non-GBR */
+		if( (bearer->qos.qci >= PDN_QCI_5 && bearer->qos.qci <= PDN_QCI_9) || bearer->qos.qci == PDN_QCI_69 || bearer->qos.qci == PDN_QCI_70)
+		{
+		    if (bearer->qos.arp.priority_level < lowest_priority)
+		    {
+			lowest_priority = bearer->qos.arp.priority_level;
+			ebi = bearer->ebi;
+		    }
+		}  
+
+	        bearer = mme_bearer_next(bearer);
+	    }
+	    sess = mme_sess_next(sess);
+	}
+		
+	/* Find bearer */
+	if (lowest_priority == 99 || ebi == -1)
+	{
+	    sess = mme_sess_first(mme_ue);
+	    bearer = mme_bearer_first(sess);
+	}
+	else  bearer = mme_bearer_find_by_ue_ebi(mme_ue, ebi);
+
+	if (bearer)
+	{
+	    S1AP_E_RABLevelQoSParameters_t *E_RABLevelQoSParameters = NULL;
+	    S1AP_GBR_QosInformation_t *gbrQosInformation = NULL;
+		
+	    ie = core_calloc(1, sizeof(S1AP_UEInformationTransferIEs_t));
+	    ASN_SEQUENCE_ADD(&UEInformationTransfer->protocolIEs, ie);
+
+	    ie->id = S1AP_ProtocolIE_ID_id_UE_Level_QoS_Parameters;
+	    ie->criticality = S1AP_Criticality_ignore;
+	    ie->value.present = S1AP_UEInformationTransferIEs__value_PR_E_RABLevelQoSParameters;
+
+	    E_RABLevelQoSParameters = &ie->value.choice.E_RABLevelQoSParameters;
+	    E_RABLevelQoSParameters->qCI = bearer->qos.qci;
+	    E_RABLevelQoSParameters->allocationRetentionPriority.priorityLevel = bearer->qos.arp.priority_level;
+	    E_RABLevelQoSParameters->allocationRetentionPriority.pre_emptionCapability = bearer->qos.arp.pre_emption_capability;
+	    E_RABLevelQoSParameters->allocationRetentionPriority.pre_emptionVulnerability = bearer->qos.arp.pre_emption_vulnerability;
+			
+	    gbrQosInformation = core_calloc(1, sizeof(struct S1AP_GBR_QosInformation));
+            asn_uint642INTEGER(&gbrQosInformation->e_RAB_MaximumBitrateDL, bearer->qos.mbr.downlink);
+            asn_uint642INTEGER(&gbrQosInformation->e_RAB_MaximumBitrateUL, bearer->qos.mbr.uplink);
+            asn_uint642INTEGER(&gbrQosInformation->e_RAB_GuaranteedBitrateDL, bearer->qos.gbr.downlink);
+            asn_uint642INTEGER(&gbrQosInformation->e_RAB_GuaranteedBitrateUL, bearer->qos.gbr.uplink);
+            E_RABLevelQoSParameters->gbrQosInformation = gbrQosInformation;
+			
+	}
+	
+
+	/* UE Radio Capability field */
+	if (mme_ue->ueRadioCapability.buf && mme_ue->ueRadioCapability.size)
+	{
+	    S1AP_UERadioCapability_t *UERadioCapability = NULL;
+
+	    UERadioCapability = &ie->value.choice.UERadioCapability;
+
+	    ie = core_calloc(1, sizeof(S1AP_UEInformationTransferIEs_t));
+	    ASN_SEQUENCE_ADD(&UEInformationTransfer->protocolIEs, ie);
+
+	    ie->id = S1AP_ProtocolIE_ID_id_UERadioCapability;
+	    ie->criticality = S1AP_Criticality_ignore;
+	    ie->value.present = S1AP_UEInformationTransferIEs__value_PR_UERadioCapability;
+
+	    UERadioCapability = &ie->value.choice.UERadioCapability;
+
+	    d_assert(UERadioCapability, return CORE_ERROR,);
+	    s1ap_buffer_to_OCTET_STRING(mme_ue->ueRadioCapability.buf, mme_ue->ueRadioCapability.size, UERadioCapability);
+	}
+
+    }
+
+    rv = s1ap_encode_pdu(s1apbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+	
+}

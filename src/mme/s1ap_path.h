@@ -83,6 +83,10 @@ CORE_DECLARE(status_t) s1ap_send_connection_establishment_indication(
         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
 	mme_ue_t *mme_ue);
 
+CORE_DECLARE(status_t) s1ap_send_ue_information_transfer(
+	mme_ue_t *mme_ue, 
+	S1AP_S_TMSI_t *S_TMSI);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
