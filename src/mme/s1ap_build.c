@@ -9,6 +9,112 @@
 #include "mme_kdf.h"
 #include "s1ap_build.h"
 #include "s1ap_conv.h"
+
+//////////////////////////////////////////////////////////////////pan
+status_t s1ap_build_enb_configuration_update_acknowledge(pkbuf_t **pkbuf){
+
+	status_t rv;
+
+	S1AP_S1AP_PDU_t pdu;
+	S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+
+
+	memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = 
+        core_calloc(1, sizeof(S1AP_SuccessfulOutcome_t));
+
+
+	successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = S1AP_ProcedureCode_id_ENBConfigurationUpdate;
+    successfulOutcome->criticality = S1AP_Criticality_reject;
+    successfulOutcome->value.present =
+        S1AP_SuccessfulOutcome__value_PR_ENBConfigurationUpdateAcknowledge;
+
+
+	rv = s1ap_encode_pdu(pkbuf, &pdu);
+	s1ap_free_pdu(&pdu);
+
+	if (rv != CORE_OK)
+	{
+		d_error("s1ap_encode_pdu() failed");
+		return CORE_ERROR;
+	}
+
+	return CORE_OK;
+
+}
+
+status_t s1ap_build_enb_configuration_update_failure(
+        pkbuf_t **pkbuf, S1AP_Cause_PR group, long cause, long time_to_wait)
+{
+    status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
+    S1AP_ENBConfigurationUpdateFailure_t *ENBConfigurationUpdateFailure = NULL;
+
+    S1AP_ENBConfigurationUpdateFailureIEs_t *ie = NULL;
+    S1AP_Cause_t *Cause = NULL;
+    S1AP_TimeToWait_t *TimeToWait = NULL;
+    
+    d_trace(5, "    Group[%d] Cause[%d] TimeToWait[%ld]\n",
+            group, cause, time_to_wait);
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_unsuccessfulOutcome;
+    pdu.choice.unsuccessfulOutcome = 
+        core_calloc(1, sizeof(S1AP_UnsuccessfulOutcome_t));
+
+    unsuccessfulOutcome = pdu.choice.unsuccessfulOutcome;
+    unsuccessfulOutcome->procedureCode = S1AP_ProcedureCode_id_ENBConfigurationUpdate;
+    unsuccessfulOutcome->criticality = S1AP_Criticality_reject;
+    unsuccessfulOutcome->value.present =
+        S1AP_UnsuccessfulOutcome__value_PR_ENBConfigurationUpdateFailure;
+
+    ENBConfigurationUpdateFailure = &unsuccessfulOutcome->value.choice.ENBConfigurationUpdateFailure;
+
+    ie = core_calloc(1, sizeof(S1AP_ENBConfigurationUpdateFailureIEs_t));
+    ASN_SEQUENCE_ADD(&ENBConfigurationUpdateFailure->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_Cause;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present = S1AP_ENBConfigurationUpdateFailureIEs__value_PR_Cause;
+
+    Cause = &ie->value.choice.Cause;
+
+    if (time_to_wait > -1)
+    {
+        ie = core_calloc(1, sizeof(S1AP_ENBConfigurationUpdateFailureIEs_t));
+        ASN_SEQUENCE_ADD(&ENBConfigurationUpdateFailure->protocolIEs, ie);
+
+        ie->id = S1AP_ProtocolIE_ID_id_TimeToWait;
+        ie->criticality = S1AP_Criticality_ignore;
+        ie->value.present = S1AP_ENBConfigurationUpdateFailureIEs__value_PR_Cause;
+
+        TimeToWait = &ie->value.choice.TimeToWait;
+    }
+
+    Cause->present = group;
+    Cause->choice.radioNetwork = cause;
+
+    if (TimeToWait)
+        *TimeToWait = time_to_wait;
+
+    rv = s1ap_encode_pdu(pkbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
+//////////////////////////////////////////////////////////////////
+
 /***************Add by Steven ****************/
 // MME Configuration Update
 status_t s1ap_build_mme_configuration_update(pkbuf_t **pkbuf)

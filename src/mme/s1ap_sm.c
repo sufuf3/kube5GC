@@ -69,6 +69,13 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_s1_setup_request(enb, pdu);
                             break;
                         }
+			////////////////// pan
+			case S1AP_ProcedureCode_id_ENBConfigurationUpdate :
+                        {
+                            s1ap_handle_eNB_configuration_update(enb, pdu);
+                            break;
+                        }
+			/////////////////
                         /********************** Qiu *******************/
                         case S1AP_ProcedureCode_id_WriteReplaceWarning :
                         {

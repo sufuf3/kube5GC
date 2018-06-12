@@ -163,6 +163,142 @@ void s1ap_handle_s1_setup_request(mme_enb_t *enb, s1ap_message_t *message)
             "s1ap_send_to_enb() failed");
 }
 
+///////////////////////////////////////////////////////////////// pan
+void s1ap_handle_eNB_configuration_update(mme_enb_t *enb, s1ap_message_t *message){
+
+	int i, j;
+
+	S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_ENBConfigurationUpdate_t *ENBConfigurationUpdate = NULL;
+
+	S1AP_ENBConfigurationUpdateIEs_t *ie = NULL;
+	S1AP_SupportedTAs_t *SupportedTAs = NULL;
+	S1AP_PagingDRX_t *PagingDRX = NULL;
+
+	pkbuf_t *s1apbuf = NULL;
+    S1AP_Cause_PR group = S1AP_Cause_PR_NOTHING;
+    long cause = 0;
+
+	d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    ENBConfigurationUpdate = &initiatingMessage->value.choice.ENBConfigurationUpdate;
+    d_assert(ENBConfigurationUpdate, return,);
+
+	d_trace(3, "[MME] eNB Configuration update\n");
+
+	for (i = 0; i < ENBConfigurationUpdate->protocolIEs.list.count; i++)
+    {
+        ie = ENBConfigurationUpdate->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_SupportedTAs:
+                SupportedTAs = &ie->value.choice.SupportedTAs;
+                break;
+            case S1AP_ProtocolIE_ID_id_DefaultPagingDRX:
+                PagingDRX = &ie->value.choice.PagingDRX;
+                break;
+            default:
+                break;
+        }
+    }
+
+	if (PagingDRX)
+        d_trace(5, "    PagingDRX[%ld]\n", *PagingDRX);
+
+	d_assert(SupportedTAs, return,);
+    /* Parse Supported TA */
+    enb->num_of_supported_ta_list = 0;
+    for (i = 0; i < SupportedTAs->list.count; i++)
+    {
+        S1AP_SupportedTAs_Item_t *SupportedTAs_Item = NULL;
+        S1AP_TAC_t *tAC = NULL;
+
+        SupportedTAs_Item = 
+            (S1AP_SupportedTAs_Item_t *)SupportedTAs->list.array[i];
+        d_assert(SupportedTAs_Item, return,);
+        tAC = &SupportedTAs_Item->tAC;
+        d_assert(tAC, return,);
+
+        for (j = 0; j < SupportedTAs_Item->broadcastPLMNs.list.count; j++)
+        {
+            S1AP_PLMNidentity_t *pLMNidentity = NULL;
+            pLMNidentity = (S1AP_PLMNidentity_t *)
+                SupportedTAs_Item->broadcastPLMNs.list.array[j];
+            d_assert(pLMNidentity, return,);
+
+            memcpy(&enb->supported_ta_list[enb->num_of_supported_ta_list].tac,
+                    tAC->buf, sizeof(c_uint16_t));
+            enb->supported_ta_list[enb->num_of_supported_ta_list].tac = 
+                ntohs(enb->supported_ta_list
+                        [enb->num_of_supported_ta_list].tac);
+            memcpy(&enb->supported_ta_list
+                        [enb->num_of_supported_ta_list].plmn_id,
+                    pLMNidentity->buf, sizeof(plmn_id_t));
+            d_trace(5, "    PLMN_ID[MCC:%d MNC:%d] TAC[%d]\n",
+                plmn_id_mcc(&enb->supported_ta_list
+                    [enb->num_of_supported_ta_list].plmn_id),
+                plmn_id_mnc(&enb->supported_ta_list
+                    [enb->num_of_supported_ta_list].plmn_id),
+                enb->supported_ta_list[enb->num_of_supported_ta_list].tac);
+            enb->num_of_supported_ta_list++;
+        }
+    }
+
+    if (enb->num_of_supported_ta_list == 0)
+    {
+        d_warn("eNB Configuration update failure:");
+        d_warn("    No supported TA exist in eNB Configuration update");
+        group = S1AP_Cause_PR_misc;
+        cause = S1AP_CauseMisc_unspecified;
+    }
+    else
+    {
+        int served_tai_index = -1;
+        for (i = 0; i < enb->num_of_supported_ta_list; i++)
+        {
+            served_tai_index = 
+                mme_find_served_tai(&enb->supported_ta_list[i]);
+            if (served_tai_index >= 0 &&
+                served_tai_index < MAX_NUM_OF_SERVED_TAI)
+            {
+                d_trace(5, "    SERVED_TAI_INDEX[%d]\n", served_tai_index);
+                break;
+            }
+        }
+
+        if (served_tai_index < 0)
+        {
+            d_warn("eNB Configuration update failure:");
+            d_warn("    Cannot find Served TAI. Check 'mme.tai' configuration");
+            group = S1AP_Cause_PR_misc;
+            cause = S1AP_CauseMisc_unknown_PLMN;
+        }
+    }
+
+    if (group == S1AP_Cause_PR_NOTHING)
+    {
+        d_trace(3, "[MME]eNB Configuration update ACKNOWLEDGE\n");
+        d_assert(s1ap_build_enb_configuration_update_acknowledge(&s1apbuf) == CORE_OK, 
+                return, "s1ap_build_setup_rsp() failed");
+    }
+    else
+    {
+        d_trace(3, "[MME] eNB Configuration update failure\n");
+        d_assert(s1ap_build_enb_configuration_update_failure(
+                &s1apbuf, group, cause, S1AP_TimeToWait_v10s) == CORE_OK, 
+                return, "s1ap_build_setup_failure() failed");
+    }
+
+    d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,
+            "s1ap_send_to_enb() failed");
+
+}
+/////////////////////////////////////////////////////////////////
+
 /***********Add by Steven Lee*************/
 // Handle MME configuration Update Acknowledge
 void s1ap_handle_mme_configuration_update_acknowledge(
