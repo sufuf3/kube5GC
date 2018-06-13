@@ -159,6 +159,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_s1_reset(enb, pdu);
                             break;
                         }
+			case S1AP_ProcedureCode_id_RetrieveUEInformation: 
+			{
+			    s1ap_handle_retrieve_ue_information(enb, pdu);
+			    break;
+			}
                         default:
                         {
                             d_warn("Not implemented(choice:%d, proc:%d)",

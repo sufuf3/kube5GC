@@ -2518,3 +2518,66 @@ void s1ap_handle_s1_reset(
     d_assert(rv == CORE_OK,,);
 }
 
+void s1ap_handle_retrieve_ue_information(mme_enb_t *enb, s1ap_message_t *message)
+{
+    status_t rv;
+    int i;
+
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_RetrieveUEInformation_t *RetrieveUEInformation = NULL;
+	
+    S1AP_RetrieveUEInformationIEs_t *ie = NULL;
+    S1AP_S_TMSI_t *S_TMSI = NULL;
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    RetrieveUEInformation = &initiatingMessage->value.choice.RetrieveUEInformation;
+    d_assert(RetrieveUEInformation, return,);
+
+d_trace(3, "[MME] Retrieve UE Information\n");
+    
+// Retrieve s-tmsi
+    for (i = 0; i < RetrieveUEInformation->protocolIEs.list.count; i++)
+    {
+        ie = RetrieveUEInformation->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_S_TMSI:
+                S_TMSI = &ie->value.choice.S_TMSI;
+                break;
+            default:
+                break;
+        }
+    }
+	
+	// Find MME_UE if S_TMSI included
+	if (S_TMSI)
+	{
+		served_gummei_t *served_gummei = &mme_self()->served_gummei[0];
+		guti_t guti;
+		mme_ue_t *mme_ue = NULL;
+
+		memset(&guti, 0, sizeof(guti_t));
+
+		/* Use the first configured plmn_id and mme group id */
+		memcpy(&guti.plmn_id, &served_gummei->plmn_id[0], PLMN_ID_LEN);
+		guti.mme_gid = served_gummei->mme_gid[0];
+
+		/* size must be 1 */
+		memcpy(&guti.mme_code, S_TMSI->mMEC.buf, S_TMSI->mMEC.size);
+		/* size must be 4 */
+		memcpy(&guti.m_tmsi, S_TMSI->m_TMSI.buf, S_TMSI->m_TMSI.size);
+		guti.m_tmsi = ntohl(guti.m_tmsi);
+
+		mme_ue = mme_ue_find_by_guti(&guti);
+           // Call s1ap_send_ue_information_transfer and pass mme_ue and S_TMSI 
+		rv = s1ap_send_ue_information_transfer(mme_ue, S_TMSI);
+		d_assert(rv == CORE_OK,,);
+	}
+}
+
+
