@@ -75,6 +75,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_eNB_configuration_update(enb, pdu);
                             break;
                         }
+			case S1AP_ProcedureCode_id_eNBCPRelocationIndication :
+                        {
+                            s1ap_handle_eNB_cp_relocation_indication(enb, pdu);
+                            break;
+                        }
 			/////////////////
                         /********************** Qiu *******************/
                         case S1AP_ProcedureCode_id_WriteReplaceWarning :

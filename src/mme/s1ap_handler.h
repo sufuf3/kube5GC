@@ -15,6 +15,8 @@ CORE_DECLARE(void) s1ap_handle_nas_delivery_indication(
 /////////////////////////////////////////////////pan
 CORE_DECLARE(void) s1ap_handle_eNB_configuration_update(
         mme_enb_t *enb, s1ap_message_t *message);
+CORE_DECLARE(void) s1ap_handle_eNB_cp_relocation_indication(
+        mme_enb_t *enb, s1ap_message_t *message);
 /////////////////////////////////////////////////
 /*******************Qiu********************/
 CORE_DECLARE(void) s1ap_handle_CBC_write_replace_warning_message(

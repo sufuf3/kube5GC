@@ -51,6 +51,12 @@ CORE_DECLARE(status_t) s1ap_send_mme_configuration_transfer(
         mme_enb_t *target_enb,
         S1AP_SONConfigurationTransfer_t *SONConfigurationTransfer);
 
+//////////////////////////pan
+CORE_DECLARE(status_t) s1ap_send_mme_direct_information_transfer(
+	mme_enb_t *target_enb,
+	S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType);
+//////////////////////////
+
 CORE_DECLARE(status_t) s1ap_send_path_switch_ack(mme_ue_t *mme_ue);
 
 CORE_DECLARE(status_t) s1ap_send_handover_command(enb_ue_t *source_ue);

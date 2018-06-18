@@ -17,6 +17,7 @@ status_t s1ap_build_enb_configuration_update_acknowledge(pkbuf_t **pkbuf){
 
 	S1AP_S1AP_PDU_t pdu;
 	S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+	//S1AP_ENBConfigurationUpdateAcknowledge_t *ENBConfigurationUpdateAcknowledge = NULL;
 
 
 	memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
@@ -30,6 +31,10 @@ status_t s1ap_build_enb_configuration_update_acknowledge(pkbuf_t **pkbuf){
     successfulOutcome->criticality = S1AP_Criticality_reject;
     successfulOutcome->value.present =
         S1AP_SuccessfulOutcome__value_PR_ENBConfigurationUpdateAcknowledge;
+
+	//ENBConfigurationUpdateAcknowledge = &successfulOutcome->value.choice.ENBConfigurationUpdateAcknowledge;
+
+
 
 
 	rv = s1ap_encode_pdu(pkbuf, &pdu);
@@ -1629,7 +1634,62 @@ status_t s1ap_build_mme_configuration_transfer(
 
     return CORE_OK;
 }
+////////////////////////////////////pan
+status_t s1ap_build_mme_direct_information_transfer(
+            pkbuf_t **s1apbuf,S1AP_Inter_SystemInformationTransferType_t *inter_systemInformationtransferType)
+{
+    status_t rv;
 
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_MMEDirectInformationTransfer_t *MMEDirectInformationTransfer = NULL;
+
+    S1AP_MMEDirectInformationTransferIEs_t *ie = NULL;
+	S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType = NULL;
+
+    d_trace(3, "[MME] MME Direct Information Transfer\n");
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode =
+        S1AP_ProcedureCode_id_MMEDirectInformationTransfer;
+    initiatingMessage->criticality = S1AP_Criticality_ignore;
+    initiatingMessage->value.present =
+        S1AP_InitiatingMessage__value_PR_MMEDirectInformationTransfer;
+
+    MMEDirectInformationTransfer =
+        &initiatingMessage->value.choice.MMEDirectInformationTransfer;
+
+	ie = core_calloc(1, sizeof(S1AP_MMEDirectInformationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&MMEDirectInformationTransfer->protocolIEs, ie);
+
+	ie->id = S1AP_ProtocolIE_ID_id_Inter_SystemInformationTransferTypeMDT;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_MMEDirectInformationTransferIEs__value_PR_Inter_SystemInformationTransferType;
+
+    Inter_SystemInformationTransferType = &ie->value.choice.Inter_SystemInformationTransferType;
+
+	rv = s1ap_copy_ie(&asn_DEF_S1AP_Inter_SystemInformationTransferType,
+            inter_systemInformationtransferType, Inter_SystemInformationTransferType);
+    d_assert(rv == CORE_OK, return CORE_ERROR,);
+
+	rv = s1ap_encode_pdu(s1apbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+	
+}
+////////////////////////////////////
 status_t s1ap_build_path_switch_ack(pkbuf_t **s1apbuf, mme_ue_t *mme_ue)
 {
     status_t rv;
