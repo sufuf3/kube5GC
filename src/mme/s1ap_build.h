@@ -7,6 +7,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+//add by YEE
+CORE_DECLARE(status_t) s1ap_build_reroute_nas_request(
+    pkbuf_t **s1apbuf, enb_ue_t *enb_ue);
 
 CORE_DECLARE(status_t) s1ap_build_setup_rsp(pkbuf_t **pkbuf);
 /////////////////////////////////////////////////////////////////////////pan

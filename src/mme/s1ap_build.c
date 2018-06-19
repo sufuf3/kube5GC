@@ -10,6 +10,119 @@
 #include "s1ap_build.h"
 #include "s1ap_conv.h"
 
+//add by YEE
+status_t s1ap_build_reroute_nas_request(
+            pkbuf_t **s1apbuf, enb_ue_t *enb_ue)
+{
+    status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_RerouteNASRequest_t *RerouteNASRequest = NULL;
+
+    S1AP_RerouteNASRequest_IEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    //S1AP_NAS_PDU_t *NAS_PDU = NULL;
+    OCTET_STRING_t* OCTET_STRING = NULL;
+
+    //d_assert(emmbuf, return CORE_ERROR, "Null param");
+    d_assert(enb_ue, return CORE_ERROR, "Null param");
+
+    d_trace(3, "[MME] Reroute NAS request\n");
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+
+    //Message Type: reject
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode =
+        S1AP_ProcedureCode_id_RerouteNASRequest;
+    initiatingMessage->criticality = S1AP_Criticality_reject;
+    initiatingMessage->value.present =
+        S1AP_InitiatingMessage__value_PR_RerouteNASRequest;
+
+    RerouteNASRequest =
+        &initiatingMessage->value.choice.RerouteNASRequest;
+
+    //MME UE S1AP ID: reject
+    ie = core_calloc(1, sizeof(S1AP_RerouteNASRequest_IEs_t));
+    ASN_SEQUENCE_ADD(&RerouteNASRequest->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_RerouteNASRequest_IEs__value_PR_MME_UE_S1AP_ID;
+
+    MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+
+    //ENB UE S1AP ID: ignore
+    ie = core_calloc(1, sizeof(S1AP_RerouteNASRequest_IEs_t));
+    ASN_SEQUENCE_ADD(&RerouteNASRequest->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present = S1AP_RerouteNASRequest_IEs__value_PR_ENB_UE_S1AP_ID;
+
+    ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+
+    //S1 Message: reject
+    ie = core_calloc(1, sizeof(S1AP_RerouteNASRequest_IEs_t));
+    ASN_SEQUENCE_ADD(&RerouteNASRequest->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_S1_Message;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_RerouteNASRequest_IEs__value_PR_OCTET_STRING;
+
+    OCTET_STRING = &ie->value.choice.OCTET_STRING;
+    
+    //MME Group ID: reject
+    ie = core_calloc(1, sizeof(S1AP_RerouteNASRequest_IEs_t));
+    ASN_SEQUENCE_ADD(&RerouteNASRequest->protocolIEs, ie);
+    
+    ie->id = S1AP_ProtocolIE_ID_id_MME_Group_ID;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_RerouteNASRequest_IEs__value_PR_MME_Group_ID;
+
+
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+            enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
+
+    *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
+    *ENB_UE_S1AP_ID = enb_ue->enb_ue_s1ap_id;
+
+    //......... how to fill in S1 Message QAQQQQQQQQQQQQQQ
+    
+    /*S1AP_ENB_UE_S1AP_ID_t enb_ue_s1ap_id_in,
+            S1AP_NAS_PDU_t nas_pdu_in, S1AP_TAI_t tai_in,
+            S1AP_EUTRAN_CGI_t eutran_cgi_in*/
+    /*S1AP_TAI_t = PLMNidentity + tAC*/
+    
+    /*s1ap_buffer_to_OCTET_STRING(
+                    OCTET_STRING, sizeof(tai_in.tAC), tai_in.tAC);*/
+    //for(int i=0;i<4;++i)
+    //{
+    memcpy(OCTET_STRING->buf, enb_ue, sizeof(*enb_ue));
+        
+    //}
+    /*NAS_PDU->size = emmbuf->len;
+    NAS_PDU->buf = core_calloc(NAS_PDU->size, sizeof(c_uint8_t));
+    memcpy(NAS_PDU->buf, emmbuf->payload, NAS_PDU->size);
+    pkbuf_free(emmbuf);*/
+
+    rv = s1ap_encode_pdu(s1apbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
 //////////////////////////////////////////////////////////////////pan
 status_t s1ap_build_enb_configuration_update_acknowledge(pkbuf_t **pkbuf){
 

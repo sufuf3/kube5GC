@@ -592,6 +592,14 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
         enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
 
+//add by YEE: for testing
+    /*if (enb_ue){
+        pkbuf_t *s1apbuf = NULL;
+        s1ap_build_reroute_nas_request(&s1apbuf,enb_ue);
+        d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,"s1ap_send_to_enb() failed");
+    }*/
+//END
+
     d_assert(s1ap_send_to_nas(enb_ue,
         S1AP_ProcedureCode_id_initialUEMessage, NAS_PDU) == CORE_OK,,
         "s1ap_send_to_nas failed");
