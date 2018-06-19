@@ -69,6 +69,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_s1_setup_request(enb, pdu);
                             break;
                         }
+                        case S1AP_ProcedureCode_id_eNBDirectInformationTransfer :
+                        {/*************Add by Steven*********************/
+                            s1ap_handle_enb_direct_information_transfer(enb,pdu);
+                            break;
+                        }
 			////////////////// pan
 			case S1AP_ProcedureCode_id_ENBConfigurationUpdate :
                         {

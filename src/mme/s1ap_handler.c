@@ -325,6 +325,44 @@ void s1ap_handle_mme_configuration_update_acknowledge(
 	d_trace(3, "[MME] MME configuration update acknowledge\n");
 }
 /*******************************************************/
+/*************Add by Steven Lee*****************/
+void s1ap_handle_enb_direct_information_transfer(mme_enb_t *enb, s1ap_message_t *message)
+{
+    int i;
+
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+	S1AP_ENBDirectInformationTransfer_t *ENBDirectInformationTransfer = NULL;
+
+	S1AP_ENBDirectInformationTransferIEs_t *ie = NULL;
+	//S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType = NULL;
+    
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+	// Message Type
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    ENBDirectInformationTransfer = &initiatingMessage->value.choice.ENBDirectInformationTransfer;
+	//--------------
+	
+    d_trace(3, "[MME] ENB Direct Information Transfer\n");
+	
+    for (i = 0; i < ENBDirectInformationTransfer->protocolIEs.list.count; i++)
+    {
+        ie = ENBDirectInformationTransfer->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_Inter_SystemInformationTransferTypeEDT:
+                //Inter_SystemInformationTransferType = &ie->value.choice.Inter_SystemInformationTransferType;
+                break;
+            default:
+                break;
+        }
+    } 
+}
+
+/****************************************************/
 /***********Add by Steven Lee************/
 // Handle MME Configuration Update Failure
 void s1ap_handle_mme_configuration_update_failure(
