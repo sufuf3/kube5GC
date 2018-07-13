@@ -18,6 +18,8 @@ CORE_DECLARE(status_t) s1ap_final();
 /***************Add by Steven********/
 CORE_DECLARE(status_t) s1ap_send_mme_configuration_update(
     mme_enb_t *target_enb);
+CORE_DECLARE(status_t) s1ap_send_mme_cp_relocation_indication(
+        enb_ue_t *source_ue);
 /***************************************/
 
 CORE_DECLARE(status_t) s1ap_open();

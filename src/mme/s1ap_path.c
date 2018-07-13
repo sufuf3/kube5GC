@@ -74,6 +74,24 @@ status_t s1ap_send_mme_configuration_update(
 
 /**************************************************/
 
+/*************Add by Steven*******************/
+status_t s1ap_send_mme_cp_relocation_indication(
+        enb_ue_t *source_ue)
+{
+    status_t rv;
+    pkbuf_t *s1apbuf = NULL;
+
+    d_assert(source_ue, return CORE_ERROR,);
+
+    rv = s1ap_build_mme_cp_relocation_indication(&s1apbuf, source_ue);
+    d_assert(rv == CORE_OK && s1apbuf, return CORE_ERROR, "s1ap build error");
+
+    rv = s1ap_send_to_enb_ue(source_ue, s1apbuf);
+    d_assert(rv == CORE_OK,, "s1ap send error");
+
+    return rv;
+}
+
 static status_t s1ap_delete_list(list_t *list)
 {
     sock_node_t *snode = NULL;
