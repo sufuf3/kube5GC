@@ -47,7 +47,7 @@ CORE_DECLARE(status_t) s1ap_build_mme_configuration_transfer(
         S1AP_SONConfigurationTransfer_t *son_configuration_transfer);
 ////////////////////////////////////////////////////////pan
 CORE_DECLARE(status_t) s1ap_build_mme_direct_information_transfer(
-    pkbuf_t **s1apbuf,S1AP_Inter_SystemInformationTransferType_t *inter_systemInformationtransferType);
+    pkbuf_t **s1apbuf);
 //////////////////////////////////////////////////////////
 CORE_DECLARE(status_t) s1ap_build_path_switch_ack(
     pkbuf_t **s1apbuf, mme_ue_t *mme_ue);

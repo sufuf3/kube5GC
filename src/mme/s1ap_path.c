@@ -345,17 +345,16 @@ status_t s1ap_send_mme_configuration_transfer(
 
 /////////////////////////////////////////pan
 status_t s1ap_send_mme_direct_information_transfer(
-	mme_enb_t *target_enb,
-	S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType)
+	mme_enb_t *target_enb)
 {
     status_t rv;
     pkbuf_t *s1apbuf = NULL;
 	
     d_assert(target_enb, return CORE_ERROR,);
-    d_assert(Inter_SystemInformationTransferType, return CORE_ERROR,);
+    //d_assert(Inter_SystemInformationTransferType, return CORE_ERROR,);
 
     rv = s1ap_build_mme_direct_information_transfer(
-            &s1apbuf,Inter_SystemInformationTransferType);
+            &s1apbuf);
     d_assert(rv == CORE_OK && s1apbuf, return CORE_ERROR, "s1ap build error");
 
     rv = s1ap_send_to_enb(target_enb, s1apbuf, S1AP_NON_UE_SIGNALLING);

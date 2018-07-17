@@ -66,9 +66,6 @@ status_t s1ap_build_mme_cp_relocation_indication(
 
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
-    ie = core_calloc(1, sizeof(S1AP_MMECPRelocationIndicationIEs_t));
-    ASN_SEQUENCE_ADD(&MMECPRelocationIndication->protocolIEs, ie);
-
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
 
@@ -101,20 +98,19 @@ status_t s1ap_build_reroute_nas_request(
     S1AP_RerouteNASRequest_IEs_t *ie = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
-    //S1AP_NAS_PDU_t *NAS_PDU = NULL;
     OCTET_STRING_t* OCTET_STRING = NULL;
+    S1AP_MME_Group_ID_t *MME_Group_ID = NULL;
 
-    //d_assert(emmbuf, return CORE_ERROR, "Null param");
     d_assert(enb_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Reroute NAS request\n");
+    d_trace(1, "[MME] Reroute NAS request\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+
+    //Message Type: reject
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
         core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
-
-    //Message Type: reject
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode =
         S1AP_ProcedureCode_id_RerouteNASRequest;
@@ -146,7 +142,7 @@ status_t s1ap_build_reroute_nas_request(
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
     //S1 Message: reject
-    ie = core_calloc(1, sizeof(S1AP_RerouteNASRequest_IEs_t));
+    ie = core_calloc(1, sizeof(S1AP_RerouteNASRequest_IEs_t) + sizeof(enb_ue_t));
     ASN_SEQUENCE_ADD(&RerouteNASRequest->protocolIEs, ie);
 
     ie->id = S1AP_ProtocolIE_ID_id_S1_Message;
@@ -163,6 +159,7 @@ status_t s1ap_build_reroute_nas_request(
     ie->criticality = S1AP_Criticality_reject;
     ie->value.present = S1AP_RerouteNASRequest_IEs__value_PR_MME_Group_ID;
 
+    MME_Group_ID = &ie->value.choice.MME_Group_ID;
 
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
@@ -170,24 +167,9 @@ status_t s1ap_build_reroute_nas_request(
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
     *ENB_UE_S1AP_ID = enb_ue->enb_ue_s1ap_id;
 
-    //......... how to fill in S1 Message QAQQQQQQQQQQQQQQ
-    
-    /*S1AP_ENB_UE_S1AP_ID_t enb_ue_s1ap_id_in,
-            S1AP_NAS_PDU_t nas_pdu_in, S1AP_TAI_t tai_in,
-            S1AP_EUTRAN_CGI_t eutran_cgi_in*/
-    /*S1AP_TAI_t = PLMNidentity + tAC*/
-    
-    /*s1ap_buffer_to_OCTET_STRING(
-                    OCTET_STRING, sizeof(tai_in.tAC), tai_in.tAC);*/
-    //for(int i=0;i<4;++i)
-    //{
-    memcpy(OCTET_STRING->buf, enb_ue, sizeof(*enb_ue));
-        
-    //}
-    /*NAS_PDU->size = emmbuf->len;
-    NAS_PDU->buf = core_calloc(NAS_PDU->size, sizeof(c_uint8_t));
-    memcpy(NAS_PDU->buf, emmbuf->payload, NAS_PDU->size);
-    pkbuf_free(emmbuf);*/
+    s1ap_buffer_to_OCTET_STRING(enb_ue,sizeof(enb_ue_t),OCTET_STRING);
+ 
+    s1ap_uint16_to_OCTET_STRING(100, MME_Group_ID);//100 for test
 
     rv = s1ap_encode_pdu(s1apbuf, &pdu);
     s1ap_free_pdu(&pdu);
@@ -1827,16 +1809,16 @@ status_t s1ap_build_mme_configuration_transfer(
 }
 ////////////////////////////////////pan
 status_t s1ap_build_mme_direct_information_transfer(
-            pkbuf_t **s1apbuf,S1AP_Inter_SystemInformationTransferType_t *inter_systemInformationtransferType)
+            pkbuf_t **s1apbuf)
 {
     status_t rv;
 
     S1AP_S1AP_PDU_t pdu;
     S1AP_InitiatingMessage_t *initiatingMessage = NULL;
-    S1AP_MMEDirectInformationTransfer_t *MMEDirectInformationTransfer = NULL;
+ //   S1AP_MMEDirectInformationTransfer_t *MMEDirectInformationTransfer = NULL;
 
-    S1AP_MMEDirectInformationTransferIEs_t *ie = NULL;
-	S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType = NULL;
+//    S1AP_MMEDirectInformationTransferIEs_t *ie = NULL;
+//	S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType = NULL;
 
     d_trace(3, "[MME] MME Direct Information Transfer\n");
 
@@ -1852,7 +1834,7 @@ status_t s1ap_build_mme_direct_information_transfer(
     initiatingMessage->value.present =
         S1AP_InitiatingMessage__value_PR_MMEDirectInformationTransfer;
 
-    MMEDirectInformationTransfer =
+   /* MMEDirectInformationTransfer =
         &initiatingMessage->value.choice.MMEDirectInformationTransfer;
 
 	ie = core_calloc(1, sizeof(S1AP_MMEDirectInformationTransferIEs_t));
@@ -1865,8 +1847,8 @@ status_t s1ap_build_mme_direct_information_transfer(
     Inter_SystemInformationTransferType = &ie->value.choice.Inter_SystemInformationTransferType;
 
 	rv = s1ap_copy_ie(&asn_DEF_S1AP_Inter_SystemInformationTransferType,
-            inter_systemInformationtransferType, Inter_SystemInformationTransferType);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
+            inter_systemInformationtransferType, Inter_SystemInformationTransferType);*/
+    //d_assert(rv == CORE_OK, return CORE_ERROR,);
 
 	rv = s1ap_encode_pdu(s1apbuf, &pdu);
     s1ap_free_pdu(&pdu);

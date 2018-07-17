@@ -55,8 +55,7 @@ CORE_DECLARE(status_t) s1ap_send_mme_configuration_transfer(
 
 //////////////////////////pan
 CORE_DECLARE(status_t) s1ap_send_mme_direct_information_transfer(
-	mme_enb_t *target_enb,
-	S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType);
+	mme_enb_t *target_enb);
 //////////////////////////
 
 CORE_DECLARE(status_t) s1ap_send_path_switch_ack(mme_ue_t *mme_ue);
