@@ -10,6 +10,94 @@
 #include "s1ap_build.h"
 #include "s1ap_conv.h"
 
+//add by YEE
+status_t s1ap_build_ue_radio_capability_match_request(
+    pkbuf_t **s1apbuf, enb_ue_t *enb_ue)
+{
+    status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_UERadioCapabilityMatchRequest_t *UERadioCapabilityMatchRequest = NULL;
+
+    S1AP_UERadioCapabilityMatchRequestIEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_UERadioCapability_t *UERadioCapability = NULL;//Optional
+    
+
+    d_assert(enb_ue, return CORE_ERROR, "Null param");
+
+    d_trace(1, "[MME] UE Radio Capability Match Request\n");
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+
+    //Message Type: reject
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode =
+        S1AP_ProcedureCode_id_UERadioCapabilityMatch;
+    initiatingMessage->criticality = S1AP_Criticality_reject;
+    initiatingMessage->value.present =
+        S1AP_InitiatingMessage__value_PR_UERadioCapabilityMatchRequest;
+
+    UERadioCapabilityMatchRequest =
+        &initiatingMessage->value.choice.UERadioCapabilityMatchRequest;
+
+    //MME UE S1AP ID: reject
+    ie = core_calloc(1, sizeof(S1AP_UERadioCapabilityMatchRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UERadioCapabilityMatchRequest->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_UERadioCapabilityMatchRequestIEs__value_PR_MME_UE_S1AP_ID;
+
+    MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+
+    //ENB UE S1AP ID: reject
+    ie = core_calloc(1, sizeof(S1AP_UERadioCapabilityMatchRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UERadioCapabilityMatchRequest->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_UERadioCapabilityMatchRequestIEs__value_PR_ENB_UE_S1AP_ID;
+
+    ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+
+    //UE Radio Capability: ignore
+    ie = core_calloc(1, sizeof(S1AP_UERadioCapabilityMatchRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UERadioCapabilityMatchRequest->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_UERadioCapability;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present = S1AP_UERadioCapabilityMatchRequestIEs__value_PR_UERadioCapability;
+
+    UERadioCapability = &ie->value.choice.UERadioCapability;
+
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+            enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
+
+    *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
+    *ENB_UE_S1AP_ID = enb_ue->enb_ue_s1ap_id;
+
+    //s1ap_buffer_to_OCTET_STRING(enb_ue,sizeof(enb_ue_t),OCTET_STRING);
+ 
+    s1ap_uint16_to_OCTET_STRING(0, UERadioCapability);//0 for test
+
+    rv = s1ap_encode_pdu(s1apbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
 /***************Add by Steven****************/
 status_t s1ap_build_mme_cp_relocation_indication(
         pkbuf_t **s1apbuf, enb_ue_t *source_ue)

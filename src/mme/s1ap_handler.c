@@ -664,6 +664,61 @@ void s1ap_handle_uplink_nas_transport(
 }
 
 //add by YEE
+void s1ap_handle_ue_radio_capability_match_response(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    //status_t rv;
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+
+    S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    S1AP_UERadioCapabilityMatchResponse_t *UERadioCapabilityMatchResponse = NULL;
+
+    S1AP_UERadioCapabilityMatchResponseIEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_VoiceSupportMatchIndicator_t *VoiceSupportMatchIndicator = NULL;
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    UERadioCapabilityMatchResponse =
+        &successfulOutcome->value.choice.UERadioCapabilityMatchResponse;
+    d_assert(UERadioCapabilityMatchResponse, return,);
+
+    d_trace(1, "[MME] UE Radio Capability Match Response\n");
+
+    for (i = 0; i < UERadioCapabilityMatchResponse->protocolIEs.list.count; i++)
+    {
+        ie = UERadioCapabilityMatchResponse->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
+                MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_VoiceSupportMatchIndicator:
+                VoiceSupportMatchIndicator = &ie->value.choice.VoiceSupportMatchIndicator;
+                break;
+            default:
+                break;
+        }
+    }
+
+    d_trace(1, "    IP[%s] ENB_ID[%d]\n",
+            CORE_ADDR(enb->addr, buf), enb->enb_id);
+    //d_trace(1, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    //        enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
+    d_trace(1, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] VoiceSupportMatchIndicator[%d]\n",
+            *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID, *VoiceSupportMatchIndicator);
+}
+
+//add by YEE
 void s1ap_handle_nas_delivery_indication(
         mme_enb_t *enb, s1ap_message_t *message)
 {
