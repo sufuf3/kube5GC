@@ -174,6 +174,12 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
 			    s1ap_handle_retrieve_ue_information(enb, pdu);
 			    break;
 			}
+                        case S1AP_ProcedureCode_id_E_RABReleaseIndication:
+                        {
+                        	/*************Add by Steven*********************/
+                        	s1ap_handle_e_rab_release_indication(enb,pdu);
+                        	break;
+                        }
                         default:
                         {
                             d_warn("Not implemented(choice:%d, proc:%d)",

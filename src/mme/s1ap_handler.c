@@ -409,6 +409,51 @@ void s1ap_handle_mme_configuration_update_failure(
 }
 
 /*************************************************************/
+/*************Add by Steven Lee*****************/
+// Handle E-RAB release indication
+void s1ap_handle_e_rab_release_indication(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    int i;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_E_RABReleaseIndication_t *E_RABReleaseIndication = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+	S1AP_E_RABReleaseIndicationIEs_t *ie = NULL;
+    
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+	// Message Type
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    E_RABReleaseIndication = &initiatingMessage->value.choice.E_RABReleaseIndication;
+	//--------------
+	
+    d_trace(3, "[MME] E-RAB Release Indication\n");
+	
+    for (i = 0; i < E_RABReleaseIndication->protocolIEs.list.count; i++)
+    {
+        ie = E_RABReleaseIndication->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
+                MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+                break;
+			case S1AP_ProtocolIE_ID_id_E_RABReleasedList:
+				break;
+            default:
+                break;
+        }
+    }
+    d_trace(1, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n", *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID );
+}
+
+/****************************************************/
 /**************************** Qiu ***************************/
 void s1ap_handle_CBC_write_replace_warning_message(mme_enb_t *enb)
 {
@@ -1030,7 +1075,9 @@ void s1ap_handle_initial_context_setup_response(
             rv = mme_gtp_send_modify_bearer_request(bearer, uli_presence);
             d_assert(rv == CORE_OK, return, "gtp send failed");
         }
+        
     }
+    
 }
 
 ////////////////////////////////////////////////////////////////pan

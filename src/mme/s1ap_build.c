@@ -23,7 +23,7 @@ status_t s1ap_build_ue_radio_capability_match_request(
     S1AP_UERadioCapabilityMatchRequestIEs_t *ie = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
-    S1AP_UERadioCapability_t *UERadioCapability = NULL;//Optional
+    //S1AP_UERadioCapability_t *UERadioCapability = NULL;//Optional
     
 
     d_assert(enb_ue, return CORE_ERROR, "Null param");
@@ -67,14 +67,14 @@ status_t s1ap_build_ue_radio_capability_match_request(
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
     //UE Radio Capability: ignore
-    ie = core_calloc(1, sizeof(S1AP_UERadioCapabilityMatchRequestIEs_t));
+    /*ie = core_calloc(1, sizeof(S1AP_UERadioCapabilityMatchRequestIEs_t));
     ASN_SEQUENCE_ADD(&UERadioCapabilityMatchRequest->protocolIEs, ie);
 
     ie->id = S1AP_ProtocolIE_ID_id_UERadioCapability;
     ie->criticality = S1AP_Criticality_ignore;
     ie->value.present = S1AP_UERadioCapabilityMatchRequestIEs__value_PR_UERadioCapability;
 
-    UERadioCapability = &ie->value.choice.UERadioCapability;
+    UERadioCapability = &ie->value.choice.UERadioCapability;*/
 
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
@@ -84,7 +84,7 @@ status_t s1ap_build_ue_radio_capability_match_request(
 
     //s1ap_buffer_to_OCTET_STRING(enb_ue,sizeof(enb_ue_t),OCTET_STRING);
  
-    s1ap_uint16_to_OCTET_STRING(0, UERadioCapability);//0 for test
+    //s1ap_uint32_to_OCTET_STRING(1, UERadioCapability);//0 for test, failed
 
     rv = s1ap_encode_pdu(s1apbuf, &pdu);
     s1ap_free_pdu(&pdu);
