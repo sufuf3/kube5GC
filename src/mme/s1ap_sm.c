@@ -85,6 +85,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_eNB_cp_relocation_indication(enb, pdu);
                             break;
                         }
+			case S1AP_ProcedureCode_id_UEContextSuspend :
+                        {
+                            s1ap_handle_ue_context_suspend(enb, pdu);
+                            break;
+                        }
 			/////////////////
                         /********************** Qiu *******************/
                         case S1AP_ProcedureCode_id_WriteReplaceWarning :

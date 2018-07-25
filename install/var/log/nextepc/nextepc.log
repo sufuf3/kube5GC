@@ -1,0 +1,49 @@
+  File Logging : '/home/pan/foxconn/nextepc/install/var/log/nextepc/nextepc.log'
+  MongoDB URI : 'mongodb://localhost/nextepc'
+  Configuration : '/home/pan/foxconn/nextepc/install/etc/nextepc/nextepc.conf'
+[06/19 13:05:52.664] INFO: CONNECTED TO 'pgw.localdomain' (TCP,soc#7): (fd_logger.c:93)
+[06/19 13:05:52.665] INFO: CONNECTED TO 'pcrf.localdomain' (TCP,soc#10): (fd_logger.c:93)
+[06/19 13:05:53.004] INFO: CONNECTED TO 'mme.localdomain' (TCP,soc#7): (fd_logger.c:93)
+[06/19 13:05:53.004] INFO: CONNECTED TO 'hss.localdomain' (TCP,soc#10): (fd_logger.c:93)
+[06/19 13:05:56.267] WARN: No ENB UE Context : MME_UE_S1AP_ID[16777373] (s1ap_handler.c:1408)
+[06/19 13:05:56.871] WARN: Unknown UE by GUTI[G:2,C:1,M_TMSI:0x9] (mme_context.c:2156)
+[06/19 13:05:56.873] WARN: Cannot find IMSI in DB : 001010123456815 (hss_context.c:386)
+[06/19 13:05:56.874] WARN: ERROR DIAMETER Result Code(5001) (mme_fd_path.c:300)
+[06/19 13:05:56.874] WARN: EMM_CAUSE : IMSI Unknown in HSS (mme_sm.c:443)
+[06/19 13:05:59.398] WARN: Authentication failure(Synch failure) (emm_sm.c:443)
+[06/19 13:05:59.400] WARN: Authentication failure(MAC failure) (emm_sm.c:436)
+[06/19 13:06:03.632] WARN: [EMM] EMM STATUS : IMSI[001010000000002] Cause[101] (emm_sm.c:673)
+[06/19 13:06:04.536] WARN: Unknown UE by S_TMSI[G:2,C:1,M_TMSI:0x12345678] (s1ap_handler.c:484)
+[06/19 13:06:04.536] WARN: [EMM] Service request : Unknown UE (emm_sm.c:103)
+[06/19 13:06:05.457] WARN: NAS MAC verification failed (nas_security.c:159)
+[06/19 13:06:05.457] WARN: No Security Context : IMSI[001010123456937] (emm_sm.c:114)
+[06/19 13:06:05.962] WARN: NAS MAC verification failed(0x7ca0b388 != 0xf7b833b1) (nas_security.c:218)
+[06/19 13:06:09.086] WARN: NAS MAC verification failed(0x7ca0b388 != 0xf7b833b1) (nas_security.c:218)
+[06/19 13:06:12.128] WARN: Unknown UE by GUTI[G:2,C:1,M_TMSI:0x10003e8] (mme_context.c:2156)
+  File Logging : '/home/pan/foxconn/nextepc/install/var/log/nextepc/nextepc.log'
+  MongoDB URI : 'mongodb://localhost/nextepc'
+  Configuration : '/home/pan/foxconn/nextepc/install/etc/nextepc/nextepc.conf'
+[06/19 14:56:11.785] INFO: CONNECTED TO 'pgw.localdomain' (TCP,soc#7): (fd_logger.c:93)
+[06/19 14:56:11.785] INFO: CONNECTED TO 'pcrf.localdomain' (TCP,soc#10): (fd_logger.c:93)
+[06/19 14:56:12.040] INFO: CONNECTED TO 'mme.localdomain' (TCP,soc#7): (fd_logger.c:93)
+[06/19 14:56:12.041] INFO: CONNECTED TO 'hss.localdomain' (TCP,soc#10): (fd_logger.c:93)
+[06/19 14:56:13.704] WARN: Unknown UE by GUTI[G:2,C:1,M_TMSI:0x10003e8] (mme_context.c:2156)
+  File Logging : '/home/pan/foxconn/nextepc/install/var/log/nextepc/nextepc.log'
+  MongoDB URI : 'mongodb://localhost/nextepc'
+  Configuration : '/home/pan/foxconn/nextepc/install/etc/nextepc/nextepc.conf'
+[06/19 17:13:49.048] INFO: CONNECTED TO 'pgw.localdomain' (TCP,soc#7): (fd_logger.c:93)
+[06/19 17:13:49.048] INFO: CONNECTED TO 'pcrf.localdomain' (TCP,soc#10): (fd_logger.c:93)
+[06/19 17:13:49.380] INFO: CONNECTED TO 'mme.localdomain' (TCP,soc#7): (fd_logger.c:93)
+[06/19 17:13:49.380] INFO: CONNECTED TO 'hss.localdomain' (TCP,soc#10): (fd_logger.c:93)
+[06/19 17:13:51.227] WARN: No ENB UE Context : MME_UE_S1AP_ID[16777373] (s1ap_handler.c:1408)
+[06/19 17:13:51.830] WARN: Unknown UE by GUTI[G:2,C:1,M_TMSI:0x9] (mme_context.c:2156)
+[06/19 17:13:51.832] WARN: Cannot find IMSI in DB : 001010123456815 (hss_context.c:386)
+[06/19 17:13:51.832] WARN: ERROR DIAMETER Result Code(5001) (mme_fd_path.c:300)
+[06/19 17:13:51.833] WARN: EMM_CAUSE : IMSI Unknown in HSS (mme_sm.c:443)
+[06/19 17:13:54.353] WARN: Authentication failure(Synch failure) (emm_sm.c:443)
+[06/19 17:13:54.354] WARN: Authentication failure(MAC failure) (emm_sm.c:436)
+[06/19 17:13:58.582] WARN: [EMM] EMM STATUS : IMSI[001010000000002] Cause[101] (emm_sm.c:673)
+[06/19 17:13:59.486] WARN: Unknown UE by S_TMSI[G:2,C:1,M_TMSI:0x12345678] (s1ap_handler.c:484)
+[06/19 17:13:59.486] WARN: [EMM] Service request : Unknown UE (emm_sm.c:103)
+[06/19 17:14:00.405] WARN: NAS MAC verification failed (nas_security.c:159)
+[06/19 17:14:00.405] WARN: No Security Context : IMSI[001010123456937] (emm_sm.c:114)

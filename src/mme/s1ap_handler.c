@@ -297,6 +297,57 @@ void s1ap_handle_eNB_configuration_update(mme_enb_t *enb, s1ap_message_t *messag
             "s1ap_send_to_enb() failed");
 
 }
+void s1ap_handle_ue_context_suspend(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+	int i;
+
+	S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+	S1AP_UEContextSuspendRequest_t *UEContextSuspendRequest = NULL;
+
+	S1AP_UEContextSuspendRequestIEs_t *ie = NULL;
+	S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+	S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+
+	pkbuf_t *s1apbuf = NULL;
+
+	d_assert(enb, return,);
+	d_assert(enb->sock, return,);
+
+	d_assert(message, return,);
+	initiatingMessage = message->choice.initiatingMessage;
+	d_assert(initiatingMessage, return,);
+	UEContextSuspendRequest = &initiatingMessage->value.choice.UEContextSuspendRequest;
+	d_assert(UEContextSuspendRequest, return,);
+
+	d_trace(3, "[MME] ue context suspend request\n");
+
+	for (i = 0; i < UEContextSuspendRequest->protocolIEs.list.count; i++)
+	{
+		ie = UEContextSuspendRequest->protocolIEs.list.array[i];
+		switch(ie->id)
+		{
+			case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
+				MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+				break;
+			case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+				ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+				break;
+			default:
+				break;
+		}
+	}
+
+	d_trace(3, "[MME] ue context suspend response\n");
+	d_assert(s1ap_build_ue_context_suspend_response(&s1apbuf,MME_UE_S1AP_ID,ENB_UE_S1AP_ID) == CORE_OK, 
+			return, "s1ap_build_setup_rsp() failed");
+
+
+	d_assert(s1ap_send_to_enb(enb, s1apbuf,S1AP_NON_UE_SIGNALLING) == CORE_OK,,
+			"s1ap_send_to_enb() failed");
+
+}
+
 /////////////////////////////////////////////////////////////////
 
 /***********Add by Steven Lee*************/
