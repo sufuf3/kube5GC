@@ -213,10 +213,13 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         {
                             break;
                         }
-                        case S1AP_ProcedureCode_id_E_RABRelease :
+			//////////////////////////////////////////pan
+			case S1AP_ProcedureCode_id_E_RABRelease :
                         {
+			    //s1ap_handle_ERAB_release_response(enb, pdu);
                             break;
                         }
+			/////////////////////////////////////////
                         case S1AP_ProcedureCode_id_UEContextRelease :
                         {
                             s1ap_handle_ue_context_release_complete(
