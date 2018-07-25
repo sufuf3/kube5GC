@@ -12,6 +12,8 @@ CORE_DECLARE(status_t) s1ap_build_reroute_nas_request(
     pkbuf_t **s1apbuf, enb_ue_t *enb_ue);
 CORE_DECLARE(status_t) s1ap_build_ue_radio_capability_match_request(
     pkbuf_t **s1apbuf, enb_ue_t *enb_ue);
+CORE_DECLARE(status_t) s1ap_build_e_rab_modification_confirm(
+            pkbuf_t **s1apbuf, mme_bearer_t *bearer, pkbuf_t *esmbuf)
 
 CORE_DECLARE(status_t) s1ap_build_setup_rsp(pkbuf_t **pkbuf);
 /////////////////////////////////////////////////////////////////////////pan
