@@ -347,7 +347,46 @@ void s1ap_handle_ue_context_suspend(
 			"s1ap_send_to_enb() failed");
 
 }
+void s1ap_handle_ERAB_release_response(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    int i;
 
+    S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    S1AP_E_RABReleaseResponse_t *E_RABReleaseResponse = NULL;
+
+    S1AP_E_RABReleaseResponseIEs_t *ie = NULL;
+   // S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;	
+//	S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;	
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    E_RABReleaseResponse = &successfulOutcome->value.choice.E_RABReleaseResponse;
+    d_assert(E_RABReleaseResponse, return,);
+
+    d_trace(3, "[MME] ERAB release response\n");
+
+    for (i = 0; i < E_RABReleaseResponse->protocolIEs.list.count; i++)
+    {
+        ie = E_RABReleaseResponse->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+               // ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
+              //  MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+                break;
+            default:
+                break;
+        }
+    }
+
+}
 /////////////////////////////////////////////////////////////////
 
 /***********Add by Steven Lee*************/

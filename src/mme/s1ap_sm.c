@@ -216,7 +216,7 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
 			//////////////////////////////////////////pan
 			case S1AP_ProcedureCode_id_E_RABRelease :
                         {
-			    //s1ap_handle_ERAB_release_response(enb, pdu);
+			    s1ap_handle_ERAB_release_response(enb, pdu);
                             break;
                         }
 			/////////////////////////////////////////

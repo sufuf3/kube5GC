@@ -345,6 +345,22 @@ status_t s1ap_send_mme_direct_information_transfer(
 
     return rv;
 }
+status_t s1ap_send_ERAB_release_command(mme_enb_t *enb,
+    c_uint32_t enb_ue_s1ap_id, c_uint32_t mme_ue_s1ap_id)
+{
+    status_t rv;
+    pkbuf_t *s1apbuf = NULL;
+
+    d_assert(enb, return CORE_ERROR, "Null param");
+
+    rv = s1ap_build_ERAB_release_command(&s1apbuf, enb_ue_s1ap_id, mme_ue_s1ap_id);
+    d_assert(rv == CORE_OK && s1apbuf, return CORE_ERROR, "s1ap build error");
+
+    rv = s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING);
+    d_assert(rv == CORE_OK,, "s1ap send error");
+    
+    return rv;
+}
 /////////////////////////////////////////
 
 status_t s1ap_send_path_switch_ack(mme_ue_t *mme_ue)

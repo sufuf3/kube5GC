@@ -25,6 +25,8 @@ CORE_DECLARE(void) s1ap_handle_CBC_write_replace_warning_message(
 		mme_enb_t *enb);		
 CORE_DECLARE(void) s1ap_handle_CBC_stop_warning_message(
 		mme_enb_t *enb);
+CORE_DECLARE(void) s1ap_handle_ERAB_release_response(
+        mme_enb_t *enb, s1ap_message_t *message);
 /******************************************/
 /*****Steven****/
 CORE_DECLARE(void) s1ap_handle_mme_configuration_update_acknowledge(

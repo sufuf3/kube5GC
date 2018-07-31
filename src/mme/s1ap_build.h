@@ -20,6 +20,8 @@ CORE_DECLARE(status_t) s1ap_build_ue_context_suspend_response(
         pkbuf_t **pkbuf,
 	S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id);
+CORE_DECLARE(status_t) s1ap_build_ERAB_release_command(pkbuf_t **s1apbuf,
+    c_uint32_t enb_ue_s1ap_id, c_uint32_t mme_ue_s1ap_id);
 /////////////////////////////////////////////////////////////////////////
 /******************** Qiu ********************/
 CORE_DECLARE(status_t) s1ap_build_write_replace_warning_request(pkbuf_t **pkbuf);
