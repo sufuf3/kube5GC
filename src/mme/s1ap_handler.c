@@ -163,23 +163,22 @@ void s1ap_handle_s1_setup_request(mme_enb_t *enb, s1ap_message_t *message)
             "s1ap_send_to_enb() failed");
 }
 
-///////////////////////////////////////////////////////////////// pan
 void s1ap_handle_eNB_configuration_update(mme_enb_t *enb, s1ap_message_t *message){
 
-	int i, j;
+    int i, j;
 
-	S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
     S1AP_ENBConfigurationUpdate_t *ENBConfigurationUpdate = NULL;
 
-	S1AP_ENBConfigurationUpdateIEs_t *ie = NULL;
-	S1AP_SupportedTAs_t *SupportedTAs = NULL;
-	S1AP_PagingDRX_t *PagingDRX = NULL;
+    S1AP_ENBConfigurationUpdateIEs_t *ie = NULL;
+    S1AP_SupportedTAs_t *SupportedTAs = NULL;
+    S1AP_PagingDRX_t *PagingDRX = NULL;
 
-	pkbuf_t *s1apbuf = NULL;
+    pkbuf_t *s1apbuf = NULL;
     S1AP_Cause_PR group = S1AP_Cause_PR_NOTHING;
     long cause = 0;
 
-	d_assert(enb, return,);
+    d_assert(enb, return,);
     d_assert(enb->sock, return,);
 
     d_assert(message, return,);
@@ -188,9 +187,9 @@ void s1ap_handle_eNB_configuration_update(mme_enb_t *enb, s1ap_message_t *messag
     ENBConfigurationUpdate = &initiatingMessage->value.choice.ENBConfigurationUpdate;
     d_assert(ENBConfigurationUpdate, return,);
 
-	d_trace(3, "[MME] eNB Configuration update\n");
+    d_trace(3, "[MME] eNB Configuration update\n");
 
-	for (i = 0; i < ENBConfigurationUpdate->protocolIEs.list.count; i++)
+    for (i = 0; i < ENBConfigurationUpdate->protocolIEs.list.count; i++)
     {
         ie = ENBConfigurationUpdate->protocolIEs.list.array[i];
         switch(ie->id)
@@ -206,10 +205,10 @@ void s1ap_handle_eNB_configuration_update(mme_enb_t *enb, s1ap_message_t *messag
         }
     }
 
-	if (PagingDRX)
+    if (PagingDRX)
         d_trace(5, "    PagingDRX[%ld]\n", *PagingDRX);
 
-	d_assert(SupportedTAs, return,);
+    d_assert(SupportedTAs, return,);
     /* Parse Supported TA */
     enb->num_of_supported_ta_list = 0;
     for (i = 0; i < SupportedTAs->list.count; i++)
@@ -300,51 +299,51 @@ void s1ap_handle_eNB_configuration_update(mme_enb_t *enb, s1ap_message_t *messag
 void s1ap_handle_ue_context_suspend(
         mme_enb_t *enb, s1ap_message_t *message)
 {
-	int i;
+    int i;
 
-	S1AP_InitiatingMessage_t *initiatingMessage = NULL;
-	S1AP_UEContextSuspendRequest_t *UEContextSuspendRequest = NULL;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_UEContextSuspendRequest_t *UEContextSuspendRequest = NULL;
 
-	S1AP_UEContextSuspendRequestIEs_t *ie = NULL;
-	S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
-	S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_UEContextSuspendRequestIEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
 
-	pkbuf_t *s1apbuf = NULL;
+    pkbuf_t *s1apbuf = NULL;
 
-	d_assert(enb, return,);
-	d_assert(enb->sock, return,);
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
 
-	d_assert(message, return,);
-	initiatingMessage = message->choice.initiatingMessage;
-	d_assert(initiatingMessage, return,);
-	UEContextSuspendRequest = &initiatingMessage->value.choice.UEContextSuspendRequest;
-	d_assert(UEContextSuspendRequest, return,);
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    UEContextSuspendRequest = &initiatingMessage->value.choice.UEContextSuspendRequest;
+    d_assert(UEContextSuspendRequest, return,);
 
-	d_trace(3, "[MME] ue context suspend request\n");
+    d_trace(3, "[MME] ue context suspend request\n");
 
-	for (i = 0; i < UEContextSuspendRequest->protocolIEs.list.count; i++)
-	{
-		ie = UEContextSuspendRequest->protocolIEs.list.array[i];
-		switch(ie->id)
-		{
-			case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
-				MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
-				break;
-			case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
-				ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
-				break;
-			default:
-				break;
-		}
-	}
+    for (i = 0; i < UEContextSuspendRequest->protocolIEs.list.count; i++)
+    {
+        ie = UEContextSuspendRequest->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
+                MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            default:
+                break;
+        }
+    }
 
-	d_trace(3, "[MME] ue context suspend response\n");
-	d_assert(s1ap_build_ue_context_suspend_response(&s1apbuf,MME_UE_S1AP_ID,ENB_UE_S1AP_ID) == CORE_OK, 
-			return, "s1ap_build_setup_rsp() failed");
+    d_trace(3, "[MME] ue context suspend response\n");
+    d_assert(s1ap_build_ue_context_suspend_response(&s1apbuf,MME_UE_S1AP_ID,ENB_UE_S1AP_ID) == CORE_OK, 
+            return, "s1ap_build_setup_rsp() failed");
 
 
-	d_assert(s1ap_send_to_enb(enb, s1apbuf,S1AP_NON_UE_SIGNALLING) == CORE_OK,,
-			"s1ap_send_to_enb() failed");
+    d_assert(s1ap_send_to_enb(enb, s1apbuf,S1AP_NON_UE_SIGNALLING) == CORE_OK,,
+            "s1ap_send_to_enb() failed");
 
 }
 void s1ap_handle_ERAB_release_response(
@@ -356,8 +355,8 @@ void s1ap_handle_ERAB_release_response(
     S1AP_E_RABReleaseResponse_t *E_RABReleaseResponse = NULL;
 
     S1AP_E_RABReleaseResponseIEs_t *ie = NULL;
-   // S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;	
-//	S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;	
+   // S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;    
+//    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;    
 
     d_assert(enb, return,);
     d_assert(enb->sock, return,);
@@ -387,57 +386,54 @@ void s1ap_handle_ERAB_release_response(
     }
 
 }
-/////////////////////////////////////////////////////////////////
 
-/***********Add by Steven Lee*************/
 // Handle MME configuration Update Acknowledge
 void s1ap_handle_mme_configuration_update_acknowledge(
-		mme_enb_t * enb,s1ap_message_t * message)
+        mme_enb_t * enb,s1ap_message_t * message)
 {
-	//status_t rv;
+    //status_t rv;
     //char buf[CORE_ADDRSTRLEN];
     //int i;
 
     S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
-	S1AP_MMEConfigurationUpdateAcknowledge_t *MMEConfigurationUpdateAcknowledge = NULL;
-	//S1AP_MMEConfigurationUpdateAcknowledgeIEs_t *ie = NULL;
+    S1AP_MMEConfigurationUpdateAcknowledge_t *MMEConfigurationUpdateAcknowledge = NULL;
+    //S1AP_MMEConfigurationUpdateAcknowledgeIEs_t *ie = NULL;
 
-	d_assert(enb, return,);
+    d_assert(enb, return,);
     d_assert(enb->sock, return,);
 
     d_assert(message, return,);
-	successfulOutcome = message->choice.successfulOutcome;
-	MMEConfigurationUpdateAcknowledge = 
-		&successfulOutcome->value.choice.MMEConfigurationUpdateAcknowledge;
+    successfulOutcome = message->choice.successfulOutcome;
+    MMEConfigurationUpdateAcknowledge = 
+        &successfulOutcome->value.choice.MMEConfigurationUpdateAcknowledge;
 
-	d_assert(MMEConfigurationUpdateAcknowledge, return,);
+    d_assert(MMEConfigurationUpdateAcknowledge, return,);
 
-	d_trace(3, "[MME] MME configuration update acknowledge\n");
+    d_trace(3, "[MME] MME configuration update acknowledge\n");
 }
-/*******************************************************/
-/*************Add by Steven Lee*****************/
+
 void s1ap_handle_enb_direct_information_transfer(mme_enb_t *enb, s1ap_message_t *message)
 {
     int i;
 
     S1AP_InitiatingMessage_t *initiatingMessage = NULL;
-	S1AP_ENBDirectInformationTransfer_t *ENBDirectInformationTransfer = NULL;
+    S1AP_ENBDirectInformationTransfer_t *ENBDirectInformationTransfer = NULL;
 
-	S1AP_ENBDirectInformationTransferIEs_t *ie = NULL;
-	//S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType = NULL;
+    S1AP_ENBDirectInformationTransferIEs_t *ie = NULL;
+    //S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType = NULL;
     
     d_assert(enb, return,);
     d_assert(enb->sock, return,);
 
-	// Message Type
+    // Message Type
     d_assert(message, return,);
     initiatingMessage = message->choice.initiatingMessage;
     d_assert(initiatingMessage, return,);
     ENBDirectInformationTransfer = &initiatingMessage->value.choice.ENBDirectInformationTransfer;
-	//--------------
-	
+    //--------------
+    
     d_trace(3, "[MME] ENB Direct Information Transfer\n");
-	
+    
     for (i = 0; i < ENBDirectInformationTransfer->protocolIEs.list.count; i++)
     {
         ie = ENBDirectInformationTransfer->protocolIEs.list.array[i];
@@ -452,45 +448,43 @@ void s1ap_handle_enb_direct_information_transfer(mme_enb_t *enb, s1ap_message_t 
     } 
 }
 
-/****************************************************/
-/***********Add by Steven Lee************/
 // Handle MME Configuration Update Failure
 void s1ap_handle_mme_configuration_update_failure(
-		mme_enb_t *enb, s1ap_message_t *message)
+        mme_enb_t *enb, s1ap_message_t *message)
 {
-	//status_t rv;
-	//char buf[CORE_ADDRSTRLEN];
-	int i;
-	// Beginning of Message Type
-	S1AP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
-	S1AP_MMEConfigurationUpdateFailure_t *MMEConfigurationUpdateFailure = NULL;
+    //status_t rv;
+    //char buf[CORE_ADDRSTRLEN];
+    int i;
+    // Beginning of Message Type
+    S1AP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
+    S1AP_MMEConfigurationUpdateFailure_t *MMEConfigurationUpdateFailure = NULL;
 
-	S1AP_MMEConfigurationUpdateFailureIEs_t *ie = NULL;
-	//S1AP_Cause_t *Cause = NULL;
+    S1AP_MMEConfigurationUpdateFailureIEs_t *ie = NULL;
+    //S1AP_Cause_t *Cause = NULL;
 
-	d_assert(enb, return,);
+    d_assert(enb, return,);
     d_assert(enb->sock, return,);
 
     d_assert(message, return,);
 
-	unsuccessfulOutcome = message->choice.unsuccessfulOutcome;
+    unsuccessfulOutcome = message->choice.unsuccessfulOutcome;
     d_assert(unsuccessfulOutcome, return,);
 
-	MMEConfigurationUpdateFailure = 
-		&unsuccessfulOutcome->value.choice.MMEConfigurationUpdateFailure;
-	d_assert(MMEConfigurationUpdateFailure, return,);
+    MMEConfigurationUpdateFailure = 
+        &unsuccessfulOutcome->value.choice.MMEConfigurationUpdateFailure;
+    d_assert(MMEConfigurationUpdateFailure, return,);
 
-	d_trace(3, "[MME] MME configuration update failure\n");
-	// End of Message Type
-	
-	for (i = 0; i < MMEConfigurationUpdateFailure->protocolIEs.list.count; i++)
+    d_trace(3, "[MME] MME configuration update failure\n");
+    // End of Message Type
+    
+    for (i = 0; i < MMEConfigurationUpdateFailure->protocolIEs.list.count; i++)
     {
         ie = MMEConfigurationUpdateFailure->protocolIEs.list.array[i];
         switch(ie->id)
         {
             case S1AP_ProtocolIE_ID_id_Cause:
                 //Cause = &ie->value.choice.Cause;
-		//printf("cause = %d\n",(int)Cause);
+        //printf("cause = %d\n",(int)Cause);
                 break;
             default:
                 break;
@@ -498,8 +492,6 @@ void s1ap_handle_mme_configuration_update_failure(
     }
 }
 
-/*************************************************************/
-/*************Add by Steven Lee*****************/
 // Handle E-RAB release indication
 void s1ap_handle_e_rab_release_indication(
         mme_enb_t *enb, s1ap_message_t *message)
@@ -509,20 +501,20 @@ void s1ap_handle_e_rab_release_indication(
     S1AP_E_RABReleaseIndication_t *E_RABReleaseIndication = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
-	S1AP_E_RABReleaseIndicationIEs_t *ie = NULL;
+    S1AP_E_RABReleaseIndicationIEs_t *ie = NULL;
     
     d_assert(enb, return,);
     d_assert(enb->sock, return,);
 
-	// Message Type
+    // Message Type
     d_assert(message, return,);
     initiatingMessage = message->choice.initiatingMessage;
     d_assert(initiatingMessage, return,);
     E_RABReleaseIndication = &initiatingMessage->value.choice.E_RABReleaseIndication;
-	//--------------
-	
+    //--------------
+    
     d_trace(3, "[MME] E-RAB Release Indication\n");
-	
+    
     for (i = 0; i < E_RABReleaseIndication->protocolIEs.list.count; i++)
     {
         ie = E_RABReleaseIndication->protocolIEs.list.array[i];
@@ -534,8 +526,8 @@ void s1ap_handle_e_rab_release_indication(
             case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
                 MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
                 break;
-			case S1AP_ProtocolIE_ID_id_E_RABReleasedList:
-				break;
+            case S1AP_ProtocolIE_ID_id_E_RABReleasedList:
+                break;
             default:
                 break;
         }
@@ -543,8 +535,6 @@ void s1ap_handle_e_rab_release_indication(
     d_trace(1, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n", *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID );
 }
 
-/****************************************************/
-/**************************** Qiu ***************************/
 void s1ap_handle_CBC_write_replace_warning_message(mme_enb_t *enb)
 {
     pkbuf_t *s1apbuf = NULL;
@@ -553,6 +543,7 @@ void s1ap_handle_CBC_write_replace_warning_message(mme_enb_t *enb)
     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,"s1ap_send_to_enb() failed");
 
 }
+
 void s1ap_handle_CBC_stop_warning_message(mme_enb_t *enb)
 {
     pkbuf_t *s1apbuf = NULL;
@@ -560,7 +551,7 @@ void s1ap_handle_CBC_stop_warning_message(mme_enb_t *enb)
     d_assert(s1ap_build_kill_request(&s1apbuf) == CORE_OK,return, "s1ap_build_kill_request() failed");
     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,"s1ap_send_to_enb() failed");
 }
-/************************************************************/
+
 void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
 {
     status_t rv;
@@ -577,9 +568,9 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
     S1AP_EUTRAN_CGI_t *EUTRAN_CGI = NULL;
     S1AP_S_TMSI_t *S_TMSI = NULL;
 
-	S1AP_PLMNidentity_t	*pLMNidentity = NULL;
-	S1AP_TAC_t *tAC = NULL;
-	S1AP_CellIdentity_t *cell_ID = NULL;
+    S1AP_PLMNidentity_t    *pLMNidentity = NULL;
+    S1AP_TAC_t *tAC = NULL;
+    S1AP_CellIdentity_t *cell_ID = NULL;
 
     enb_ue_t *enb_ue = NULL;
 
@@ -727,13 +718,11 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
         enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
 
-//add by YEE: for testing
     /*if (enb_ue){
         pkbuf_t *s1apbuf = NULL;
         s1ap_build_reroute_nas_request(&s1apbuf,enb_ue);
         d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,"s1ap_send_to_enb() failed");
     }*/
-//END
 
     d_assert(s1ap_send_to_nas(enb_ue,
         S1AP_ProcedureCode_id_initialUEMessage, NAS_PDU) == CORE_OK,,
@@ -798,7 +787,6 @@ void s1ap_handle_uplink_nas_transport(
         "s1ap_send_to_nas failed");
 }
 
-//add by YEE
 void s1ap_handle_ue_radio_capability_match_response(
         mme_enb_t *enb, s1ap_message_t *message)
 {
@@ -853,7 +841,6 @@ void s1ap_handle_ue_radio_capability_match_response(
             *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID, *VoiceSupportMatchIndicator);
 }
 
-//add by YEE
 void s1ap_handle_nas_delivery_indication(
         mme_enb_t *enb, s1ap_message_t *message)
 {
@@ -911,7 +898,6 @@ void s1ap_handle_nas_delivery_indication(
         "s1ap_send_to_nas failed");*/
 }
 
-//add by YEE
 void s1ap_handle_nas_non_delivery_indication(
         mme_enb_t *enb, s1ap_message_t *message)
 {
@@ -979,7 +965,6 @@ void s1ap_handle_nas_non_delivery_indication(
         "s1ap_send_to_nas failed");
 }
 
-//add by YEE (incopmlete)
 void s1ap_handle_e_rab_modification_indication(
         mme_enb_t *enb, s1ap_message_t *message)
 {
@@ -992,9 +977,9 @@ void s1ap_handle_e_rab_modification_indication(
     S1AP_E_RABModificationIndicationIEs_t *ie = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
-    S1AP_E_RABToBeModifiedListBearerModInd_t*	 E_RABToBeModifiedListBearerModInd = NULL;
-    //S1AP_E_RABNotToBeModifiedListBearerModInd_t*	 E_RABNotToBeModifiedListBearerModInd = NULL;
-    //S1AP_CSGMembershipInfo_t*	 CSGMembershipInfo = NULL;
+    S1AP_E_RABToBeModifiedListBearerModInd_t*     E_RABToBeModifiedListBearerModInd = NULL;
+    //S1AP_E_RABNotToBeModifiedListBearerModInd_t*     E_RABNotToBeModifiedListBearerModInd = NULL;
+    //S1AP_CSGMembershipInfo_t*     CSGMembershipInfo = NULL;
 
     enb_ue_t *enb_ue = NULL;
 
@@ -1295,12 +1280,11 @@ void s1ap_handle_initial_context_setup_response(
     
 }
 
-////////////////////////////////////////////////////////////////pan
 void s1ap_handle_eNB_cp_relocation_indication(
         mme_enb_t *enb, s1ap_message_t *message)
 {
-	status_t rv;
-	char buf[CORE_ADDRSTRLEN];
+    status_t rv;
+    char buf[CORE_ADDRSTRLEN];
     int i;
 
     S1AP_InitiatingMessage_t *initiatingMessage = NULL;
@@ -1308,25 +1292,25 @@ void s1ap_handle_eNB_cp_relocation_indication(
 
     S1AP_ENBCPRelocationIndicationIEs_t *ie = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
-	S1AP_S_TMSI_t *S_TMSI = NULL;
-	S1AP_EUTRAN_CGI_t *EUTRAN_CGI = NULL;
-	S1AP_TAI_t *TAI = NULL;
-	//S1AP_UL_CP_SecurityInformation_t *UL_CP_SecurityInformation = NULL;
-	
+    S1AP_S_TMSI_t *S_TMSI = NULL;
+    S1AP_EUTRAN_CGI_t *EUTRAN_CGI = NULL;
+    S1AP_TAI_t *TAI = NULL;
+    //S1AP_UL_CP_SecurityInformation_t *UL_CP_SecurityInformation = NULL;
+    
     pkbuf_t *s1apbuf = NULL;
 
-	S1AP_PLMNidentity_t *pLMNidentity = NULL;
-	S1AP_CellIdentity_t	*cell_ID = NULL;
-	S1AP_TAC_t *tAC = NULL;
+    S1AP_PLMNidentity_t *pLMNidentity = NULL;
+    S1AP_CellIdentity_t    *cell_ID = NULL;
+    S1AP_TAC_t *tAC = NULL;
 
     mme_ue_t *mme_ue = NULL;
     S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id = NULL;
     enb_ue_t *enb_ue = NULL;
 
-	mme_ue = enb_ue->mme_ue;
+    mme_ue = enb_ue->mme_ue;
     d_assert(mme_ue, return,);
 
-	*mme_ue_s1ap_id = enb_ue->mme_ue_s1ap_id;
+    *mme_ue_s1ap_id = enb_ue->mme_ue_s1ap_id;
     d_assert(mme_ue_s1ap_id, return,);
 
     d_assert(enb, return,);
@@ -1348,7 +1332,7 @@ void s1ap_handle_eNB_cp_relocation_indication(
             case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
                 ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
                 break;
-			case S1AP_ProtocolIE_ID_id_S_TMSI:
+            case S1AP_ProtocolIE_ID_id_S_TMSI:
                 S_TMSI = &ie->value.choice.S_TMSI;
                 break;
             case S1AP_ProtocolIE_ID_id_EUTRAN_CGI:
@@ -1357,7 +1341,7 @@ void s1ap_handle_eNB_cp_relocation_indication(
             case S1AP_ProtocolIE_ID_id_TAI:
                 TAI = &ie->value.choice.TAI;
                 break;
-	//case S1AP_ProtocolIE_ID_id_UL_CP_SecurityInformation:
+    //case S1AP_ProtocolIE_ID_id_UL_CP_SecurityInformation:
           //      UL_CP_SecurityInformation = &ie->value.choice.UL_CP_SecurityInformation;
             //    break;
             default:
@@ -1473,12 +1457,11 @@ void s1ap_handle_eNB_cp_relocation_indication(
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
         enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
 
-	rv = s1ap_build_connection_establishment_indication(
-		&s1apbuf,mme_ue_s1ap_id,ENB_UE_S1AP_ID,mme_ue);
+    rv = s1ap_build_connection_establishment_indication(
+        &s1apbuf,mme_ue_s1ap_id,ENB_UE_S1AP_ID,mme_ue);
 
     
 }
-////////////////////////////////////////////////////////////
 
 void s1ap_handle_initial_context_setup_failure(
         mme_enb_t *enb, s1ap_message_t *message)
@@ -1711,6 +1694,112 @@ void s1ap_handle_e_rab_setup_response(
         }
     }
 }
+
+void s1ap_handle_e_rab_modify_response(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    //status_t rv;
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+
+    S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    S1AP_E_RABModifyResponse_t *E_RABModifyResponse = NULL;
+
+    S1AP_E_RABModifyResponseIEs_t *ie = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_E_RABModifyListBearerModRes_t *E_RABModifyListBearerModRes = NULL;
+    //S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList = NULL;
+
+    enb_ue_t *enb_ue = NULL;
+    mme_ue_t *mme_ue = NULL;
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    E_RABModifyResponse = &successfulOutcome->value.choice.E_RABModifyResponse;
+    d_assert(E_RABModifyResponse, return,);
+
+    d_trace(3, "[MME] E-RAB modify response\n");
+
+    for (i = 0; i < E_RABModifyResponse->protocolIEs.list.count; i++)
+    {
+        ie = E_RABModifyResponse->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_E_RABModifyListBearerModRes:
+                E_RABModifyListBearerModRes =
+                    &ie->value.choice.E_RABModifyListBearerModRes;
+                break;
+            /*case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+                SecondaryRATDataUsageReportList =
+                    &ie->value.choice.SecondaryRATDataUsageReportList;
+        break;*/
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    IP[%s] ENB_ID[%d]\n",
+            CORE_ADDR(enb->addr, buf), enb->enb_id);
+
+    d_assert(ENB_UE_S1AP_ID, return,);
+    enb_ue = enb_ue_find_by_enb_ue_s1ap_id(enb, *ENB_UE_S1AP_ID);
+    d_assert(enb_ue, return, "No UE Context[%d]", *ENB_UE_S1AP_ID);
+    mme_ue = enb_ue->mme_ue;
+    d_assert(mme_ue, return,);
+
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+            enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
+
+    d_assert(E_RABModifyListBearerModRes, return,);
+    for (i = 0; i < E_RABModifyListBearerModRes->list.count; i++)
+    {
+        S1AP_E_RABModifyItemBearerModResIEs_t *ie2 = NULL;
+        S1AP_E_RABModifyItemBearerModRes_t *e_rab = NULL;
+
+        mme_bearer_t *bearer = NULL;
+
+        ie2 = (S1AP_E_RABModifyItemBearerModResIEs_t *)
+            E_RABModifyListBearerModRes->list.array[i];
+        d_assert(ie2, return,);
+
+        e_rab = &ie2->value.choice.E_RABModifyItemBearerModRes;
+        d_assert(e_rab, return, "Null param");
+
+        bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
+        d_assert(bearer, return, "Null param");
+
+        if (FSM_CHECK(&bearer->sm, esm_state_active))
+        {
+            status_t rv;
+            if (bearer->enb_s1u_teid != bearer->sgw_s1u_teid)
+            {
+                //if(SecondaryRATDataUsageReportList != NULL)
+                {
+                    //rv = mme_gtp_send_change_notification_request(mme_ue, NULL);
+                    //d_assert(rv == CORE_OK, return, "gtp send failed");
+                }
+        //else
+        {
+            rv = mme_gtp_send_delete_session_request(bearer->sess);
+            d_assert(rv == CORE_OK, return, "gtp send failed");
+        } 
+            }
+            else
+            {
+                rv = mme_gtp_send_update_bearer_response(bearer);
+                d_assert(rv == CORE_OK, return, "gtp send failed");
+            }  
+        }
+    }
+}
+
 
 void s1ap_handle_ue_context_release_request(
         mme_enb_t *enb, s1ap_message_t *message)
@@ -2017,11 +2106,11 @@ void s1ap_handle_path_switch_request(
     S1AP_TAI_t *TAI = NULL;
     S1AP_UESecurityCapabilities_t *UESecurityCapabilities = NULL;
 
-	S1AP_PLMNidentity_t *pLMNidentity = NULL;
-	S1AP_CellIdentity_t	*cell_ID = NULL;
-	S1AP_TAC_t *tAC = NULL;
-	S1AP_EncryptionAlgorithms_t	*encryptionAlgorithms = NULL;
-	S1AP_IntegrityProtectionAlgorithms_t *integrityProtectionAlgorithms = NULL;
+    S1AP_PLMNidentity_t *pLMNidentity = NULL;
+    S1AP_CellIdentity_t    *cell_ID = NULL;
+    S1AP_TAC_t *tAC = NULL;
+    S1AP_EncryptionAlgorithms_t    *encryptionAlgorithms = NULL;
+    S1AP_IntegrityProtectionAlgorithms_t *integrityProtectionAlgorithms = NULL;
     c_uint16_t eea = 0, eia = 0;
 
     enb_ue_t *enb_ue = NULL;
@@ -2814,9 +2903,9 @@ void s1ap_handle_handover_notification(mme_enb_t *enb, s1ap_message_t *message)
     S1AP_EUTRAN_CGI_t *EUTRAN_CGI = NULL;
     S1AP_TAI_t *TAI = NULL;
 
-	S1AP_PLMNidentity_t *pLMNidentity = NULL;
-	S1AP_CellIdentity_t	*cell_ID = NULL;
-	S1AP_TAC_t *tAC = NULL;
+    S1AP_PLMNidentity_t *pLMNidentity = NULL;
+    S1AP_CellIdentity_t    *cell_ID = NULL;
+    S1AP_TAC_t *tAC = NULL;
 
     enb_ue_t *source_ue = NULL;
     enb_ue_t *target_ue = NULL;
@@ -3073,7 +3162,7 @@ void s1ap_handle_retrieve_ue_information(mme_enb_t *enb, s1ap_message_t *message
 
     S1AP_InitiatingMessage_t *initiatingMessage = NULL;
     S1AP_RetrieveUEInformation_t *RetrieveUEInformation = NULL;
-	
+    
     S1AP_RetrieveUEInformationIEs_t *ie = NULL;
     S1AP_S_TMSI_t *S_TMSI = NULL;
 
@@ -3101,31 +3190,31 @@ d_trace(3, "[MME] Retrieve UE Information\n");
                 break;
         }
     }
-	
-	// Find MME_UE if S_TMSI included
-	if (S_TMSI)
-	{
-		served_gummei_t *served_gummei = &mme_self()->served_gummei[0];
-		guti_t guti;
-		mme_ue_t *mme_ue = NULL;
+    
+    // Find MME_UE if S_TMSI included
+    if (S_TMSI)
+    {
+        served_gummei_t *served_gummei = &mme_self()->served_gummei[0];
+        guti_t guti;
+        mme_ue_t *mme_ue = NULL;
 
-		memset(&guti, 0, sizeof(guti_t));
+        memset(&guti, 0, sizeof(guti_t));
 
-		/* Use the first configured plmn_id and mme group id */
-		memcpy(&guti.plmn_id, &served_gummei->plmn_id[0], PLMN_ID_LEN);
-		guti.mme_gid = served_gummei->mme_gid[0];
+        /* Use the first configured plmn_id and mme group id */
+        memcpy(&guti.plmn_id, &served_gummei->plmn_id[0], PLMN_ID_LEN);
+        guti.mme_gid = served_gummei->mme_gid[0];
 
-		/* size must be 1 */
-		memcpy(&guti.mme_code, S_TMSI->mMEC.buf, S_TMSI->mMEC.size);
-		/* size must be 4 */
-		memcpy(&guti.m_tmsi, S_TMSI->m_TMSI.buf, S_TMSI->m_TMSI.size);
-		guti.m_tmsi = ntohl(guti.m_tmsi);
+        /* size must be 1 */
+        memcpy(&guti.mme_code, S_TMSI->mMEC.buf, S_TMSI->mMEC.size);
+        /* size must be 4 */
+        memcpy(&guti.m_tmsi, S_TMSI->m_TMSI.buf, S_TMSI->m_TMSI.size);
+        guti.m_tmsi = ntohl(guti.m_tmsi);
 
-		mme_ue = mme_ue_find_by_guti(&guti);
+        mme_ue = mme_ue_find_by_guti(&guti);
            // Call s1ap_send_ue_information_transfer and pass mme_ue and S_TMSI 
-		rv = s1ap_send_ue_information_transfer(mme_ue, S_TMSI);
-		d_assert(rv == CORE_OK,,);
-	}
+        rv = s1ap_send_ue_information_transfer(mme_ue, S_TMSI);
+        d_assert(rv == CORE_OK,,);
+    }
 }
 
 

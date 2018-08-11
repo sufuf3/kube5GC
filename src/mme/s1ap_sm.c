@@ -70,28 +70,25 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             break;
                         }
                         case S1AP_ProcedureCode_id_eNBDirectInformationTransfer :
-                        {/*************Add by Steven*********************/
+                        {
                             s1ap_handle_enb_direct_information_transfer(enb,pdu);
                             break;
                         }
-			////////////////// pan
-			case S1AP_ProcedureCode_id_ENBConfigurationUpdate :
+                        case S1AP_ProcedureCode_id_ENBConfigurationUpdate :
                         {
                             s1ap_handle_eNB_configuration_update(enb, pdu);
                             break;
                         }
-			case S1AP_ProcedureCode_id_eNBCPRelocationIndication :
+                        case S1AP_ProcedureCode_id_eNBCPRelocationIndication :
                         {
                             s1ap_handle_eNB_cp_relocation_indication(enb, pdu);
                             break;
                         }
-			case S1AP_ProcedureCode_id_UEContextSuspend :
+                        case S1AP_ProcedureCode_id_UEContextSuspend :
                         {
                             s1ap_handle_ue_context_suspend(enb, pdu);
                             break;
                         }
-			/////////////////
-                        /********************** Qiu *******************/
                         case S1AP_ProcedureCode_id_WriteReplaceWarning :
                         {
                             printf("\nThe S1AP_ProcedureCode_id_WriteReplaceWarning message has been received.\n");
@@ -112,7 +109,6 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             printf("\nThe S1AP_ProcedureCode_id_PWSFailureIndication message has been received.\n");
                             break;
                         }
-                        /**********************************************/
                         case S1AP_ProcedureCode_id_initialUEMessage :
                         {
                             s1ap_handle_initial_ue_message(enb, pdu);
@@ -174,16 +170,15 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_s1_reset(enb, pdu);
                             break;
                         }
-			case S1AP_ProcedureCode_id_RetrieveUEInformation: 
-			{
-			    s1ap_handle_retrieve_ue_information(enb, pdu);
-			    break;
-			}
+                        case S1AP_ProcedureCode_id_RetrieveUEInformation: 
+                        {
+                            s1ap_handle_retrieve_ue_information(enb, pdu);
+                            break;
+                        }
                         case S1AP_ProcedureCode_id_E_RABReleaseIndication:
                         {
-                        	/*************Add by Steven*********************/
-                        	s1ap_handle_e_rab_release_indication(enb,pdu);
-                        	break;
+                            s1ap_handle_e_rab_release_indication(enb,pdu);
+                                    break;
                         }
                         default:
                         {
@@ -217,15 +212,14 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         }
                         case S1AP_ProcedureCode_id_E_RABModify :
                         {
+                            s1ap_handle_e_rab_modify_response(enb, pdu);
                             break;
                         }
-			//////////////////////////////////////////pan
-			case S1AP_ProcedureCode_id_E_RABRelease :
+                        case S1AP_ProcedureCode_id_E_RABRelease :
                         {
-			    s1ap_handle_ERAB_release_response(enb, pdu);
+                            s1ap_handle_ERAB_release_response(enb, pdu);
                             break;
                         }
-			/////////////////////////////////////////
                         case S1AP_ProcedureCode_id_UEContextRelease :
                         {
                             s1ap_handle_ue_context_release_complete(
@@ -238,22 +232,22 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             break;
                         }
                         case S1AP_ProcedureCode_id_NASDeliveryIndication:
-                        {//add by YEE
+                        {
                             s1ap_handle_nas_delivery_indication(enb, pdu);
                             break;
                         }
                         case S1AP_ProcedureCode_id_NASNonDeliveryIndication:
-                        {//add by YEE
+                        {
                             s1ap_handle_nas_non_delivery_indication(enb, pdu);
                             break;
                         }
                         case S1AP_ProcedureCode_id_UERadioCapabilityMatch:
-                        {//add by YEE
+                        {
                             s1ap_handle_ue_radio_capability_match_response(enb, pdu);
                             break;
                         }
                         case S1AP_ProcedureCode_id_MMEConfigurationUpdate:
-                        {/*****Add by Steven Lee***/
+                        {
                             s1ap_handle_mme_configuration_update_acknowledge(enb, pdu);
                             break;
                         }
@@ -287,7 +281,7 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             break;
                         }
                         case S1AP_ProcedureCode_id_MMEConfigurationUpdate:
-                        {/*****Add by Steven Lee***/
+                        {
                             s1ap_handle_mme_configuration_update_failure(enb, pdu);
                             break;
                         }
