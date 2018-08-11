@@ -206,6 +206,9 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         }
                         case S1AP_ProcedureCode_id_E_RABModify :
                         {
+			    /*added by EvanHuang*/
+                            s1ap_handle_e_rab_modify_response(enb, pdu);
+                            /*added by EvanHuang*/
                             break;
                         }
                         case S1AP_ProcedureCode_id_E_RABRelease :

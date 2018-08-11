@@ -1395,6 +1395,114 @@ void s1ap_handle_e_rab_setup_response(
     }
 }
 
+/*added by EvanHuang*/
+void s1ap_handle_e_rab_modify_response(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    //status_t rv;
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+
+    S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    S1AP_E_RABModifyResponse_t *E_RABModifyResponse = NULL;
+
+    S1AP_E_RABModifyResponseIEs_t *ie = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_E_RABModifyListBearerModRes_t *E_RABModifyListBearerModRes = NULL;
+    //S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList = NULL;
+
+    enb_ue_t *enb_ue = NULL;
+    mme_ue_t *mme_ue = NULL;
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    E_RABModifyResponse = &successfulOutcome->value.choice.E_RABModifyResponse;
+    d_assert(E_RABModifyResponse, return,);
+
+    d_trace(3, "[MME] E-RAB modify response\n");
+
+    for (i = 0; i < E_RABModifyResponse->protocolIEs.list.count; i++)
+    {
+        ie = E_RABModifyResponse->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_E_RABModifyListBearerModRes:
+                E_RABModifyListBearerModRes =
+                    &ie->value.choice.E_RABModifyListBearerModRes;
+                break;
+            /*case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+                SecondaryRATDataUsageReportList =
+                    &ie->value.choice.SecondaryRATDataUsageReportList;
+		break;*/
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    IP[%s] ENB_ID[%d]\n",
+            CORE_ADDR(enb->addr, buf), enb->enb_id);
+
+    d_assert(ENB_UE_S1AP_ID, return,);
+    enb_ue = enb_ue_find_by_enb_ue_s1ap_id(enb, *ENB_UE_S1AP_ID);
+    d_assert(enb_ue, return, "No UE Context[%d]", *ENB_UE_S1AP_ID);
+    mme_ue = enb_ue->mme_ue;
+    d_assert(mme_ue, return,);
+
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+            enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
+
+    d_assert(E_RABModifyListBearerModRes, return,);
+    for (i = 0; i < E_RABModifyListBearerModRes->list.count; i++)
+    {
+        S1AP_E_RABModifyItemBearerModResIEs_t *ie2 = NULL;
+        S1AP_E_RABModifyItemBearerModRes_t *e_rab = NULL;
+
+        mme_bearer_t *bearer = NULL;
+
+        ie2 = (S1AP_E_RABModifyItemBearerModResIEs_t *)
+            E_RABModifyListBearerModRes->list.array[i];
+        d_assert(ie2, return,);
+
+        e_rab = &ie2->value.choice.E_RABModifyItemBearerModRes;
+        d_assert(e_rab, return, "Null param");
+
+        bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
+        d_assert(bearer, return, "Null param");
+
+        if (FSM_CHECK(&bearer->sm, esm_state_active))
+        {
+            status_t rv;
+            if (bearer->enb_s1u_teid != bearer->sgw_s1u_teid)
+            {
+                //if(SecondaryRATDataUsageReportList != NULL)
+                {
+                    //rv = mme_gtp_send_change_notification_request(mme_ue, NULL);
+                    //d_assert(rv == CORE_OK, return, "gtp send failed");
+                }
+		//else
+		{
+			rv = mme_gtp_send_delete_session_request(bearer->sess);
+			d_assert(rv == CORE_OK, return, "gtp send failed");
+		} 
+            }
+            else
+            {
+                rv = mme_gtp_send_update_bearer_response(bearer);
+                d_assert(rv == CORE_OK, return, "gtp send failed");
+            }  
+        }
+    }
+}
+/*added by EvanHuang*/
+
+
 void s1ap_handle_ue_context_release_request(
         mme_enb_t *enb, s1ap_message_t *message)
 {
