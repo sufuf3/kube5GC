@@ -70,3 +70,10 @@ debian/nextepc-hss
 # webui
 webui/.next/
 webui/node_modules/
+
+# installation
+install
+
+# development env
+.idea
+.vscode
