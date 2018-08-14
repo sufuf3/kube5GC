@@ -93,6 +93,10 @@ static void *THREAD_FUNC sm_main(thread_id id, void *data)
     fsm_create(&mme_sm, mme_state_initial, mme_state_final);
     fsm_init(&mme_sm, 0);
 
+    /******************** Added by Chi ********************/
+    mme_overload_checking_init();
+    /******************************************************/
+
     prev_tm = time_now();
 
 #define EVENT_LOOP_TIMEOUT 50   /* 50ms */

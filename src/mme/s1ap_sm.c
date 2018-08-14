@@ -74,18 +74,18 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_enb_direct_information_transfer(enb,pdu);
                             break;
                         }
-			////////////////// pan
-			case S1AP_ProcedureCode_id_ENBConfigurationUpdate :
+                        ////////////////// pan
+                        case S1AP_ProcedureCode_id_ENBConfigurationUpdate :
                         {
                             s1ap_handle_eNB_configuration_update(enb, pdu);
                             break;
                         }
-			case S1AP_ProcedureCode_id_eNBCPRelocationIndication :
+			            case S1AP_ProcedureCode_id_eNBCPRelocationIndication :
                         {
                             s1ap_handle_eNB_cp_relocation_indication(enb, pdu);
                             break;
                         }
-			/////////////////
+                        /////////////////
                         /********************** Qiu *******************/
                         case S1AP_ProcedureCode_id_WriteReplaceWarning :
                         {
@@ -169,11 +169,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_s1_reset(enb, pdu);
                             break;
                         }
-			case S1AP_ProcedureCode_id_RetrieveUEInformation: 
-			{
-			    s1ap_handle_retrieve_ue_information(enb, pdu);
-			    break;
-			}
+                        case S1AP_ProcedureCode_id_RetrieveUEInformation: 
+                        {
+                            s1ap_handle_retrieve_ue_information(enb, pdu);
+                            break;
+                        }
                         default:
                         {
                             d_warn("Not implemented(choice:%d, proc:%d)",

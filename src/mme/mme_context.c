@@ -78,6 +78,11 @@ status_t mme_context_init()
     self.t3413_value = 2;               /* Paging retry timer: 2 secs */
     self.s1_holding_timer_value = 30;   /* S1 holding timer: 30 secs */
 
+    /******************** Added by Chi ********************/
+    /* Status */
+    self.overload_started = false;
+    /******************************************************/
+
     context_initialized = 1;
 
     return CORE_OK;
@@ -129,6 +134,10 @@ status_t mme_context_final()
     sock_remove_all_nodes(&self.s1ap_list6);
     sock_remove_all_nodes(&self.gtpc_list);
     sock_remove_all_nodes(&self.gtpc_list6);
+
+    /******************** Added by Chi ********************/
+    tm_delete(self.overloading_checking_timer);
+    /******************************************************/
 
     context_initialized = 0;
 
@@ -2918,4 +2927,21 @@ status_t mme_m_tmsi_free(mme_m_tmsi_t *m_tmsi)
 
     return CORE_OK;
 }
+
+/******************** Added by Chi ********************/
+status_t mme_overload_checking_init()
+{
+    c_uint32_t duration = 500;
+
+    tm_block_id *timer = &self.overloading_checking_timer;
+    *timer = timer_create(
+            &self.tm_service, MME_EVT_CHECK_OVERLOAD, duration);
+    d_assert(*timer, return CORE_ERROR,);
+
+    timer_set_param1(*timer, *timer);
+    tm_start(*timer);
+
+    return CORE_OK;
+}
+/******************************************************/
 

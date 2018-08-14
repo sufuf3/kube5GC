@@ -7,6 +7,11 @@
 #include "gtp/gtp_xact.h"
 #include "fd/fd_lib.h"
 
+/******************** Added by Chi ********************/
+#include "app/util.h"
+#include "mme_context.h"
+/******************************************************/
+
 #include "mme_event.h"
 #include "mme_sm.h"
 
@@ -615,6 +620,49 @@ void mme_state_operational(fsm_t *s, event_t *e)
             gtp_xact_timeout(event_get_param1(e), event_get(e));
             break;
         }
+        /******************** Added by Chi ********************/
+        case MME_EVT_CHECK_OVERLOAD:
+        {
+            float load_per_core_threshold = 0.85;
+
+            tm_block_id timer = (tm_block_id) event_get_param1(e);
+            d_assert(timer, return, "Null timer");
+            
+            int n_cores = get_cpu_cores();
+            float load_avg = get_cpu_load();
+            float load_per_core = load_avg / n_cores;
+
+            d_trace(9, "MME_EVT_CHECK_OVERLOAD: load_avg=%.2f, n_cores=%d, threshold=%.2f\n", 
+                load_avg, n_cores, load_per_core_threshold);
+
+            if (load_per_core > load_per_core_threshold)
+            {   
+                if (!mme_self()->overload_started)
+                {
+                    d_trace(1, "MME overload_start (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
+                        load_per_core, load_per_core_threshold);
+
+                    // TODO
+
+                    mme_self()->overload_started = true;
+                }
+            } else {
+                if (mme_self()->overload_started)
+                {
+                    d_trace(1, "MME overload_stop (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
+                        load_per_core, load_per_core_threshold);
+
+                    // TODO
+                    
+                    mme_self()->overload_started = false;
+                }
+            }
+
+            // Restart timer for the next tick
+            tm_start(timer);
+            break;
+        }
+        /******************************************************/
         default:
         {
             d_error("No handler for event %s", mme_event_get_name(e));
