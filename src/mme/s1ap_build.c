@@ -10,6 +10,53 @@
 #include "s1ap_build.h"
 #include "s1ap_conv.h"
 
+/******************** Chu ********************/
+status_t s1ap_build_overload_stop(pkbuf_t **pkbuf){
+
+    status_t rv;
+    S1AP_S1AP_PDU_t pdu;
+
+    /************ InitiatingMessage ***************/
+	S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    // S1AP_OverloadStop_t *OverloadStop = NULL;
+    //S1AP_OverloadStopIEs_t *ie = NULL;
+
+    /******************** IE *********************/
+    //S1AP_GUMMEIList_t *GUMMEIList = NULL;
+    
+
+    /**************** Message type: reject *******************/
+    memset(&pdu,0,sizeof(S1AP_S1AP_PDU_t));
+	pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+	pdu.choice.initiatingMessage = core_calloc(1,sizeof(S1AP_InitiatingMessage_t));
+	initiatingMessage = pdu.choice.initiatingMessage;//pointer point to it
+	initiatingMessage->procedureCode = S1AP_ProcedureCode_id_OverloadStop;
+	initiatingMessage->criticality = S1AP_Criticality_reject;
+	initiatingMessage->value.present = S1AP_InitiatingMessage__value_PR_OverloadStop;
+	// OverloadStop = &initiatingMessage->value.choice.OverloadStop;
+
+    /********* GUMMEIList: ignore (optional) *********/
+    /*ie = core_calloc(1, sizeof(S1AP_OverloadStopIEs_t));
+    ASN_SEQUENCE_ADD(&OverloadStop->protocolIEs, ie);
+	ie->id = S1AP_ProtocolIE_ID_id_GUMMEIList;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present = S1AP_OverloadStopIEs__value_PR_GUMMEIList;
+	GUMMEIList = &ie->value.choice.GUMMEIList;*/
+
+    /****************** Encode **********************/
+    rv = s1ap_encode_pdu(pkbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+/*********************************************/
+
 /***************Add by Steven****************/
 status_t s1ap_build_mme_cp_relocation_indication(
         pkbuf_t **s1apbuf, enb_ue_t *source_ue)
@@ -2974,7 +3021,6 @@ status_t s1ap_build_s1_reset_ack(
                 d_warn("No MME_UE_S1AP_ID & ENB_UE_S1AP_ID");
                 continue;
             }
-
             ie2 = core_calloc(1,
                     sizeof(S1AP_UE_associatedLogicalS1_ConnectionItemResAck_t));
             d_assert(ie2, return CORE_ERROR,);
