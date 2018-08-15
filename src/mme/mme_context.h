@@ -38,6 +38,10 @@ extern "C" {
 
 #define MAX_NUM_OF_BPLMN            6
 
+/******************** Added by Chi ********************/
+#define OVERLOAD_THRESHOLD          0.85    /* Trigger overload_start if system load_avg/n_proc is greater than this threshold */
+/******************************************************/
+
 typedef struct _enb_ue_t enb_ue_t;
 typedef struct _mme_ue_t mme_ue_t;
 
@@ -151,7 +155,7 @@ typedef struct _mme_context_t {
     /* Status */
     bool overload_started;
     /******************************************************/
-    
+
 } mme_context_t;
 
 typedef struct _mme_enb_t {

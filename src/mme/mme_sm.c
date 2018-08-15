@@ -17,6 +17,9 @@
 
 #include "s1ap_handler.h"
 #include "s1ap_path.h"
+/******************** Added by Chi ********************/
+#include "s1ap_build.h"
+/******************************************************/
 #include "nas_security.h"
 #include "nas_path.h"
 #include "emm_handler.h"
@@ -623,24 +626,24 @@ void mme_state_operational(fsm_t *s, event_t *e)
         /******************** Added by Chi ********************/
         case MME_EVT_CHECK_OVERLOAD:
         {
-            float load_per_core_threshold = 0.85;
-
             tm_block_id timer = (tm_block_id) event_get_param1(e);
-            d_assert(timer, return, "Null timer");
-            
+            pkbuf_t *s1apbuf = NULL;
             int n_cores = get_cpu_cores();
             float load_avg = get_cpu_load();
             float load_per_core = load_avg / n_cores;
 
-            d_trace(9, "MME_EVT_CHECK_OVERLOAD: load_avg=%.2f, n_cores=%d, threshold=%.2f\n", 
-                load_avg, n_cores, load_per_core_threshold);
+            d_assert(timer, return, "Null timer");
+            d_assert(load_avg >= 0, return, "Negative cpu load average");
 
-            if (load_per_core > load_per_core_threshold)
-            {   
+            d_trace(9, "MME_EVT_CHECK_OVERLOAD: load_avg=%.2f, n_cores=%d, threshold=%.2f\n", 
+                load_avg, n_cores, OVERLOAD_THRESHOLD);
+
+            if (load_per_core > OVERLOAD_THRESHOLD)
+            {
                 if (!mme_self()->overload_started)
                 {
                     d_trace(1, "MME overload_start (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
-                        load_per_core, load_per_core_threshold);
+                        load_per_core, OVERLOAD_THRESHOLD);
 
                     // TODO
 
@@ -650,11 +653,27 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 if (mme_self()->overload_started)
                 {
                     d_trace(1, "MME overload_stop (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
-                        load_per_core, load_per_core_threshold);
+                        load_per_core, OVERLOAD_THRESHOLD);
 
                     // TODO
                     
                     mme_self()->overload_started = false;
+                }
+            }
+
+            if (s1apbuf != NULL)
+            {
+                // Send message to all eNB (or randomly selected eNB) connected to this MME
+                hash_index_t *it;
+                mme_enb_t *enb;
+                void *val;
+                for (it = hash_first(mme_self()->enb_id_hash); it; it = hash_next(it))
+                {                        
+                    hash_this(it, NULL, NULL, &val);
+                    enb = (mme_enb_t *) val;
+
+                    d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,
+                        "s1ap_send_to_enb() failed");
                 }
             }
 
