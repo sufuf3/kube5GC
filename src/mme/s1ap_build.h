@@ -12,6 +12,10 @@ CORE_DECLARE(status_t) s1ap_build_reroute_nas_request(
     pkbuf_t **s1apbuf, enb_ue_t *enb_ue);
 
 CORE_DECLARE(status_t) s1ap_build_setup_rsp(pkbuf_t **pkbuf);
+
+/******************** Added by Chi ********************/
+CORE_DECLARE(status_t) s1ap_build_overload_start(pkbuf_t **pkbuf);
+/******************************************************/
 /////////////////////////////////////////////////////////////////////////pan
 CORE_DECLARE(status_t) s1ap_build_enb_configuration_update_acknowledge(pkbuf_t **pkbuf);
 CORE_DECLARE(status_t) s1ap_build_enb_configuration_update_failure(

@@ -505,6 +505,64 @@ status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
 
     return CORE_OK;
 }
+
+/******************** Added by Chi ********************/
+status_t s1ap_build_overload_start(pkbuf_t **pkbuf)
+{
+    status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_OverloadStart_t *OverloadStart = NULL;
+    S1AP_OverloadStartIEs_t *ie = NULL;
+
+    // Mandatory IEs
+    S1AP_OverloadResponse_t *OverloadResponse;
+
+    // Optional IEs
+    // S1AP_GUMMEIList_t *GUMMEIList;
+    // S1AP_TrafficLoadReductionIndication_t *TrafficLoadReductionIndication;
+    
+    // PDU
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+
+    // IE: Message Type
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = S1AP_ProcedureCode_id_OverloadStart;
+    initiatingMessage->criticality = S1AP_Criticality_ignore;
+    initiatingMessage->value.present =
+        S1AP_InitiatingMessage__value_PR_OverloadStart;
+    OverloadStart = &initiatingMessage->value.choice.OverloadStart;
+
+    // IE: Overload Response
+    ie = core_calloc(1, sizeof(S1AP_OverloadStartIEs_t));
+    ASN_SEQUENCE_ADD(&OverloadStart->protocolIEs, ie);
+    
+    ie->id = S1AP_ProtocolIE_ID_id_OverloadResponse;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_OverloadStartIEs__value_PR_OverloadResponse;
+
+    // IE: Overload Response > Overload Action (TS23.401-f40: Ch4.3.7.4.1)
+    OverloadResponse = &ie->value.choice.OverloadResponse;
+    OverloadResponse->present = S1AP_OverloadResponse_PR_overloadAction;
+    OverloadResponse->choice.overloadAction = S1AP_OverloadAction_reject_non_emergency_mo_dt;
+
+    rv = s1ap_encode_pdu(pkbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+/******************************************************/
+
 /*************************** Qiu ***************************/
 status_t s1ap_build_write_replace_warning_request(pkbuf_t **pkbuf)
 {
