@@ -655,8 +655,8 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     d_trace(1, "MME overload_stop (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
                         load_per_core, OVERLOAD_THRESHOLD);
 
-                    // TODO
-                    
+                    s1ap_build_overload_stop(&s1apbuf);
+
                     mme_self()->overload_started = false;
                 }
             }
