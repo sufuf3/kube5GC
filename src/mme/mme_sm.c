@@ -1,4 +1,7 @@
 #define TRACE_MODULE _mme_sm
+
+#include <math.h>
+
 #include "core_debug.h"
 #include "core_lib.h"
 
@@ -627,13 +630,17 @@ void mme_state_operational(fsm_t *s, event_t *e)
         case MME_EVT_CHECK_OVERLOAD:
         {
             tm_block_id timer = (tm_block_id) event_get_param1(e);
-            pkbuf_t *s1apbuf = NULL;
             int n_cores = get_cpu_cores();
             float load_avg = get_cpu_load();
             float load_per_core = load_avg / n_cores;
 
             d_assert(timer, return, "Null timer");
             d_assert(load_avg >= 0, return, "Negative cpu load average");
+
+            hash_t *enbs = mme_self()->enb_id_hash;
+            int n_enb = hash_count(enbs);
+            int n_enb_to_send = 0;
+            pkbuf_t *s1apbuf = NULL;
 
             d_trace(9, "MME_EVT_CHECK_OVERLOAD: load_avg=%.2f, n_cores=%d, threshold=%.2f\n", 
                 load_avg, n_cores, OVERLOAD_THRESHOLD);
@@ -646,35 +653,42 @@ void mme_state_operational(fsm_t *s, event_t *e)
                         load_per_core, OVERLOAD_THRESHOLD);
 
                     s1ap_build_overload_start(&s1apbuf);
+                    n_enb_to_send = ceil(n_enb * OVERLOAD_NOTIFY_ENB_RATIO);
 
                     mme_self()->overload_started = true;
                 }
-            } else {
+            }
+            else
+            {
                 if (mme_self()->overload_started)
                 {
                     d_trace(1, "MME overload_stop (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
                         load_per_core, OVERLOAD_THRESHOLD);
 
                     s1ap_build_overload_stop(&s1apbuf);
+                    n_enb_to_send = n_enb;
 
                     mme_self()->overload_started = false;
                 }
             }
 
-            if (s1apbuf != NULL)
+            if (s1apbuf != NULL && n_enb_to_send > 0)
             {
-                // Send message to all eNB (or randomly selected eNB) connected to this MME
-                hash_index_t *it;
-                mme_enb_t *enb;
-                void *val;
-                for (it = hash_first(mme_self()->enb_id_hash); it; it = hash_next(it))
-                {                        
-                    hash_this(it, NULL, NULL, &val);
-                    enb = (mme_enb_t *) val;
+                // Send message to randomly selected eNBs which connected to this MME
+                mme_enb_t **selected_enb = (mme_enb_t **) malloc(n_enb_to_send * sizeof(mme_enb_t *));
+                d_assert(ht_rand_select_non_dup(enbs, n_enb_to_send, (void **) selected_enb) == CORE_OK, break, "Unable to select target eNBs");
 
+                mme_enb_t *enb;
+                int i = 0;
+                for (i = 0; i < n_enb_to_send; i++)
+                {                        
+                    enb = selected_enb[i];
+                    d_trace(1, "Sending message to eNB #%d/%d\n", enb->index, n_enb);
                     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,
                         "s1ap_send_to_enb() failed");
                 }
+
+                free(selected_enb);
             }
 
             // Restart timer for the next tick

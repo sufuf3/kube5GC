@@ -39,7 +39,17 @@ extern "C" {
 #define MAX_NUM_OF_BPLMN            6
 
 /******************** Added by Chi ********************/
-#define OVERLOAD_THRESHOLD          0.85    /* Trigger overload_start if system load_avg/n_proc is greater than this threshold */
+#define OVERLOAD_THRESHOLD          0.8    /* Threshold for triggering overload_start/stop */
+
+/**
+ * OVERLOAD_NOTIFY_ENB_RATIO
+ * 
+ * Ratio of eNB which overload_start message will be sent to.
+ * (all eNB will receive overload_stop when MME is recovering)
+ * 
+ * Ref: TS23.401 Ch4.3.7.4.1
+ */
+#define OVERLOAD_NOTIFY_ENB_RATIO   0.7
 /******************************************************/
 
 typedef struct _enb_ue_t enb_ue_t;
