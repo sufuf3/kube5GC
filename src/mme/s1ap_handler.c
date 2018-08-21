@@ -1639,6 +1639,56 @@ void s1ap_handle_ue_context_release_complete(
     }
 }
 
+/*************Add by Steven Lee*****************/
+// Handle UE Context Resume Request
+void s1ap_handle_ue_context_resume_request(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    int i;
+
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+	S1AP_UEContextResumeRequest_t *UEContextResumeRequest = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+	S1AP_UEContextResumeRequestIEs_t *ie = NULL;
+    S1AP_E_RABFailedToResumeListResumeReq_t	 *E_RABFailedToResumeListResumeReq;
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+	// Message Type
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    UEContextResumeRequest= &initiatingMessage->value.choice.UEContextResumeRequest;
+	//--------------
+	
+    d_trace(3, "[MME] UE Context Resume Request\n");
+	
+    for (i = 0; i <UEContextResumeRequest->protocolIEs.list.count; i++)
+    {
+        ie = UEContextResumeRequest->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
+                MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+                break;
+			case S1AP_ProtocolIE_ID_id_E_RABFailedToResumeListResumeReq:
+				E_RABFailedToResumeListResumeReq = &ie->value.choice.E_RABFailedToResumeListResumeReq;
+				break;
+            default:
+                break;
+        }
+    }
+
+    // TODO: build response and send back to enb
+
+}
+/****************************************************/
+
 void s1ap_handle_paging(mme_ue_t *mme_ue)
 {
     pkbuf_t *s1apbuf = NULL;

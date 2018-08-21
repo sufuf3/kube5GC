@@ -55,6 +55,11 @@ CORE_DECLARE(void) s1ap_handle_ue_context_release_request(
 CORE_DECLARE(void) s1ap_handle_ue_context_release_complete(
         mme_enb_t *enb, s1ap_message_t *message);
 
+/*************Add by Steven Lee*****************/
+CORE_DECLARE(void) s1ap_handle_ue_context_resume_request(
+        mme_enb_t *enb, s1ap_message_t *message);
+/******************************************/
+
 CORE_DECLARE(void) s1ap_handle_paging(mme_ue_t *mme_ue);
 
 CORE_DECLARE(void) s1ap_handle_path_switch_request(
