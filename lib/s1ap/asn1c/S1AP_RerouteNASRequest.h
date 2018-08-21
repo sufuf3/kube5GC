@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_RerouteNASRequest */
 typedef struct S1AP_RerouteNASRequest {
-	S1AP_ProtocolIE_Container_6551P35_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P35_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_TraceStart */
 typedef struct S1AP_TraceStart {
-	S1AP_ProtocolIE_Container_6551P54_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P54_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

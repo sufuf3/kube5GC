@@ -24,10 +24,12 @@ typedef enum S1AP_HandoverType {
 	S1AP_HandoverType_ltetoutran	= 1,
 	S1AP_HandoverType_ltetogeran	= 2,
 	S1AP_HandoverType_utrantolte	= 3,
-	S1AP_HandoverType_gerantolte	= 4
+	S1AP_HandoverType_gerantolte	= 4,
 	/*
 	 * Enumeration is extensible
 	 */
+	S1AP_HandoverType_ltetonr	= 5,
+	S1AP_HandoverType_nrtolte	= 6
 } e_S1AP_HandoverType;
 
 /* S1AP_HandoverType */

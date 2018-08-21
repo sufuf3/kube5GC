@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_Paging */
 typedef struct S1AP_Paging {
-	S1AP_ProtocolIE_Container_6551P22_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P22_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

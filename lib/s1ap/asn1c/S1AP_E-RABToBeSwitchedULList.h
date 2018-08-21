@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /* S1AP_E-RABToBeSwitchedULList */
-typedef S1AP_E_RAB_IE_ContainerList_1142P5_t	 S1AP_E_RABToBeSwitchedULList_t;
+typedef S1AP_E_RAB_IE_ContainerList_1181P5_t	 S1AP_E_RABToBeSwitchedULList_t;
 
 /* Implementation */
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABToBeSwitchedULList;

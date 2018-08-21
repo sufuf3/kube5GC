@@ -11,7 +11,7 @@ asn_TYPE_member_t asn_MBR_S1AP_LocationReportingFailureIndication_1[] = {
 	{ ATF_NOFLAGS, 0, offsetof(struct S1AP_LocationReportingFailureIndication, protocolIEs),
 		(ASN_TAG_CLASS_CONTEXT | (0 << 2)),
 		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_S1AP_ProtocolIE_Container_6551P59,
+		&asn_DEF_S1AP_ProtocolIE_Container_7004P59,
 		0,
 		{ 0, 0, 0 },
 		0, 0, /* No default value */

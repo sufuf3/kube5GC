@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /* S1AP_E-RABToBeSetupListHOReq */
-typedef S1AP_E_RAB_IE_ContainerList_1142P1_t	 S1AP_E_RABToBeSetupListHOReq_t;
+typedef S1AP_E_RAB_IE_ContainerList_1181P1_t	 S1AP_E_RABToBeSetupListHOReq_t;
 
 /* Implementation */
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABToBeSetupListHOReq;

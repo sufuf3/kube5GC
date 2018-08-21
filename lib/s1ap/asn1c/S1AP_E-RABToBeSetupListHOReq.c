@@ -34,7 +34,7 @@ S1AP_E_RABToBeSetupListHOReq_constraint(const asn_TYPE_descriptor_t *td, const v
 }
 
 /*
- * This type is implemented using S1AP_E_RAB_IE_ContainerList_1142P1,
+ * This type is implemented using S1AP_E_RAB_IE_ContainerList_1181P1,
  * so here we adjust the DEF accordingly.
  */
 static asn_oer_constraints_t asn_OER_type_S1AP_E_RABToBeSetupListHOReq_constr_1 CC_NOTUSED = {
@@ -59,8 +59,8 @@ asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABToBeSetupListHOReq = {
 	sizeof(asn_DEF_S1AP_E_RABToBeSetupListHOReq_tags_1)
 		/sizeof(asn_DEF_S1AP_E_RABToBeSetupListHOReq_tags_1[0]), /* 1 */
 	{ &asn_OER_type_S1AP_E_RABToBeSetupListHOReq_constr_1, &asn_PER_type_S1AP_E_RABToBeSetupListHOReq_constr_1, S1AP_E_RABToBeSetupListHOReq_constraint },
-	asn_MBR_S1AP_ProtocolIE_ContainerList_6588P1_3,
+	asn_MBR_S1AP_ProtocolIE_ContainerList_7041P1_3,
 	1,	/* Single element */
-	&asn_SPC_S1AP_ProtocolIE_ContainerList_6588P1_specs_3	/* Additional specs */
+	&asn_SPC_S1AP_ProtocolIE_ContainerList_7041P1_specs_3	/* Additional specs */
 };
 

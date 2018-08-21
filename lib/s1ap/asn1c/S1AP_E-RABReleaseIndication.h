@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_E-RABReleaseIndication */
 typedef struct S1AP_E_RABReleaseIndication {
-	S1AP_ProtocolIE_Container_6551P18_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P18_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

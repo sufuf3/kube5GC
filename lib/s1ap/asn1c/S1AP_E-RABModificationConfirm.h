@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_E-RABModificationConfirm */
 typedef struct S1AP_E_RABModificationConfirm {
-	S1AP_ProtocolIE_Container_6551P78_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P78_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

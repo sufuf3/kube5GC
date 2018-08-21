@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_ENBCPRelocationIndication */
 typedef struct S1AP_ENBCPRelocationIndication {
-	S1AP_ProtocolIE_Container_6551P89_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P89_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

@@ -23,18 +23,18 @@ extern "C" {
 struct S1AP_PrivateMessageIEs;
 
 /* S1AP_PrivateIE-Container */
-typedef struct S1AP_PrivateIE_Container_6618P0 {
+typedef struct S1AP_PrivateIE_Container_7071P0 {
 	A_SEQUENCE_OF(struct S1AP_PrivateMessageIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_PrivateIE_Container_6618P0_t;
+} S1AP_PrivateIE_Container_7071P0_t;
 
 /* Implementation */
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_PrivateIE_Container_6618P0;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_PrivateIE_Container_6618P0_specs_1;
-extern asn_TYPE_member_t asn_MBR_S1AP_PrivateIE_Container_6618P0_1[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_PrivateIE_Container_6618P0_constr_1;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_PrivateIE_Container_7071P0;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_PrivateIE_Container_7071P0_specs_1;
+extern asn_TYPE_member_t asn_MBR_S1AP_PrivateIE_Container_7071P0_1[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_PrivateIE_Container_7071P0_constr_1;
 
 #ifdef __cplusplus
 }

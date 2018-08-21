@@ -48,6 +48,10 @@ extern "C" {
 #define S1AP_maxnoofMBSFNAreaMDT (8)
 #define S1AP_maxnoofRecommendedCells (16)
 #define S1AP_maxnoofRecommendedENBs (16)
+#define S1AP_maxnooftimeperiods (2)
+#define S1AP_maxnoofCellIDforQMC (32)
+#define S1AP_maxnoofTAforQMC (8)
+#define S1AP_maxnoofPLMNforQMC (16)
 
 
 #ifdef __cplusplus

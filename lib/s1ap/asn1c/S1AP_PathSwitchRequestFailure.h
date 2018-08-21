@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_PathSwitchRequestFailure */
 typedef struct S1AP_PathSwitchRequestFailure {
-	S1AP_ProtocolIE_Container_6551P9_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P9_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

@@ -40,7 +40,7 @@ asn_TYPE_member_t asn_MBR_S1AP_E_RABLevelQoSParameters_1[] = {
 	{ ATF_POINTER, 1, offsetof(struct S1AP_E_RABLevelQoSParameters, iE_Extensions),
 		(ASN_TAG_CLASS_CONTEXT | (3 << 2)),
 		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_S1AP_ProtocolExtensionContainer_6602P51,
+		&asn_DEF_S1AP_ProtocolExtensionContainer_7055P53,
 		0,
 		{ 0, 0, 0 },
 		0, 0, /* No default value */

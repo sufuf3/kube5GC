@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_KillResponse */
 typedef struct S1AP_KillResponse {
-	S1AP_ProtocolIE_Container_6551P70_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P70_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

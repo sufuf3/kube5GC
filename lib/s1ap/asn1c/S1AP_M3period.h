@@ -22,10 +22,17 @@ extern "C" {
 typedef enum S1AP_M3period {
 	S1AP_M3period_ms100	= 0,
 	S1AP_M3period_ms1000	= 1,
-	S1AP_M3period_ms10000	= 2
+	S1AP_M3period_ms10000	= 2,
 	/*
 	 * Enumeration is extensible
 	 */
+	S1AP_M3period_ms1024	= 3,
+	S1AP_M3period_ms1280	= 4,
+	S1AP_M3period_ms2048	= 5,
+	S1AP_M3period_ms2560	= 6,
+	S1AP_M3period_ms5120	= 7,
+	S1AP_M3period_ms10240	= 8,
+	S1AP_M3period_min1	= 9
 } e_S1AP_M3period;
 
 /* S1AP_M3period */

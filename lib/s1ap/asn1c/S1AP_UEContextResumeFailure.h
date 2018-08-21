@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_UEContextResumeFailure */
 typedef struct S1AP_UEContextResumeFailure {
-	S1AP_ProtocolIE_Container_6551P85_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P85_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

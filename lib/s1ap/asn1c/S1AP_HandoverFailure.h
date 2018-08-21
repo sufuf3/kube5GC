@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_HandoverFailure */
 typedef struct S1AP_HandoverFailure {
-	S1AP_ProtocolIE_Container_6551P5_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P5_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

@@ -52,9 +52,11 @@ struct S1AP_CellIdentifierAndCELevelForCECapableUEs_ExtIEs;
 struct S1AP_CellID_Broadcast_Item_ExtIEs;
 struct S1AP_CellID_Cancelled_Item_ExtIEs;
 struct S1AP_CellBasedMDT_ExtIEs;
+struct S1AP_CellBasedQMC_ExtIEs;
 struct S1AP_Cdma2000OneXSRVCCInfo_ExtIEs;
 struct S1AP_CellType_ExtIEs;
 struct S1AP_CGI_ExtIEs;
+struct S1AP_CNTypeRestrictions_Item_ExtIEs;
 struct S1AP_CSG_IdList_Item_ExtIEs;
 struct S1AP_COUNTvalue_ExtIEs;
 struct S1AP_COUNTValueExtended_ExtIEs;
@@ -72,9 +74,11 @@ struct S1AP_ENB_StatusTransfer_TransparentContainer_ExtIEs;
 struct S1AP_E_RABInformationListItem_ExtIEs;
 struct S1AP_E_RABItem_ExtIEs;
 struct S1AP_E_RABQoSParameters_ExtIEs;
+struct S1AP_E_RABUsageReportItem_ExtIEs;
 struct S1AP_EUTRAN_CGI_ExtIEs;
 struct S1AP_ExpectedUEBehaviour_ExtIEs;
 struct S1AP_ExpectedUEActivityBehaviour_ExtIEs;
+struct S1AP_FiveGSTAI_ExtIEs;
 struct S1AP_ForbiddenTAs_Item_ExtIEs;
 struct S1AP_ForbiddenLAs_Item_ExtIEs;
 struct S1AP_GBR_QosInformation_ExtIEs;
@@ -96,9 +100,11 @@ struct S1AP_MDT_Configuration_ExtIEs;
 struct S1AP_MBSFN_ResultToLogInfo_ExtIEs;
 struct S1AP_MutingPatternInformation_ExtIEs;
 struct S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs;
+struct S1AP_NRUESecurityCapabilities_ExtIEs;
 struct S1AP_PagingAttemptInformation_ExtIEs;
 struct S1AP_Paging_eDRXInformation_ExtIEs;
 struct S1AP_M1PeriodicReporting_ExtIEs;
+struct S1AP_PLMNAreaBasedQMC_ExtIEs;
 struct S1AP_ProSeAuthorized_ExtIEs;
 struct S1AP_RecommendedCellsForPaging_ExtIEs;
 struct S1AP_RecommendedCellsForPagingItem_ExtIEs;
@@ -108,6 +114,7 @@ struct S1AP_RequestType_ExtIEs;
 struct S1AP_RIMTransfer_ExtIEs;
 struct S1AP_RLFReportInformation_ExtIEs;
 struct S1AP_SecurityContext_ExtIEs;
+struct S1AP_SecondaryRATDataUsageReportItem_ExtIEs;
 struct S1AP_SONInformationReply_ExtIEs;
 struct S1AP_SONConfigurationTransfer_ExtIEs;
 struct S1AP_SynchronisationInformation_ExtIEs;
@@ -122,14 +129,21 @@ struct S1AP_TAI_ExtIEs;
 struct S1AP_TAI_Broadcast_Item_ExtIEs;
 struct S1AP_TAI_Cancelled_Item_ExtIEs;
 struct S1AP_TABasedMDT_ExtIEs;
+struct S1AP_TABasedQMC_ExtIEs;
+struct S1AP_TAIBasedQMC_ExtIEs;
 struct S1AP_CompletedCellinTAI_Item_ExtIEs;
 struct S1AP_TargeteNB_ID_ExtIEs;
 struct S1AP_TargetRNC_ID_ExtIEs;
+struct S1AP_TargetNgRanNode_ID_ExtIEs;
+struct S1AP_GNB_ExtIEs;
+struct S1AP_Global_GNB_ID_ExtIEs;
+struct S1AP_NG_eNB_ExtIEs;
 struct S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs;
 struct S1AP_M1ThresholdEventA2_ExtIEs;
 struct S1AP_TraceActivation_ExtIEs;
 struct S1AP_Tunnel_Information_ExtIEs;
 struct S1AP_UEAggregate_MaximumBitrates_ExtIEs;
+struct S1AP_UEAppLayerMeasConfig_ExtIEs;
 struct S1AP_UE_S1AP_ID_pair_ExtIEs;
 struct S1AP_UE_associatedLogicalS1_ConnectionItemExtIEs;
 struct S1AP_UESecurityCapabilities_ExtIEs;
@@ -141,1198 +155,1338 @@ struct S1AP_X2TNLConfigurationInfo_ExtIEs;
 struct S1AP_ENBX2ExtTLA_ExtIEs;
 
 /* S1AP_ProtocolExtensionContainer */
-typedef struct S1AP_ProtocolExtensionContainer_6602P0 {
+typedef struct S1AP_ProtocolExtensionContainer_7055P0 {
 	A_SEQUENCE_OF(struct S1AP_E_RABDataForwardingItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P0_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P1 {
+} S1AP_ProtocolExtensionContainer_7055P0_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P1 {
 	A_SEQUENCE_OF(struct S1AP_E_RABToBeSetupItemHOReq_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P1_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P2 {
+} S1AP_ProtocolExtensionContainer_7055P1_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P2 {
 	A_SEQUENCE_OF(struct S1AP_E_RABAdmittedItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P2_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P3 {
+} S1AP_ProtocolExtensionContainer_7055P2_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P3 {
 	A_SEQUENCE_OF(struct S1AP_E_RABFailedToSetupItemHOReqAckExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P3_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P4 {
+} S1AP_ProtocolExtensionContainer_7055P3_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P4 {
 	A_SEQUENCE_OF(struct S1AP_E_RABToBeSwitchedDLItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P4_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P5 {
+} S1AP_ProtocolExtensionContainer_7055P4_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P5 {
 	A_SEQUENCE_OF(struct S1AP_E_RABToBeSwitchedULItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P5_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P6 {
+} S1AP_ProtocolExtensionContainer_7055P5_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P6 {
 	A_SEQUENCE_OF(struct S1AP_E_RABToBeSetupItemBearerSUReqExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P6_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P7 {
+} S1AP_ProtocolExtensionContainer_7055P6_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P7 {
 	A_SEQUENCE_OF(struct S1AP_E_RABSetupItemBearerSUResExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P7_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P8 {
+} S1AP_ProtocolExtensionContainer_7055P7_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P8 {
 	A_SEQUENCE_OF(struct S1AP_E_RABToBeModifyItemBearerModReqExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P8_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P9 {
+} S1AP_ProtocolExtensionContainer_7055P8_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P9 {
 	A_SEQUENCE_OF(struct S1AP_E_RABModifyItemBearerModResExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P9_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P10 {
+} S1AP_ProtocolExtensionContainer_7055P9_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P10 {
 	A_SEQUENCE_OF(struct S1AP_E_RABReleaseItemBearerRelCompExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P10_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P11 {
+} S1AP_ProtocolExtensionContainer_7055P10_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P11 {
 	A_SEQUENCE_OF(struct S1AP_E_RABToBeSetupItemCtxtSUReqExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P11_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P12 {
+} S1AP_ProtocolExtensionContainer_7055P11_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P12 {
 	A_SEQUENCE_OF(struct S1AP_E_RABSetupItemCtxtSUResExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P12_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P13 {
+} S1AP_ProtocolExtensionContainer_7055P12_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P13 {
 	A_SEQUENCE_OF(struct S1AP_TAIItemExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P13_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P14 {
+} S1AP_ProtocolExtensionContainer_7055P13_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P14 {
 	A_SEQUENCE_OF(struct S1AP_E_RABToBeModifiedItemBearerModInd_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P14_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P15 {
+} S1AP_ProtocolExtensionContainer_7055P14_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P15 {
 	A_SEQUENCE_OF(struct S1AP_E_RABNotToBeModifiedItemBearerModInd_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P15_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P16 {
+} S1AP_ProtocolExtensionContainer_7055P15_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P16 {
 	A_SEQUENCE_OF(struct S1AP_CSGMembershipInfo_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P16_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P17 {
+} S1AP_ProtocolExtensionContainer_7055P16_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P17 {
 	A_SEQUENCE_OF(struct S1AP_E_RABModifyItemBearerModConfExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P17_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P18 {
+} S1AP_ProtocolExtensionContainer_7055P17_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P18 {
 	A_SEQUENCE_OF(struct S1AP_E_RABFailedToResumeItemResumeReq_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P18_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P19 {
+} S1AP_ProtocolExtensionContainer_7055P18_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P19 {
 	A_SEQUENCE_OF(struct S1AP_E_RABFailedToResumeItemResumeRes_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P19_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P20 {
+} S1AP_ProtocolExtensionContainer_7055P19_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P20 {
 	A_SEQUENCE_OF(struct S1AP_Additional_GUTI_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P20_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P21 {
+} S1AP_ProtocolExtensionContainer_7055P20_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P21 {
 	A_SEQUENCE_OF(struct S1AP_AllocationAndRetentionPriority_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P21_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P22 {
+} S1AP_ProtocolExtensionContainer_7055P21_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P22 {
 	A_SEQUENCE_OF(struct S1AP_InformationForCECapableUEs_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P22_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P23 {
+} S1AP_ProtocolExtensionContainer_7055P22_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P23 {
 	A_SEQUENCE_OF(struct S1AP_AssistanceDataForPaging_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P23_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P24 {
+} S1AP_ProtocolExtensionContainer_7055P23_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P24 {
 	A_SEQUENCE_OF(struct S1AP_AssistanceDataForRecommendedCells_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P24_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P25 {
+} S1AP_ProtocolExtensionContainer_7055P24_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P25 {
 	A_SEQUENCE_OF(struct S1AP_Bearers_SubjectToStatusTransfer_ItemExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P25_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P26 {
+} S1AP_ProtocolExtensionContainer_7055P25_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P26 {
 	A_SEQUENCE_OF(struct S1AP_CancelledCellinEAI_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P26_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P27 {
+} S1AP_ProtocolExtensionContainer_7055P26_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P27 {
 	A_SEQUENCE_OF(struct S1AP_CancelledCellinTAI_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P27_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P28 {
+} S1AP_ProtocolExtensionContainer_7055P27_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P28 {
 	A_SEQUENCE_OF(struct S1AP_CellIdentifierAndCELevelForCECapableUEs_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P28_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P29 {
+} S1AP_ProtocolExtensionContainer_7055P28_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P29 {
 	A_SEQUENCE_OF(struct S1AP_CellID_Broadcast_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P29_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P30 {
+} S1AP_ProtocolExtensionContainer_7055P29_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P30 {
 	A_SEQUENCE_OF(struct S1AP_CellID_Cancelled_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P30_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P31 {
+} S1AP_ProtocolExtensionContainer_7055P30_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P31 {
 	A_SEQUENCE_OF(struct S1AP_CellBasedMDT_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P31_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P32 {
+} S1AP_ProtocolExtensionContainer_7055P31_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P32 {
+	A_SEQUENCE_OF(struct S1AP_CellBasedQMC_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P32_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P33 {
 	A_SEQUENCE_OF(struct S1AP_Cdma2000OneXSRVCCInfo_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P32_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P33 {
+} S1AP_ProtocolExtensionContainer_7055P33_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P34 {
 	A_SEQUENCE_OF(struct S1AP_CellType_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P33_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P34 {
+} S1AP_ProtocolExtensionContainer_7055P34_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P35 {
 	A_SEQUENCE_OF(struct S1AP_CGI_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P34_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P35 {
+} S1AP_ProtocolExtensionContainer_7055P35_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P36 {
+	A_SEQUENCE_OF(struct S1AP_CNTypeRestrictions_Item_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P36_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P37 {
 	A_SEQUENCE_OF(struct S1AP_CSG_IdList_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P35_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P36 {
+} S1AP_ProtocolExtensionContainer_7055P37_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P38 {
 	A_SEQUENCE_OF(struct S1AP_COUNTvalue_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P36_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P37 {
+} S1AP_ProtocolExtensionContainer_7055P38_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P39 {
 	A_SEQUENCE_OF(struct S1AP_COUNTValueExtended_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P37_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P38 {
+} S1AP_ProtocolExtensionContainer_7055P39_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P40 {
 	A_SEQUENCE_OF(struct S1AP_COUNTvaluePDCP_SNlength18_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P38_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P39 {
+} S1AP_ProtocolExtensionContainer_7055P40_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P41 {
 	A_SEQUENCE_OF(struct S1AP_CriticalityDiagnostics_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P39_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P40 {
+} S1AP_ProtocolExtensionContainer_7055P41_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P42 {
 	A_SEQUENCE_OF(struct S1AP_CriticalityDiagnostics_IE_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P40_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P41 {
+} S1AP_ProtocolExtensionContainer_7055P42_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P43 {
 	A_SEQUENCE_OF(struct S1AP_ServedDCNsItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P41_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P42 {
+} S1AP_ProtocolExtensionContainer_7055P43_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P44 {
 	A_SEQUENCE_OF(struct S1AP_DL_CP_SecurityInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P42_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P43 {
+} S1AP_ProtocolExtensionContainer_7055P44_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P45 {
 	A_SEQUENCE_OF(struct S1AP_EmergencyAreaID_Broadcast_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P43_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P44 {
+} S1AP_ProtocolExtensionContainer_7055P45_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P46 {
 	A_SEQUENCE_OF(struct S1AP_EmergencyAreaID_Cancelled_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P44_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P45 {
+} S1AP_ProtocolExtensionContainer_7055P46_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P47 {
 	A_SEQUENCE_OF(struct S1AP_CompletedCellinEAI_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P45_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P46 {
+} S1AP_ProtocolExtensionContainer_7055P47_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P48 {
 	A_SEQUENCE_OF(struct S1AP_GERAN_Cell_ID_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P46_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P47 {
+} S1AP_ProtocolExtensionContainer_7055P48_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P49 {
 	A_SEQUENCE_OF(struct S1AP_GlobalENB_ID_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P47_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P48 {
+} S1AP_ProtocolExtensionContainer_7055P49_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P50 {
 	A_SEQUENCE_OF(struct S1AP_ENB_StatusTransfer_TransparentContainer_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P48_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P49 {
+} S1AP_ProtocolExtensionContainer_7055P50_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P51 {
 	A_SEQUENCE_OF(struct S1AP_E_RABInformationListItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P49_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P50 {
+} S1AP_ProtocolExtensionContainer_7055P51_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P52 {
 	A_SEQUENCE_OF(struct S1AP_E_RABItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P50_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P51 {
+} S1AP_ProtocolExtensionContainer_7055P52_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P53 {
 	A_SEQUENCE_OF(struct S1AP_E_RABQoSParameters_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P51_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P52 {
+} S1AP_ProtocolExtensionContainer_7055P53_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P54 {
+	A_SEQUENCE_OF(struct S1AP_E_RABUsageReportItem_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P54_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P55 {
 	A_SEQUENCE_OF(struct S1AP_EUTRAN_CGI_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P52_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P53 {
+} S1AP_ProtocolExtensionContainer_7055P55_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P56 {
 	A_SEQUENCE_OF(struct S1AP_ExpectedUEBehaviour_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P53_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P54 {
+} S1AP_ProtocolExtensionContainer_7055P56_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P57 {
 	A_SEQUENCE_OF(struct S1AP_ExpectedUEActivityBehaviour_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P54_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P55 {
+} S1AP_ProtocolExtensionContainer_7055P57_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P58 {
+	A_SEQUENCE_OF(struct S1AP_FiveGSTAI_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P58_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P59 {
 	A_SEQUENCE_OF(struct S1AP_ForbiddenTAs_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P55_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P56 {
+} S1AP_ProtocolExtensionContainer_7055P59_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P60 {
 	A_SEQUENCE_OF(struct S1AP_ForbiddenLAs_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P56_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P57 {
+} S1AP_ProtocolExtensionContainer_7055P60_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P61 {
 	A_SEQUENCE_OF(struct S1AP_GBR_QosInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P57_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P58 {
+} S1AP_ProtocolExtensionContainer_7055P61_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P62 {
 	A_SEQUENCE_OF(struct S1AP_GUMMEI_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P58_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P59 {
+} S1AP_ProtocolExtensionContainer_7055P62_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P63 {
 	A_SEQUENCE_OF(struct S1AP_HandoverRestrictionList_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P59_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P60 {
+} S1AP_ProtocolExtensionContainer_7055P63_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P64 {
 	A_SEQUENCE_OF(struct S1AP_ImmediateMDT_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P60_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P61 {
+} S1AP_ProtocolExtensionContainer_7055P64_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P65 {
 	A_SEQUENCE_OF(struct S1AP_InformationOnRecommendedCellsAndENBsForPaging_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P61_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P62 {
+} S1AP_ProtocolExtensionContainer_7055P65_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P66 {
 	A_SEQUENCE_OF(struct S1AP_LAI_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P62_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P63 {
+} S1AP_ProtocolExtensionContainer_7055P66_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P67 {
 	A_SEQUENCE_OF(struct S1AP_LastVisitedEUTRANCellInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P63_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P64 {
+} S1AP_ProtocolExtensionContainer_7055P67_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P68 {
 	A_SEQUENCE_OF(struct S1AP_ListeningSubframePattern_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P64_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P65 {
+} S1AP_ProtocolExtensionContainer_7055P68_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P69 {
 	A_SEQUENCE_OF(struct S1AP_LoggedMDT_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P65_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P66 {
+} S1AP_ProtocolExtensionContainer_7055P69_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P70 {
 	A_SEQUENCE_OF(struct S1AP_LoggedMBSFNMDT_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P66_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P67 {
+} S1AP_ProtocolExtensionContainer_7055P70_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P71 {
 	A_SEQUENCE_OF(struct S1AP_M3Configuration_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P67_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P68 {
+} S1AP_ProtocolExtensionContainer_7055P71_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P72 {
 	A_SEQUENCE_OF(struct S1AP_M4Configuration_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P68_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P69 {
+} S1AP_ProtocolExtensionContainer_7055P72_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P73 {
 	A_SEQUENCE_OF(struct S1AP_M5Configuration_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P69_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P70 {
+} S1AP_ProtocolExtensionContainer_7055P73_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P74 {
 	A_SEQUENCE_OF(struct S1AP_M6Configuration_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P70_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P71 {
+} S1AP_ProtocolExtensionContainer_7055P74_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P75 {
 	A_SEQUENCE_OF(struct S1AP_M7Configuration_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P71_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P72 {
+} S1AP_ProtocolExtensionContainer_7055P75_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P76 {
 	A_SEQUENCE_OF(struct S1AP_MDT_Configuration_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P72_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P73 {
+} S1AP_ProtocolExtensionContainer_7055P76_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P77 {
 	A_SEQUENCE_OF(struct S1AP_MBSFN_ResultToLogInfo_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P73_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P74 {
+} S1AP_ProtocolExtensionContainer_7055P77_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P78 {
 	A_SEQUENCE_OF(struct S1AP_MutingPatternInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P74_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P75 {
+} S1AP_ProtocolExtensionContainer_7055P78_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P79 {
 	A_SEQUENCE_OF(struct S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P75_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P76 {
+} S1AP_ProtocolExtensionContainer_7055P79_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P80 {
+	A_SEQUENCE_OF(struct S1AP_NRUESecurityCapabilities_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P80_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P81 {
 	A_SEQUENCE_OF(struct S1AP_PagingAttemptInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P76_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P77 {
+} S1AP_ProtocolExtensionContainer_7055P81_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P82 {
 	A_SEQUENCE_OF(struct S1AP_Paging_eDRXInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P77_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P78 {
+} S1AP_ProtocolExtensionContainer_7055P82_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P83 {
 	A_SEQUENCE_OF(struct S1AP_M1PeriodicReporting_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P78_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P79 {
+} S1AP_ProtocolExtensionContainer_7055P83_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P84 {
+	A_SEQUENCE_OF(struct S1AP_PLMNAreaBasedQMC_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P84_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P85 {
 	A_SEQUENCE_OF(struct S1AP_ProSeAuthorized_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P79_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P80 {
+} S1AP_ProtocolExtensionContainer_7055P85_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P86 {
 	A_SEQUENCE_OF(struct S1AP_RecommendedCellsForPaging_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P80_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P81 {
+} S1AP_ProtocolExtensionContainer_7055P86_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P87 {
 	A_SEQUENCE_OF(struct S1AP_RecommendedCellsForPagingItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P81_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P82 {
+} S1AP_ProtocolExtensionContainer_7055P87_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P88 {
 	A_SEQUENCE_OF(struct S1AP_RecommendedENBsForPaging_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P82_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P83 {
+} S1AP_ProtocolExtensionContainer_7055P88_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P89 {
 	A_SEQUENCE_OF(struct S1AP_RecommendedENBItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P83_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P84 {
+} S1AP_ProtocolExtensionContainer_7055P89_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P90 {
 	A_SEQUENCE_OF(struct S1AP_RequestType_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P84_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P85 {
+} S1AP_ProtocolExtensionContainer_7055P90_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P91 {
 	A_SEQUENCE_OF(struct S1AP_RIMTransfer_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P85_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P86 {
+} S1AP_ProtocolExtensionContainer_7055P91_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P92 {
 	A_SEQUENCE_OF(struct S1AP_RLFReportInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P86_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P87 {
+} S1AP_ProtocolExtensionContainer_7055P92_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P93 {
 	A_SEQUENCE_OF(struct S1AP_SecurityContext_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P87_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P88 {
+} S1AP_ProtocolExtensionContainer_7055P93_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P94 {
+	A_SEQUENCE_OF(struct S1AP_SecondaryRATDataUsageReportItem_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P94_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P95 {
 	A_SEQUENCE_OF(struct S1AP_SONInformationReply_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P88_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P89 {
+} S1AP_ProtocolExtensionContainer_7055P95_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P96 {
 	A_SEQUENCE_OF(struct S1AP_SONConfigurationTransfer_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P89_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P90 {
+} S1AP_ProtocolExtensionContainer_7055P96_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P97 {
 	A_SEQUENCE_OF(struct S1AP_SynchronisationInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P90_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P91 {
+} S1AP_ProtocolExtensionContainer_7055P97_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P98 {
 	A_SEQUENCE_OF(struct S1AP_SourceeNB_ID_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P91_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P92 {
+} S1AP_ProtocolExtensionContainer_7055P98_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P99 {
 	A_SEQUENCE_OF(struct S1AP_SourceeNB_ToTargeteNB_TransparentContainer_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P92_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P93 {
+} S1AP_ProtocolExtensionContainer_7055P99_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P100 {
 	A_SEQUENCE_OF(struct S1AP_ServedGUMMEIsItem_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P93_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P94 {
+} S1AP_ProtocolExtensionContainer_7055P100_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P101 {
 	A_SEQUENCE_OF(struct S1AP_SupportedTAs_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P94_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P95 {
+} S1AP_ProtocolExtensionContainer_7055P101_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P102 {
 	A_SEQUENCE_OF(struct S1AP_TimeSynchronisationInfo_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P95_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P96 {
+} S1AP_ProtocolExtensionContainer_7055P102_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P103 {
 	A_SEQUENCE_OF(struct S1AP_S_TMSI_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P96_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P97 {
+} S1AP_ProtocolExtensionContainer_7055P103_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P104 {
 	A_SEQUENCE_OF(struct S1AP_TAIBasedMDT_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P97_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P98 {
+} S1AP_ProtocolExtensionContainer_7055P104_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P105 {
 	A_SEQUENCE_OF(struct S1AP_TAI_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P98_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P99 {
+} S1AP_ProtocolExtensionContainer_7055P105_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P106 {
 	A_SEQUENCE_OF(struct S1AP_TAI_Broadcast_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P99_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P100 {
+} S1AP_ProtocolExtensionContainer_7055P106_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P107 {
 	A_SEQUENCE_OF(struct S1AP_TAI_Cancelled_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P100_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P101 {
+} S1AP_ProtocolExtensionContainer_7055P107_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P108 {
 	A_SEQUENCE_OF(struct S1AP_TABasedMDT_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P101_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P102 {
+} S1AP_ProtocolExtensionContainer_7055P108_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P109 {
+	A_SEQUENCE_OF(struct S1AP_TABasedQMC_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P109_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P110 {
+	A_SEQUENCE_OF(struct S1AP_TAIBasedQMC_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P110_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P111 {
 	A_SEQUENCE_OF(struct S1AP_CompletedCellinTAI_Item_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P102_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P103 {
+} S1AP_ProtocolExtensionContainer_7055P111_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P112 {
 	A_SEQUENCE_OF(struct S1AP_TargeteNB_ID_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P103_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P104 {
+} S1AP_ProtocolExtensionContainer_7055P112_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P113 {
 	A_SEQUENCE_OF(struct S1AP_TargetRNC_ID_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P104_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P105 {
+} S1AP_ProtocolExtensionContainer_7055P113_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P114 {
+	A_SEQUENCE_OF(struct S1AP_TargetNgRanNode_ID_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P114_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P115 {
+	A_SEQUENCE_OF(struct S1AP_GNB_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P115_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P116 {
+	A_SEQUENCE_OF(struct S1AP_Global_GNB_ID_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P116_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P117 {
+	A_SEQUENCE_OF(struct S1AP_NG_eNB_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P117_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P118 {
 	A_SEQUENCE_OF(struct S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P105_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P106 {
+} S1AP_ProtocolExtensionContainer_7055P118_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P119 {
 	A_SEQUENCE_OF(struct S1AP_M1ThresholdEventA2_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P106_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P107 {
+} S1AP_ProtocolExtensionContainer_7055P119_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P120 {
 	A_SEQUENCE_OF(struct S1AP_TraceActivation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P107_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P108 {
+} S1AP_ProtocolExtensionContainer_7055P120_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P121 {
 	A_SEQUENCE_OF(struct S1AP_Tunnel_Information_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P108_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P109 {
+} S1AP_ProtocolExtensionContainer_7055P121_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P122 {
 	A_SEQUENCE_OF(struct S1AP_UEAggregate_MaximumBitrates_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P109_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P110 {
+} S1AP_ProtocolExtensionContainer_7055P122_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P123 {
+	A_SEQUENCE_OF(struct S1AP_UEAppLayerMeasConfig_ExtIEs) list;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_ProtocolExtensionContainer_7055P123_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P124 {
 	A_SEQUENCE_OF(struct S1AP_UE_S1AP_ID_pair_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P110_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P111 {
+} S1AP_ProtocolExtensionContainer_7055P124_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P125 {
 	A_SEQUENCE_OF(struct S1AP_UE_associatedLogicalS1_ConnectionItemExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P111_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P112 {
+} S1AP_ProtocolExtensionContainer_7055P125_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P126 {
 	A_SEQUENCE_OF(struct S1AP_UESecurityCapabilities_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P112_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P113 {
+} S1AP_ProtocolExtensionContainer_7055P126_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P127 {
 	A_SEQUENCE_OF(struct S1AP_UE_Sidelink_Aggregate_MaximumBitrates_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P113_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P114 {
+} S1AP_ProtocolExtensionContainer_7055P127_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P128 {
 	A_SEQUENCE_OF(struct S1AP_UL_CP_SecurityInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P114_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P115 {
+} S1AP_ProtocolExtensionContainer_7055P128_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P129 {
 	A_SEQUENCE_OF(struct S1AP_UserLocationInformation_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P115_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P116 {
+} S1AP_ProtocolExtensionContainer_7055P129_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P130 {
 	A_SEQUENCE_OF(struct S1AP_V2XServicesAuthorized_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P116_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P117 {
+} S1AP_ProtocolExtensionContainer_7055P130_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P131 {
 	A_SEQUENCE_OF(struct S1AP_X2TNLConfigurationInfo_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P117_t;
-typedef struct S1AP_ProtocolExtensionContainer_6602P118 {
+} S1AP_ProtocolExtensionContainer_7055P131_t;
+typedef struct S1AP_ProtocolExtensionContainer_7055P132 {
 	A_SEQUENCE_OF(struct S1AP_ENBX2ExtTLA_ExtIEs) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} S1AP_ProtocolExtensionContainer_6602P118_t;
+} S1AP_ProtocolExtensionContainer_7055P132_t;
 
 /* Implementation */
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P0;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P0_specs_1;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P0_1[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P0_constr_1;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P1;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P1_specs_3;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P1_3[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P1_constr_3;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P2;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P2_specs_5;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P2_5[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P2_constr_5;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P3;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P3_specs_7;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P3_7[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P3_constr_7;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P4;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P4_specs_9;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P4_9[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P4_constr_9;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P5;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P5_specs_11;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P5_11[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P5_constr_11;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P6;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P6_specs_13;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P6_13[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P6_constr_13;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P7;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P7_specs_15;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P7_15[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P7_constr_15;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P8;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P8_specs_17;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P8_17[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P8_constr_17;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P9;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P9_specs_19;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P9_19[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P9_constr_19;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P10;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P10_specs_21;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P10_21[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P10_constr_21;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P11;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P11_specs_23;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P11_23[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P11_constr_23;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P12;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P12_specs_25;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P12_25[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P12_constr_25;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P13;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P13_specs_27;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P13_27[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P13_constr_27;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P14;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P14_specs_29;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P14_29[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P14_constr_29;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P15;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P15_specs_31;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P15_31[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P15_constr_31;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P16;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P16_specs_33;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P16_33[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P16_constr_33;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P17;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P17_specs_35;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P17_35[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P17_constr_35;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P18;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P18_specs_37;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P18_37[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P18_constr_37;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P19;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P19_specs_39;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P19_39[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P19_constr_39;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P20;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P20_specs_41;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P20_41[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P20_constr_41;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P21;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P21_specs_43;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P21_43[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P21_constr_43;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P22;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P22_specs_45;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P22_45[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P22_constr_45;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P23;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P23_specs_47;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P23_47[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P23_constr_47;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P24;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P24_specs_49;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P24_49[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P24_constr_49;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P25;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P25_specs_51;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P25_51[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P25_constr_51;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P26;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P26_specs_53;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P26_53[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P26_constr_53;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P27;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P27_specs_55;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P27_55[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P27_constr_55;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P28;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P28_specs_57;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P28_57[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P28_constr_57;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P29;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P29_specs_59;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P29_59[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P29_constr_59;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P30;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P30_specs_61;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P30_61[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P30_constr_61;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P31;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P31_specs_63;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P31_63[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P31_constr_63;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P32;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P32_specs_65;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P32_65[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P32_constr_65;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P33;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P33_specs_67;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P33_67[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P33_constr_67;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P34;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P34_specs_69;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P34_69[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P34_constr_69;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P35;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P35_specs_71;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P35_71[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P35_constr_71;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P36;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P36_specs_73;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P36_73[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P36_constr_73;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P37;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P37_specs_75;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P37_75[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P37_constr_75;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P38;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P38_specs_77;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P38_77[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P38_constr_77;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P39;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P39_specs_79;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P39_79[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P39_constr_79;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P40;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P40_specs_81;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P40_81[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P40_constr_81;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P41;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P41_specs_83;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P41_83[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P41_constr_83;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P42;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P42_specs_85;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P42_85[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P42_constr_85;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P43;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P43_specs_87;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P43_87[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P43_constr_87;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P44;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P44_specs_89;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P44_89[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P44_constr_89;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P45;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P45_specs_91;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P45_91[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P45_constr_91;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P46;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P46_specs_93;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P46_93[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P46_constr_93;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P47;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P47_specs_95;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P47_95[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P47_constr_95;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P48;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P48_specs_97;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P48_97[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P48_constr_97;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P49;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P49_specs_99;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P49_99[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P49_constr_99;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P50;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P50_specs_101;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P50_101[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P50_constr_101;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P51;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P51_specs_103;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P51_103[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P51_constr_103;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P52;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P52_specs_105;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P52_105[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P52_constr_105;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P53;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P53_specs_107;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P53_107[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P53_constr_107;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P54;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P54_specs_109;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P54_109[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P54_constr_109;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P55;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P55_specs_111;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P55_111[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P55_constr_111;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P56;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P56_specs_113;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P56_113[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P56_constr_113;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P57;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P57_specs_115;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P57_115[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P57_constr_115;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P58;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P58_specs_117;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P58_117[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P58_constr_117;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P59;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P59_specs_119;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P59_119[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P59_constr_119;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P60;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P60_specs_121;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P60_121[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P60_constr_121;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P61;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P61_specs_123;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P61_123[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P61_constr_123;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P62;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P62_specs_125;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P62_125[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P62_constr_125;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P63;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P63_specs_127;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P63_127[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P63_constr_127;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P64;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P64_specs_129;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P64_129[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P64_constr_129;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P65;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P65_specs_131;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P65_131[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P65_constr_131;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P66;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P66_specs_133;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P66_133[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P66_constr_133;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P67;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P67_specs_135;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P67_135[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P67_constr_135;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P68;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P68_specs_137;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P68_137[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P68_constr_137;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P69;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P69_specs_139;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P69_139[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P69_constr_139;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P70;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P70_specs_141;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P70_141[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P70_constr_141;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P71;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P71_specs_143;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P71_143[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P71_constr_143;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P72;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P72_specs_145;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P72_145[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P72_constr_145;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P73;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P73_specs_147;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P73_147[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P73_constr_147;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P74;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P74_specs_149;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P74_149[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P74_constr_149;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P75;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P75_specs_151;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P75_151[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P75_constr_151;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P76;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P76_specs_153;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P76_153[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P76_constr_153;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P77;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P77_specs_155;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P77_155[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P77_constr_155;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P78;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P78_specs_157;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P78_157[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P78_constr_157;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P79;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P79_specs_159;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P79_159[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P79_constr_159;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P80;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P80_specs_161;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P80_161[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P80_constr_161;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P81;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P81_specs_163;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P81_163[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P81_constr_163;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P82;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P82_specs_165;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P82_165[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P82_constr_165;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P83;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P83_specs_167;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P83_167[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P83_constr_167;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P84;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P84_specs_169;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P84_169[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P84_constr_169;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P85;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P85_specs_171;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P85_171[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P85_constr_171;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P86;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P86_specs_173;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P86_173[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P86_constr_173;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P87;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P87_specs_175;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P87_175[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P87_constr_175;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P88;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P88_specs_177;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P88_177[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P88_constr_177;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P89;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P89_specs_179;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P89_179[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P89_constr_179;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P90;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P90_specs_181;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P90_181[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P90_constr_181;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P91;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P91_specs_183;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P91_183[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P91_constr_183;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P92;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P92_specs_185;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P92_185[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P92_constr_185;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P93;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P93_specs_187;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P93_187[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P93_constr_187;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P94;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P94_specs_189;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P94_189[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P94_constr_189;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P95;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P95_specs_191;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P95_191[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P95_constr_191;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P96;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P96_specs_193;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P96_193[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P96_constr_193;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P97;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P97_specs_195;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P97_195[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P97_constr_195;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P98;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P98_specs_197;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P98_197[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P98_constr_197;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P99;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P99_specs_199;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P99_199[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P99_constr_199;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P100;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P100_specs_201;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P100_201[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P100_constr_201;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P101;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P101_specs_203;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P101_203[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P101_constr_203;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P102;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P102_specs_205;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P102_205[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P102_constr_205;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P103;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P103_specs_207;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P103_207[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P103_constr_207;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P104;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P104_specs_209;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P104_209[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P104_constr_209;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P105;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P105_specs_211;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P105_211[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P105_constr_211;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P106;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P106_specs_213;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P106_213[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P106_constr_213;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P107;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P107_specs_215;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P107_215[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P107_constr_215;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P108;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P108_specs_217;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P108_217[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P108_constr_217;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P109;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P109_specs_219;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P109_219[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P109_constr_219;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P110;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P110_specs_221;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P110_221[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P110_constr_221;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P111;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P111_specs_223;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P111_223[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P111_constr_223;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P112;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P112_specs_225;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P112_225[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P112_constr_225;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P113;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P113_specs_227;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P113_227[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P113_constr_227;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P114;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P114_specs_229;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P114_229[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P114_constr_229;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P115;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P115_specs_231;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P115_231[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P115_constr_231;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P116;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P116_specs_233;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P116_233[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P116_constr_233;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P117;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P117_specs_235;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P117_235[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P117_constr_235;
-extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_6602P118;
-extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_6602P118_specs_237;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_6602P118_237[1];
-extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_6602P118_constr_237;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P0;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P0_specs_1;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P0_1[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P0_constr_1;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P1;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P1_specs_3;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P1_3[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P1_constr_3;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P2;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P2_specs_5;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P2_5[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P2_constr_5;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P3;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P3_specs_7;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P3_7[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P3_constr_7;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P4;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P4_specs_9;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P4_9[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P4_constr_9;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P5;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P5_specs_11;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P5_11[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P5_constr_11;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P6;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P6_specs_13;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P6_13[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P6_constr_13;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P7;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P7_specs_15;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P7_15[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P7_constr_15;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P8;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P8_specs_17;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P8_17[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P8_constr_17;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P9;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P9_specs_19;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P9_19[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P9_constr_19;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P10;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P10_specs_21;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P10_21[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P10_constr_21;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P11;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P11_specs_23;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P11_23[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P11_constr_23;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P12;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P12_specs_25;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P12_25[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P12_constr_25;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P13;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P13_specs_27;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P13_27[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P13_constr_27;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P14;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P14_specs_29;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P14_29[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P14_constr_29;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P15;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P15_specs_31;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P15_31[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P15_constr_31;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P16;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P16_specs_33;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P16_33[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P16_constr_33;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P17;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P17_specs_35;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P17_35[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P17_constr_35;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P18;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P18_specs_37;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P18_37[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P18_constr_37;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P19;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P19_specs_39;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P19_39[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P19_constr_39;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P20;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P20_specs_41;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P20_41[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P20_constr_41;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P21;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P21_specs_43;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P21_43[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P21_constr_43;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P22;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P22_specs_45;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P22_45[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P22_constr_45;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P23;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P23_specs_47;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P23_47[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P23_constr_47;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P24;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P24_specs_49;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P24_49[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P24_constr_49;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P25;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P25_specs_51;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P25_51[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P25_constr_51;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P26;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P26_specs_53;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P26_53[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P26_constr_53;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P27;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P27_specs_55;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P27_55[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P27_constr_55;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P28;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P28_specs_57;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P28_57[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P28_constr_57;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P29;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P29_specs_59;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P29_59[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P29_constr_59;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P30;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P30_specs_61;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P30_61[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P30_constr_61;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P31;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P31_specs_63;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P31_63[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P31_constr_63;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P32;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P32_specs_65;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P32_65[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P32_constr_65;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P33;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P33_specs_67;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P33_67[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P33_constr_67;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P34;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P34_specs_69;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P34_69[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P34_constr_69;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P35;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P35_specs_71;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P35_71[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P35_constr_71;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P36;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P36_specs_73;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P36_73[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P36_constr_73;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P37;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P37_specs_75;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P37_75[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P37_constr_75;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P38;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P38_specs_77;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P38_77[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P38_constr_77;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P39;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P39_specs_79;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P39_79[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P39_constr_79;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P40;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P40_specs_81;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P40_81[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P40_constr_81;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P41;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P41_specs_83;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P41_83[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P41_constr_83;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P42;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P42_specs_85;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P42_85[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P42_constr_85;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P43;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P43_specs_87;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P43_87[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P43_constr_87;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P44;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P44_specs_89;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P44_89[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P44_constr_89;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P45;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P45_specs_91;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P45_91[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P45_constr_91;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P46;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P46_specs_93;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P46_93[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P46_constr_93;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P47;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P47_specs_95;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P47_95[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P47_constr_95;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P48;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P48_specs_97;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P48_97[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P48_constr_97;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P49;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P49_specs_99;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P49_99[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P49_constr_99;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P50;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P50_specs_101;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P50_101[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P50_constr_101;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P51;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P51_specs_103;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P51_103[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P51_constr_103;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P52;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P52_specs_105;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P52_105[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P52_constr_105;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P53;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P53_specs_107;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P53_107[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P53_constr_107;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P54;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P54_specs_109;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P54_109[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P54_constr_109;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P55;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P55_specs_111;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P55_111[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P55_constr_111;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P56;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P56_specs_113;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P56_113[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P56_constr_113;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P57;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P57_specs_115;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P57_115[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P57_constr_115;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P58;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P58_specs_117;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P58_117[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P58_constr_117;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P59;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P59_specs_119;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P59_119[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P59_constr_119;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P60;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P60_specs_121;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P60_121[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P60_constr_121;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P61;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P61_specs_123;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P61_123[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P61_constr_123;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P62;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P62_specs_125;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P62_125[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P62_constr_125;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P63;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P63_specs_127;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P63_127[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P63_constr_127;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P64;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P64_specs_129;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P64_129[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P64_constr_129;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P65;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P65_specs_131;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P65_131[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P65_constr_131;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P66;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P66_specs_133;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P66_133[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P66_constr_133;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P67;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P67_specs_135;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P67_135[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P67_constr_135;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P68;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P68_specs_137;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P68_137[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P68_constr_137;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P69;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P69_specs_139;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P69_139[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P69_constr_139;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P70;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P70_specs_141;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P70_141[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P70_constr_141;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P71;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P71_specs_143;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P71_143[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P71_constr_143;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P72;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P72_specs_145;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P72_145[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P72_constr_145;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P73;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P73_specs_147;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P73_147[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P73_constr_147;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P74;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P74_specs_149;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P74_149[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P74_constr_149;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P75;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P75_specs_151;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P75_151[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P75_constr_151;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P76;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P76_specs_153;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P76_153[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P76_constr_153;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P77;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P77_specs_155;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P77_155[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P77_constr_155;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P78;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P78_specs_157;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P78_157[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P78_constr_157;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P79;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P79_specs_159;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P79_159[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P79_constr_159;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P80;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P80_specs_161;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P80_161[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P80_constr_161;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P81;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P81_specs_163;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P81_163[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P81_constr_163;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P82;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P82_specs_165;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P82_165[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P82_constr_165;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P83;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P83_specs_167;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P83_167[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P83_constr_167;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P84;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P84_specs_169;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P84_169[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P84_constr_169;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P85;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P85_specs_171;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P85_171[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P85_constr_171;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P86;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P86_specs_173;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P86_173[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P86_constr_173;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P87;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P87_specs_175;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P87_175[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P87_constr_175;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P88;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P88_specs_177;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P88_177[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P88_constr_177;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P89;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P89_specs_179;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P89_179[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P89_constr_179;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P90;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P90_specs_181;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P90_181[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P90_constr_181;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P91;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P91_specs_183;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P91_183[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P91_constr_183;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P92;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P92_specs_185;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P92_185[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P92_constr_185;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P93;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P93_specs_187;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P93_187[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P93_constr_187;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P94;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P94_specs_189;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P94_189[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P94_constr_189;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P95;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P95_specs_191;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P95_191[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P95_constr_191;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P96;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P96_specs_193;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P96_193[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P96_constr_193;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P97;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P97_specs_195;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P97_195[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P97_constr_195;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P98;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P98_specs_197;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P98_197[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P98_constr_197;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P99;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P99_specs_199;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P99_199[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P99_constr_199;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P100;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P100_specs_201;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P100_201[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P100_constr_201;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P101;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P101_specs_203;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P101_203[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P101_constr_203;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P102;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P102_specs_205;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P102_205[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P102_constr_205;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P103;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P103_specs_207;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P103_207[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P103_constr_207;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P104;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P104_specs_209;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P104_209[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P104_constr_209;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P105;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P105_specs_211;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P105_211[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P105_constr_211;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P106;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P106_specs_213;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P106_213[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P106_constr_213;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P107;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P107_specs_215;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P107_215[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P107_constr_215;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P108;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P108_specs_217;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P108_217[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P108_constr_217;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P109;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P109_specs_219;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P109_219[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P109_constr_219;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P110;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P110_specs_221;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P110_221[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P110_constr_221;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P111;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P111_specs_223;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P111_223[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P111_constr_223;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P112;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P112_specs_225;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P112_225[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P112_constr_225;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P113;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P113_specs_227;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P113_227[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P113_constr_227;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P114;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P114_specs_229;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P114_229[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P114_constr_229;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P115;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P115_specs_231;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P115_231[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P115_constr_231;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P116;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P116_specs_233;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P116_233[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P116_constr_233;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P117;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P117_specs_235;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P117_235[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P117_constr_235;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P118;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P118_specs_237;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P118_237[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P118_constr_237;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P119;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P119_specs_239;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P119_239[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P119_constr_239;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P120;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P120_specs_241;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P120_241[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P120_constr_241;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P121;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P121_specs_243;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P121_243[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P121_constr_243;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P122;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P122_specs_245;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P122_245[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P122_constr_245;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P123;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P123_specs_247;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P123_247[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P123_constr_247;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P124;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P124_specs_249;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P124_249[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P124_constr_249;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P125;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P125_specs_251;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P125_251[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P125_constr_251;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P126;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P126_specs_253;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P126_253[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P126_constr_253;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P127;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P127_specs_255;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P127_255[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P127_constr_255;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P128;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P128_specs_257;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P128_257[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P128_constr_257;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P129;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P129_specs_259;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P129_259[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P129_constr_259;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P130;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P130_specs_261;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P130_261[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P130_constr_261;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P131;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P131_specs_263;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P131_263[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P131_constr_263;
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProtocolExtensionContainer_7055P132;
+extern asn_SET_OF_specifics_t asn_SPC_S1AP_ProtocolExtensionContainer_7055P132_specs_265;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProtocolExtensionContainer_7055P132_265[1];
+extern asn_per_constraints_t asn_PER_type_S1AP_ProtocolExtensionContainer_7055P132_constr_265;
 
 #ifdef __cplusplus
 }

@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_UECapabilityInfoIndication */
 typedef struct S1AP_UECapabilityInfoIndication {
-	S1AP_ProtocolIE_Container_6551P51_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P51_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

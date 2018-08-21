@@ -99,6 +99,7 @@ per_type_encoder_f S1AP_ProcedureCode_encode_aper;
 #define S1AP_ProcedureCode_id_UEInformationTransfer	((S1AP_ProcedureCode_t)59)
 #define S1AP_ProcedureCode_id_eNBCPRelocationIndication	((S1AP_ProcedureCode_t)60)
 #define S1AP_ProcedureCode_id_MMECPRelocationIndication	((S1AP_ProcedureCode_t)61)
+#define S1AP_ProcedureCode_id_SecondaryRATDataUsageReport	((S1AP_ProcedureCode_t)62)
 
 #ifdef __cplusplus
 }

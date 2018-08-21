@@ -34,7 +34,7 @@ S1AP_E_RABToBeModifiedListBearerModInd_constraint(const asn_TYPE_descriptor_t *t
 }
 
 /*
- * This type is implemented using S1AP_E_RAB_IE_ContainerList_1142P6,
+ * This type is implemented using S1AP_E_RAB_IE_ContainerList_1181P6,
  * so here we adjust the DEF accordingly.
  */
 static asn_oer_constraints_t asn_OER_type_S1AP_E_RABToBeModifiedListBearerModInd_constr_1 CC_NOTUSED = {
@@ -59,8 +59,8 @@ asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABToBeModifiedListBearerModInd = {
 	sizeof(asn_DEF_S1AP_E_RABToBeModifiedListBearerModInd_tags_1)
 		/sizeof(asn_DEF_S1AP_E_RABToBeModifiedListBearerModInd_tags_1[0]), /* 1 */
 	{ &asn_OER_type_S1AP_E_RABToBeModifiedListBearerModInd_constr_1, &asn_PER_type_S1AP_E_RABToBeModifiedListBearerModInd_constr_1, S1AP_E_RABToBeModifiedListBearerModInd_constraint },
-	asn_MBR_S1AP_ProtocolIE_ContainerList_6588P6_13,
+	asn_MBR_S1AP_ProtocolIE_ContainerList_7041P6_13,
 	1,	/* Single element */
-	&asn_SPC_S1AP_ProtocolIE_ContainerList_6588P6_specs_13	/* Additional specs */
+	&asn_SPC_S1AP_ProtocolIE_ContainerList_7041P6_specs_13	/* Additional specs */
 };
 

@@ -23,7 +23,8 @@ typedef enum S1AP_TargetID_PR {
 	S1AP_TargetID_PR_NOTHING,	/* No components present */
 	S1AP_TargetID_PR_targeteNB_ID,
 	S1AP_TargetID_PR_targetRNC_ID,
-	S1AP_TargetID_PR_cGI
+	S1AP_TargetID_PR_cGI,
+	S1AP_TargetID_PR_targetgNgRanNode_ID
 	/* Extensions may appear below */
 	
 } S1AP_TargetID_PR;
@@ -32,6 +33,7 @@ typedef enum S1AP_TargetID_PR {
 struct S1AP_TargeteNB_ID;
 struct S1AP_TargetRNC_ID;
 struct S1AP_CGI;
+struct S1AP_TargetNgRanNode_ID;
 
 /* S1AP_TargetID */
 typedef struct S1AP_TargetID {
@@ -40,6 +42,7 @@ typedef struct S1AP_TargetID {
 		struct S1AP_TargeteNB_ID	*targeteNB_ID;
 		struct S1AP_TargetRNC_ID	*targetRNC_ID;
 		struct S1AP_CGI	*cGI;
+		struct S1AP_TargetNgRanNode_ID	*targetgNgRanNode_ID;
 		/*
 		 * This type is extensible,
 		 * possible extensions are below.

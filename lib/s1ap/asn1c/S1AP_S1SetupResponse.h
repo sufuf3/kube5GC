@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_S1SetupResponse */
 typedef struct S1AP_S1SetupResponse {
-	S1AP_ProtocolIE_Container_6551P41_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P41_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

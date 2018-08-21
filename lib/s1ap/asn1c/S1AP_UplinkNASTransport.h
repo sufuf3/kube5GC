@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_UplinkNASTransport */
 typedef struct S1AP_UplinkNASTransport {
-	S1AP_ProtocolIE_Container_6551P33_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P33_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

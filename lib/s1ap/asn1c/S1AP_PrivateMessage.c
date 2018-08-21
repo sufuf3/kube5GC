@@ -11,7 +11,7 @@ asn_TYPE_member_t asn_MBR_S1AP_PrivateMessage_1[] = {
 	{ ATF_NOFLAGS, 0, offsetof(struct S1AP_PrivateMessage, privateIEs),
 		(ASN_TAG_CLASS_CONTEXT | (0 << 2)),
 		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_S1AP_PrivateIE_Container_6618P0,
+		&asn_DEF_S1AP_PrivateIE_Container_7071P0,
 		0,
 		{ 0, 0, 0 },
 		0, 0, /* No default value */

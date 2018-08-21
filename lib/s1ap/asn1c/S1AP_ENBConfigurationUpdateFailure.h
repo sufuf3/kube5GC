@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_ENBConfigurationUpdateFailure */
 typedef struct S1AP_ENBConfigurationUpdateFailure {
-	S1AP_ProtocolIE_Container_6551P45_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P45_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

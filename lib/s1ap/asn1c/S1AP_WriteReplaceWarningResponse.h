@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_WriteReplaceWarningResponse */
 typedef struct S1AP_WriteReplaceWarningResponse {
-	S1AP_ProtocolIE_Container_6551P64_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P64_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

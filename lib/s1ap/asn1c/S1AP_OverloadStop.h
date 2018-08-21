@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_OverloadStop */
 typedef struct S1AP_OverloadStop {
-	S1AP_ProtocolIE_Container_6551P62_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P62_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

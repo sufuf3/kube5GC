@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /* S1AP_E-RABNotToBeModifiedListBearerModInd */
-typedef S1AP_E_RAB_IE_ContainerList_1142P7_t	 S1AP_E_RABNotToBeModifiedListBearerModInd_t;
+typedef S1AP_E_RAB_IE_ContainerList_1181P7_t	 S1AP_E_RABNotToBeModifiedListBearerModInd_t;
 
 /* Implementation */
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABNotToBeModifiedListBearerModInd;

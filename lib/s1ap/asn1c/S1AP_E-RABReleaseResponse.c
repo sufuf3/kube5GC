@@ -11,7 +11,7 @@ asn_TYPE_member_t asn_MBR_S1AP_E_RABReleaseResponse_1[] = {
 	{ ATF_NOFLAGS, 0, offsetof(struct S1AP_E_RABReleaseResponse, protocolIEs),
 		(ASN_TAG_CLASS_CONTEXT | (0 << 2)),
 		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_S1AP_ProtocolIE_Container_6551P17,
+		&asn_DEF_S1AP_ProtocolIE_Container_7004P17,
 		0,
 		{ 0, 0, 0 },
 		0, 0, /* No default value */

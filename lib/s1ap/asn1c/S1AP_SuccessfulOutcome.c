@@ -131,6 +131,8 @@ static const long asn_VAL_61_S1AP_id_eNBCPRelocationIndication = 60;
 static const long asn_VAL_61_S1AP_reject = 0;
 static const long asn_VAL_62_S1AP_id_MMECPRelocationIndication = 61;
 static const long asn_VAL_62_S1AP_reject = 0;
+static const long asn_VAL_63_S1AP_id_SecondaryRATDataUsageReport = 62;
+static const long asn_VAL_63_S1AP_ignore = 1;
 static const asn_ioc_cell_t asn_IOS_S1AP_S1AP_ELEMENTARY_PROCEDURES_1_rows[] = {
 	{ "&InitiatingMessage", aioc__type, &asn_DEF_S1AP_HandoverRequired },
 	{ "&SuccessfulOutcome", aioc__type, &asn_DEF_S1AP_HandoverCommand },
@@ -441,10 +443,15 @@ static const asn_ioc_cell_t asn_IOS_S1AP_S1AP_ELEMENTARY_PROCEDURES_1_rows[] = {
 	{ "&SuccessfulOutcome",  },
 	{ "&UnsuccessfulOutcome",  },
 	{ "&procedureCode", aioc__value, &asn_DEF_S1AP_ProcedureCode, &asn_VAL_62_S1AP_id_MMECPRelocationIndication },
-	{ "&criticality", aioc__value, &asn_DEF_S1AP_Criticality, &asn_VAL_62_S1AP_reject }
+	{ "&criticality", aioc__value, &asn_DEF_S1AP_Criticality, &asn_VAL_62_S1AP_reject },
+	{ "&InitiatingMessage", aioc__type, &asn_DEF_S1AP_SecondaryRATDataUsageReport },
+	{ "&SuccessfulOutcome",  },
+	{ "&UnsuccessfulOutcome",  },
+	{ "&procedureCode", aioc__value, &asn_DEF_S1AP_ProcedureCode, &asn_VAL_63_S1AP_id_SecondaryRATDataUsageReport },
+	{ "&criticality", aioc__value, &asn_DEF_S1AP_Criticality, &asn_VAL_63_S1AP_ignore }
 };
 static const asn_ioc_set_t asn_IOS_S1AP_S1AP_ELEMENTARY_PROCEDURES_1[] = {
-	{ 62, 5, asn_IOS_S1AP_S1AP_ELEMENTARY_PROCEDURES_1_rows }
+	{ 63, 5, asn_IOS_S1AP_S1AP_ELEMENTARY_PROCEDURES_1_rows }
 };
 static int
 memb_S1AP_procedureCode_constraint_1(const asn_TYPE_descriptor_t *td, const void *sptr,

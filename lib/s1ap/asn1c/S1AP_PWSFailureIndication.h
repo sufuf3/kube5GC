@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_PWSFailureIndication */
 typedef struct S1AP_PWSFailureIndication {
-	S1AP_ProtocolIE_Container_6551P72_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P72_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

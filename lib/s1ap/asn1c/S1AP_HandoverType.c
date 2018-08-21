@@ -24,21 +24,25 @@ static const asn_INTEGER_enum_map_t asn_MAP_S1AP_HandoverType_value2enum_1[] = {
 	{ 1,	10,	"ltetoutran" },
 	{ 2,	10,	"ltetogeran" },
 	{ 3,	10,	"utrantolte" },
-	{ 4,	10,	"gerantolte" }
+	{ 4,	10,	"gerantolte" },
+	{ 5,	7,	"ltetonr" },
+	{ 6,	7,	"nrtolte" }
 	/* This list is extensible */
 };
 static const unsigned int asn_MAP_S1AP_HandoverType_enum2value_1[] = {
 	4,	/* gerantolte(4) */
 	0,	/* intralte(0) */
 	2,	/* ltetogeran(2) */
+	5,	/* ltetonr(5) */
 	1,	/* ltetoutran(1) */
+	6,	/* nrtolte(6) */
 	3	/* utrantolte(3) */
 	/* This list is extensible */
 };
 static const asn_INTEGER_specifics_t asn_SPC_S1AP_HandoverType_specs_1 = {
 	asn_MAP_S1AP_HandoverType_value2enum_1,	/* "tag" => N; sorted by tag */
 	asn_MAP_S1AP_HandoverType_enum2value_1,	/* N => "tag"; sorted by N */
-	5,	/* Number of elements in the maps */
+	7,	/* Number of elements in the maps */
 	6,	/* Extensions before this member */
 	1,	/* Strict enumeration */
 	0,	/* Native long size */

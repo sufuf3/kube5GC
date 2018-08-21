@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_PrivateMessage */
 typedef struct S1AP_PrivateMessage {
-	S1AP_PrivateIE_Container_6618P0_t	 privateIEs;
+	S1AP_PrivateIE_Container_7071P0_t	 privateIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

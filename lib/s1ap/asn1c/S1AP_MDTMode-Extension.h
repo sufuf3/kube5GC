@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /* S1AP_MDTMode-Extension */
-typedef S1AP_ProtocolIE_SingleContainer_6554P14_t	 S1AP_MDTMode_Extension_t;
+typedef S1AP_ProtocolIE_SingleContainer_7007P15_t	 S1AP_MDTMode_Extension_t;
 
 /* Implementation */
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_MDTMode_Extension;

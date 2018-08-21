@@ -20,7 +20,7 @@ static asn_TYPE_member_t asn_MBR_S1AP_E_RABToBeSetupListBearerSUReq_1[] = {
 	{ ATF_POINTER, 0, 0,
 		(ASN_TAG_CLASS_UNIVERSAL | (16 << 2)),
 		0,
-		&asn_DEF_S1AP_ProtocolIE_SingleContainer_6554P0,
+		&asn_DEF_S1AP_ProtocolIE_SingleContainer_7007P0,
 		0,
 		{ 0, 0, 0 },
 		0, 0, /* No default value */

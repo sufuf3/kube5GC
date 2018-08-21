@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_InitialContextSetupFailure */
 typedef struct S1AP_InitialContextSetupFailure {
-	S1AP_ProtocolIE_Container_6551P21_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P21_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_NASNonDeliveryIndication */
 typedef struct S1AP_NASNonDeliveryIndication {
-	S1AP_ProtocolIE_Container_6551P34_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P34_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

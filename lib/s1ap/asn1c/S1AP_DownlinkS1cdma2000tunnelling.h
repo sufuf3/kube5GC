@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_DownlinkS1cdma2000tunnelling */
 typedef struct S1AP_DownlinkS1cdma2000tunnelling {
-	S1AP_ProtocolIE_Container_6551P49_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P49_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.
