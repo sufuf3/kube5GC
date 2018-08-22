@@ -10,11 +10,12 @@
 #include "S1AP_TargeteNB-ID.h"
 #include "S1AP_TargetRNC-ID.h"
 #include "S1AP_CGI.h"
+#include "S1AP_TargetNgRanNode-ID.h"
 static asn_oer_constraints_t asn_OER_type_S1AP_TargetID_constr_1 CC_NOTUSED = {
 	{ 0, 0 },
 	-1};
 static asn_per_constraints_t asn_PER_type_S1AP_TargetID_constr_1 CC_NOTUSED = {
-	{ APC_CONSTRAINED | APC_EXTENSIBLE,  2,  2,  0,  2 }	/* (0..2,...) */,
+	{ APC_CONSTRAINED | APC_EXTENSIBLE,  2,  2,  0,  3 }	/* (0..3,...) */,
 	{ APC_UNCONSTRAINED,	-1, -1,  0,  0 },
 	0, 0	/* No PER value map */
 };
@@ -46,11 +47,21 @@ static asn_TYPE_member_t asn_MBR_S1AP_TargetID_1[] = {
 		0, 0, /* No default value */
 		"cGI"
 		},
+	{ ATF_POINTER, 0, offsetof(struct S1AP_TargetID, choice.targetgNgRanNode_ID),
+		(ASN_TAG_CLASS_CONTEXT | (3 << 2)),
+		-1,	/* IMPLICIT tag at current level */
+		&asn_DEF_S1AP_TargetNgRanNode_ID,
+		0,
+		{ 0, 0, 0 },
+		0, 0, /* No default value */
+		"targetgNgRanNode-ID"
+		},
 };
 static const asn_TYPE_tag2member_t asn_MAP_S1AP_TargetID_tag2el_1[] = {
     { (ASN_TAG_CLASS_CONTEXT | (0 << 2)), 0, 0, 0 }, /* targeteNB-ID */
     { (ASN_TAG_CLASS_CONTEXT | (1 << 2)), 1, 0, 0 }, /* targetRNC-ID */
-    { (ASN_TAG_CLASS_CONTEXT | (2 << 2)), 2, 0, 0 } /* cGI */
+    { (ASN_TAG_CLASS_CONTEXT | (2 << 2)), 2, 0, 0 }, /* cGI */
+    { (ASN_TAG_CLASS_CONTEXT | (3 << 2)), 3, 0, 0 } /* targetgNgRanNode-ID */
 };
 static asn_CHOICE_specifics_t asn_SPC_S1AP_TargetID_specs_1 = {
 	sizeof(struct S1AP_TargetID),
@@ -58,9 +69,9 @@ static asn_CHOICE_specifics_t asn_SPC_S1AP_TargetID_specs_1 = {
 	offsetof(struct S1AP_TargetID, present),
 	sizeof(((struct S1AP_TargetID *)0)->present),
 	asn_MAP_S1AP_TargetID_tag2el_1,
-	3,	/* Count of tags in the map */
+	4,	/* Count of tags in the map */
 	0, 0,
-	3	/* Extensions start */
+	4	/* Extensions start */
 };
 asn_TYPE_descriptor_t asn_DEF_S1AP_TargetID = {
 	"TargetID",
@@ -72,7 +83,7 @@ asn_TYPE_descriptor_t asn_DEF_S1AP_TargetID = {
 	0,	/* No tags (count) */
 	{ &asn_OER_type_S1AP_TargetID_constr_1, &asn_PER_type_S1AP_TargetID_constr_1, CHOICE_constraint },
 	asn_MBR_S1AP_TargetID_1,
-	3,	/* Elements count */
+	4,	/* Elements count */
 	&asn_SPC_S1AP_TargetID_specs_1	/* Additional specs */
 };
 

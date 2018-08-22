@@ -34,7 +34,7 @@ S1AP_E_RABAdmittedList_constraint(const asn_TYPE_descriptor_t *td, const void *s
 }
 
 /*
- * This type is implemented using S1AP_E_RAB_IE_ContainerList_1142P2,
+ * This type is implemented using S1AP_E_RAB_IE_ContainerList_1181P2,
  * so here we adjust the DEF accordingly.
  */
 static asn_oer_constraints_t asn_OER_type_S1AP_E_RABAdmittedList_constr_1 CC_NOTUSED = {
@@ -59,8 +59,8 @@ asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABAdmittedList = {
 	sizeof(asn_DEF_S1AP_E_RABAdmittedList_tags_1)
 		/sizeof(asn_DEF_S1AP_E_RABAdmittedList_tags_1[0]), /* 1 */
 	{ &asn_OER_type_S1AP_E_RABAdmittedList_constr_1, &asn_PER_type_S1AP_E_RABAdmittedList_constr_1, S1AP_E_RABAdmittedList_constraint },
-	asn_MBR_S1AP_ProtocolIE_ContainerList_6588P2_5,
+	asn_MBR_S1AP_ProtocolIE_ContainerList_7041P2_5,
 	1,	/* Single element */
-	&asn_SPC_S1AP_ProtocolIE_ContainerList_6588P2_specs_5	/* Additional specs */
+	&asn_SPC_S1AP_ProtocolIE_ContainerList_7041P2_specs_5	/* Additional specs */
 };
 

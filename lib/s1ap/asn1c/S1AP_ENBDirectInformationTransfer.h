@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_ENBDirectInformationTransfer */
 typedef struct S1AP_ENBDirectInformationTransfer {
-	S1AP_ProtocolIE_Container_6551P65_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P65_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

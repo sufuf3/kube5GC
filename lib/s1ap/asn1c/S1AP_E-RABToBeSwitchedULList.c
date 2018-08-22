@@ -34,7 +34,7 @@ S1AP_E_RABToBeSwitchedULList_constraint(const asn_TYPE_descriptor_t *td, const v
 }
 
 /*
- * This type is implemented using S1AP_E_RAB_IE_ContainerList_1142P5,
+ * This type is implemented using S1AP_E_RAB_IE_ContainerList_1181P5,
  * so here we adjust the DEF accordingly.
  */
 static asn_oer_constraints_t asn_OER_type_S1AP_E_RABToBeSwitchedULList_constr_1 CC_NOTUSED = {
@@ -59,8 +59,8 @@ asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABToBeSwitchedULList = {
 	sizeof(asn_DEF_S1AP_E_RABToBeSwitchedULList_tags_1)
 		/sizeof(asn_DEF_S1AP_E_RABToBeSwitchedULList_tags_1[0]), /* 1 */
 	{ &asn_OER_type_S1AP_E_RABToBeSwitchedULList_constr_1, &asn_PER_type_S1AP_E_RABToBeSwitchedULList_constr_1, S1AP_E_RABToBeSwitchedULList_constraint },
-	asn_MBR_S1AP_ProtocolIE_ContainerList_6588P5_11,
+	asn_MBR_S1AP_ProtocolIE_ContainerList_7041P5_11,
 	1,	/* Single element */
-	&asn_SPC_S1AP_ProtocolIE_ContainerList_6588P5_specs_11	/* Additional specs */
+	&asn_SPC_S1AP_ProtocolIE_ContainerList_7041P5_specs_11	/* Additional specs */
 };
 

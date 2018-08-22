@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_E-RABModifyResponse */
 typedef struct S1AP_E_RABModifyResponse {
-	S1AP_ProtocolIE_Container_6551P15_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P15_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_E-RABSetupRequest */
 typedef struct S1AP_E_RABSetupRequest {
-	S1AP_ProtocolIE_Container_6551P12_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P12_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

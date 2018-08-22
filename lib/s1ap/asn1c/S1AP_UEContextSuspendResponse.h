@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_UEContextSuspendResponse */
 typedef struct S1AP_UEContextSuspendResponse {
-	S1AP_ProtocolIE_Container_6551P82_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P82_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

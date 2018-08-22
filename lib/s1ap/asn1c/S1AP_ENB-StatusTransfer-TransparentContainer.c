@@ -21,7 +21,7 @@ static asn_TYPE_member_t asn_MBR_S1AP_ENB_StatusTransfer_TransparentContainer_1[
 	{ ATF_POINTER, 1, offsetof(struct S1AP_ENB_StatusTransfer_TransparentContainer, iE_Extensions),
 		(ASN_TAG_CLASS_CONTEXT | (1 << 2)),
 		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_S1AP_ProtocolExtensionContainer_6602P48,
+		&asn_DEF_S1AP_ProtocolExtensionContainer_7055P50,
 		0,
 		{ 0, 0, 0 },
 		0, 0, /* No default value */

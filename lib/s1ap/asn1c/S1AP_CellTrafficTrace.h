@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_CellTrafficTrace */
 typedef struct S1AP_CellTrafficTrace {
-	S1AP_ProtocolIE_Container_6551P57_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P57_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

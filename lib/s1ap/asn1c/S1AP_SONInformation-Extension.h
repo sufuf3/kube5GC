@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /* S1AP_SONInformation-Extension */
-typedef S1AP_ProtocolIE_SingleContainer_6554P17_t	 S1AP_SONInformation_Extension_t;
+typedef S1AP_ProtocolIE_SingleContainer_7007P19_t	 S1AP_SONInformation_Extension_t;
 
 /* Implementation */
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_SONInformation_Extension;

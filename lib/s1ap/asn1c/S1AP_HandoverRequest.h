@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_HandoverRequest */
 typedef struct S1AP_HandoverRequest {
-	S1AP_ProtocolIE_Container_6551P3_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P3_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

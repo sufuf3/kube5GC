@@ -28,6 +28,11 @@
 #include "S1AP_ReceiveStatusOfULPDCPSDUsExtended.h"
 #include "S1AP_COUNTvaluePDCP-SNlength18.h"
 #include "S1AP_ReceiveStatusOfULPDCPSDUsPDCP-SNlength18.h"
+#include "S1AP_Packet-LossRate.h"
+#include "S1AP_ExtendedBitRate.h"
+#include "S1AP_NRrestriction.h"
+#include "S1AP_UnlicensedSpectrumRestriction.h"
+#include "S1AP_CNTypeRestrictions.h"
 #include "S1AP_M3Configuration.h"
 #include "S1AP_M4Configuration.h"
 #include "S1AP_M5Configuration.h"
@@ -47,6 +52,8 @@
 #include "S1AP_RAT-Type.h"
 #include "S1AP_MutingAvailabilityIndication.h"
 #include "S1AP_MDT-Configuration.h"
+#include "S1AP_UEAppLayerMeasConfig.h"
+#include "S1AP_ServiceType.h"
 #include "S1AP_ENBX2ExtTLAs.h"
 #include "S1AP_ENBIndirectX2TransportLayerAddresses.h"
 
@@ -189,6 +196,10 @@ typedef enum S1AP_CellBasedMDT_ExtIEs__extensionValue_PR {
 	S1AP_CellBasedMDT_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_CellBasedMDT_ExtIEs__extensionValue_PR;
+typedef enum S1AP_CellBasedQMC_ExtIEs__extensionValue_PR {
+	S1AP_CellBasedQMC_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_CellBasedQMC_ExtIEs__extensionValue_PR;
 typedef enum S1AP_Cdma2000OneXSRVCCInfo_ExtIEs__extensionValue_PR {
 	S1AP_Cdma2000OneXSRVCCInfo_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
@@ -201,6 +212,10 @@ typedef enum S1AP_CGI_ExtIEs__extensionValue_PR {
 	S1AP_CGI_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_CGI_ExtIEs__extensionValue_PR;
+typedef enum S1AP_CNTypeRestrictions_Item_ExtIEs__extensionValue_PR {
+	S1AP_CNTypeRestrictions_Item_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_CNTypeRestrictions_Item_ExtIEs__extensionValue_PR;
 typedef enum S1AP_CSG_IdList_Item_ExtIEs__extensionValue_PR {
 	S1AP_CSG_IdList_Item_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
@@ -266,9 +281,13 @@ typedef enum S1AP_E_RABItem_ExtIEs__extensionValue_PR {
 	
 } S1AP_E_RABItem_ExtIEs__extensionValue_PR;
 typedef enum S1AP_E_RABQoSParameters_ExtIEs__extensionValue_PR {
-	S1AP_E_RABQoSParameters_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
-	
+	S1AP_E_RABQoSParameters_ExtIEs__extensionValue_PR_NOTHING,	/* No components present */
+	S1AP_E_RABQoSParameters_ExtIEs__extensionValue_PR_Packet_LossRate
 } S1AP_E_RABQoSParameters_ExtIEs__extensionValue_PR;
+typedef enum S1AP_E_RABUsageReportItem_ExtIEs__extensionValue_PR {
+	S1AP_E_RABUsageReportItem_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_E_RABUsageReportItem_ExtIEs__extensionValue_PR;
 typedef enum S1AP_EUTRAN_CGI_ExtIEs__extensionValue_PR {
 	S1AP_EUTRAN_CGI_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
@@ -281,6 +300,10 @@ typedef enum S1AP_ExpectedUEActivityBehaviour_ExtIEs__extensionValue_PR {
 	S1AP_ExpectedUEActivityBehaviour_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_ExpectedUEActivityBehaviour_ExtIEs__extensionValue_PR;
+typedef enum S1AP_FiveGSTAI_ExtIEs__extensionValue_PR {
+	S1AP_FiveGSTAI_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_FiveGSTAI_ExtIEs__extensionValue_PR;
 typedef enum S1AP_ForbiddenTAs_Item_ExtIEs__extensionValue_PR {
 	S1AP_ForbiddenTAs_Item_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
@@ -290,16 +313,18 @@ typedef enum S1AP_ForbiddenLAs_Item_ExtIEs__extensionValue_PR {
 	
 } S1AP_ForbiddenLAs_Item_ExtIEs__extensionValue_PR;
 typedef enum S1AP_GBR_QosInformation_ExtIEs__extensionValue_PR {
-	S1AP_GBR_QosInformation_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
-	
+	S1AP_GBR_QosInformation_ExtIEs__extensionValue_PR_NOTHING,	/* No components present */
+	S1AP_GBR_QosInformation_ExtIEs__extensionValue_PR_ExtendedBitRate
 } S1AP_GBR_QosInformation_ExtIEs__extensionValue_PR;
 typedef enum S1AP_GUMMEI_ExtIEs__extensionValue_PR {
 	S1AP_GUMMEI_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_GUMMEI_ExtIEs__extensionValue_PR;
 typedef enum S1AP_HandoverRestrictionList_ExtIEs__extensionValue_PR {
-	S1AP_HandoverRestrictionList_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
-	
+	S1AP_HandoverRestrictionList_ExtIEs__extensionValue_PR_NOTHING,	/* No components present */
+	S1AP_HandoverRestrictionList_ExtIEs__extensionValue_PR_NRrestriction,
+	S1AP_HandoverRestrictionList_ExtIEs__extensionValue_PR_UnlicensedSpectrumRestriction,
+	S1AP_HandoverRestrictionList_ExtIEs__extensionValue_PR_CNTypeRestrictions
 } S1AP_HandoverRestrictionList_ExtIEs__extensionValue_PR;
 typedef enum S1AP_ImmediateMDT_ExtIEs__extensionValue_PR {
 	S1AP_ImmediateMDT_ExtIEs__extensionValue_PR_NOTHING,	/* No components present */
@@ -371,6 +396,10 @@ typedef enum S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs__extensionValue_PR {
 	S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs__extensionValue_PR;
+typedef enum S1AP_NRUESecurityCapabilities_ExtIEs__extensionValue_PR {
+	S1AP_NRUESecurityCapabilities_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_NRUESecurityCapabilities_ExtIEs__extensionValue_PR;
 typedef enum S1AP_PagingAttemptInformation_ExtIEs__extensionValue_PR {
 	S1AP_PagingAttemptInformation_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
@@ -383,6 +412,10 @@ typedef enum S1AP_M1PeriodicReporting_ExtIEs__extensionValue_PR {
 	S1AP_M1PeriodicReporting_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_M1PeriodicReporting_ExtIEs__extensionValue_PR;
+typedef enum S1AP_PLMNAreaBasedQMC_ExtIEs__extensionValue_PR {
+	S1AP_PLMNAreaBasedQMC_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_PLMNAreaBasedQMC_ExtIEs__extensionValue_PR;
 typedef enum S1AP_ProSeAuthorized_ExtIEs__extensionValue_PR {
 	S1AP_ProSeAuthorized_ExtIEs__extensionValue_PR_NOTHING,	/* No components present */
 	S1AP_ProSeAuthorized_ExtIEs__extensionValue_PR_ProSeUEtoNetworkRelaying
@@ -419,6 +452,10 @@ typedef enum S1AP_SecurityContext_ExtIEs__extensionValue_PR {
 	S1AP_SecurityContext_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_SecurityContext_ExtIEs__extensionValue_PR;
+typedef enum S1AP_SecondaryRATDataUsageReportItem_ExtIEs__extensionValue_PR {
+	S1AP_SecondaryRATDataUsageReportItem_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_SecondaryRATDataUsageReportItem_ExtIEs__extensionValue_PR;
 typedef enum S1AP_SONInformationReply_ExtIEs__extensionValue_PR {
 	S1AP_SONInformationReply_ExtIEs__extensionValue_PR_NOTHING,	/* No components present */
 	S1AP_SONInformationReply_ExtIEs__extensionValue_PR_TimeSynchronisationInfo,
@@ -478,6 +515,14 @@ typedef enum S1AP_TABasedMDT_ExtIEs__extensionValue_PR {
 	S1AP_TABasedMDT_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_TABasedMDT_ExtIEs__extensionValue_PR;
+typedef enum S1AP_TABasedQMC_ExtIEs__extensionValue_PR {
+	S1AP_TABasedQMC_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_TABasedQMC_ExtIEs__extensionValue_PR;
+typedef enum S1AP_TAIBasedQMC_ExtIEs__extensionValue_PR {
+	S1AP_TAIBasedQMC_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_TAIBasedQMC_ExtIEs__extensionValue_PR;
 typedef enum S1AP_CompletedCellinTAI_Item_ExtIEs__extensionValue_PR {
 	S1AP_CompletedCellinTAI_Item_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
@@ -490,6 +535,22 @@ typedef enum S1AP_TargetRNC_ID_ExtIEs__extensionValue_PR {
 	S1AP_TargetRNC_ID_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_TargetRNC_ID_ExtIEs__extensionValue_PR;
+typedef enum S1AP_TargetNgRanNode_ID_ExtIEs__extensionValue_PR {
+	S1AP_TargetNgRanNode_ID_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_TargetNgRanNode_ID_ExtIEs__extensionValue_PR;
+typedef enum S1AP_GNB_ExtIEs__extensionValue_PR {
+	S1AP_GNB_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_GNB_ExtIEs__extensionValue_PR;
+typedef enum S1AP_Global_GNB_ID_ExtIEs__extensionValue_PR {
+	S1AP_Global_GNB_ID_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_Global_GNB_ID_ExtIEs__extensionValue_PR;
+typedef enum S1AP_NG_eNB_ExtIEs__extensionValue_PR {
+	S1AP_NG_eNB_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
+	
+} S1AP_NG_eNB_ExtIEs__extensionValue_PR;
 typedef enum S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs__extensionValue_PR {
 	S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
@@ -500,16 +561,21 @@ typedef enum S1AP_M1ThresholdEventA2_ExtIEs__extensionValue_PR {
 } S1AP_M1ThresholdEventA2_ExtIEs__extensionValue_PR;
 typedef enum S1AP_TraceActivation_ExtIEs__extensionValue_PR {
 	S1AP_TraceActivation_ExtIEs__extensionValue_PR_NOTHING,	/* No components present */
-	S1AP_TraceActivation_ExtIEs__extensionValue_PR_MDT_Configuration
+	S1AP_TraceActivation_ExtIEs__extensionValue_PR_MDT_Configuration,
+	S1AP_TraceActivation_ExtIEs__extensionValue_PR_UEAppLayerMeasConfig
 } S1AP_TraceActivation_ExtIEs__extensionValue_PR;
 typedef enum S1AP_Tunnel_Information_ExtIEs__extensionValue_PR {
 	S1AP_Tunnel_Information_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
 } S1AP_Tunnel_Information_ExtIEs__extensionValue_PR;
 typedef enum S1AP_UEAggregate_MaximumBitrates_ExtIEs__extensionValue_PR {
-	S1AP_UEAggregate_MaximumBitrates_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
-	
+	S1AP_UEAggregate_MaximumBitrates_ExtIEs__extensionValue_PR_NOTHING,	/* No components present */
+	S1AP_UEAggregate_MaximumBitrates_ExtIEs__extensionValue_PR_ExtendedBitRate
 } S1AP_UEAggregate_MaximumBitrates_ExtIEs__extensionValue_PR;
+typedef enum S1AP_UEAppLayerMeasConfig_ExtIEs__extensionValue_PR {
+	S1AP_UEAppLayerMeasConfig_ExtIEs__extensionValue_PR_NOTHING,	/* No components present */
+	S1AP_UEAppLayerMeasConfig_ExtIEs__extensionValue_PR_ServiceType
+} S1AP_UEAppLayerMeasConfig_ExtIEs__extensionValue_PR;
 typedef enum S1AP_UE_S1AP_ID_pair_ExtIEs__extensionValue_PR {
 	S1AP_UE_S1AP_ID_pair_ExtIEs__extensionValue_PR_NOTHING	/* No components present */
 	
@@ -1040,6 +1106,21 @@ typedef struct S1AP_CellBasedMDT_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_CellBasedMDT_ExtIEs_t;
+typedef struct S1AP_CellBasedQMC_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_CellBasedQMC_ExtIEs__extensionValue {
+		S1AP_CellBasedQMC_ExtIEs__extensionValue_PR present;
+		union S1AP_CellBasedQMC_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_CellBasedQMC_ExtIEs_t;
 typedef struct S1AP_Cdma2000OneXSRVCCInfo_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -1085,6 +1166,21 @@ typedef struct S1AP_CGI_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_CGI_ExtIEs_t;
+typedef struct S1AP_CNTypeRestrictions_Item_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_CNTypeRestrictions_Item_ExtIEs__extensionValue {
+		S1AP_CNTypeRestrictions_Item_ExtIEs__extensionValue_PR present;
+		union S1AP_CNTypeRestrictions_Item_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_CNTypeRestrictions_Item_ExtIEs_t;
 typedef struct S1AP_CSG_IdList_Item_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -1331,6 +1427,7 @@ typedef struct S1AP_E_RABQoSParameters_ExtIEs {
 	struct S1AP_E_RABQoSParameters_ExtIEs__extensionValue {
 		S1AP_E_RABQoSParameters_ExtIEs__extensionValue_PR present;
 		union S1AP_E_RABQoSParameters_ExtIEs__S1AP_extensionValue_u {
+			S1AP_Packet_LossRate_t	 Packet_LossRate;
 		} choice;
 		
 		/* Context for parsing across buffer boundaries */
@@ -1340,6 +1437,21 @@ typedef struct S1AP_E_RABQoSParameters_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_E_RABQoSParameters_ExtIEs_t;
+typedef struct S1AP_E_RABUsageReportItem_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_E_RABUsageReportItem_ExtIEs__extensionValue {
+		S1AP_E_RABUsageReportItem_ExtIEs__extensionValue_PR present;
+		union S1AP_E_RABUsageReportItem_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_E_RABUsageReportItem_ExtIEs_t;
 typedef struct S1AP_EUTRAN_CGI_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -1385,6 +1497,21 @@ typedef struct S1AP_ExpectedUEActivityBehaviour_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_ExpectedUEActivityBehaviour_ExtIEs_t;
+typedef struct S1AP_FiveGSTAI_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_FiveGSTAI_ExtIEs__extensionValue {
+		S1AP_FiveGSTAI_ExtIEs__extensionValue_PR present;
+		union S1AP_FiveGSTAI_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_FiveGSTAI_ExtIEs_t;
 typedef struct S1AP_ForbiddenTAs_Item_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -1421,6 +1548,7 @@ typedef struct S1AP_GBR_QosInformation_ExtIEs {
 	struct S1AP_GBR_QosInformation_ExtIEs__extensionValue {
 		S1AP_GBR_QosInformation_ExtIEs__extensionValue_PR present;
 		union S1AP_GBR_QosInformation_ExtIEs__S1AP_extensionValue_u {
+			S1AP_ExtendedBitRate_t	 ExtendedBitRate;
 		} choice;
 		
 		/* Context for parsing across buffer boundaries */
@@ -1451,6 +1579,9 @@ typedef struct S1AP_HandoverRestrictionList_ExtIEs {
 	struct S1AP_HandoverRestrictionList_ExtIEs__extensionValue {
 		S1AP_HandoverRestrictionList_ExtIEs__extensionValue_PR present;
 		union S1AP_HandoverRestrictionList_ExtIEs__S1AP_extensionValue_u {
+			S1AP_NRrestriction_t	 NRrestriction;
+			S1AP_UnlicensedSpectrumRestriction_t	 UnlicensedSpectrumRestriction;
+			S1AP_CNTypeRestrictions_t	 CNTypeRestrictions;
 		} choice;
 		
 		/* Context for parsing across buffer boundaries */
@@ -1709,6 +1840,21 @@ typedef struct S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs_t;
+typedef struct S1AP_NRUESecurityCapabilities_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_NRUESecurityCapabilities_ExtIEs__extensionValue {
+		S1AP_NRUESecurityCapabilities_ExtIEs__extensionValue_PR present;
+		union S1AP_NRUESecurityCapabilities_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_NRUESecurityCapabilities_ExtIEs_t;
 typedef struct S1AP_PagingAttemptInformation_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -1754,6 +1900,21 @@ typedef struct S1AP_M1PeriodicReporting_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_M1PeriodicReporting_ExtIEs_t;
+typedef struct S1AP_PLMNAreaBasedQMC_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_PLMNAreaBasedQMC_ExtIEs__extensionValue {
+		S1AP_PLMNAreaBasedQMC_ExtIEs__extensionValue_PR present;
+		union S1AP_PLMNAreaBasedQMC_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_PLMNAreaBasedQMC_ExtIEs_t;
 typedef struct S1AP_ProSeAuthorized_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -1890,6 +2051,21 @@ typedef struct S1AP_SecurityContext_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_SecurityContext_ExtIEs_t;
+typedef struct S1AP_SecondaryRATDataUsageReportItem_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_SecondaryRATDataUsageReportItem_ExtIEs__extensionValue {
+		S1AP_SecondaryRATDataUsageReportItem_ExtIEs__extensionValue_PR present;
+		union S1AP_SecondaryRATDataUsageReportItem_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_SecondaryRATDataUsageReportItem_ExtIEs_t;
 typedef struct S1AP_SONInformationReply_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -2108,6 +2284,36 @@ typedef struct S1AP_TABasedMDT_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_TABasedMDT_ExtIEs_t;
+typedef struct S1AP_TABasedQMC_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_TABasedQMC_ExtIEs__extensionValue {
+		S1AP_TABasedQMC_ExtIEs__extensionValue_PR present;
+		union S1AP_TABasedQMC_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_TABasedQMC_ExtIEs_t;
+typedef struct S1AP_TAIBasedQMC_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_TAIBasedQMC_ExtIEs__extensionValue {
+		S1AP_TAIBasedQMC_ExtIEs__extensionValue_PR present;
+		union S1AP_TAIBasedQMC_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_TAIBasedQMC_ExtIEs_t;
 typedef struct S1AP_CompletedCellinTAI_Item_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -2153,6 +2359,66 @@ typedef struct S1AP_TargetRNC_ID_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_TargetRNC_ID_ExtIEs_t;
+typedef struct S1AP_TargetNgRanNode_ID_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_TargetNgRanNode_ID_ExtIEs__extensionValue {
+		S1AP_TargetNgRanNode_ID_ExtIEs__extensionValue_PR present;
+		union S1AP_TargetNgRanNode_ID_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_TargetNgRanNode_ID_ExtIEs_t;
+typedef struct S1AP_GNB_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_GNB_ExtIEs__extensionValue {
+		S1AP_GNB_ExtIEs__extensionValue_PR present;
+		union S1AP_GNB_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_GNB_ExtIEs_t;
+typedef struct S1AP_Global_GNB_ID_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_Global_GNB_ID_ExtIEs__extensionValue {
+		S1AP_Global_GNB_ID_ExtIEs__extensionValue_PR present;
+		union S1AP_Global_GNB_ID_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_Global_GNB_ID_ExtIEs_t;
+typedef struct S1AP_NG_eNB_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_NG_eNB_ExtIEs__extensionValue {
+		S1AP_NG_eNB_ExtIEs__extensionValue_PR present;
+		union S1AP_NG_eNB_ExtIEs__S1AP_extensionValue_u {
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_NG_eNB_ExtIEs_t;
 typedef struct S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -2190,6 +2456,7 @@ typedef struct S1AP_TraceActivation_ExtIEs {
 		S1AP_TraceActivation_ExtIEs__extensionValue_PR present;
 		union S1AP_TraceActivation_ExtIEs__S1AP_extensionValue_u {
 			S1AP_MDT_Configuration_t	 MDT_Configuration;
+			S1AP_UEAppLayerMeasConfig_t	 UEAppLayerMeasConfig;
 		} choice;
 		
 		/* Context for parsing across buffer boundaries */
@@ -2220,6 +2487,7 @@ typedef struct S1AP_UEAggregate_MaximumBitrates_ExtIEs {
 	struct S1AP_UEAggregate_MaximumBitrates_ExtIEs__extensionValue {
 		S1AP_UEAggregate_MaximumBitrates_ExtIEs__extensionValue_PR present;
 		union S1AP_UEAggregate_MaximumBitrates_ExtIEs__S1AP_extensionValue_u {
+			S1AP_ExtendedBitRate_t	 ExtendedBitRate;
 		} choice;
 		
 		/* Context for parsing across buffer boundaries */
@@ -2229,6 +2497,22 @@ typedef struct S1AP_UEAggregate_MaximumBitrates_ExtIEs {
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
 } S1AP_UEAggregate_MaximumBitrates_ExtIEs_t;
+typedef struct S1AP_UEAppLayerMeasConfig_ExtIEs {
+	S1AP_ProtocolExtensionID_t	 id;
+	S1AP_Criticality_t	 criticality;
+	struct S1AP_UEAppLayerMeasConfig_ExtIEs__extensionValue {
+		S1AP_UEAppLayerMeasConfig_ExtIEs__extensionValue_PR present;
+		union S1AP_UEAppLayerMeasConfig_ExtIEs__S1AP_extensionValue_u {
+			S1AP_ServiceType_t	 ServiceType;
+		} choice;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} extensionValue;
+	
+	/* Context for parsing across buffer boundaries */
+	asn_struct_ctx_t _asn_ctx;
+} S1AP_UEAppLayerMeasConfig_ExtIEs_t;
 typedef struct S1AP_UE_S1AP_ID_pair_ExtIEs {
 	S1AP_ProtocolExtensionID_t	 id;
 	S1AP_Criticality_t	 criticality;
@@ -2464,267 +2748,309 @@ extern asn_TYPE_member_t asn_MBR_S1AP_CellID_Cancelled_Item_ExtIEs_121[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_CellBasedMDT_ExtIEs;
 extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CellBasedMDT_ExtIEs_specs_125;
 extern asn_TYPE_member_t asn_MBR_S1AP_CellBasedMDT_ExtIEs_125[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_CellBasedQMC_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CellBasedQMC_ExtIEs_specs_129;
+extern asn_TYPE_member_t asn_MBR_S1AP_CellBasedQMC_ExtIEs_129[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_Cdma2000OneXSRVCCInfo_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_Cdma2000OneXSRVCCInfo_ExtIEs_specs_129;
-extern asn_TYPE_member_t asn_MBR_S1AP_Cdma2000OneXSRVCCInfo_ExtIEs_129[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_Cdma2000OneXSRVCCInfo_ExtIEs_specs_133;
+extern asn_TYPE_member_t asn_MBR_S1AP_Cdma2000OneXSRVCCInfo_ExtIEs_133[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_CellType_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CellType_ExtIEs_specs_133;
-extern asn_TYPE_member_t asn_MBR_S1AP_CellType_ExtIEs_133[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CellType_ExtIEs_specs_137;
+extern asn_TYPE_member_t asn_MBR_S1AP_CellType_ExtIEs_137[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_CGI_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CGI_ExtIEs_specs_137;
-extern asn_TYPE_member_t asn_MBR_S1AP_CGI_ExtIEs_137[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CGI_ExtIEs_specs_141;
+extern asn_TYPE_member_t asn_MBR_S1AP_CGI_ExtIEs_141[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_CNTypeRestrictions_Item_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CNTypeRestrictions_Item_ExtIEs_specs_145;
+extern asn_TYPE_member_t asn_MBR_S1AP_CNTypeRestrictions_Item_ExtIEs_145[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_CSG_IdList_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CSG_IdList_Item_ExtIEs_specs_141;
-extern asn_TYPE_member_t asn_MBR_S1AP_CSG_IdList_Item_ExtIEs_141[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CSG_IdList_Item_ExtIEs_specs_149;
+extern asn_TYPE_member_t asn_MBR_S1AP_CSG_IdList_Item_ExtIEs_149[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_COUNTvalue_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_COUNTvalue_ExtIEs_specs_145;
-extern asn_TYPE_member_t asn_MBR_S1AP_COUNTvalue_ExtIEs_145[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_COUNTvalue_ExtIEs_specs_153;
+extern asn_TYPE_member_t asn_MBR_S1AP_COUNTvalue_ExtIEs_153[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_COUNTValueExtended_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_COUNTValueExtended_ExtIEs_specs_149;
-extern asn_TYPE_member_t asn_MBR_S1AP_COUNTValueExtended_ExtIEs_149[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_COUNTValueExtended_ExtIEs_specs_157;
+extern asn_TYPE_member_t asn_MBR_S1AP_COUNTValueExtended_ExtIEs_157[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_COUNTvaluePDCP_SNlength18_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_COUNTvaluePDCP_SNlength18_ExtIEs_specs_153;
-extern asn_TYPE_member_t asn_MBR_S1AP_COUNTvaluePDCP_SNlength18_ExtIEs_153[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_COUNTvaluePDCP_SNlength18_ExtIEs_specs_161;
+extern asn_TYPE_member_t asn_MBR_S1AP_COUNTvaluePDCP_SNlength18_ExtIEs_161[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_CriticalityDiagnostics_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CriticalityDiagnostics_ExtIEs_specs_157;
-extern asn_TYPE_member_t asn_MBR_S1AP_CriticalityDiagnostics_ExtIEs_157[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CriticalityDiagnostics_ExtIEs_specs_165;
+extern asn_TYPE_member_t asn_MBR_S1AP_CriticalityDiagnostics_ExtIEs_165[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_CriticalityDiagnostics_IE_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CriticalityDiagnostics_IE_Item_ExtIEs_specs_161;
-extern asn_TYPE_member_t asn_MBR_S1AP_CriticalityDiagnostics_IE_Item_ExtIEs_161[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CriticalityDiagnostics_IE_Item_ExtIEs_specs_169;
+extern asn_TYPE_member_t asn_MBR_S1AP_CriticalityDiagnostics_IE_Item_ExtIEs_169[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ServedDCNsItem_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ServedDCNsItem_ExtIEs_specs_165;
-extern asn_TYPE_member_t asn_MBR_S1AP_ServedDCNsItem_ExtIEs_165[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ServedDCNsItem_ExtIEs_specs_173;
+extern asn_TYPE_member_t asn_MBR_S1AP_ServedDCNsItem_ExtIEs_173[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_DL_CP_SecurityInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_DL_CP_SecurityInformation_ExtIEs_specs_169;
-extern asn_TYPE_member_t asn_MBR_S1AP_DL_CP_SecurityInformation_ExtIEs_169[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_DL_CP_SecurityInformation_ExtIEs_specs_177;
+extern asn_TYPE_member_t asn_MBR_S1AP_DL_CP_SecurityInformation_ExtIEs_177[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_EmergencyAreaID_Broadcast_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_EmergencyAreaID_Broadcast_Item_ExtIEs_specs_173;
-extern asn_TYPE_member_t asn_MBR_S1AP_EmergencyAreaID_Broadcast_Item_ExtIEs_173[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_EmergencyAreaID_Broadcast_Item_ExtIEs_specs_181;
+extern asn_TYPE_member_t asn_MBR_S1AP_EmergencyAreaID_Broadcast_Item_ExtIEs_181[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_EmergencyAreaID_Cancelled_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_EmergencyAreaID_Cancelled_Item_ExtIEs_specs_177;
-extern asn_TYPE_member_t asn_MBR_S1AP_EmergencyAreaID_Cancelled_Item_ExtIEs_177[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_EmergencyAreaID_Cancelled_Item_ExtIEs_specs_185;
+extern asn_TYPE_member_t asn_MBR_S1AP_EmergencyAreaID_Cancelled_Item_ExtIEs_185[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_CompletedCellinEAI_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CompletedCellinEAI_Item_ExtIEs_specs_181;
-extern asn_TYPE_member_t asn_MBR_S1AP_CompletedCellinEAI_Item_ExtIEs_181[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CompletedCellinEAI_Item_ExtIEs_specs_189;
+extern asn_TYPE_member_t asn_MBR_S1AP_CompletedCellinEAI_Item_ExtIEs_189[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_GERAN_Cell_ID_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_GERAN_Cell_ID_ExtIEs_specs_185;
-extern asn_TYPE_member_t asn_MBR_S1AP_GERAN_Cell_ID_ExtIEs_185[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_GERAN_Cell_ID_ExtIEs_specs_193;
+extern asn_TYPE_member_t asn_MBR_S1AP_GERAN_Cell_ID_ExtIEs_193[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_GlobalENB_ID_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_GlobalENB_ID_ExtIEs_specs_189;
-extern asn_TYPE_member_t asn_MBR_S1AP_GlobalENB_ID_ExtIEs_189[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_GlobalENB_ID_ExtIEs_specs_197;
+extern asn_TYPE_member_t asn_MBR_S1AP_GlobalENB_ID_ExtIEs_197[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ENB_StatusTransfer_TransparentContainer_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ENB_StatusTransfer_TransparentContainer_ExtIEs_specs_193;
-extern asn_TYPE_member_t asn_MBR_S1AP_ENB_StatusTransfer_TransparentContainer_ExtIEs_193[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ENB_StatusTransfer_TransparentContainer_ExtIEs_specs_201;
+extern asn_TYPE_member_t asn_MBR_S1AP_ENB_StatusTransfer_TransparentContainer_ExtIEs_201[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABInformationListItem_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_E_RABInformationListItem_ExtIEs_specs_197;
-extern asn_TYPE_member_t asn_MBR_S1AP_E_RABInformationListItem_ExtIEs_197[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_E_RABInformationListItem_ExtIEs_specs_205;
+extern asn_TYPE_member_t asn_MBR_S1AP_E_RABInformationListItem_ExtIEs_205[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABItem_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_E_RABItem_ExtIEs_specs_201;
-extern asn_TYPE_member_t asn_MBR_S1AP_E_RABItem_ExtIEs_201[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_E_RABItem_ExtIEs_specs_209;
+extern asn_TYPE_member_t asn_MBR_S1AP_E_RABItem_ExtIEs_209[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABQoSParameters_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_E_RABQoSParameters_ExtIEs_specs_205;
-extern asn_TYPE_member_t asn_MBR_S1AP_E_RABQoSParameters_ExtIEs_205[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_E_RABQoSParameters_ExtIEs_specs_213;
+extern asn_TYPE_member_t asn_MBR_S1AP_E_RABQoSParameters_ExtIEs_213[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_E_RABUsageReportItem_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_E_RABUsageReportItem_ExtIEs_specs_217;
+extern asn_TYPE_member_t asn_MBR_S1AP_E_RABUsageReportItem_ExtIEs_217[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_EUTRAN_CGI_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_EUTRAN_CGI_ExtIEs_specs_209;
-extern asn_TYPE_member_t asn_MBR_S1AP_EUTRAN_CGI_ExtIEs_209[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_EUTRAN_CGI_ExtIEs_specs_221;
+extern asn_TYPE_member_t asn_MBR_S1AP_EUTRAN_CGI_ExtIEs_221[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ExpectedUEBehaviour_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ExpectedUEBehaviour_ExtIEs_specs_213;
-extern asn_TYPE_member_t asn_MBR_S1AP_ExpectedUEBehaviour_ExtIEs_213[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ExpectedUEBehaviour_ExtIEs_specs_225;
+extern asn_TYPE_member_t asn_MBR_S1AP_ExpectedUEBehaviour_ExtIEs_225[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ExpectedUEActivityBehaviour_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ExpectedUEActivityBehaviour_ExtIEs_specs_217;
-extern asn_TYPE_member_t asn_MBR_S1AP_ExpectedUEActivityBehaviour_ExtIEs_217[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ExpectedUEActivityBehaviour_ExtIEs_specs_229;
+extern asn_TYPE_member_t asn_MBR_S1AP_ExpectedUEActivityBehaviour_ExtIEs_229[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_FiveGSTAI_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_FiveGSTAI_ExtIEs_specs_233;
+extern asn_TYPE_member_t asn_MBR_S1AP_FiveGSTAI_ExtIEs_233[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ForbiddenTAs_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ForbiddenTAs_Item_ExtIEs_specs_221;
-extern asn_TYPE_member_t asn_MBR_S1AP_ForbiddenTAs_Item_ExtIEs_221[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ForbiddenTAs_Item_ExtIEs_specs_237;
+extern asn_TYPE_member_t asn_MBR_S1AP_ForbiddenTAs_Item_ExtIEs_237[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ForbiddenLAs_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ForbiddenLAs_Item_ExtIEs_specs_225;
-extern asn_TYPE_member_t asn_MBR_S1AP_ForbiddenLAs_Item_ExtIEs_225[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ForbiddenLAs_Item_ExtIEs_specs_241;
+extern asn_TYPE_member_t asn_MBR_S1AP_ForbiddenLAs_Item_ExtIEs_241[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_GBR_QosInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_GBR_QosInformation_ExtIEs_specs_229;
-extern asn_TYPE_member_t asn_MBR_S1AP_GBR_QosInformation_ExtIEs_229[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_GBR_QosInformation_ExtIEs_specs_245;
+extern asn_TYPE_member_t asn_MBR_S1AP_GBR_QosInformation_ExtIEs_245[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_GUMMEI_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_GUMMEI_ExtIEs_specs_233;
-extern asn_TYPE_member_t asn_MBR_S1AP_GUMMEI_ExtIEs_233[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_GUMMEI_ExtIEs_specs_249;
+extern asn_TYPE_member_t asn_MBR_S1AP_GUMMEI_ExtIEs_249[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_HandoverRestrictionList_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_HandoverRestrictionList_ExtIEs_specs_237;
-extern asn_TYPE_member_t asn_MBR_S1AP_HandoverRestrictionList_ExtIEs_237[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_HandoverRestrictionList_ExtIEs_specs_253;
+extern asn_TYPE_member_t asn_MBR_S1AP_HandoverRestrictionList_ExtIEs_253[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ImmediateMDT_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ImmediateMDT_ExtIEs_specs_241;
-extern asn_TYPE_member_t asn_MBR_S1AP_ImmediateMDT_ExtIEs_241[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ImmediateMDT_ExtIEs_specs_257;
+extern asn_TYPE_member_t asn_MBR_S1AP_ImmediateMDT_ExtIEs_257[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_InformationOnRecommendedCellsAndENBsForPaging_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_InformationOnRecommendedCellsAndENBsForPaging_ExtIEs_specs_245;
-extern asn_TYPE_member_t asn_MBR_S1AP_InformationOnRecommendedCellsAndENBsForPaging_ExtIEs_245[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_InformationOnRecommendedCellsAndENBsForPaging_ExtIEs_specs_261;
+extern asn_TYPE_member_t asn_MBR_S1AP_InformationOnRecommendedCellsAndENBsForPaging_ExtIEs_261[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_LAI_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_LAI_ExtIEs_specs_249;
-extern asn_TYPE_member_t asn_MBR_S1AP_LAI_ExtIEs_249[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_LAI_ExtIEs_specs_265;
+extern asn_TYPE_member_t asn_MBR_S1AP_LAI_ExtIEs_265[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_LastVisitedEUTRANCellInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_LastVisitedEUTRANCellInformation_ExtIEs_specs_253;
-extern asn_TYPE_member_t asn_MBR_S1AP_LastVisitedEUTRANCellInformation_ExtIEs_253[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_LastVisitedEUTRANCellInformation_ExtIEs_specs_269;
+extern asn_TYPE_member_t asn_MBR_S1AP_LastVisitedEUTRANCellInformation_ExtIEs_269[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ListeningSubframePattern_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ListeningSubframePattern_ExtIEs_specs_257;
-extern asn_TYPE_member_t asn_MBR_S1AP_ListeningSubframePattern_ExtIEs_257[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ListeningSubframePattern_ExtIEs_specs_273;
+extern asn_TYPE_member_t asn_MBR_S1AP_ListeningSubframePattern_ExtIEs_273[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_LoggedMDT_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_LoggedMDT_ExtIEs_specs_261;
-extern asn_TYPE_member_t asn_MBR_S1AP_LoggedMDT_ExtIEs_261[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_LoggedMDT_ExtIEs_specs_277;
+extern asn_TYPE_member_t asn_MBR_S1AP_LoggedMDT_ExtIEs_277[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_LoggedMBSFNMDT_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_LoggedMBSFNMDT_ExtIEs_specs_265;
-extern asn_TYPE_member_t asn_MBR_S1AP_LoggedMBSFNMDT_ExtIEs_265[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_LoggedMBSFNMDT_ExtIEs_specs_281;
+extern asn_TYPE_member_t asn_MBR_S1AP_LoggedMBSFNMDT_ExtIEs_281[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_M3Configuration_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M3Configuration_ExtIEs_specs_269;
-extern asn_TYPE_member_t asn_MBR_S1AP_M3Configuration_ExtIEs_269[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M3Configuration_ExtIEs_specs_285;
+extern asn_TYPE_member_t asn_MBR_S1AP_M3Configuration_ExtIEs_285[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_M4Configuration_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M4Configuration_ExtIEs_specs_273;
-extern asn_TYPE_member_t asn_MBR_S1AP_M4Configuration_ExtIEs_273[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M4Configuration_ExtIEs_specs_289;
+extern asn_TYPE_member_t asn_MBR_S1AP_M4Configuration_ExtIEs_289[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_M5Configuration_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M5Configuration_ExtIEs_specs_277;
-extern asn_TYPE_member_t asn_MBR_S1AP_M5Configuration_ExtIEs_277[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M5Configuration_ExtIEs_specs_293;
+extern asn_TYPE_member_t asn_MBR_S1AP_M5Configuration_ExtIEs_293[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_M6Configuration_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M6Configuration_ExtIEs_specs_281;
-extern asn_TYPE_member_t asn_MBR_S1AP_M6Configuration_ExtIEs_281[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M6Configuration_ExtIEs_specs_297;
+extern asn_TYPE_member_t asn_MBR_S1AP_M6Configuration_ExtIEs_297[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_M7Configuration_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M7Configuration_ExtIEs_specs_285;
-extern asn_TYPE_member_t asn_MBR_S1AP_M7Configuration_ExtIEs_285[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M7Configuration_ExtIEs_specs_301;
+extern asn_TYPE_member_t asn_MBR_S1AP_M7Configuration_ExtIEs_301[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_MDT_Configuration_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_MDT_Configuration_ExtIEs_specs_289;
-extern asn_TYPE_member_t asn_MBR_S1AP_MDT_Configuration_ExtIEs_289[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_MDT_Configuration_ExtIEs_specs_305;
+extern asn_TYPE_member_t asn_MBR_S1AP_MDT_Configuration_ExtIEs_305[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_MBSFN_ResultToLogInfo_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_MBSFN_ResultToLogInfo_ExtIEs_specs_293;
-extern asn_TYPE_member_t asn_MBR_S1AP_MBSFN_ResultToLogInfo_ExtIEs_293[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_MBSFN_ResultToLogInfo_ExtIEs_specs_309;
+extern asn_TYPE_member_t asn_MBR_S1AP_MBSFN_ResultToLogInfo_ExtIEs_309[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_MutingPatternInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_MutingPatternInformation_ExtIEs_specs_297;
-extern asn_TYPE_member_t asn_MBR_S1AP_MutingPatternInformation_ExtIEs_297[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_MutingPatternInformation_ExtIEs_specs_313;
+extern asn_TYPE_member_t asn_MBR_S1AP_MutingPatternInformation_ExtIEs_313[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs_specs_301;
-extern asn_TYPE_member_t asn_MBR_S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs_301[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs_specs_317;
+extern asn_TYPE_member_t asn_MBR_S1AP_NB_IoT_Paging_eDRXInformation_ExtIEs_317[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_NRUESecurityCapabilities_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_NRUESecurityCapabilities_ExtIEs_specs_321;
+extern asn_TYPE_member_t asn_MBR_S1AP_NRUESecurityCapabilities_ExtIEs_321[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_PagingAttemptInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_PagingAttemptInformation_ExtIEs_specs_305;
-extern asn_TYPE_member_t asn_MBR_S1AP_PagingAttemptInformation_ExtIEs_305[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_PagingAttemptInformation_ExtIEs_specs_325;
+extern asn_TYPE_member_t asn_MBR_S1AP_PagingAttemptInformation_ExtIEs_325[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_Paging_eDRXInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_Paging_eDRXInformation_ExtIEs_specs_309;
-extern asn_TYPE_member_t asn_MBR_S1AP_Paging_eDRXInformation_ExtIEs_309[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_Paging_eDRXInformation_ExtIEs_specs_329;
+extern asn_TYPE_member_t asn_MBR_S1AP_Paging_eDRXInformation_ExtIEs_329[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_M1PeriodicReporting_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M1PeriodicReporting_ExtIEs_specs_313;
-extern asn_TYPE_member_t asn_MBR_S1AP_M1PeriodicReporting_ExtIEs_313[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M1PeriodicReporting_ExtIEs_specs_333;
+extern asn_TYPE_member_t asn_MBR_S1AP_M1PeriodicReporting_ExtIEs_333[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_PLMNAreaBasedQMC_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_PLMNAreaBasedQMC_ExtIEs_specs_337;
+extern asn_TYPE_member_t asn_MBR_S1AP_PLMNAreaBasedQMC_ExtIEs_337[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ProSeAuthorized_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ProSeAuthorized_ExtIEs_specs_317;
-extern asn_TYPE_member_t asn_MBR_S1AP_ProSeAuthorized_ExtIEs_317[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ProSeAuthorized_ExtIEs_specs_341;
+extern asn_TYPE_member_t asn_MBR_S1AP_ProSeAuthorized_ExtIEs_341[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_RecommendedCellsForPaging_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RecommendedCellsForPaging_ExtIEs_specs_321;
-extern asn_TYPE_member_t asn_MBR_S1AP_RecommendedCellsForPaging_ExtIEs_321[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RecommendedCellsForPaging_ExtIEs_specs_345;
+extern asn_TYPE_member_t asn_MBR_S1AP_RecommendedCellsForPaging_ExtIEs_345[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_RecommendedCellsForPagingItem_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RecommendedCellsForPagingItem_ExtIEs_specs_325;
-extern asn_TYPE_member_t asn_MBR_S1AP_RecommendedCellsForPagingItem_ExtIEs_325[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RecommendedCellsForPagingItem_ExtIEs_specs_349;
+extern asn_TYPE_member_t asn_MBR_S1AP_RecommendedCellsForPagingItem_ExtIEs_349[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_RecommendedENBsForPaging_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RecommendedENBsForPaging_ExtIEs_specs_329;
-extern asn_TYPE_member_t asn_MBR_S1AP_RecommendedENBsForPaging_ExtIEs_329[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RecommendedENBsForPaging_ExtIEs_specs_353;
+extern asn_TYPE_member_t asn_MBR_S1AP_RecommendedENBsForPaging_ExtIEs_353[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_RecommendedENBItem_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RecommendedENBItem_ExtIEs_specs_333;
-extern asn_TYPE_member_t asn_MBR_S1AP_RecommendedENBItem_ExtIEs_333[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RecommendedENBItem_ExtIEs_specs_357;
+extern asn_TYPE_member_t asn_MBR_S1AP_RecommendedENBItem_ExtIEs_357[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_RequestType_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RequestType_ExtIEs_specs_337;
-extern asn_TYPE_member_t asn_MBR_S1AP_RequestType_ExtIEs_337[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RequestType_ExtIEs_specs_361;
+extern asn_TYPE_member_t asn_MBR_S1AP_RequestType_ExtIEs_361[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_RIMTransfer_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RIMTransfer_ExtIEs_specs_341;
-extern asn_TYPE_member_t asn_MBR_S1AP_RIMTransfer_ExtIEs_341[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RIMTransfer_ExtIEs_specs_365;
+extern asn_TYPE_member_t asn_MBR_S1AP_RIMTransfer_ExtIEs_365[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_RLFReportInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RLFReportInformation_ExtIEs_specs_345;
-extern asn_TYPE_member_t asn_MBR_S1AP_RLFReportInformation_ExtIEs_345[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_RLFReportInformation_ExtIEs_specs_369;
+extern asn_TYPE_member_t asn_MBR_S1AP_RLFReportInformation_ExtIEs_369[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_SecurityContext_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SecurityContext_ExtIEs_specs_349;
-extern asn_TYPE_member_t asn_MBR_S1AP_SecurityContext_ExtIEs_349[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SecurityContext_ExtIEs_specs_373;
+extern asn_TYPE_member_t asn_MBR_S1AP_SecurityContext_ExtIEs_373[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_SecondaryRATDataUsageReportItem_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SecondaryRATDataUsageReportItem_ExtIEs_specs_377;
+extern asn_TYPE_member_t asn_MBR_S1AP_SecondaryRATDataUsageReportItem_ExtIEs_377[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_SONInformationReply_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SONInformationReply_ExtIEs_specs_353;
-extern asn_TYPE_member_t asn_MBR_S1AP_SONInformationReply_ExtIEs_353[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SONInformationReply_ExtIEs_specs_381;
+extern asn_TYPE_member_t asn_MBR_S1AP_SONInformationReply_ExtIEs_381[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_SONConfigurationTransfer_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SONConfigurationTransfer_ExtIEs_specs_357;
-extern asn_TYPE_member_t asn_MBR_S1AP_SONConfigurationTransfer_ExtIEs_357[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SONConfigurationTransfer_ExtIEs_specs_385;
+extern asn_TYPE_member_t asn_MBR_S1AP_SONConfigurationTransfer_ExtIEs_385[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_SynchronisationInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SynchronisationInformation_ExtIEs_specs_361;
-extern asn_TYPE_member_t asn_MBR_S1AP_SynchronisationInformation_ExtIEs_361[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SynchronisationInformation_ExtIEs_specs_389;
+extern asn_TYPE_member_t asn_MBR_S1AP_SynchronisationInformation_ExtIEs_389[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_SourceeNB_ID_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SourceeNB_ID_ExtIEs_specs_365;
-extern asn_TYPE_member_t asn_MBR_S1AP_SourceeNB_ID_ExtIEs_365[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SourceeNB_ID_ExtIEs_specs_393;
+extern asn_TYPE_member_t asn_MBR_S1AP_SourceeNB_ID_ExtIEs_393[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_SourceeNB_ToTargeteNB_TransparentContainer_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SourceeNB_ToTargeteNB_TransparentContainer_ExtIEs_specs_369;
-extern asn_TYPE_member_t asn_MBR_S1AP_SourceeNB_ToTargeteNB_TransparentContainer_ExtIEs_369[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SourceeNB_ToTargeteNB_TransparentContainer_ExtIEs_specs_397;
+extern asn_TYPE_member_t asn_MBR_S1AP_SourceeNB_ToTargeteNB_TransparentContainer_ExtIEs_397[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ServedGUMMEIsItem_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ServedGUMMEIsItem_ExtIEs_specs_373;
-extern asn_TYPE_member_t asn_MBR_S1AP_ServedGUMMEIsItem_ExtIEs_373[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ServedGUMMEIsItem_ExtIEs_specs_401;
+extern asn_TYPE_member_t asn_MBR_S1AP_ServedGUMMEIsItem_ExtIEs_401[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_SupportedTAs_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SupportedTAs_Item_ExtIEs_specs_377;
-extern asn_TYPE_member_t asn_MBR_S1AP_SupportedTAs_Item_ExtIEs_377[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_SupportedTAs_Item_ExtIEs_specs_405;
+extern asn_TYPE_member_t asn_MBR_S1AP_SupportedTAs_Item_ExtIEs_405[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TimeSynchronisationInfo_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TimeSynchronisationInfo_ExtIEs_specs_381;
-extern asn_TYPE_member_t asn_MBR_S1AP_TimeSynchronisationInfo_ExtIEs_381[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TimeSynchronisationInfo_ExtIEs_specs_409;
+extern asn_TYPE_member_t asn_MBR_S1AP_TimeSynchronisationInfo_ExtIEs_409[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_S_TMSI_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_S_TMSI_ExtIEs_specs_385;
-extern asn_TYPE_member_t asn_MBR_S1AP_S_TMSI_ExtIEs_385[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_S_TMSI_ExtIEs_specs_413;
+extern asn_TYPE_member_t asn_MBR_S1AP_S_TMSI_ExtIEs_413[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TAIBasedMDT_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TAIBasedMDT_ExtIEs_specs_389;
-extern asn_TYPE_member_t asn_MBR_S1AP_TAIBasedMDT_ExtIEs_389[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TAIBasedMDT_ExtIEs_specs_417;
+extern asn_TYPE_member_t asn_MBR_S1AP_TAIBasedMDT_ExtIEs_417[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TAI_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TAI_ExtIEs_specs_393;
-extern asn_TYPE_member_t asn_MBR_S1AP_TAI_ExtIEs_393[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TAI_ExtIEs_specs_421;
+extern asn_TYPE_member_t asn_MBR_S1AP_TAI_ExtIEs_421[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TAI_Broadcast_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TAI_Broadcast_Item_ExtIEs_specs_397;
-extern asn_TYPE_member_t asn_MBR_S1AP_TAI_Broadcast_Item_ExtIEs_397[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TAI_Broadcast_Item_ExtIEs_specs_425;
+extern asn_TYPE_member_t asn_MBR_S1AP_TAI_Broadcast_Item_ExtIEs_425[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TAI_Cancelled_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TAI_Cancelled_Item_ExtIEs_specs_401;
-extern asn_TYPE_member_t asn_MBR_S1AP_TAI_Cancelled_Item_ExtIEs_401[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TAI_Cancelled_Item_ExtIEs_specs_429;
+extern asn_TYPE_member_t asn_MBR_S1AP_TAI_Cancelled_Item_ExtIEs_429[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TABasedMDT_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TABasedMDT_ExtIEs_specs_405;
-extern asn_TYPE_member_t asn_MBR_S1AP_TABasedMDT_ExtIEs_405[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TABasedMDT_ExtIEs_specs_433;
+extern asn_TYPE_member_t asn_MBR_S1AP_TABasedMDT_ExtIEs_433[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_TABasedQMC_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TABasedQMC_ExtIEs_specs_437;
+extern asn_TYPE_member_t asn_MBR_S1AP_TABasedQMC_ExtIEs_437[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_TAIBasedQMC_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TAIBasedQMC_ExtIEs_specs_441;
+extern asn_TYPE_member_t asn_MBR_S1AP_TAIBasedQMC_ExtIEs_441[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_CompletedCellinTAI_Item_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CompletedCellinTAI_Item_ExtIEs_specs_409;
-extern asn_TYPE_member_t asn_MBR_S1AP_CompletedCellinTAI_Item_ExtIEs_409[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_CompletedCellinTAI_Item_ExtIEs_specs_445;
+extern asn_TYPE_member_t asn_MBR_S1AP_CompletedCellinTAI_Item_ExtIEs_445[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TargeteNB_ID_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TargeteNB_ID_ExtIEs_specs_413;
-extern asn_TYPE_member_t asn_MBR_S1AP_TargeteNB_ID_ExtIEs_413[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TargeteNB_ID_ExtIEs_specs_449;
+extern asn_TYPE_member_t asn_MBR_S1AP_TargeteNB_ID_ExtIEs_449[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TargetRNC_ID_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TargetRNC_ID_ExtIEs_specs_417;
-extern asn_TYPE_member_t asn_MBR_S1AP_TargetRNC_ID_ExtIEs_417[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TargetRNC_ID_ExtIEs_specs_453;
+extern asn_TYPE_member_t asn_MBR_S1AP_TargetRNC_ID_ExtIEs_453[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_TargetNgRanNode_ID_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TargetNgRanNode_ID_ExtIEs_specs_457;
+extern asn_TYPE_member_t asn_MBR_S1AP_TargetNgRanNode_ID_ExtIEs_457[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_GNB_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_GNB_ExtIEs_specs_461;
+extern asn_TYPE_member_t asn_MBR_S1AP_GNB_ExtIEs_461[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_Global_GNB_ID_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_Global_GNB_ID_ExtIEs_specs_465;
+extern asn_TYPE_member_t asn_MBR_S1AP_Global_GNB_ID_ExtIEs_465[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_NG_eNB_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_NG_eNB_ExtIEs_specs_469;
+extern asn_TYPE_member_t asn_MBR_S1AP_NG_eNB_ExtIEs_469[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs_specs_421;
-extern asn_TYPE_member_t asn_MBR_S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs_421[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs_specs_473;
+extern asn_TYPE_member_t asn_MBR_S1AP_TargeteNB_ToSourceeNB_TransparentContainer_ExtIEs_473[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_M1ThresholdEventA2_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M1ThresholdEventA2_ExtIEs_specs_425;
-extern asn_TYPE_member_t asn_MBR_S1AP_M1ThresholdEventA2_ExtIEs_425[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_M1ThresholdEventA2_ExtIEs_specs_477;
+extern asn_TYPE_member_t asn_MBR_S1AP_M1ThresholdEventA2_ExtIEs_477[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_TraceActivation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TraceActivation_ExtIEs_specs_429;
-extern asn_TYPE_member_t asn_MBR_S1AP_TraceActivation_ExtIEs_429[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_TraceActivation_ExtIEs_specs_481;
+extern asn_TYPE_member_t asn_MBR_S1AP_TraceActivation_ExtIEs_481[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_Tunnel_Information_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_Tunnel_Information_ExtIEs_specs_433;
-extern asn_TYPE_member_t asn_MBR_S1AP_Tunnel_Information_ExtIEs_433[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_Tunnel_Information_ExtIEs_specs_485;
+extern asn_TYPE_member_t asn_MBR_S1AP_Tunnel_Information_ExtIEs_485[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_UEAggregate_MaximumBitrates_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UEAggregate_MaximumBitrates_ExtIEs_specs_437;
-extern asn_TYPE_member_t asn_MBR_S1AP_UEAggregate_MaximumBitrates_ExtIEs_437[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UEAggregate_MaximumBitrates_ExtIEs_specs_489;
+extern asn_TYPE_member_t asn_MBR_S1AP_UEAggregate_MaximumBitrates_ExtIEs_489[3];
+extern asn_TYPE_descriptor_t asn_DEF_S1AP_UEAppLayerMeasConfig_ExtIEs;
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UEAppLayerMeasConfig_ExtIEs_specs_493;
+extern asn_TYPE_member_t asn_MBR_S1AP_UEAppLayerMeasConfig_ExtIEs_493[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_UE_S1AP_ID_pair_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UE_S1AP_ID_pair_ExtIEs_specs_441;
-extern asn_TYPE_member_t asn_MBR_S1AP_UE_S1AP_ID_pair_ExtIEs_441[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UE_S1AP_ID_pair_ExtIEs_specs_497;
+extern asn_TYPE_member_t asn_MBR_S1AP_UE_S1AP_ID_pair_ExtIEs_497[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_UE_associatedLogicalS1_ConnectionItemExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UE_associatedLogicalS1_ConnectionItemExtIEs_specs_445;
-extern asn_TYPE_member_t asn_MBR_S1AP_UE_associatedLogicalS1_ConnectionItemExtIEs_445[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UE_associatedLogicalS1_ConnectionItemExtIEs_specs_501;
+extern asn_TYPE_member_t asn_MBR_S1AP_UE_associatedLogicalS1_ConnectionItemExtIEs_501[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_UESecurityCapabilities_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UESecurityCapabilities_ExtIEs_specs_449;
-extern asn_TYPE_member_t asn_MBR_S1AP_UESecurityCapabilities_ExtIEs_449[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UESecurityCapabilities_ExtIEs_specs_505;
+extern asn_TYPE_member_t asn_MBR_S1AP_UESecurityCapabilities_ExtIEs_505[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_UE_Sidelink_Aggregate_MaximumBitrates_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UE_Sidelink_Aggregate_MaximumBitrates_ExtIEs_specs_453;
-extern asn_TYPE_member_t asn_MBR_S1AP_UE_Sidelink_Aggregate_MaximumBitrates_ExtIEs_453[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UE_Sidelink_Aggregate_MaximumBitrates_ExtIEs_specs_509;
+extern asn_TYPE_member_t asn_MBR_S1AP_UE_Sidelink_Aggregate_MaximumBitrates_ExtIEs_509[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_UL_CP_SecurityInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UL_CP_SecurityInformation_ExtIEs_specs_457;
-extern asn_TYPE_member_t asn_MBR_S1AP_UL_CP_SecurityInformation_ExtIEs_457[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UL_CP_SecurityInformation_ExtIEs_specs_513;
+extern asn_TYPE_member_t asn_MBR_S1AP_UL_CP_SecurityInformation_ExtIEs_513[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_UserLocationInformation_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UserLocationInformation_ExtIEs_specs_461;
-extern asn_TYPE_member_t asn_MBR_S1AP_UserLocationInformation_ExtIEs_461[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_UserLocationInformation_ExtIEs_specs_517;
+extern asn_TYPE_member_t asn_MBR_S1AP_UserLocationInformation_ExtIEs_517[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_V2XServicesAuthorized_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_V2XServicesAuthorized_ExtIEs_specs_465;
-extern asn_TYPE_member_t asn_MBR_S1AP_V2XServicesAuthorized_ExtIEs_465[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_V2XServicesAuthorized_ExtIEs_specs_521;
+extern asn_TYPE_member_t asn_MBR_S1AP_V2XServicesAuthorized_ExtIEs_521[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_X2TNLConfigurationInfo_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_X2TNLConfigurationInfo_ExtIEs_specs_469;
-extern asn_TYPE_member_t asn_MBR_S1AP_X2TNLConfigurationInfo_ExtIEs_469[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_X2TNLConfigurationInfo_ExtIEs_specs_525;
+extern asn_TYPE_member_t asn_MBR_S1AP_X2TNLConfigurationInfo_ExtIEs_525[3];
 extern asn_TYPE_descriptor_t asn_DEF_S1AP_ENBX2ExtTLA_ExtIEs;
-extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ENBX2ExtTLA_ExtIEs_specs_473;
-extern asn_TYPE_member_t asn_MBR_S1AP_ENBX2ExtTLA_ExtIEs_473[3];
+extern asn_SEQUENCE_specifics_t asn_SPC_S1AP_ENBX2ExtTLA_ExtIEs_specs_529;
+extern asn_TYPE_member_t asn_MBR_S1AP_ENBX2ExtTLA_ExtIEs_529[3];
 
 #ifdef __cplusplus
 }

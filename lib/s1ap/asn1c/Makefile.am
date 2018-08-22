@@ -4,6 +4,8 @@ ASN_MODULE_SRCS=	\
 	S1AP_SuccessfulOutcome.c	\
 	S1AP_UnsuccessfulOutcome.c	\
 	S1AP_E-RAB-IE-ContainerList.c	\
+	S1AP_E-RAB-IE-ContainerPairList.c	\
+	S1AP_ProtocolError-IE-ContainerList.c	\
 	S1AP_HandoverRequired.c	\
 	S1AP_HandoverCommand.c	\
 	S1AP_E-RABSubjecttoDataForwardingList.c	\
@@ -140,8 +142,11 @@ ASN_MODULE_SRCS=	\
 	S1AP_UEInformationTransfer.c	\
 	S1AP_ENBCPRelocationIndication.c	\
 	S1AP_MMECPRelocationIndication.c	\
+	S1AP_SecondaryRATDataUsageReport.c	\
 	S1AP_Additional-GUTI.c	\
+	S1AP_AerialUEsubscriptionInformation.c	\
 	S1AP_AreaScopeOfMDT.c	\
+	S1AP_AreaScopeOfQMC.c	\
 	S1AP_AllocationAndRetentionPriority.c	\
 	S1AP_AssistanceDataForCECapableUEs.c	\
 	S1AP_AssistanceDataForPaging.c	\
@@ -174,6 +179,8 @@ ASN_MODULE_SRCS=	\
 	S1AP_CellID-Cancelled-Item.c	\
 	S1AP_CellBasedMDT.c	\
 	S1AP_CellIdListforMDT.c	\
+	S1AP_CellBasedQMC.c	\
+	S1AP_CellIdListforQMC.c	\
 	S1AP_Cdma2000PDU.c	\
 	S1AP_Cdma2000RATType.c	\
 	S1AP_Cdma2000SectorID.c	\
@@ -189,6 +196,9 @@ ASN_MODULE_SRCS=	\
 	S1AP_CGI.c	\
 	S1AP_CI.c	\
 	S1AP_CNDomain.c	\
+	S1AP_CNTypeRestrictions.c	\
+	S1AP_CNTypeRestrictions-Item.c	\
+	S1AP_CNType.c	\
 	S1AP_ConcurrentWarningMessageIndicator.c	\
 	S1AP_Correlation-ID.c	\
 	S1AP_CSFallbackIndicator.c	\
@@ -217,6 +227,7 @@ ASN_MODULE_SRCS=	\
 	S1AP_EARFCN.c	\
 	S1AP_ECGIList.c	\
 	S1AP_PWSfailedECGIList.c	\
+	S1AP_EDT-Session.c	\
 	S1AP_EmergencyAreaIDList.c	\
 	S1AP_EmergencyAreaID.c	\
 	S1AP_EmergencyAreaID-Broadcast.c	\
@@ -236,7 +247,9 @@ ASN_MODULE_SRCS=	\
 	S1AP_ENBname.c	\
 	S1AP_ENBX2TLAs.c	\
 	S1AP_EncryptionAlgorithms.c	\
+	S1AP_EndIndication.c	\
 	S1AP_EnhancedCoverageRestricted.c	\
+	S1AP_CE-ModeBRestricted.c	\
 	S1AP_EPLMNs.c	\
 	S1AP_EventType.c	\
 	S1AP_E-RAB-ID.c	\
@@ -245,6 +258,8 @@ ASN_MODULE_SRCS=	\
 	S1AP_E-RABList.c	\
 	S1AP_E-RABItem.c	\
 	S1AP_E-RABLevelQoSParameters.c	\
+	S1AP_E-RABUsageReportList.c	\
+	S1AP_E-RABUsageReportItem.c	\
 	S1AP_EUTRAN-CGI.c	\
 	S1AP_EUTRANRoundTripDelayEstimationInfo.c	\
 	S1AP_ExpectedUEBehaviour.c	\
@@ -253,9 +268,12 @@ ASN_MODULE_SRCS=	\
 	S1AP_ExpectedIdlePeriod.c	\
 	S1AP_SourceOfUEActivityBehaviourInformation.c	\
 	S1AP_ExpectedHOInterval.c	\
+	S1AP_ExtendedBitRate.c	\
 	S1AP_ExtendedRNC-ID.c	\
 	S1AP_ExtendedRepetitionPeriod.c	\
 	S1AP_Extended-UEIdentityIndexValue.c	\
+	S1AP_FiveGSTAC.c	\
+	S1AP_FiveGSTAI.c	\
 	S1AP_ForbiddenInterRATs.c	\
 	S1AP_ForbiddenTAs.c	\
 	S1AP_ForbiddenTAs-Item.c	\
@@ -268,6 +286,7 @@ ASN_MODULE_SRCS=	\
 	S1AP_GUMMEI.c	\
 	S1AP_GUMMEIType.c	\
 	S1AP_GWContextReleaseIndication.c	\
+	S1AP_HandoverFlag.c	\
 	S1AP_HandoverRestrictionList.c	\
 	S1AP_HandoverType.c	\
 	S1AP_HFN.c	\
@@ -296,6 +315,7 @@ ASN_MODULE_SRCS=	\
 	S1AP_LoggingInterval.c	\
 	S1AP_LoggingDuration.c	\
 	S1AP_LoggedMBSFNMDT.c	\
+	S1AP_LTE-M-Indication.c	\
 	S1AP_M3Configuration.c	\
 	S1AP_M3period.c	\
 	S1AP_M4Configuration.c	\
@@ -341,11 +361,16 @@ ASN_MODULE_SRCS=	\
 	S1AP_NB-IoT-PagingTimeWindow.c	\
 	S1AP_NB-IoT-UEIdentityIndexValue.c	\
 	S1AP_NextPagingAreaScope.c	\
+	S1AP_NRencryptionAlgorithms.c	\
+	S1AP_NRintegrityProtectionAlgorithms.c	\
+	S1AP_NRrestriction.c	\
+	S1AP_NRUESecurityCapabilities.c	\
 	S1AP_NumberofBroadcastRequest.c	\
 	S1AP_NumberOfBroadcasts.c	\
 	S1AP_OldBSS-ToNewBSS-Information.c	\
 	S1AP_OverloadAction.c	\
 	S1AP_OverloadResponse.c	\
+	S1AP_Packet-LossRate.c	\
 	S1AP_PagingAttemptInformation.c	\
 	S1AP_PagingAttemptCount.c	\
 	S1AP_Paging-eDRXInformation.c	\
@@ -358,6 +383,8 @@ ASN_MODULE_SRCS=	\
 	S1AP_PDCP-SNlength18.c	\
 	S1AP_M1PeriodicReporting.c	\
 	S1AP_PLMNidentity.c	\
+	S1AP_PLMNAreaBasedQMC.c	\
+	S1AP_PLMNListforQMC.c	\
 	S1AP_Port-Number.c	\
 	S1AP_Pre-emptionCapability.c	\
 	S1AP_Pre-emptionVulnerability.c	\
@@ -398,7 +425,12 @@ ASN_MODULE_SRCS=	\
 	S1AP_Routing-ID.c	\
 	S1AP_SecurityKey.c	\
 	S1AP_SecurityContext.c	\
+	S1AP_SecondaryRATType.c	\
+	S1AP_SecondaryRATDataUsageRequest.c	\
+	S1AP_SecondaryRATDataUsageReportList.c	\
+	S1AP_SecondaryRATDataUsageReportItem.c	\
 	S1AP_SerialNumber.c	\
+	S1AP_ServiceType.c	\
 	S1AP_SONInformation.c	\
 	S1AP_SONInformation-Extension.c	\
 	S1AP_SONInformationRequest.c	\
@@ -414,6 +446,7 @@ ASN_MODULE_SRCS=	\
 	S1AP_SRVCCHOIndication.c	\
 	S1AP_SourceeNB-ToTargeteNB-TransparentContainer.c	\
 	S1AP_SourceRNC-ToTargetRNC-TransparentContainer.c	\
+	S1AP_SourceNgRanNode-ToTargetNgRanNode-TransparentContainer.c	\
 	S1AP_ServedGUMMEIs.c	\
 	S1AP_ServedGUMMEIsItem.c	\
 	S1AP_ServedGroupIDs.c	\
@@ -437,16 +470,28 @@ ASN_MODULE_SRCS=	\
 	S1AP_TAI-Cancelled-Item.c	\
 	S1AP_TABasedMDT.c	\
 	S1AP_TAListforMDT.c	\
+	S1AP_TABasedQMC.c	\
+	S1AP_TAListforQMC.c	\
+	S1AP_TAIBasedQMC.c	\
+	S1AP_TAIListforQMC.c	\
 	S1AP_CompletedCellinTAI.c	\
 	S1AP_CompletedCellinTAI-Item.c	\
 	S1AP_TBCD-STRING.c	\
 	S1AP_TargetID.c	\
 	S1AP_TargeteNB-ID.c	\
 	S1AP_TargetRNC-ID.c	\
+	S1AP_TargetNgRanNode-ID.c	\
+	S1AP_Global-RAN-NODE-ID.c	\
+	S1AP_GNB.c	\
+	S1AP_Global-GNB-ID.c	\
+	S1AP_GNB-Identity.c	\
+	S1AP_NG-eNB.c	\
+	S1AP_GNB-ID.c	\
 	S1AP_TargeteNB-ToSourceeNB-TransparentContainer.c	\
 	S1AP_Target-ToSource-TransparentContainer.c	\
 	S1AP_TargetRNC-ToSourceRNC-TransparentContainer.c	\
 	S1AP_TargetBSS-ToSourceBSS-TransparentContainer.c	\
+	S1AP_TargetNgRanNode-ToSourceNgRanNode-TransparentContainer.c	\
 	S1AP_M1ThresholdEventA2.c	\
 	S1AP_Threshold-RSRP.c	\
 	S1AP_Threshold-RSRQ.c	\
@@ -463,6 +508,8 @@ ASN_MODULE_SRCS=	\
 	S1AP_TypeOfError.c	\
 	S1AP_TAIListForRestart.c	\
 	S1AP_UEAggregateMaximumBitrate.c	\
+	S1AP_UEAppLayerMeasConfig.c	\
+	S1AP_UECapabilityInfoRequest.c	\
 	S1AP_UE-RetentionInformation.c	\
 	S1AP_UE-S1AP-IDs.c	\
 	S1AP_UE-S1AP-ID-pair.c	\
@@ -481,8 +528,10 @@ ASN_MODULE_SRCS=	\
 	S1AP_UL-CP-SecurityInformation.c	\
 	S1AP_UL-NAS-MAC.c	\
 	S1AP_UL-NAS-Count.c	\
+	S1AP_UnlicensedSpectrumRestriction.c	\
 	S1AP_UserLocationInformation.c	\
 	S1AP_UEUserPlaneCIoTSupportIndicator.c	\
+	S1AP_UE-Application-Layer-Measurement-Capability.c	\
 	S1AP_VoiceSupportMatchIndicator.c	\
 	S1AP_V2XServicesAuthorized.c	\
 	S1AP_VehicleUE.c	\
@@ -506,7 +555,10 @@ ASN_MODULE_SRCS=	\
 	S1AP_ProtocolIE-Container.c	\
 	S1AP_ProtocolIE-SingleContainer.c	\
 	S1AP_ProtocolIE-Field.c	\
+	S1AP_ProtocolIE-ContainerPair.c	\
+	S1AP_ProtocolIE-FieldPair.c	\
 	S1AP_ProtocolIE-ContainerList.c	\
+	S1AP_ProtocolIE-ContainerPairList.c	\
 	S1AP_ProtocolExtensionContainer.c	\
 	S1AP_ProtocolExtensionField.c	\
 	S1AP_PrivateIE-Container.c	\
@@ -656,8 +708,11 @@ ASN_MODULE_HDRS=	\
 	S1AP_UEInformationTransfer.h	\
 	S1AP_ENBCPRelocationIndication.h	\
 	S1AP_MMECPRelocationIndication.h	\
+	S1AP_SecondaryRATDataUsageReport.h	\
 	S1AP_Additional-GUTI.h	\
+	S1AP_AerialUEsubscriptionInformation.h	\
 	S1AP_AreaScopeOfMDT.h	\
+	S1AP_AreaScopeOfQMC.h	\
 	S1AP_AllocationAndRetentionPriority.h	\
 	S1AP_AssistanceDataForCECapableUEs.h	\
 	S1AP_AssistanceDataForPaging.h	\
@@ -690,6 +745,8 @@ ASN_MODULE_HDRS=	\
 	S1AP_CellID-Cancelled-Item.h	\
 	S1AP_CellBasedMDT.h	\
 	S1AP_CellIdListforMDT.h	\
+	S1AP_CellBasedQMC.h	\
+	S1AP_CellIdListforQMC.h	\
 	S1AP_Cdma2000PDU.h	\
 	S1AP_Cdma2000RATType.h	\
 	S1AP_Cdma2000SectorID.h	\
@@ -705,6 +762,9 @@ ASN_MODULE_HDRS=	\
 	S1AP_CGI.h	\
 	S1AP_CI.h	\
 	S1AP_CNDomain.h	\
+	S1AP_CNTypeRestrictions.h	\
+	S1AP_CNTypeRestrictions-Item.h	\
+	S1AP_CNType.h	\
 	S1AP_ConcurrentWarningMessageIndicator.h	\
 	S1AP_Correlation-ID.h	\
 	S1AP_CSFallbackIndicator.h	\
@@ -733,6 +793,7 @@ ASN_MODULE_HDRS=	\
 	S1AP_EARFCN.h	\
 	S1AP_ECGIList.h	\
 	S1AP_PWSfailedECGIList.h	\
+	S1AP_EDT-Session.h	\
 	S1AP_EmergencyAreaIDList.h	\
 	S1AP_EmergencyAreaID.h	\
 	S1AP_EmergencyAreaID-Broadcast.h	\
@@ -752,7 +813,9 @@ ASN_MODULE_HDRS=	\
 	S1AP_ENBname.h	\
 	S1AP_ENBX2TLAs.h	\
 	S1AP_EncryptionAlgorithms.h	\
+	S1AP_EndIndication.h	\
 	S1AP_EnhancedCoverageRestricted.h	\
+	S1AP_CE-ModeBRestricted.h	\
 	S1AP_EPLMNs.h	\
 	S1AP_EventType.h	\
 	S1AP_E-RAB-ID.h	\
@@ -761,6 +824,8 @@ ASN_MODULE_HDRS=	\
 	S1AP_E-RABList.h	\
 	S1AP_E-RABItem.h	\
 	S1AP_E-RABLevelQoSParameters.h	\
+	S1AP_E-RABUsageReportList.h	\
+	S1AP_E-RABUsageReportItem.h	\
 	S1AP_EUTRAN-CGI.h	\
 	S1AP_EUTRANRoundTripDelayEstimationInfo.h	\
 	S1AP_ExpectedUEBehaviour.h	\
@@ -769,9 +834,12 @@ ASN_MODULE_HDRS=	\
 	S1AP_ExpectedIdlePeriod.h	\
 	S1AP_SourceOfUEActivityBehaviourInformation.h	\
 	S1AP_ExpectedHOInterval.h	\
+	S1AP_ExtendedBitRate.h	\
 	S1AP_ExtendedRNC-ID.h	\
 	S1AP_ExtendedRepetitionPeriod.h	\
 	S1AP_Extended-UEIdentityIndexValue.h	\
+	S1AP_FiveGSTAC.h	\
+	S1AP_FiveGSTAI.h	\
 	S1AP_ForbiddenInterRATs.h	\
 	S1AP_ForbiddenTAs.h	\
 	S1AP_ForbiddenTAs-Item.h	\
@@ -784,6 +852,7 @@ ASN_MODULE_HDRS=	\
 	S1AP_GUMMEI.h	\
 	S1AP_GUMMEIType.h	\
 	S1AP_GWContextReleaseIndication.h	\
+	S1AP_HandoverFlag.h	\
 	S1AP_HandoverRestrictionList.h	\
 	S1AP_HandoverType.h	\
 	S1AP_HFN.h	\
@@ -812,6 +881,7 @@ ASN_MODULE_HDRS=	\
 	S1AP_LoggingInterval.h	\
 	S1AP_LoggingDuration.h	\
 	S1AP_LoggedMBSFNMDT.h	\
+	S1AP_LTE-M-Indication.h	\
 	S1AP_M3Configuration.h	\
 	S1AP_M3period.h	\
 	S1AP_M4Configuration.h	\
@@ -857,11 +927,16 @@ ASN_MODULE_HDRS=	\
 	S1AP_NB-IoT-PagingTimeWindow.h	\
 	S1AP_NB-IoT-UEIdentityIndexValue.h	\
 	S1AP_NextPagingAreaScope.h	\
+	S1AP_NRencryptionAlgorithms.h	\
+	S1AP_NRintegrityProtectionAlgorithms.h	\
+	S1AP_NRrestriction.h	\
+	S1AP_NRUESecurityCapabilities.h	\
 	S1AP_NumberofBroadcastRequest.h	\
 	S1AP_NumberOfBroadcasts.h	\
 	S1AP_OldBSS-ToNewBSS-Information.h	\
 	S1AP_OverloadAction.h	\
 	S1AP_OverloadResponse.h	\
+	S1AP_Packet-LossRate.h	\
 	S1AP_PagingAttemptInformation.h	\
 	S1AP_PagingAttemptCount.h	\
 	S1AP_Paging-eDRXInformation.h	\
@@ -874,6 +949,8 @@ ASN_MODULE_HDRS=	\
 	S1AP_PDCP-SNlength18.h	\
 	S1AP_M1PeriodicReporting.h	\
 	S1AP_PLMNidentity.h	\
+	S1AP_PLMNAreaBasedQMC.h	\
+	S1AP_PLMNListforQMC.h	\
 	S1AP_Port-Number.h	\
 	S1AP_Pre-emptionCapability.h	\
 	S1AP_Pre-emptionVulnerability.h	\
@@ -914,7 +991,12 @@ ASN_MODULE_HDRS=	\
 	S1AP_Routing-ID.h	\
 	S1AP_SecurityKey.h	\
 	S1AP_SecurityContext.h	\
+	S1AP_SecondaryRATType.h	\
+	S1AP_SecondaryRATDataUsageRequest.h	\
+	S1AP_SecondaryRATDataUsageReportList.h	\
+	S1AP_SecondaryRATDataUsageReportItem.h	\
 	S1AP_SerialNumber.h	\
+	S1AP_ServiceType.h	\
 	S1AP_SONInformation.h	\
 	S1AP_SONInformation-Extension.h	\
 	S1AP_SONInformationRequest.h	\
@@ -930,6 +1012,7 @@ ASN_MODULE_HDRS=	\
 	S1AP_SRVCCHOIndication.h	\
 	S1AP_SourceeNB-ToTargeteNB-TransparentContainer.h	\
 	S1AP_SourceRNC-ToTargetRNC-TransparentContainer.h	\
+	S1AP_SourceNgRanNode-ToTargetNgRanNode-TransparentContainer.h	\
 	S1AP_ServedGUMMEIs.h	\
 	S1AP_ServedGUMMEIsItem.h	\
 	S1AP_ServedGroupIDs.h	\
@@ -953,16 +1036,28 @@ ASN_MODULE_HDRS=	\
 	S1AP_TAI-Cancelled-Item.h	\
 	S1AP_TABasedMDT.h	\
 	S1AP_TAListforMDT.h	\
+	S1AP_TABasedQMC.h	\
+	S1AP_TAListforQMC.h	\
+	S1AP_TAIBasedQMC.h	\
+	S1AP_TAIListforQMC.h	\
 	S1AP_CompletedCellinTAI.h	\
 	S1AP_CompletedCellinTAI-Item.h	\
 	S1AP_TBCD-STRING.h	\
 	S1AP_TargetID.h	\
 	S1AP_TargeteNB-ID.h	\
 	S1AP_TargetRNC-ID.h	\
+	S1AP_TargetNgRanNode-ID.h	\
+	S1AP_Global-RAN-NODE-ID.h	\
+	S1AP_GNB.h	\
+	S1AP_Global-GNB-ID.h	\
+	S1AP_GNB-Identity.h	\
+	S1AP_NG-eNB.h	\
+	S1AP_GNB-ID.h	\
 	S1AP_TargeteNB-ToSourceeNB-TransparentContainer.h	\
 	S1AP_Target-ToSource-TransparentContainer.h	\
 	S1AP_TargetRNC-ToSourceRNC-TransparentContainer.h	\
 	S1AP_TargetBSS-ToSourceBSS-TransparentContainer.h	\
+	S1AP_TargetNgRanNode-ToSourceNgRanNode-TransparentContainer.h	\
 	S1AP_M1ThresholdEventA2.h	\
 	S1AP_Threshold-RSRP.h	\
 	S1AP_Threshold-RSRQ.h	\
@@ -979,6 +1074,8 @@ ASN_MODULE_HDRS=	\
 	S1AP_TypeOfError.h	\
 	S1AP_TAIListForRestart.h	\
 	S1AP_UEAggregateMaximumBitrate.h	\
+	S1AP_UEAppLayerMeasConfig.h	\
+	S1AP_UECapabilityInfoRequest.h	\
 	S1AP_UE-RetentionInformation.h	\
 	S1AP_UE-S1AP-IDs.h	\
 	S1AP_UE-S1AP-ID-pair.h	\
@@ -997,8 +1094,10 @@ ASN_MODULE_HDRS=	\
 	S1AP_UL-CP-SecurityInformation.h	\
 	S1AP_UL-NAS-MAC.h	\
 	S1AP_UL-NAS-Count.h	\
+	S1AP_UnlicensedSpectrumRestriction.h	\
 	S1AP_UserLocationInformation.h	\
 	S1AP_UEUserPlaneCIoTSupportIndicator.h	\
+	S1AP_UE-Application-Layer-Measurement-Capability.h	\
 	S1AP_VoiceSupportMatchIndicator.h	\
 	S1AP_V2XServicesAuthorized.h	\
 	S1AP_VehicleUE.h	\

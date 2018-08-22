@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_RetrieveUEInformation */
 typedef struct S1AP_RetrieveUEInformation {
-	S1AP_ProtocolIE_Container_6551P87_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P87_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

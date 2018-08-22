@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_UEContextReleaseComplete */
 typedef struct S1AP_UEContextReleaseComplete {
-	S1AP_ProtocolIE_Container_6551P25_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P25_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

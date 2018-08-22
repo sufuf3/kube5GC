@@ -8,7 +8,7 @@
 #include "S1AP_SONInformation-Extension.h"
 
 /*
- * This type is implemented using S1AP_ProtocolIE_SingleContainer_6554P17,
+ * This type is implemented using S1AP_ProtocolIE_SingleContainer_7007P19,
  * so here we adjust the DEF accordingly.
  */
 static const ber_tlv_tag_t asn_DEF_S1AP_SONInformation_Extension_tags_1[] = {
@@ -25,8 +25,8 @@ asn_TYPE_descriptor_t asn_DEF_S1AP_SONInformation_Extension = {
 	sizeof(asn_DEF_S1AP_SONInformation_Extension_tags_1)
 		/sizeof(asn_DEF_S1AP_SONInformation_Extension_tags_1[0]), /* 1 */
 	{ 0, 0, SEQUENCE_constraint },
-	asn_MBR_S1AP_SONInformation_ExtensionIE_69,
+	asn_MBR_S1AP_SONInformation_ExtensionIE_77,
 	3,	/* Elements count */
-	&asn_SPC_S1AP_SONInformation_ExtensionIE_specs_69	/* Additional specs */
+	&asn_SPC_S1AP_SONInformation_ExtensionIE_specs_77	/* Additional specs */
 };
 

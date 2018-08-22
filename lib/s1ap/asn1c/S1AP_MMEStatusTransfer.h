@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_MMEStatusTransfer */
 typedef struct S1AP_MMEStatusTransfer {
-	S1AP_ProtocolIE_Container_6551P53_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P53_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

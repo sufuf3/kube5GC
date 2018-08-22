@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_E-RABModificationIndication */
 typedef struct S1AP_E_RABModificationIndication {
-	S1AP_ProtocolIE_Container_6551P77_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P77_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

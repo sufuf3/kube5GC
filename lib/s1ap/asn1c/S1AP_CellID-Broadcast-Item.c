@@ -21,7 +21,7 @@ asn_TYPE_member_t asn_MBR_S1AP_CellID_Broadcast_Item_1[] = {
 	{ ATF_POINTER, 1, offsetof(struct S1AP_CellID_Broadcast_Item, iE_Extensions),
 		(ASN_TAG_CLASS_CONTEXT | (1 << 2)),
 		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_S1AP_ProtocolExtensionContainer_6602P29,
+		&asn_DEF_S1AP_ProtocolExtensionContainer_7055P29,
 		0,
 		{ 0, 0, 0 },
 		0, 0, /* No default value */

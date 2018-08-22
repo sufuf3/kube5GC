@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_ENBConfigurationTransfer */
 typedef struct S1AP_ENBConfigurationTransfer {
-	S1AP_ProtocolIE_Container_6551P67_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P67_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

@@ -21,7 +21,7 @@ extern "C" {
 
 /* S1AP_UplinkNonUEAssociatedLPPaTransport */
 typedef struct S1AP_UplinkNonUEAssociatedLPPaTransport {
-	S1AP_ProtocolIE_Container_6551P76_t	 protocolIEs;
+	S1AP_ProtocolIE_Container_7004P76_t	 protocolIEs;
 	/*
 	 * This type is extensible,
 	 * possible extensions are below.

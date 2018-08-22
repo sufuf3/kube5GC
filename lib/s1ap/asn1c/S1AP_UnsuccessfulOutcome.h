@@ -108,6 +108,7 @@
 #include "S1AP_UEInformationTransfer.h"
 #include "S1AP_ENBCPRelocationIndication.h"
 #include "S1AP_MMECPRelocationIndication.h"
+#include "S1AP_SecondaryRATDataUsageReport.h"
 #include <OPEN_TYPE.h>
 #include <constr_CHOICE.h>
 #include <constr_SEQUENCE.h>

@@ -21,7 +21,7 @@ asn_TYPE_member_t asn_MBR_S1AP_CompletedCellinEAI_Item_1[] = {
 	{ ATF_POINTER, 1, offsetof(struct S1AP_CompletedCellinEAI_Item, iE_Extensions),
 		(ASN_TAG_CLASS_CONTEXT | (1 << 2)),
 		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_S1AP_ProtocolExtensionContainer_6602P45,
+		&asn_DEF_S1AP_ProtocolExtensionContainer_7055P47,
 		0,
 		{ 0, 0, 0 },
 		0, 0, /* No default value */

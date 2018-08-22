@@ -21,7 +21,7 @@ static asn_TYPE_member_t asn_MBR_S1AP_TargeteNB_ToSourceeNB_TransparentContainer
 	{ ATF_POINTER, 1, offsetof(struct S1AP_TargeteNB_ToSourceeNB_TransparentContainer, iE_Extensions),
 		(ASN_TAG_CLASS_CONTEXT | (1 << 2)),
 		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_S1AP_ProtocolExtensionContainer_6602P105,
+		&asn_DEF_S1AP_ProtocolExtensionContainer_7055P118,
 		0,
 		{ 0, 0, 0 },
 		0, 0, /* No default value */
