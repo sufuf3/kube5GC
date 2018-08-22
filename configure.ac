@@ -397,7 +397,7 @@ AC_SEARCH_LIBS(gethostname, nsl)
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(pthread_barrier_wait, pthread)
 AC_SEARCH_LIBS(gnutls_global_set_log_level, gnutls)
-AC_SEARCH_LIBS([ceil], [m])
+AC_SEARCH_LIBS([ceil], [m]) # link math library
 
 AC_SEARCH_LIBS([sctp_sendmsg], [sctp], [have_sctp_lib=yes], [have_sctp_lib=no])
 if test x$have_sctp_lib == xno; then
