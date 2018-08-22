@@ -441,15 +441,12 @@ status_t s1ap_build_reroute_nas_request(
     return CORE_OK;
 }
 
-//////////////////////////////////////////////////////////////////pan
 status_t s1ap_build_enb_configuration_update_acknowledge(pkbuf_t **pkbuf){
 
 	status_t rv;
 
 	S1AP_S1AP_PDU_t pdu;
 	S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
-	//S1AP_ENBConfigurationUpdateAcknowledge_t *ENBConfigurationUpdateAcknowledge = NULL;
-
 
 	memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
@@ -462,11 +459,6 @@ status_t s1ap_build_enb_configuration_update_acknowledge(pkbuf_t **pkbuf){
     successfulOutcome->criticality = S1AP_Criticality_reject;
     successfulOutcome->value.present =
         S1AP_SuccessfulOutcome__value_PR_ENBConfigurationUpdateAcknowledge;
-
-	//ENBConfigurationUpdateAcknowledge = &successfulOutcome->value.choice.ENBConfigurationUpdateAcknowledge;
-
-
-
 
 	rv = s1ap_encode_pdu(pkbuf, &pdu);
 	s1ap_free_pdu(&pdu);
@@ -549,9 +541,6 @@ status_t s1ap_build_enb_configuration_update_failure(
     return CORE_OK;
 }
 
-//////////////////////////////////////////////////////////////////
-
-/***************Add by Steven ****************/
 // MME Configuration Update
 status_t s1ap_build_mme_configuration_update(pkbuf_t **pkbuf)
 {
@@ -660,7 +649,6 @@ status_t s1ap_build_mme_configuration_update(pkbuf_t **pkbuf)
 	
 }
 
-/******************************************/
 status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
 {
     status_t rv;
@@ -763,7 +751,8 @@ status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
 
     return CORE_OK;
 }
-/*************************** Qiu ***************************/
+
+
 status_t s1ap_build_write_replace_warning_request(pkbuf_t **pkbuf)
 {
 	status_t rv;
@@ -928,7 +917,7 @@ status_t s1ap_build_kill_request(pkbuf_t **pkbuf)
     return CORE_OK;
 	
 }	
-/***********************************************************/
+
 status_t s1ap_build_setup_failure(
         pkbuf_t **pkbuf, S1AP_Cause_PR group, long cause, long time_to_wait)
 {

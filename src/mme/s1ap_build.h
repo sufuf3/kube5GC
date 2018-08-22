@@ -13,23 +13,23 @@ CORE_DECLARE(status_t) s1ap_build_reroute_nas_request(
 CORE_DECLARE(status_t) s1ap_build_ue_radio_capability_match_request(
     pkbuf_t **s1apbuf, enb_ue_t *enb_ue);
 CORE_DECLARE(status_t) s1ap_build_e_rab_modification_confirm(
-            pkbuf_t **s1apbuf, mme_bearer_t *bearer, pkbuf_t *esmbuf)
+            pkbuf_t **s1apbuf, mme_bearer_t *bearer, pkbuf_t *esmbuf);
 
 CORE_DECLARE(status_t) s1ap_build_setup_rsp(pkbuf_t **pkbuf);
-/////////////////////////////////////////////////////////////////////////pan
-CORE_DECLARE(status_t) s1ap_build_enb_configuration_update_acknowledge(pkbuf_t **pkbuf);
+CORE_DECLARE(status_t) s1ap_build_enb_configuration_update_acknowledge(
+    pkbuf_t **pkbuf);
 CORE_DECLARE(status_t) s1ap_build_enb_configuration_update_failure(
     pkbuf_t **pkbuf, S1AP_Cause_PR group, long cause, long time_to_wait);
-/////////////////////////////////////////////////////////////////////////
-/******************** Qiu ********************/
-CORE_DECLARE(status_t) s1ap_build_write_replace_warning_request(pkbuf_t **pkbuf);
-CORE_DECLARE(status_t) s1ap_build_kill_request(pkbuf_t **pkbuf);
-/*********************************************/
-/******Steven*****/
+
+CORE_DECLARE(status_t) s1ap_build_write_replace_warning_request(
+    pkbuf_t **pkbuf);
+CORE_DECLARE(status_t) s1ap_build_kill_request(
+    pkbuf_t **pkbuf);
+
 CORE_DECLARE(status_t) s1ap_build_mme_configuration_update(pkbuf_t **pkbuf);
 CORE_DECLARE(status_t) s1ap_build_mme_cp_relocation_indication(
         pkbuf_t **s1apbuf, enb_ue_t *source_ue);
-/*******************/
+
 CORE_DECLARE(status_t) s1ap_build_setup_failure(
     pkbuf_t **pkbuf, S1AP_Cause_PR group, long cause, long time_to_wait);
 CORE_DECLARE(status_t) s1ap_build_downlink_nas_transport(
@@ -49,10 +49,10 @@ CORE_DECLARE(status_t) s1ap_build_paging(pkbuf_t **s1apbuf, mme_ue_t *mme_ue);
 CORE_DECLARE(status_t) s1ap_build_mme_configuration_transfer(
         pkbuf_t **s1apbuf, 
         S1AP_SONConfigurationTransfer_t *son_configuration_transfer);
-////////////////////////////////////////////////////////pan
+
 CORE_DECLARE(status_t) s1ap_build_mme_direct_information_transfer(
     pkbuf_t **s1apbuf);
-//////////////////////////////////////////////////////////
+
 CORE_DECLARE(status_t) s1ap_build_path_switch_ack(
     pkbuf_t **s1apbuf, mme_ue_t *mme_ue);
 CORE_DECLARE(status_t) s1ap_build_path_switch_failure(pkbuf_t **s1apbuf,
