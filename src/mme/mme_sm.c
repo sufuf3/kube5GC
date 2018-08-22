@@ -683,7 +683,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 for (i = 0; i < n_enb_to_send; i++)
                 {                        
                     enb = selected_enb[i];
-                    d_trace(1, "Sending message to eNB #%d/%d\n", enb->index, n_enb);
+                    d_trace(1, "- sending message to eNB #%d/%d\n", enb->index, n_enb);
                     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,
                         "s1ap_send_to_enb() failed");
                 }
