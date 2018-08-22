@@ -541,6 +541,133 @@ status_t s1ap_build_enb_configuration_update_failure(
     return CORE_OK;
 }
 
+status_t s1ap_build_ue_context_suspend_response(
+        pkbuf_t **pkbuf,
+	S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
+        S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id)
+{
+    status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    S1AP_UEContextSuspendResponse_t *UEContextSuspendResponse = NULL;
+
+    S1AP_UEContextSuspendResponseIEs_t *ie = NULL;
+	S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+	S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = 
+        core_calloc(1, sizeof(S1AP_SuccessfulOutcome_t));
+
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = S1AP_ProcedureCode_id_UEContextSuspend;
+    successfulOutcome->criticality = S1AP_Criticality_reject;
+    successfulOutcome->value.present =
+        S1AP_SuccessfulOutcome__value_PR_S1SetupResponse;
+
+    UEContextSuspendResponse = &successfulOutcome->value.choice.UEContextSuspendResponse;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextSuspendResponseIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextSuspendResponse->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present = S1AP_UEContextSuspendResponseIEs__value_PR_MME_UE_S1AP_ID;
+
+    MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextSuspendResponseIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextSuspendResponse->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present = S1AP_UEContextSuspendResponseIEs__value_PR_ENB_UE_S1AP_ID;
+
+    ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+
+    *ENB_UE_S1AP_ID = *enb_ue_s1ap_id;
+    *MME_UE_S1AP_ID = *mme_ue_s1ap_id;
+
+
+    rv = s1ap_encode_pdu(pkbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+
+}
+status_t s1ap_build_ERAB_release_command(pkbuf_t **s1apbuf,
+    c_uint32_t enb_ue_s1ap_id, c_uint32_t mme_ue_s1ap_id)
+{
+    status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_E_RABReleaseCommand_t *E_RABReleaseCommand = NULL;
+
+    S1AP_E_RABReleaseCommandIEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+
+    d_trace(3, "[MME] ERAB release command failure\n");
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = S1AP_ProcedureCode_id_E_RABRelease;
+    initiatingMessage->criticality = S1AP_Criticality_reject;
+    initiatingMessage->value.present =
+        S1AP_InitiatingMessage__value_PR_E_RABReleaseCommand;
+
+    E_RABReleaseCommand =
+        &initiatingMessage->value.choice.E_RABReleaseCommand;
+
+    ie = core_calloc(1, sizeof(S1AP_E_RABReleaseCommandIEs_t));
+    ASN_SEQUENCE_ADD(&E_RABReleaseCommand->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present =
+        S1AP_E_RABReleaseCommandIEs__value_PR_MME_UE_S1AP_ID;
+
+    MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+
+    ie = core_calloc(1, sizeof(S1AP_E_RABReleaseCommandIEs_t));
+    ASN_SEQUENCE_ADD(&E_RABReleaseCommand->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present =
+        S1AP_E_RABReleaseCommandIEs__value_PR_ENB_UE_S1AP_ID;
+
+    ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+
+    *MME_UE_S1AP_ID = mme_ue_s1ap_id;
+    *ENB_UE_S1AP_ID = enb_ue_s1ap_id;
+	
+    rv = s1ap_encode_pdu(s1apbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
 // MME Configuration Update
 status_t s1ap_build_mme_configuration_update(pkbuf_t **pkbuf)
 {

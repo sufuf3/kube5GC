@@ -15,12 +15,10 @@ extern "C" {
 CORE_DECLARE(status_t) s1ap_init(int sctp_streams, c_uint16_t port);
 CORE_DECLARE(status_t) s1ap_final();
 
-/***************Add by Steven********/
 CORE_DECLARE(status_t) s1ap_send_mme_configuration_update(
     mme_enb_t *target_enb);
 CORE_DECLARE(status_t) s1ap_send_mme_cp_relocation_indication(
         enb_ue_t *source_ue);
-/***************************************/
 
 CORE_DECLARE(status_t) s1ap_open();
 CORE_DECLARE(status_t) s1ap_close();
@@ -53,10 +51,10 @@ CORE_DECLARE(status_t) s1ap_send_mme_configuration_transfer(
         mme_enb_t *target_enb,
         S1AP_SONConfigurationTransfer_t *SONConfigurationTransfer);
 
-//////////////////////////pan
 CORE_DECLARE(status_t) s1ap_send_mme_direct_information_transfer(
 	mme_enb_t *target_enb);
-//////////////////////////
+CORE_DECLARE(status_t) s1ap_send_ERAB_release_command(mme_enb_t *enb,
+    c_uint32_t enb_ue_s1ap_id, c_uint32_t mme_ue_s1ap_id);
 
 CORE_DECLARE(status_t) s1ap_send_path_switch_ack(mme_ue_t *mme_ue);
 
