@@ -1,6 +1,10 @@
 #ifndef __MME_CONTEXT__
 #define __MME_CONTEXT__
 
+/******************** Added by Chi ********************/
+#include <stdbool.h>
+/******************************************************/
+
 #include "core_list.h"
 #include "core_index.h"
 #include "core_errno.h"
@@ -33,6 +37,20 @@ extern "C" {
 #define MAX_NUM_OF_ALGORITHM        8
 
 #define MAX_NUM_OF_BPLMN            6
+
+/******************** Added by Chi ********************/
+#define OVERLOAD_THRESHOLD          0.8    /* Threshold for triggering overload_start/stop */
+
+/**
+ * OVERLOAD_NOTIFY_ENB_RATIO
+ * 
+ * Ratio of eNB which overload_start message will be sent to.
+ * (all eNB will receive overload_stop when MME is recovering)
+ * 
+ * Ref: TS23.401 Ch4.3.7.4.1
+ */
+#define OVERLOAD_NOTIFY_ENB_RATIO   0.7
+/******************************************************/
 
 typedef struct _enb_ue_t enb_ue_t;
 typedef struct _mme_ue_t mme_ue_t;
@@ -107,6 +125,11 @@ typedef struct _mme_context_t {
     /* S1SetupResponse */
     c_uint8_t       relative_capacity;
 
+    /******************** Added by Chi ********************/
+    /* Timer */
+    tm_block_id     overloading_checking_timer; /* For firing MME_EVT_CHECK_OVERLOAD event periodically */
+    /******************************************************/
+
     /* Timer value */
     c_uint32_t      t3413_value;            /* Paging retry timer value */
     c_uint32_t      s1_holding_timer_value; /* S1 holding timer value */
@@ -137,7 +160,12 @@ typedef struct _mme_context_t {
     /* Network Name */    
     nas_network_name_t short_name; /* Network short name */
     nas_network_name_t full_name; /* Network Full Name */
-                        
+
+    /******************** Added by Chi ********************/
+    /* Status */
+    bool overload_started;
+    /******************************************************/
+
 } mme_context_t;
 
 typedef struct _mme_enb_t {
@@ -664,6 +692,10 @@ CORE_DECLARE(int)           mme_find_served_tai(tai_t *tai);
 CORE_DECLARE(status_t)     mme_m_tmsi_pool_generate();
 CORE_DECLARE(mme_m_tmsi_t *) mme_m_tmsi_alloc();
 CORE_DECLARE(status_t)      mme_m_tmsi_free(mme_m_tmsi_t *tmsi);
+
+/******************** Added by Chi ********************/
+CORE_DECLARE(status_t)      mme_overload_checking_init(void);
+/******************************************************/
 
 #ifdef __cplusplus
 }

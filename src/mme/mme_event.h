@@ -31,6 +31,10 @@ typedef enum {
 
     MME_EVT_S6A_MESSAGE,
 
+    /******************** Added by Chi ********************/
+    MME_EVT_CHECK_OVERLOAD,
+    /******************************************************/
+
     MME_EVT_TOP,
 
 } event_e;

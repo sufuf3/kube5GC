@@ -266,7 +266,7 @@ status_t s1ap_build_e_rab_modification_confirm(
 
     return CORE_OK;
 }
-
+/*********************************************/
 
 /***************Add by Steven****************/
 status_t s1ap_build_mme_cp_relocation_indication(
@@ -879,7 +879,111 @@ status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
     return CORE_OK;
 }
 
+/******************** Added by Chi ********************/
+status_t s1ap_build_overload_start(pkbuf_t **pkbuf)
+{
+    status_t rv;
 
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_OverloadStart_t *OverloadStart = NULL;
+    S1AP_OverloadStartIEs_t *ie = NULL;
+
+    // Mandatory IEs
+    S1AP_OverloadResponse_t *OverloadResponse;
+
+    // Optional IEs
+    // S1AP_GUMMEIList_t *GUMMEIList;
+    // S1AP_TrafficLoadReductionIndication_t *TrafficLoadReductionIndication;
+    
+    // PDU
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+
+    // IE: Message Type
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = S1AP_ProcedureCode_id_OverloadStart;
+    initiatingMessage->criticality = S1AP_Criticality_ignore;
+    initiatingMessage->value.present =
+        S1AP_InitiatingMessage__value_PR_OverloadStart;
+    OverloadStart = &initiatingMessage->value.choice.OverloadStart;
+
+    // IE: Overload Response
+    ie = core_calloc(1, sizeof(S1AP_OverloadStartIEs_t));
+    ASN_SEQUENCE_ADD(&OverloadStart->protocolIEs, ie);
+    
+    ie->id = S1AP_ProtocolIE_ID_id_OverloadResponse;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_OverloadStartIEs__value_PR_OverloadResponse;
+
+    // IE: Overload Response > Overload Action (TS23.401-f40: Ch4.3.7.4.1)
+    OverloadResponse = &ie->value.choice.OverloadResponse;
+    OverloadResponse->present = S1AP_OverloadResponse_PR_overloadAction;
+    OverloadResponse->choice.overloadAction = S1AP_OverloadAction_reject_non_emergency_mo_dt;
+
+    rv = s1ap_encode_pdu(pkbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+/******************************************************/
+
+/******************** Chu ********************/
+status_t s1ap_build_overload_stop(pkbuf_t **pkbuf){
+
+    status_t rv;
+    S1AP_S1AP_PDU_t pdu;
+
+    /************ InitiatingMessage ***************/
+	S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    // S1AP_OverloadStop_t *OverloadStop = NULL;
+    //S1AP_OverloadStopIEs_t *ie = NULL;
+
+    /******************** IE *********************/
+    //S1AP_GUMMEIList_t *GUMMEIList = NULL;
+    
+
+    /**************** Message type: reject *******************/
+    memset(&pdu,0,sizeof(S1AP_S1AP_PDU_t));
+	pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+	pdu.choice.initiatingMessage = core_calloc(1,sizeof(S1AP_InitiatingMessage_t));
+	initiatingMessage = pdu.choice.initiatingMessage;//pointer point to it
+	initiatingMessage->procedureCode = S1AP_ProcedureCode_id_OverloadStop;
+	initiatingMessage->criticality = S1AP_Criticality_reject;
+	initiatingMessage->value.present = S1AP_InitiatingMessage__value_PR_OverloadStop;
+	// OverloadStop = &initiatingMessage->value.choice.OverloadStop;
+
+    /********* GUMMEIList: ignore (optional) *********/
+    /*ie = core_calloc(1, sizeof(S1AP_OverloadStopIEs_t));
+    ASN_SEQUENCE_ADD(&OverloadStop->protocolIEs, ie);
+	ie->id = S1AP_ProtocolIE_ID_id_GUMMEIList;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present = S1AP_OverloadStopIEs__value_PR_GUMMEIList;
+	GUMMEIList = &ie->value.choice.GUMMEIList;*/
+
+    /****************** Encode **********************/
+    rv = s1ap_encode_pdu(pkbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+/*********************************************/
+
+/*************************** Qiu ***************************/
 status_t s1ap_build_write_replace_warning_request(pkbuf_t **pkbuf)
 {
 	status_t rv;
@@ -1991,6 +2095,208 @@ status_t s1ap_build_ue_context_release_command(
 
     return CORE_OK;
 }
+
+/***************Add by Steven****************/
+status_t s1ap_build_ue_context_resume_response(
+        pkbuf_t **s1apbuf, 
+        S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
+        S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id)
+{
+	status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    S1AP_UEContextResumeResponse_t *UEContextResumeResponse = NULL;
+
+    S1AP_UEContextResumeResponseIEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+
+    // S1AP_E_RABFailedToResumeListResumeRes_t	 *E_RABFailedToResumeListResumeRes;
+   
+    d_trace(3, "[MME] UE Context Resume Response\n");
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = 
+        core_calloc(1, sizeof(S1AP_SuccessfulOutcome_t));
+
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = S1AP_ProcedureCode_id_UEContextResume;
+    successfulOutcome->criticality = S1AP_Criticality_reject;
+    successfulOutcome->value.present =
+        S1AP_SuccessfulOutcome__value_PR_UEContextResumeResponse;
+
+    UEContextResumeResponse =
+        &successfulOutcome->value.choice.UEContextResumeResponse;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextResumeResponseIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextResumeResponse->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present =
+        S1AP_UEContextResumeResponseIEs__value_PR_MME_UE_S1AP_ID;
+
+    MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextResumeResponseIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextResumeResponse->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present =
+        S1AP_UEContextResumeResponseIEs__value_PR_ENB_UE_S1AP_ID;
+
+    ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+            *enb_ue_s1ap_id, *mme_ue_s1ap_id);
+            
+    *MME_UE_S1AP_ID = *mme_ue_s1ap_id;
+    *ENB_UE_S1AP_ID = *enb_ue_s1ap_id;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextResumeResponseIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextResumeResponse->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_E_RABFailedToResumeListResumeRes;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present =
+        S1AP_UEContextResumeResponseIEs__value_PR_E_RABFailedToResumeListResumeRes;
+
+    // E_RABFailedToResumeListResumeRes = &ie->value.choice.E_RABFailedToResumeListResumeRes;
+
+    // E-RAB Failed To Resume List
+    /* S1AP_E_RABFailedToResumeItemResumeResIEs_t *item = NULL;
+    S1AP_E_RABFailedToResumeItemResumeRes_t *e_rab = NULL;
+    S1AP_Cause_t *Cause = NULL;
+	for ()
+    {
+        mme_bearer_t *bearer;
+        S1AP_Cause_t *cause;
+        
+        item = core_calloc(1, sizeof(S1AP_E_RABFailedToResumeItemResumeResIEs_t));
+        ASN_SEQUENCE_ADD(&E_RABFailedToResumeListResumeRes->list, item);
+
+        item->id = S1AP_ProtocolIE_ID_id_E_RABFailedToResumeItemResumeRes;
+        item->criticality = S1AP_Criticality_reject;
+        item->value.present = S1AP_UEContextResumeResponseIEs__value_PR_E_RABFailedToResumeListResumeRes;
+
+        e_rab = &item->value.choice.E_RABFailedToResumeItemResumeRes;
+        e_rab->e_RAB_ID = bearer->ebi;
+
+        item = core_calloc(1, sizeof(S1AP_E_RABFailedToResumeItemResumeResIEs_t));
+        ASN_SEQUENCE_ADD(&E_RABFailedToResumeListResumeRes->list, item);
+
+        item->id = S1AP_ProtocolIE_ID_id_E_RABFailedToResumeItemResumeRes;
+        item->criticality = S1AP_Criticality_reject;
+        item->value.present = S1AP_UEContextResumeResponseIEs__value_PR_E_RABFailedToResumeListResumeRes;
+
+        Cause = &item->value.choice.E_RABFailedToResumeItemResumeRes.cause;
+        Cause->present = cause->present;
+        Cause->choice.radioNetwork = cause->choice.radioNetwork;
+    } */
+
+    rv = s1ap_encode_pdu(s1apbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
+status_t s1ap_build_ue_context_resume_failure(
+        pkbuf_t **s1apbuf, 
+        S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
+        S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
+        S1AP_Cause_t *cause)
+{
+	status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
+    S1AP_UEContextResumeFailure_t	 *UEContextResumeFailure = NULL;
+
+    S1AP_UEContextResumeFailureIEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_Cause_t *Cause = NULL;
+
+    d_assert(s1apbuf, return CORE_ERROR,);
+    d_assert(cause, return CORE_ERROR,);
+
+    d_trace(3, "[MME] UE Context Resume Failure\n");
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_unsuccessfulOutcome;
+    pdu.choice.unsuccessfulOutcome = 
+        core_calloc(1, sizeof(S1AP_UnsuccessfulOutcome_t));
+
+    unsuccessfulOutcome = pdu.choice.unsuccessfulOutcome;
+    unsuccessfulOutcome->procedureCode =
+        S1AP_ProcedureCode_id_UEContextResume;
+    unsuccessfulOutcome->criticality = S1AP_Criticality_reject;
+    unsuccessfulOutcome->value.present =
+        S1AP_UnsuccessfulOutcome__value_PR_UEContextResumeFailure;
+
+    UEContextResumeFailure =
+        &unsuccessfulOutcome->value.choice.UEContextResumeFailure;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextResumeFailureIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextResumeFailure->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present =
+        S1AP_UEContextResumeFailureIEs__value_PR_MME_UE_S1AP_ID;
+
+    MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextResumeFailureIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextResumeFailure->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present =
+        S1AP_UEContextResumeFailureIEs__value_PR_ENB_UE_S1AP_ID;
+
+    ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextResumeFailureIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextResumeFailure->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_Cause;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present = S1AP_UEContextResumeFailureIEs__value_PR_Cause;
+
+    Cause = &ie->value.choice.Cause;
+
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+            enb_ue_s1ap_id, mme_ue_s1ap_id);
+    d_trace(5, "    Group[%d] Cause[%d]\n",
+            cause->present, cause->choice.radioNetwork);
+
+    *MME_UE_S1AP_ID = *mme_ue_s1ap_id;
+    *ENB_UE_S1AP_ID = *enb_ue_s1ap_id;
+    Cause->present = cause->present;
+    Cause->choice.radioNetwork = cause->choice.radioNetwork;
+
+    rv = s1ap_encode_pdu(s1apbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+/******************************************/
 
 status_t s1ap_build_paging(pkbuf_t **s1apbuf, mme_ue_t *mme_ue)
 {
@@ -3348,7 +3654,6 @@ status_t s1ap_build_s1_reset_ack(
                 d_warn("No MME_UE_S1AP_ID & ENB_UE_S1AP_ID");
                 continue;
             }
-
             ie2 = core_calloc(1,
                     sizeof(S1AP_UE_associatedLogicalS1_ConnectionItemResAck_t));
             d_assert(ie2, return CORE_ERROR,);

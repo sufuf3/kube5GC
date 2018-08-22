@@ -74,6 +74,7 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_enb_direct_information_transfer(enb,pdu);
                             break;
                         }
+                        ////////////////// pan
                         case S1AP_ProcedureCode_id_ENBConfigurationUpdate :
                         {
                             s1ap_handle_eNB_configuration_update(enb, pdu);
@@ -89,6 +90,8 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_ue_context_suspend(enb, pdu);
                             break;
                         }
+                        /////////////////
+                        /********************** Qiu *******************/
                         case S1AP_ProcedureCode_id_WriteReplaceWarning :
                         {
                             printf("\nThe S1AP_ProcedureCode_id_WriteReplaceWarning message has been received.\n");

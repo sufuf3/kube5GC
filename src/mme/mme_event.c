@@ -47,6 +47,11 @@ char* mme_event_get_name(event_t *e)
         case MME_EVT_S6A_MESSAGE:
             return "MME_EVT_S6A_MESSAGE";
 
+        /******************** Added by Chi ********************/
+        case MME_EVT_CHECK_OVERLOAD:
+            return "MME_EVT_CHECK_OVERLOAD";
+        /******************************************************/
+
         default: 
            break;
     }

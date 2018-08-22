@@ -235,6 +235,7 @@ AC_CHECK_HEADERS( \
     string.h \
     strings.h \
     time.h \
+    math.h \
     unistd.h \
     net/if_dl.h \
     net/if.h \
@@ -388,6 +389,7 @@ AC_CHECK_FUNCS(\
     utime utimes sem_timedwait \
     pthread_yield sched_yield \
     getenv putenv setenv unsetenv \
+    ceil \
 )
 
 AC_SEARCH_LIBS(gethostbyname, nsl)
@@ -395,6 +397,7 @@ AC_SEARCH_LIBS(gethostname, nsl)
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(pthread_barrier_wait, pthread)
 AC_SEARCH_LIBS(gnutls_global_set_log_level, gnutls)
+AC_SEARCH_LIBS([ceil], [m])
 
 AC_SEARCH_LIBS([sctp_sendmsg], [sctp], [have_sctp_lib=yes], [have_sctp_lib=no])
 if test x$have_sctp_lib == xno; then
