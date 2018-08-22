@@ -1727,10 +1727,7 @@ status_t s1ap_build_ue_context_release_command(
 status_t s1ap_build_ue_context_resume_response(
         pkbuf_t **s1apbuf, 
         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
-        S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
-        S1AP_E_RABFailedToResumeListResumeReq_t	 *E_RABFailedToResumeListResumeReq,
-        mme_bearer_t *bearer,
-        S1AP_Cause_t *cause)
+        S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id)
 {
 	status_t rv;
 
@@ -1741,10 +1738,8 @@ status_t s1ap_build_ue_context_resume_response(
     S1AP_UEContextResumeResponseIEs_t *ie = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
-	S1AP_E_RABFailedToResumeListResumeRes_t	 *E_RABFailedToResumeListResumeRes;
-	S1AP_E_RABFailedToResumeItemResumeResIEs_t *item = NULL;
-	S1AP_E_RABFailedToResumeItemResumeRes_t *e_rab = NULL;
-    S1AP_Cause_t *Cause = NULL;
+
+    // S1AP_E_RABFailedToResumeListResumeRes_t	 *E_RABFailedToResumeListResumeRes;
    
     d_trace(3, "[MME] UE Context Resume Response\n");
 
@@ -1782,6 +1777,12 @@ status_t s1ap_build_ue_context_resume_response(
 
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+            *enb_ue_s1ap_id, *mme_ue_s1ap_id);
+            
+    *MME_UE_S1AP_ID = *mme_ue_s1ap_id;
+    *ENB_UE_S1AP_ID = *enb_ue_s1ap_id;
+
     ie = core_calloc(1, sizeof(S1AP_UEContextResumeResponseIEs_t));
     ASN_SEQUENCE_ADD(&UEContextResumeResponse->protocolIEs, ie);
 
@@ -1790,35 +1791,38 @@ status_t s1ap_build_ue_context_resume_response(
     ie->value.present =
         S1AP_UEContextResumeResponseIEs__value_PR_E_RABFailedToResumeListResumeRes;
 
-    E_RABFailedToResumeListResumeRes = &ie->value.choice.E_RABFailedToResumeListResumeRes;
+    // E_RABFailedToResumeListResumeRes = &ie->value.choice.E_RABFailedToResumeListResumeRes;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
-            *enb_ue_s1ap_id, *mme_ue_s1ap_id);
+    // E-RAB Failed To Resume List
+    /* S1AP_E_RABFailedToResumeItemResumeResIEs_t *item = NULL;
+    S1AP_E_RABFailedToResumeItemResumeRes_t *e_rab = NULL;
+    S1AP_Cause_t *Cause = NULL;
+	for ()
+    {
+        mme_bearer_t *bearer;
+        S1AP_Cause_t *cause;
+        
+        item = core_calloc(1, sizeof(S1AP_E_RABFailedToResumeItemResumeResIEs_t));
+        ASN_SEQUENCE_ADD(&E_RABFailedToResumeListResumeRes->list, item);
 
-    *MME_UE_S1AP_ID = *mme_ue_s1ap_id;
-    *ENB_UE_S1AP_ID = *enb_ue_s1ap_id;
+        item->id = S1AP_ProtocolIE_ID_id_E_RABFailedToResumeItemResumeRes;
+        item->criticality = S1AP_Criticality_reject;
+        item->value.present = S1AP_UEContextResumeResponseIEs__value_PR_E_RABFailedToResumeListResumeRes;
 
-	
-    item = core_calloc(1, sizeof(S1AP_E_RABFailedToResumeItemResumeResIEs_t));
-    ASN_SEQUENCE_ADD(&E_RABFailedToResumeListResumeRes->list, item);
+        e_rab = &item->value.choice.E_RABFailedToResumeItemResumeRes;
+        e_rab->e_RAB_ID = bearer->ebi;
 
-    item->id = S1AP_ProtocolIE_ID_id_E_RABFailedToResumeItemResumeRes;
-    item->criticality = S1AP_Criticality_reject;
-    item->value.present = S1AP_UEContextResumeResponseIEs__value_PR_E_RABFailedToResumeListResumeRes;
+        item = core_calloc(1, sizeof(S1AP_E_RABFailedToResumeItemResumeResIEs_t));
+        ASN_SEQUENCE_ADD(&E_RABFailedToResumeListResumeRes->list, item);
 
-    e_rab = &item->value.choice.E_RABFailedToResumeItemResumeRes;
-    e_rab->e_RAB_ID = bearer->ebi;
+        item->id = S1AP_ProtocolIE_ID_id_E_RABFailedToResumeItemResumeRes;
+        item->criticality = S1AP_Criticality_reject;
+        item->value.present = S1AP_UEContextResumeResponseIEs__value_PR_E_RABFailedToResumeListResumeRes;
 
-	item = core_calloc(1, sizeof(S1AP_E_RABFailedToResumeItemResumeResIEs_t));
-    ASN_SEQUENCE_ADD(&E_RABFailedToResumeListResumeRes->list, item);
-
-    item->id = S1AP_ProtocolIE_ID_id_E_RABFailedToResumeItemResumeRes;
-    item->criticality = S1AP_Criticality_reject;
-    item->value.present = S1AP_UEContextResumeResponseIEs__value_PR_E_RABFailedToResumeListResumeRes;
-
-	Cause = &item->value.choice.E_RABFailedToResumeItemResumeRes.cause;
-	Cause->present = cause->present;
-	Cause->choice.radioNetwork = cause->choice.radioNetwork;
+        Cause = &item->value.choice.E_RABFailedToResumeItemResumeRes.cause;
+        Cause->present = cause->present;
+        Cause->choice.radioNetwork = cause->choice.radioNetwork;
+    } */
 
     rv = s1ap_encode_pdu(s1apbuf, &pdu);
     s1ap_free_pdu(&pdu);

@@ -52,10 +52,7 @@ CORE_DECLARE(status_t) s1ap_build_ue_context_release_command(
 CORE_DECLARE(status_t) s1ap_build_ue_context_resume_response(
     pkbuf_t **s1apbuf, 
     S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
-    S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
-    S1AP_E_RABFailedToResumeListResumeReq_t	 *E_RABFailedToResumeListResumeReq,
-    mme_bearer_t *bearer,
-    S1AP_Cause_t *cause);
+    S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id);
 CORE_DECLARE(status_t) s1ap_build_ue_context_resume_failure(
     pkbuf_t **s1apbuf, 
     S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,

@@ -1651,7 +1651,7 @@ void s1ap_handle_ue_context_resume_request(
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
 	S1AP_UEContextResumeRequestIEs_t *ie = NULL;
-    S1AP_E_RABFailedToResumeListResumeReq_t	 *E_RABFailedToResumeListResumeReq;
+    // S1AP_E_RABFailedToResumeListResumeReq_t	 *E_RABFailedToResumeListResumeReq;
 
     d_assert(enb, return,);
     d_assert(enb->sock, return,);
@@ -1677,15 +1677,22 @@ void s1ap_handle_ue_context_resume_request(
                 MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
                 break;
 			case S1AP_ProtocolIE_ID_id_E_RABFailedToResumeListResumeReq:
-				E_RABFailedToResumeListResumeReq = &ie->value.choice.E_RABFailedToResumeListResumeReq;
+				// E_RABFailedToResumeListResumeReq = &ie->value.choice.E_RABFailedToResumeListResumeReq;
 				break;
             default:
                 break;
         }
     }
 
-    // TODO: build response and send back to enb
+    // Build response and send back to enb
+    pkbuf_t *s1apbuf = NULL;
 
+    d_trace(3, "[MME] s1 ue_context_resume response\n");
+    d_assert(s1ap_build_ue_context_resume_response(&s1apbuf, ENB_UE_S1AP_ID, MME_UE_S1AP_ID) == CORE_OK, 
+            return, "s1ap_build_ue_context_resume_response() failed");
+
+    d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,
+            "s1ap_send_to_enb() failed");
 }
 /****************************************************/
 
