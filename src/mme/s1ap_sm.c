@@ -174,6 +174,12 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
 			    s1ap_handle_retrieve_ue_information(enb, pdu);
 			    break;
 			}
+                        case S1AP_ProcedureCode_id_E_RABReleaseIndication:
+                        {
+                        	/*************Add by Steven*********************/
+                        	s1ap_handle_e_rab_release_indication(enb,pdu);
+                        	break;
+                        }
                         default:
                         {
                             d_warn("Not implemented(choice:%d, proc:%d)",
@@ -231,6 +237,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         case S1AP_ProcedureCode_id_NASNonDeliveryIndication:
                         {//add by YEE
                             s1ap_handle_nas_non_delivery_indication(enb, pdu);
+                            break;
+                        }
+                        case S1AP_ProcedureCode_id_UERadioCapabilityMatch:
+                        {//add by YEE
+                            s1ap_handle_ue_radio_capability_match_response(enb, pdu);
                             break;
                         }
                         case S1AP_ProcedureCode_id_MMEConfigurationUpdate:
