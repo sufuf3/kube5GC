@@ -70,3 +70,6 @@ debian/nextepc-hss
 # webui
 webui/.next/
 webui/node_modules/
+
+# VS Code configure
+.vscode/*
