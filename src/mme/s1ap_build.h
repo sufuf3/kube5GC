@@ -146,6 +146,10 @@ CORE_DECLARE(status_t) s1ap_build_ue_context_modification_request(
     pkbuf_t **s1apbuf,
     enb_ue_t *enb_ue);
 
+CORE_DECLARE(status_t) s1ap_build_ue_context_modification_confirm(
+	pkbuf_t **s1apbuf,
+    enb_ue_t *enb_ue);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

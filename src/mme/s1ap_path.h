@@ -50,6 +50,12 @@ CORE_DECLARE(status_t) s1ap_send_ue_context_release_command(
 CORE_DECLARE(status_t) s1ap_send_ue_context_modification_request(
 	enb_ue_t *enb_ue);
 
+CORE_DECLARE(status_t) s1ap_send_initial_context_setup_request(
+        mme_ue_t *mme_ue);
+
+CORE_DECLARE(status_t) s1ap_send_ue_context_modification_confirm(
+        enb_ue_t *enb_ue);
+
 CORE_DECLARE(status_t) s1ap_send_mme_configuration_transfer(
         mme_enb_t *target_enb,
         S1AP_SONConfigurationTransfer_t *SONConfigurationTransfer);
