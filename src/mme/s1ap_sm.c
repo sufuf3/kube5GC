@@ -112,6 +112,12 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             printf("\nThe S1AP_ProcedureCode_id_PWSFailureIndication message has been received.\n");
                             break;
                         }
+                        case S1AP_ProcedureCode_id_UEContextModificationIndication:
+                        {
+                            s1ap_handle_ue_context_modification_indication(
+                                enb, pdu);
+                            break;
+                        }
                         case S1AP_ProcedureCode_id_initialUEMessage :
                         {
                             s1ap_handle_initial_ue_message(enb, pdu);
@@ -254,6 +260,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                             s1ap_handle_mme_configuration_update_acknowledge(enb, pdu);
                             break;
                         }
+                        case S1AP_ProcedureCode_id_UEContextModification:
+                        {
+                            s1ap_handle_ue_context_modification_response(enb, pdu);
+                            break;
+                        }
                         default:
                         {
                             d_warn("Not implemented(choice:%d, proc:%d)",
@@ -286,6 +297,11 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         case S1AP_ProcedureCode_id_MMEConfigurationUpdate:
                         {
                             s1ap_handle_mme_configuration_update_failure(enb, pdu);
+                            break;
+                        }
+                        case S1AP_ProcedureCode_id_UEContextModification:
+                        {
+                            s1ap_handle_ue_context_modification_failure(enb, pdu);
                             break;
                         }
                         default:
