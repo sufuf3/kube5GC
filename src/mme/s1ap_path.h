@@ -47,6 +47,9 @@ CORE_DECLARE(status_t) s1ap_send_ue_context_release_command(
     enb_ue_t *enb_ue, S1AP_Cause_PR group, long cause,
     c_uint8_t action, c_uint32_t delay);
 
+CORE_DECLARE(status_t) s1ap_send_ue_context_modification_request(
+	enb_ue_t *enb_ue);
+
 CORE_DECLARE(status_t) s1ap_send_mme_configuration_transfer(
         mme_enb_t *target_enb,
         S1AP_SONConfigurationTransfer_t *SONConfigurationTransfer);

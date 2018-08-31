@@ -2298,6 +2298,91 @@ status_t s1ap_build_ue_context_resume_failure(
 }
 /******************************************/
 
+status_t s1ap_build_ue_context_modification_request(pkbuf_t **s1apbuf,
+        enb_ue_t *enb_ue)
+{
+    status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_UEContextModificationRequest_t *UEContextModificationRequest = NULL;
+
+    S1AP_UEContextModificationRequestIEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_SecurityKey_t *SecurityKey = NULL;
+
+    d_assert(enb_ue, return CORE_ERROR, "Null param");
+
+    if (enb_ue->mme_ue_s1ap_id == 0)
+    {
+        d_error("invalid mme ue s1ap id (idx: %d)", enb_ue->index);
+        return CORE_ERROR;
+    }
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+    
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = S1AP_ProcedureCode_id_UEContextModification;
+    initiatingMessage->criticality = S1AP_Criticality_ignore;
+    initiatingMessage->value.present =
+        S1AP_InitiatingMessage__value_PR_UEContextModificationRequest;
+
+    UEContextModificationRequest =
+        &initiatingMessage->value.choice.UEContextModificationRequest;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextModificationRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextModificationRequest->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_UEContextModificationRequestIEs__value_PR_MME_UE_S1AP_ID;
+
+    MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextModificationRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextModificationRequest->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_UEContextModificationRequestIEs__value_PR_ENB_UE_S1AP_ID;
+
+    ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+
+    ie = core_calloc(1, sizeof(S1AP_UEContextModificationRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextModificationRequest->protocolIEs, ie);
+
+    ie->id = S1AP_ProtocolIE_ID_id_SecurityKey;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_UEContextModificationRequestIEs__value_PR_SecurityKey;
+
+    SecurityKey = &ie->value.choice.SecurityKey;
+
+    *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
+    *ENB_UE_S1AP_ID = enb_ue->enb_ue_s1ap_id;
+
+    SecurityKey->size = SHA256_DIGEST_SIZE;
+    SecurityKey->buf = 
+        core_calloc(SecurityKey->size, sizeof(c_uint8_t));
+    SecurityKey->bits_unused = 0;
+    memcpy(SecurityKey->buf, enb_ue->mme_ue->kenb, SecurityKey->size);
+
+    rv = s1ap_encode_pdu(s1apbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
 status_t s1ap_build_paging(pkbuf_t **s1apbuf, mme_ue_t *mme_ue)
 {
     status_t rv;

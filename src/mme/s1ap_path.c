@@ -594,3 +594,22 @@ status_t s1ap_send_ue_information_transfer(
 
     return CORE_OK;
 }
+
+status_t s1ap_send_ue_context_modification_request(
+	enb_ue_t *enb_ue)
+{
+    status_t rv;
+    pkbuf_t *s1apbuf = NULL;
+
+    d_assert(enb_ue, return CORE_ERROR, "Null param");
+
+    /* build UE Context Modification Request packet */
+    rv = s1ap_build_ue_context_modification_request(&s1apbuf, enb_ue);
+    d_assert(rv == CORE_OK && s1apbuf, return CORE_ERROR, "s1ap build error");
+
+    /* Send the packet */
+    rv = s1ap_send_to_enb_ue(enb_ue, s1apbuf);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "s1ap send error");
+
+    return CORE_OK;
+}

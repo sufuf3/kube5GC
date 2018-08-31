@@ -2101,6 +2101,135 @@ void s1ap_handle_ue_context_resume_request(
 }
 /****************************************************/
 
+void s1ap_handle_ue_context_modification_response(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    status_t rv;
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+
+    S1AP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    S1AP_UEContextModificationResponse_t *UEContextModificationResponse = NULL;
+
+    S1AP_UEContextModificationResponseIEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+
+    enb_ue_t *enb_ue = NULL;
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    UEContextModificationResponse =
+        &successfulOutcome->value.choice.UEContextModificationResponse;
+    d_assert(UEContextModificationResponse, return,);
+
+    d_trace(3, "[MME] Receive UE Context modification response\n");
+    
+    for (i = 0; i < UEContextModificationResponse->protocolIEs.list.count; i++)
+    {
+        ie = UEContextModificationResponse->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
+                MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    IP[%s] ENB_ID[%d]\n",
+            CORE_ADDR(enb->addr, buf), enb->enb_id);
+    d_assert(MME_UE_S1AP_ID, return,);
+
+    enb_ue = enb_ue_find_by_mme_ue_s1ap_id(*MME_UE_S1AP_ID);
+    if (!enb_ue)
+    {
+        d_warn("No ENB UE Context : MME_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
+        rv = s1ap_send_error_indication(enb, 
+                MME_UE_S1AP_ID, NULL,
+                S1AP_Cause_PR_radioNetwork,
+                S1AP_CauseRadioNetwork_unknown_mme_ue_s1ap_id);
+        d_assert(rv == CORE_OK, return, "s1ap send error");
+        return;
+    }
+    d_trace(3, "UE Context modification. MME_UE_S1AP_ID[%lu], eNB_UE_S1AP_ID[%lu]\n", *MME_UE_S1AP_ID, *ENB_UE_S1AP_ID);
+}
+
+void s1ap_handle_ue_context_modification_failure(
+        mme_enb_t *enb, s1ap_message_t *message)
+{
+    status_t rv;
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+
+    S1AP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
+    S1AP_UEContextModificationFailure_t *UEContextModificationFailure = NULL;
+
+    S1AP_UEContextModificationFailureIEs_t *ie = NULL;
+    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+    S1AP_Cause_t *Cause = NULL;
+
+    enb_ue_t *enb_ue = NULL;
+
+    d_assert(enb, return,);
+    d_assert(enb->sock, return,);
+
+    d_assert(message, return,);
+    unsuccessfulOutcome = message->choice.unsuccessfulOutcome;
+    d_assert(unsuccessfulOutcome, return,);
+    UEContextModificationFailure =
+        &unsuccessfulOutcome->value.choice.UEContextModificationFailure;
+    d_assert(UEContextModificationFailure, return,);
+
+    d_trace(3, "[MME] Receive UE Context modification response\n");
+    
+    for (i = 0; i < UEContextModificationFailure->protocolIEs.list.count; i++)
+    {
+        ie = UEContextModificationFailure->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
+                MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
+                ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+                break;
+            case S1AP_ProtocolIE_ID_id_Cause:
+                Cause = &ie->value.choice.Cause;
+                break;
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    IP[%s] ENB_ID[%d]\n",
+            CORE_ADDR(enb->addr, buf), enb->enb_id);
+    d_assert(MME_UE_S1AP_ID, return,);
+
+    enb_ue = enb_ue_find_by_mme_ue_s1ap_id(*MME_UE_S1AP_ID);
+    if (!enb_ue)
+    {
+        d_warn("No ENB UE Context : MME_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
+        rv = s1ap_send_error_indication(enb, 
+                MME_UE_S1AP_ID, NULL,
+                S1AP_Cause_PR_radioNetwork,
+                S1AP_CauseRadioNetwork_unknown_mme_ue_s1ap_id);
+        d_assert(rv == CORE_OK, return, "s1ap send error");
+        return;
+    }
+    d_trace(3, "UE Context modification failure. MME_UE_S1AP_ID[%lu], eNB_UE_S1AP_ID[%lu]\n", *MME_UE_S1AP_ID, *ENB_UE_S1AP_ID);
+    d_trace(3, "Group[%d]Cause[%d]\n", Cause->present, Cause->choice.radioNetwork);
+}
+
 void s1ap_handle_paging(mme_ue_t *mme_ue)
 {
     pkbuf_t *s1apbuf = NULL;

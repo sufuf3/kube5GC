@@ -142,6 +142,10 @@ CORE_DECLARE(status_t) s1ap_build_ue_information_transfer(
 	mme_ue_t *mme_ue, 
 	S1AP_S_TMSI_t *S_TMSI);
 
+CORE_DECLARE(status_t) s1ap_build_ue_context_modification_request(
+    pkbuf_t **s1apbuf,
+    enb_ue_t *enb_ue);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
