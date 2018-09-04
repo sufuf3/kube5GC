@@ -3315,11 +3315,10 @@ status_t tests1ap_build_nas_non_delivery_indication(
 
     return CORE_OK;
 }
-status_t tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf)
 
+status_t tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf)
 {
     status_t rv;
-
 
     S1AP_S1AP_PDU_t pdu;
     S1AP_InitiatingMessage_t *initiatingMessage = NULL;
@@ -3363,3 +3362,57 @@ status_t tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf)
 
     return CORE_OK;
 }
+
+/******************** Added by Chi ********************/
+status_t tests1ap_build_enb_direct_information_transfer(
+    pkbuf_t **s1apbuf)
+{
+    status_t rv;
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    // S1AP_MMEDirectInformationTransfer_t *ENBDirectInformationTransfer = NULL;
+
+    // S1AP_ENBDirectInformationTransferIEs_t *ie = NULL;
+    // S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType = NULL;
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode =
+        S1AP_ProcedureCode_id_eNBDirectInformationTransfer;
+    initiatingMessage->criticality = S1AP_Criticality_ignore;
+    initiatingMessage->value.present =
+        S1AP_InitiatingMessage__value_PR_ENBDirectInformationTransfer;
+
+    /* ENBDirectInformationTransfer =
+        &initiatingMessage->value.choice.ENBDirectInformationTransfer;
+
+	ie = core_calloc(1, sizeof(S1AP_ENBDirectInformationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&ENBDirectInformationTransfer->protocolIEs, ie);
+
+	ie->id = S1AP_ProtocolIE_ID_id_Inter_SystemInformationTransferTypeMDT;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_ENBDirectInformationTransferIEs__value_PR_Inter_SystemInformationTransferType;
+
+    Inter_SystemInformationTransferType = &ie->value.choice.Inter_SystemInformationTransferType;
+
+	rv = s1ap_copy_ie(&asn_DEF_S1AP_Inter_SystemInformationTransferType,
+            inter_systemInformationtransferType, Inter_SystemInformationTransferType);
+    d_assert(rv == CORE_OK, return CORE_ERROR,); */
+
+	rv = s1ap_encode_pdu(s1apbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+/******************************************************/

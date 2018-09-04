@@ -59,6 +59,7 @@ CORE_DECLARE(status_t) tests1ap_build_e_rab_setup_response(
         pkbuf_t **pkbuf, 
         c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id,
         c_uint8_t ebi, c_uint32_t teid);
+CORE_DECLARE(status_t) tests1ap_build_e_rab_modification_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
 CORE_DECLARE(status_t) tests1ap_build_e_rab_modify_response(
         pkbuf_t **pkbuf, int i);
 CORE_DECLARE(status_t) tests1ap_build_e_rab_release_response(
@@ -108,7 +109,11 @@ CORE_DECLARE(status_t) tests1ap_build_ue_context_resume_request(pkbuf_t **pkbuf,
 CORE_DECLARE(status_t) tests1ap_build_nas_delivery_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
 CORE_DECLARE(status_t) tests1ap_build_nas_non_delivery_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
 CORE_DECLARE(status_t) tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf);
-CORE_DECLARE(status_t) tests1ap_build_e_rab_modification_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
+
+/******************** Added by Chi ********************/
+CORE_DECLARE(status_t) tests1ap_build_enb_direct_information_transfer(
+    pkbuf_t **s1apbuf);
+/******************************************************/
 
 #ifdef __cplusplus
 }

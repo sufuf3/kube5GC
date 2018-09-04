@@ -1669,6 +1669,14 @@ static void attach_test5(abts_case *tc, void *data)
     d_assert(mme_ue, goto out,);
     m_tmsi = mme_ue->guti.m_tmsi;
 
+    /******************** Added by Chi ********************/
+    /* Send eNB direct information transfer */
+    rv = tests1ap_build_enb_direct_information_transfer(&sendbuf);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    rv = tests1ap_enb_send(sock, sendbuf);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    /******************************************************/
+
 #if 0
     rv = tests1ap_build_s1_reset(&sendbuf, 0);
 #elif 0
