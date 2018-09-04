@@ -95,6 +95,8 @@ CORE_DECLARE(status_t) s1ap_send_error_indication(
 CORE_DECLARE(status_t) s1ap_send_s1_reset_ack(
         mme_enb_t *enb,
         S1AP_UE_associatedLogicalS1_ConnectionListRes_t *partOfS1_Interface);
+CORE_DECLARE(status_t) s1ap_send_e_rab_modification_confirm(
+        enb_ue_t *source_ue);
 
 CORE_DECLARE(status_t) s1ap_send_connection_establishment_indication(
         mme_enb_t *enb,

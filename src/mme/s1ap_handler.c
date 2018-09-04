@@ -977,7 +977,7 @@ void s1ap_handle_e_rab_modification_indication(
     S1AP_E_RABModificationIndicationIEs_t *ie = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
-    S1AP_E_RABToBeModifiedListBearerModInd_t*     E_RABToBeModifiedListBearerModInd = NULL;
+    //S1AP_E_RABToBeModifiedListBearerModInd_t*     E_RABToBeModifiedListBearerModInd = NULL;
     //S1AP_E_RABNotToBeModifiedListBearerModInd_t*     E_RABNotToBeModifiedListBearerModInd = NULL;
     //S1AP_CSGMembershipInfo_t*     CSGMembershipInfo = NULL;
 
@@ -1007,9 +1007,9 @@ void s1ap_handle_e_rab_modification_indication(
                 MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
                 break;
 
-            case S1AP_ProtocolIE_ID_id_E_RABToBeModifiedListBearerModInd:
+            /*case S1AP_ProtocolIE_ID_id_E_RABToBeModifiedListBearerModInd:
                 E_RABToBeModifiedListBearerModInd = &ie->value.choice.E_RABToBeModifiedListBearerModInd;
-                break;
+                break;*/
  
             /*case S1AP_ProtocolIE_ID_id_E_RABNotToBeModifiedListBearerModInd:
                 E_RABNotToBeModifiedListBearerModInd = &ie->value.choice.E_RABNotToBeModifiedListBearerModInd;
@@ -1034,60 +1034,10 @@ void s1ap_handle_e_rab_modification_indication(
 
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%s]\n",
             enb_ue->enb_ue_s1ap_id, *MME_UE_S1AP_ID);
-//#include<stdio.h>
-//    printf("%l",E_RABToBeModifiedListBearerModInd->list.array[0]);
-/*    d_trace(1, "    E-RAB_ID[%l] transportLayerAddress[%d] dL_GTP_TEID[%d]\n",
-            E_RABToBeModifiedListBearerModInd->e_RAB_ID, 
-            E_RABToBeModifiedListBearerModInd->transportLayerAddress,
-            E_RABToBeModifiedListBearerModInd->dL_GTP_TEID);*/
 
-    d_assert(E_RABToBeModifiedListBearerModInd, return,);
-    for (i = 0; i < E_RABToBeModifiedListBearerModInd->list.count; i++)
-    {
-        /*S1AP_E_RABSetupItemBearerSUResIEs_t *ie2 = NULL;
-        S1AP_E_RABSetupItemBearerSURes_t *e_rab = NULL;
+    d_assert(s1ap_send_e_rab_modification_confirm(enb_ue) == CORE_OK,,
+            "s1ap_send_e_rab_modification_confirm() failed");
 
-        mme_bearer_t *bearer = NULL;
-
-        ie2 = (S1AP_E_RABSetupItemBearerSUResIEs_t *)
-            E_RABSetupListBearerSURes->list.array[i];
-        d_assert(ie2, return,);
-
-        e_rab = &ie2->value.choice.E_RABSetupItemBearerSURes;
-        d_assert(e_rab, return, "Null param");
-
-        bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
-        d_assert(bearer, return, "Null param");
-
-        memcpy(&bearer->enb_s1u_teid, e_rab->gTP_TEID.buf, 
-                sizeof(bearer->enb_s1u_teid));
-        bearer->enb_s1u_teid = ntohl(bearer->enb_s1u_teid);
-        rv = s1ap_BIT_STRING_to_ip(
-                &e_rab->transportLayerAddress, &bearer->enb_s1u_ip);
-        d_assert(rv == CORE_OK, return,);
-
-        d_trace(5, "    EBI[%d]\n", bearer->ebi);
-
-        if (FSM_CHECK(&bearer->sm, esm_state_active))
-        {
-            status_t rv;
-
-            mme_bearer_t *linked_bearer = mme_linked_bearer(bearer);
-            d_assert(linked_bearer, return, "Null param");
-            d_trace(5, "    Linked-EBI[%d]\n", linked_bearer->ebi);
-
-            if (bearer->ebi == linked_bearer->ebi)
-            {
-                rv = mme_gtp_send_modify_bearer_request(bearer, 0);
-                d_assert(rv == CORE_OK, return, "gtp send failed");
-            }
-            else
-            {
-                rv = mme_gtp_send_create_bearer_response(bearer);
-                d_assert(rv == CORE_OK, return, "gtp send failed");
-            }
-        }*/
-    }
 }
 void s1ap_handle_ue_capability_info_indication(
         mme_enb_t *enb, s1ap_message_t *message)

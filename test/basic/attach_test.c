@@ -1159,6 +1159,11 @@ static void attach_test3(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
+    rv = tests1ap_build_e_rab_modification_indication(&sendbuf, mme_ue->enb_ue->mme_ue_s1ap_id, mme_ue->enb_ue->enb_ue_s1ap_id);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    rv = tests1ap_enb_send(sock, sendbuf);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+
     /* Send TAU Request */
     rv = tests1ap_build_tau_request(&sendbuf, 0,
             0, 0x002600, 0, m_tmsi, 8, 0x972dc6f8, mme_ue->knas_int);
@@ -1185,6 +1190,50 @@ static void attach_test3(abts_case *tc, void *data)
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     core_sleep(time_from_msec(300));
+    
+    // added by EvanHuang
+        /*rv = tests1ap_build_e_rab_release_indication(&sendbuf, 0, 0x003600);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);
+        rv = tests1ap_enb_send(sock, sendbuf);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);*/
+        /*rv = tests1ap_build_ue_context_modification_indication(&sendbuf, 0, 0x003600);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);
+        rv = tests1ap_enb_send(sock, sendbuf);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);*/
+        /*rv = tests1ap_build_ue_context_suspend_request(&sendbuf, 0, 0x002600);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);
+        rv = tests1ap_enb_send(sock, sendbuf);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);*/
+        /*rv = tests1ap_build_ue_context_resume_request(&sendbuf, 0, 0x002600);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);
+        rv = tests1ap_enb_send(sock, sendbuf);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);*/
+        /*rv = tests1ap_build_nas_delivery_indication(&sendbuf, 0, 0x002600);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);
+        rv = tests1ap_enb_send(sock, sendbuf);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);*/
+    /*S1AP_M_TMSI_t *a = NULL;
+    served_gummei_t *served_gummei = &mme_self()->served_gummei[0];
+    S1AP_MME_Code_t *MME_Code = (S1AP_MME_Code_t *)core_calloc(1, sizeof(S1AP_MME_Code_t));
+    s1ap_uint8_to_OCTET_STRING(served_gummei->mme_code[j], MME_Code);
+    s1ap_uint32_to_OCTET_STRING(m_TMSI, a);*/
+        /*rv = tests1ap_build_retrieve_ue_information(&sendbuf);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);
+        rv = tests1ap_enb_send(sock, sendbuf);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);*/
+    /*rv = tests1ap_build_nas_non_delivery_indication(&sendbuf, 0, 0x002600);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);
+        rv = tests1ap_enb_send(sock, sendbuf);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);*/
+ recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
+    rv = tests1ap_enb_read(sock, recvbuf);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    pkbuf_free(recvbuf);
+
+        
+    // added by EvanHuang
+
+
 out:
     doc = BCON_NEW("imsi", BCON_UTF8("001010123456797"));
     ABTS_PTR_NOTNULL(tc, doc);

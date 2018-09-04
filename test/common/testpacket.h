@@ -101,6 +101,14 @@ CORE_DECLARE(status_t) testgtpu_enb_send(pkbuf_t *sendbuf);
 CORE_DECLARE(status_t) testgtpu_build_ping(pkbuf_t **sendbuf,
         const char *src_ip, const char *dst_ip);
 CORE_DECLARE(status_t) testgtpu_build_slacc_rs(pkbuf_t **sendbuf, int i);
+CORE_DECLARE(status_t) tests1ap_build_e_rab_release_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
+CORE_DECLARE(status_t) tests1ap_build_ue_context_modification_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
+CORE_DECLARE(status_t) tests1ap_build_ue_context_suspend_request(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
+CORE_DECLARE(status_t) tests1ap_build_ue_context_resume_request(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
+CORE_DECLARE(status_t) tests1ap_build_nas_delivery_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
+CORE_DECLARE(status_t) tests1ap_build_nas_non_delivery_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
+CORE_DECLARE(status_t) tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf);
+CORE_DECLARE(status_t) tests1ap_build_e_rab_modification_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
 
 #ifdef __cplusplus
 }

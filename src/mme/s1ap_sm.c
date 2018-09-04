@@ -187,7 +187,12 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         case S1AP_ProcedureCode_id_E_RABReleaseIndication:
                         {
                             s1ap_handle_e_rab_release_indication(enb,pdu);
-                                    break;
+                            break;
+                        }
+                        case S1AP_ProcedureCode_id_E_RABModificationIndication:
+                        {
+                            s1ap_handle_e_rab_modification_indication(enb, pdu);
+                            break;
                         }
                         default:
                         {

@@ -98,9 +98,9 @@ status_t s1ap_build_ue_radio_capability_match_request(
     return CORE_OK;
 }
 
-//add by YEE (incomplete)
+//add by YEE 
 status_t s1ap_build_e_rab_modification_confirm(
-            pkbuf_t **s1apbuf, mme_bearer_t *bearer, pkbuf_t *esmbuf)
+            pkbuf_t **s1apbuf, enb_ue_t *enb_ue)
 {
     status_t rv;
 
@@ -112,33 +112,7 @@ status_t s1ap_build_e_rab_modification_confirm(
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
 
-    /*S1AP_E_RABModifyListBearerModConf_t  *E_RABModifyListBearerModConf = NULL;
-    S1AP_E_RABList_t                     *E_RABList = NULL;
-
-    S1AP_E_RABModifyItemBearerModConfIEs_t *item = NULL;
-    S1AP_E_RABModifyItemBearerModConf_t *e_rab = NULL;*/
-
-    /*S1AP_E_RABModifyRequestIEs_t *ie = NULL;
-    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
-    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
-    S1AP_E_RABToBeModifiedListBearerModReq_t
-        *E_RABToBeModifiedListBearerModReq = NULL;
-
-    S1AP_E_RABToBeModifiedItemBearerModReqIEs_t *item = NULL;
-    S1AP_E_RABToBeModifiedItemBearerModReq_t *e_rab = NULL;*/
-
-    mme_ue_t *mme_ue = NULL;
-    enb_ue_t *enb_ue = NULL;
-
-    d_assert(esmbuf, return CORE_ERROR, "Null param");
-    d_assert(bearer, return CORE_ERROR, "Null param");
-
-    mme_ue = bearer->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
-    enb_ue = mme_ue->enb_ue;
-    d_assert(enb_ue, return CORE_ERROR, "Null param");
-
-    d_trace(1, "[MME] E-RAB Modification Indication\n");
+    d_trace(1, "[MME] E-RAB Modification Confirm\n");
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
     pdu.choice.successfulOutcome = 
@@ -173,87 +147,12 @@ status_t s1ap_build_e_rab_modification_confirm(
 
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
-
-//    item = core_calloc(1, sizeof(S1AP_E_RABToBeModifiedItemBearerModReqIEs_t));
-//    ASN_SEQUENCE_ADD(&E_RABToBeModifiedListBearerModReq->list, item);
-
-//    item->id = S1AP_ProtocolIE_ID_id_E_RABToBeModifiedItemBearerModReq;
-//    item->criticality = S1AP_Criticality_reject;
-//    item->value.present = S1AP_E_RABToBeModifiedItemBearerModReqIEs__value_PR_E_RABToBeModifiedItemBearerModReq;
-
-//where to add list/item?????? 2018.07.18
-
-    //E-RAB Modify List: ignore
-    ie = core_calloc(1, sizeof(S1AP_E_RABModificationConfirmIEs_t));
-    ASN_SEQUENCE_ADD(&E_RABModificationConfirm->protocolIEs, ie);
-
-    ie->id = S1AP_ProtocolIE_ID_id_E_RABModifyListBearerModConf;
-    ie->criticality = S1AP_Criticality_ignore;
-    ie->value.present =
-        S1AP_E_RABModificationConfirmIEs__value_PR_E_RABModifyListBearerModConf;
-
-    //E_RABModifyListBearerModConf =
-        //&ie->value.choice.E_RABModifyListBearerModConf;
-
     //debug place
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
     *ENB_UE_S1AP_ID = enb_ue->enb_ue_s1ap_id;
-
-    //E-RAB Modify item: ignore
-    /*item = core_calloc(1, sizeof(S1AP_E_RABModifyListBearerModConf_t));
-    ASN_SEQUENCE_ADD(&E_RABModifyListBearerModConf_t->list, item);
-
-    item->id = S1AP_ProtocolIE_ID_id_E_RABModifyListBearerModConf;
-    item->criticality = S1AP_Criticality_ignore;
-    item->value.present = S1AP_E_RABModificationConfirmIEs__value_PR_E_RABModifyListBearerModConf;
-
-    e_rab = &item->value.choice.E_RABToBeModifiedItemBearerModReq;
-
-    e_rab->e_RAB_ID = bearer->ebi;
-    e_rab->e_RABLevelQoSParameters.qCI = bearer->qos.qci;
-
-    d_trace(5, "    EBI[%d] QCI[%d]\n", bearer->ebi, bearer->qos.qci);
-
-    e_rab->e_RABLevelQoSParameters.allocationRetentionPriority.
-        priorityLevel = bearer->qos.arp.priority_level;
-    e_rab->e_RABLevelQoSParameters.allocationRetentionPriority.
-        pre_emptionCapability = !(bearer->qos.arp.pre_emption_capability);
-    e_rab->e_RABLevelQoSParameters.allocationRetentionPriority.
-        pre_emptionVulnerability = !(bearer->qos.arp.pre_emption_vulnerability);
-
-    if (bearer->qos.mbr.downlink || bearer->qos.mbr.uplink ||
-        bearer->qos.gbr.downlink || bearer->qos.gbr.uplink)
-    {
-        if (bearer->qos.mbr.downlink == 0)
-            bearer->qos.mbr.downlink = MAX_BIT_RATE;
-        if (bearer->qos.mbr.uplink == 0)
-            bearer->qos.mbr.uplink = MAX_BIT_RATE;
-        if (bearer->qos.gbr.downlink == 0)
-            bearer->qos.gbr.downlink = MAX_BIT_RATE;
-        if (bearer->qos.gbr.uplink == 0)
-            bearer->qos.gbr.uplink = MAX_BIT_RATE;
-
-        gbrQosInformation = 
-                core_calloc(1, sizeof(S1AP_GBR_QosInformation_t));
-        asn_uint642INTEGER(&gbrQosInformation->e_RAB_MaximumBitrateDL,
-                bearer->qos.mbr.downlink);
-        asn_uint642INTEGER(&gbrQosInformation->e_RAB_MaximumBitrateUL,
-                bearer->qos.mbr.uplink);
-        asn_uint642INTEGER(&gbrQosInformation->e_RAB_GuaranteedBitrateDL,
-                bearer->qos.gbr.downlink);
-        asn_uint642INTEGER(&gbrQosInformation->e_RAB_GuaranteedBitrateUL,
-                bearer->qos.gbr.uplink);
-        e_rab->e_RABLevelQoSParameters.gbrQosInformation = gbrQosInformation;
-    }*/
-
-    /*nasPdu = &e_rab->nAS_PDU;
-    nasPdu->size = esmbuf->len;
-    nasPdu->buf = core_calloc(nasPdu->size, sizeof(c_uint8_t));
-    memcpy(nasPdu->buf, esmbuf->payload, nasPdu->size);
-    pkbuf_free(esmbuf);*/
 
     rv = s1ap_encode_pdu(s1apbuf, &pdu);
     s1ap_free_pdu(&pdu);
