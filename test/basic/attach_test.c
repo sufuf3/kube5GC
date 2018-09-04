@@ -1158,11 +1158,18 @@ static void attach_test3(abts_case *tc, void *data)
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     core_sleep(time_from_msec(300));
-
+    
+    ///////////// YEEEEEEEEEEEE
     rv = tests1ap_build_e_rab_modification_indication(&sendbuf, mme_ue->enb_ue->mme_ue_s1ap_id, mme_ue->enb_ue->enb_ue_s1ap_id);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
+
+    recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
+    rv = tests1ap_enb_read(sock, recvbuf);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    pkbuf_free(recvbuf);
+    ////////////
 
     /* Send TAU Request */
     rv = tests1ap_build_tau_request(&sendbuf, 0,
@@ -1224,11 +1231,11 @@ static void attach_test3(abts_case *tc, void *data)
     /*rv = tests1ap_build_nas_non_delivery_indication(&sendbuf, 0, 0x002600);
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
         rv = tests1ap_enb_send(sock, sendbuf);
-        ABTS_INT_EQUAL(tc, CORE_OK, rv);*/
- recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
+        ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
-    pkbuf_free(recvbuf);
+    pkbuf_free(recvbuf);*/
 
         
     // added by EvanHuang
