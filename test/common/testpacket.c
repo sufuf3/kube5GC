@@ -2927,6 +2927,62 @@ status_t tests1ap_build_e_rab_release_indication(
     return CORE_OK;
 }
 
+
+
+status_t tests1ap_build_enb_cp_relocation_indication(pkbuf_t **pkbuf, 
+        c_uint32_t enb_ue_s1ap_id)
+{
+    status_t rv;
+
+
+    S1AP_S1AP_PDU_t pdu;
+    S1AP_InitiatingMessage_t *initiatingMessage = NULL;
+    S1AP_ENBCPRelocationIndication_t *ENBCPRelocationIndication = NULL;
+
+    S1AP_ENBCPRelocationIndicationIEs_t *ie = NULL;
+    S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
+
+
+    memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
+    pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
+    d_trace(3, "[MME] ENB CP Relocation Indication\n");
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = S1AP_ProcedureCode_id_eNBCPRelocationIndication;
+    initiatingMessage->criticality = S1AP_Criticality_ignore;
+    initiatingMessage->value.present =
+        S1AP_InitiatingMessage__value_PR_ENBCPRelocationIndication;
+    
+
+
+    ENBCPRelocationIndication = &initiatingMessage->value.choice.ENBCPRelocationIndication;
+
+    ie = core_calloc(1, sizeof(S1AP_ENBCPRelocationIndicationIEs_t));
+    ASN_SEQUENCE_ADD(&ENBCPRelocationIndication->protocolIEs, ie);
+    
+    ie->id = S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID;
+    ie->criticality = S1AP_Criticality_reject;
+    ie->value.present = S1AP_ENBCPRelocationIndicationIEs__value_PR_ENB_UE_S1AP_ID;
+
+    ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
+
+    *ENB_UE_S1AP_ID = enb_ue_s1ap_id;
+    
+   
+    rv = s1ap_encode_pdu(pkbuf, &pdu);
+    s1ap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
+
 status_t tests1ap_build_ue_context_modification_indication(pkbuf_t **pkbuf, 
         c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id)
 {

@@ -1084,6 +1084,15 @@ static void attach_test3(abts_case *tc, void *data)
     d_assert(mme_ue, goto out,);
     m_tmsi = mme_ue->guti.m_tmsi;
 
+    /******************** Added by Hu ********************/
+    /* Send eNB CP relocation indication */
+    rv = tests1ap_build_enb_cp_relocation_indication(&sendbuf, enb_ue->enb_ue_s1ap_id);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    rv = tests1ap_enb_send(sock, sendbuf);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    /******************************************************/
+    
+
     /* Send UE Context Release Request */
     rv = tests1ap_build_ue_context_release_request(&sendbuf, msgindex);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1159,6 +1168,8 @@ static void attach_test3(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
     
+    
+
     ///////////// YEEEEEEEEEEEE
     rv = tests1ap_build_e_rab_modification_indication(&sendbuf, mme_ue->enb_ue->mme_ue_s1ap_id, mme_ue->enb_ue->enb_ue_s1ap_id);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1170,6 +1181,9 @@ static void attach_test3(abts_case *tc, void *data)
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     pkbuf_free(recvbuf);
     ////////////
+
+    
+
 
     /* Send TAU Request */
     rv = tests1ap_build_tau_request(&sendbuf, 0,
@@ -1669,6 +1683,9 @@ static void attach_test5(abts_case *tc, void *data)
     d_assert(mme_ue, goto out,);
     m_tmsi = mme_ue->guti.m_tmsi;
 
+    
+
+
     /******************** Added by Chi ********************/
     /* Send eNB direct information transfer */
     rv = tests1ap_build_enb_direct_information_transfer(&sendbuf);
@@ -1676,6 +1693,8 @@ static void attach_test5(abts_case *tc, void *data)
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     /******************************************************/
+
+    
 
 #if 0
     rv = tests1ap_build_s1_reset(&sendbuf, 0);

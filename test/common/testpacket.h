@@ -115,6 +115,11 @@ CORE_DECLARE(status_t) tests1ap_build_enb_direct_information_transfer(
     pkbuf_t **s1apbuf);
 /******************************************************/
 
+/******************** Added by Hu ********************/
+CORE_DECLARE(status_t) tests1ap_build_enb_cp_relocation_indication(pkbuf_t **pkbuf, 
+        c_uint32_t enb_ue_s1ap_id);
+/******************************************************/
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
