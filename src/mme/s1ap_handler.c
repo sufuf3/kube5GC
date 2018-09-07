@@ -1233,8 +1233,8 @@ void s1ap_handle_initial_context_setup_response(
 void s1ap_handle_eNB_cp_relocation_indication(
         mme_enb_t *enb, s1ap_message_t *message)
 {
-    status_t rv;
-    char buf[CORE_ADDRSTRLEN];
+    // status_t rv;
+    // char buf[CORE_ADDRSTRLEN];
     int i;
 
     S1AP_InitiatingMessage_t *initiatingMessage = NULL;
@@ -1242,29 +1242,29 @@ void s1ap_handle_eNB_cp_relocation_indication(
 
     S1AP_ENBCPRelocationIndicationIEs_t *ie = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
-    S1AP_S_TMSI_t *S_TMSI = NULL;
-    S1AP_EUTRAN_CGI_t *EUTRAN_CGI = NULL;
-    S1AP_TAI_t *TAI = NULL;
-    //S1AP_UL_CP_SecurityInformation_t *UL_CP_SecurityInformation = NULL;
+    // S1AP_S_TMSI_t *S_TMSI = NULL;
+    // S1AP_EUTRAN_CGI_t *EUTRAN_CGI = NULL;
+    // S1AP_TAI_t *TAI = NULL;
+    // S1AP_UL_CP_SecurityInformation_t *UL_CP_SecurityInformation = NULL;
     
-    pkbuf_t *s1apbuf = NULL;
+    // pkbuf_t *s1apbuf = NULL;
 
-    S1AP_PLMNidentity_t *pLMNidentity = NULL;
-    S1AP_CellIdentity_t    *cell_ID = NULL;
-    S1AP_TAC_t *tAC = NULL;
+    // S1AP_PLMNidentity_t *pLMNidentity = NULL;
+    // S1AP_CellIdentity_t    *cell_ID = NULL;
+    // S1AP_TAC_t *tAC = NULL;
 
-    mme_ue_t *mme_ue = NULL;
-    S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id = NULL;
-    enb_ue_t *enb_ue = NULL;
+    // mme_ue_t *mme_ue = NULL;
+    // S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id = NULL;
+    // enb_ue_t *enb_ue = NULL;
 
-    mme_ue = enb_ue->mme_ue;
-    d_assert(mme_ue, return,);
+    // mme_ue = enb_ue->mme_ue;
+    // d_assert(mme_ue, return,);
 
-    *mme_ue_s1ap_id = enb_ue->mme_ue_s1ap_id;
-    d_assert(mme_ue_s1ap_id, return,);
+    // *mme_ue_s1ap_id = enb_ue->mme_ue_s1ap_id;
+    // d_assert(mme_ue_s1ap_id, return,);
 
-    d_assert(enb, return,);
-    d_assert(enb->sock, return,);
+    // d_assert(enb, return,);
+    // d_assert(enb->sock, return,);
 
     d_assert(message, return,);
     initiatingMessage = message->choice.initiatingMessage;
@@ -1282,133 +1282,141 @@ void s1ap_handle_eNB_cp_relocation_indication(
             case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
                 ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
                 break;
-            case S1AP_ProtocolIE_ID_id_S_TMSI:
-                S_TMSI = &ie->value.choice.S_TMSI;
-                break;
-            case S1AP_ProtocolIE_ID_id_EUTRAN_CGI:
-                EUTRAN_CGI = &ie->value.choice.EUTRAN_CGI;
-                break;
-            case S1AP_ProtocolIE_ID_id_TAI:
-                TAI = &ie->value.choice.TAI;
-                break;
-    //case S1AP_ProtocolIE_ID_id_UL_CP_SecurityInformation:
-          //      UL_CP_SecurityInformation = &ie->value.choice.UL_CP_SecurityInformation;
-            //    break;
+    //         case S1AP_ProtocolIE_ID_id_S_TMSI:
+    //             S_TMSI = &ie->value.choice.S_TMSI;
+    //             break;
+    //         case S1AP_ProtocolIE_ID_id_EUTRAN_CGI:
+    //             EUTRAN_CGI = &ie->value.choice.EUTRAN_CGI;
+    //             break;
+    //         case S1AP_ProtocolIE_ID_id_TAI:
+    //             TAI = &ie->value.choice.TAI;
+    //             break;
+    // case S1AP_ProtocolIE_ID_id_UL_CP_SecurityInformation:
+    //             UL_CP_SecurityInformation = &ie->value.choice.UL_CP_SecurityInformation;
+    //             break;
             default:
                 break;
         }
     }
 
-    d_trace(5, "    IP[%s] ENB_ID[%d]\n",
-            CORE_ADDR(enb->addr, buf), enb->enb_id);
+     d_trace(5, "ENB_UE_S1AP_ID = %d\n",ENB_UE_S1AP_ID);
+    //  d_trace(5, "S_TMSI = %d\n",S_TMSI);
+    //  d_trace(5, "EUTRAN_CGI = %d\n",EUTRAN_CGI);
+    //  d_trace(5, "TAI = %d\n",TAI);
+    //  d_trace(5, "rv = %d\n",rv);
+    //  d_trace(5, "cell_ID = %d\n",*cell_ID);
+    //  d_trace(5, "tAC = %d\n",*tAC);
+    //  d_trace(5, "pLMNidentity = %d\n",*pLMNidentity);
+    //  d_trace(5, "UL_CP_SecurityInformation = %d\n",*UL_CP_SecurityInformation);
+    //  d_trace(5, "buf = %d\n",buf);
 
-    d_assert(ENB_UE_S1AP_ID, return,);
-    enb_ue = enb_ue_find_by_enb_ue_s1ap_id(enb, *ENB_UE_S1AP_ID);
-    if (!enb_ue)
-    {
-        enb_ue = enb_ue_add(enb);
-        d_assert(enb_ue, return, "Null param");
+//     d_assert(ENB_UE_S1AP_ID, return,);
+//     enb_ue = enb_ue_find_by_enb_ue_s1ap_id(enb, *ENB_UE_S1AP_ID);
+//     if (!enb_ue)
+//     {
+//         enb_ue = enb_ue_add(enb);
+//         d_assert(enb_ue, return, "Null param");
 
-        enb_ue->enb_ue_s1ap_id = *ENB_UE_S1AP_ID;
+//         enb_ue->enb_ue_s1ap_id = *ENB_UE_S1AP_ID;
 
-        /* Find MME_UE if S_TMSI included */
-        if (S_TMSI)
-        {
-            served_gummei_t *served_gummei = &mme_self()->served_gummei[0];
-            guti_t guti;
-            mme_ue_t *mme_ue = NULL;
+//         /* Find MME_UE if S_TMSI included */
+//         if (S_TMSI)
+//         {
+//             served_gummei_t *served_gummei = &mme_self()->served_gummei[0];
+//             guti_t guti;
+//             mme_ue_t *mme_ue = NULL;
 
-            memset(&guti, 0, sizeof(guti_t));
+//             memset(&guti, 0, sizeof(guti_t));
 
-            /* Use the first configured plmn_id and mme group id */
-            memcpy(&guti.plmn_id, &served_gummei->plmn_id[0], PLMN_ID_LEN);
-            guti.mme_gid = served_gummei->mme_gid[0];
+//             /* Use the first configured plmn_id and mme group id */
+//             memcpy(&guti.plmn_id, &served_gummei->plmn_id[0], PLMN_ID_LEN);
+//             guti.mme_gid = served_gummei->mme_gid[0];
 
-            /* size must be 1 */
-            memcpy(&guti.mme_code, S_TMSI->mMEC.buf, S_TMSI->mMEC.size);
-            /* size must be 4 */
-            memcpy(&guti.m_tmsi, S_TMSI->m_TMSI.buf, S_TMSI->m_TMSI.size);
-            guti.m_tmsi = ntohl(guti.m_tmsi);
+//             /* size must be 1 */
+//             memcpy(&guti.mme_code, S_TMSI->mMEC.buf, S_TMSI->mMEC.size);
+//             /* size must be 4 */
+//             memcpy(&guti.m_tmsi, S_TMSI->m_TMSI.buf, S_TMSI->m_TMSI.size);
+//             guti.m_tmsi = ntohl(guti.m_tmsi);
 
-            mme_ue = mme_ue_find_by_guti(&guti);
-            if (!mme_ue)
-            {
-                d_warn("Unknown UE by S_TMSI[G:%d,C:%d,M_TMSI:0x%x]",
-                        guti.mme_gid, guti.mme_code, guti.m_tmsi);
-            }
-            else
-            {
-                d_trace(5, "    S_TMSI[G:%d,C:%d,M_TMSI:0x%x] IMSI:[%s]\n",
-                        mme_ue->guti.mme_gid,
-                        mme_ue->guti.mme_code,
-                        mme_ue->guti.m_tmsi,
-                        MME_UE_HAVE_IMSI(mme_ue) 
-                            ? mme_ue->imsi_bcd : "Unknown");
+//             mme_ue = mme_ue_find_by_guti(&guti);
+//             if (!mme_ue)
+//             {
+//                 d_warn("Unknown UE by S_TMSI[G:%d,C:%d,M_TMSI:0x%x]",
+//                         guti.mme_gid, guti.mme_code, guti.m_tmsi);
+//             }
+//             else
+//             {
+//                 d_trace(5, "    S_TMSI[G:%d,C:%d,M_TMSI:0x%x] IMSI:[%s]\n",
+//                         mme_ue->guti.mme_gid,
+//                         mme_ue->guti.mme_code,
+//                         mme_ue->guti.m_tmsi,
+//                         MME_UE_HAVE_IMSI(mme_ue) 
+//                             ? mme_ue->imsi_bcd : "Unknown");
 
-                /* If NAS(mme_ue_t) has already been associated with
-                 * older S1(enb_ue_t) context */
-                if (ECM_CONNECTED(mme_ue))
-                {
-#if 1  /* IMPLICIT_S1_RELEASE */
-                   /* Implcit S1 release */
-                    d_warn("Implicit S1 release");
-                    d_warn("    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]",
-                          mme_ue->enb_ue->enb_ue_s1ap_id,
-                          mme_ue->enb_ue->mme_ue_s1ap_id);
-                    rv = enb_ue_remove(mme_ue->enb_ue);
-                    d_assert(rv == CORE_OK,,);
+//                 /* If NAS(mme_ue_t) has already been associated with
+//                  * older S1(enb_ue_t) context */
+//                 if (ECM_CONNECTED(mme_ue))
+//                 {
+// #if 1  /* IMPLICIT_S1_RELEASE */
+//                    /* Implcit S1 release */
+//                     d_warn("Implicit S1 release");
+//                     d_warn("    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]",
+//                           mme_ue->enb_ue->enb_ue_s1ap_id,
+//                           mme_ue->enb_ue->mme_ue_s1ap_id);
+//                     rv = enb_ue_remove(mme_ue->enb_ue);
+//                     d_assert(rv == CORE_OK,,);
 
-#else /* S1_HOLDING_TIMER */
+// #else /* S1_HOLDING_TIMER */
 
-                    /* Previous S1(enb_ue_t) context the holding timer(30secs)
-                     * is started.
-                     * Newly associated S1(enb_ue_t) context holding timer
-                     * is stopped. */
-                    d_trace(5, "Start S1 Holding Timer\n");
-                    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
-                            mme_ue->enb_ue->enb_ue_s1ap_id, 
-                            mme_ue->enb_ue->mme_ue_s1ap_id);
+//                     /* Previous S1(enb_ue_t) context the holding timer(30secs)
+//                      * is started.
+//                      * Newly associated S1(enb_ue_t) context holding timer
+//                      * is stopped. */
+//                     d_trace(5, "Start S1 Holding Timer\n");
+//                     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+//                             mme_ue->enb_ue->enb_ue_s1ap_id, 
+//                             mme_ue->enb_ue->mme_ue_s1ap_id);
 
-                    /* De-associate S1 with NAS/EMM */
-                    rv = enb_ue_deassociate(mme_ue->enb_ue);
-                    d_assert(rv == CORE_OK,,);
+//                     /* De-associate S1 with NAS/EMM */
+//                     rv = enb_ue_deassociate(mme_ue->enb_ue);
+//                     d_assert(rv == CORE_OK,,);
 
-                    tm_start(mme_ue->enb_ue->holding_timer);
-#endif
-                }
-                tm_stop(enb_ue->holding_timer);
-                mme_ue_associate_enb_ue(mme_ue, enb_ue);
-            }
-        }
-    }
+//                     tm_start(mme_ue->enb_ue->holding_timer);
+// #endif
+//                 }
+//                 tm_stop(enb_ue->holding_timer);
+//                 mme_ue_associate_enb_ue(mme_ue, enb_ue);
+//             }
+//         }
+//     }
 
-    d_assert(TAI, return,);
-    pLMNidentity = &TAI->pLMNidentity;
-    d_assert(pLMNidentity && pLMNidentity->size == sizeof(plmn_id_t), return,);
-    tAC = &TAI->tAC;
-    d_assert(tAC && tAC->size == sizeof(c_uint16_t), return,);
+//     d_assert(TAI, return,);
+//     pLMNidentity = &TAI->pLMNidentity;
+//     d_assert(pLMNidentity && pLMNidentity->size == sizeof(plmn_id_t), return,);
+//     tAC = &TAI->tAC;
+//     d_assert(tAC && tAC->size == sizeof(c_uint16_t), return,);
 
-    memcpy(&enb_ue->nas.tai.plmn_id, pLMNidentity->buf, 
-            sizeof(enb_ue->nas.tai.plmn_id));
-    memcpy(&enb_ue->nas.tai.tac, tAC->buf, sizeof(enb_ue->nas.tai.tac));
-    enb_ue->nas.tai.tac = ntohs(enb_ue->nas.tai.tac);
+//     memcpy(&enb_ue->nas.tai.plmn_id, pLMNidentity->buf, 
+//             sizeof(enb_ue->nas.tai.plmn_id));
+//     memcpy(&enb_ue->nas.tai.tac, tAC->buf, sizeof(enb_ue->nas.tai.tac));
+//     enb_ue->nas.tai.tac = ntohs(enb_ue->nas.tai.tac);
     
-    d_assert(EUTRAN_CGI, return,);
-    pLMNidentity = &EUTRAN_CGI->pLMNidentity;
-    d_assert(pLMNidentity && pLMNidentity->size == sizeof(plmn_id_t), return,);
-    cell_ID = &EUTRAN_CGI->cell_ID;
-    d_assert(cell_ID, return,);
-    memcpy(&enb_ue->nas.e_cgi.plmn_id, pLMNidentity->buf, 
-            sizeof(enb_ue->nas.e_cgi.plmn_id));
-    memcpy(&enb_ue->nas.e_cgi.cell_id, cell_ID->buf,
-            sizeof(enb_ue->nas.e_cgi.cell_id));
-    enb_ue->nas.e_cgi.cell_id = (ntohl(enb_ue->nas.e_cgi.cell_id) >> 4);
+//     d_assert(EUTRAN_CGI, return,);
+//     pLMNidentity = &EUTRAN_CGI->pLMNidentity;
+//     d_assert(pLMNidentity && pLMNidentity->size == sizeof(plmn_id_t), return,);
+//     cell_ID = &EUTRAN_CGI->cell_ID;
+//     d_assert(cell_ID, return,);
+//     memcpy(&enb_ue->nas.e_cgi.plmn_id, pLMNidentity->buf, 
+//             sizeof(enb_ue->nas.e_cgi.plmn_id));
+//     memcpy(&enb_ue->nas.e_cgi.cell_id, cell_ID->buf,
+//             sizeof(enb_ue->nas.e_cgi.cell_id));
+//     enb_ue->nas.e_cgi.cell_id = (ntohl(enb_ue->nas.e_cgi.cell_id) >> 4);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
-        enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
+    // d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
+    //     enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
 
-    rv = s1ap_build_connection_establishment_indication(
-        &s1apbuf,mme_ue_s1ap_id,ENB_UE_S1AP_ID,mme_ue);
+    // rv = s1ap_build_connection_establishment_indication(
+    //     &s1apbuf,mme_ue_s1ap_id,ENB_UE_S1AP_ID,mme_ue);
 
     
 }
