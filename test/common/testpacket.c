@@ -3378,10 +3378,10 @@ status_t tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf)
 
     S1AP_S1AP_PDU_t pdu;
     S1AP_InitiatingMessage_t *initiatingMessage = NULL;
-    S1AP_RetrieveUEInformation_t *RetrieveUEInformation = NULL;
+    //S1AP_RetrieveUEInformation_t *RetrieveUEInformation = NULL;
 
-    S1AP_RetrieveUEInformationIEs_t *ie = NULL;
-    S1AP_S_TMSI_t *S_TMSI = NULL;
+    //S1AP_RetrieveUEInformationIEs_t *ie = NULL;
+    //S1AP_S_TMSI_t *S_TMSI = NULL;
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
@@ -3393,7 +3393,7 @@ status_t tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf)
     initiatingMessage->value.present =
         S1AP_InitiatingMessage__value_PR_RetrieveUEInformation;
 
-    RetrieveUEInformation = &initiatingMessage->value.choice.RetrieveUEInformation;
+    /*RetrieveUEInformation = &initiatingMessage->value.choice.RetrieveUEInformation;
 
     ie = core_calloc(1, sizeof(S1AP_RetrieveUEInformationIEs_t));
     ASN_SEQUENCE_ADD(&RetrieveUEInformation->protocolIEs, ie);
@@ -3406,7 +3406,8 @@ status_t tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf)
     
     //memcpy(&(S_TMSI->mMEC),MME_Code,sizeof(S1AP_MME_Code_t));
     //memcpy(&(S_TMSI->m_TMSI),m_TMSI,sizeof(S1AP_M_TMSI_t));
-    memset(S_TMSI, 0, sizeof (S1AP_S_TMSI_t));
+    memset(S_TMSI, 0, sizeof (S1AP_S_TMSI_t));*/
+
     rv = s1ap_encode_pdu(pkbuf, &pdu);
     s1ap_free_pdu(&pdu);
 

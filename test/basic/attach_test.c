@@ -1695,6 +1695,12 @@ static void attach_test5(abts_case *tc, void *data)
     /******************************************************/
 
     
+    /******************** Added by Roger Chu ********************/
+    rv = tests1ap_build_retrieve_ue_information(&sendbuf);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    rv = tests1ap_enb_send(sock, sendbuf);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+    /************************************************************/
 
 #if 0
     rv = tests1ap_build_s1_reset(&sendbuf, 0);
