@@ -28,6 +28,7 @@ typedef enum {
     MME_EVT_NGAP_LO_CONNREFUSED,
     MME_EVT_NGAP_NG_HOLDING_TIMER,
   /******************************************************/
+
     MME_EVT_EMM_MESSAGE,
     MME_EVT_EMM_T3413,
 

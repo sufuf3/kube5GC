@@ -1,12 +1,16 @@
 ## Process this file with automake to produce Makefile.in.
 
-SUBDIRS = app mme hss sgw pgw pcrf smf upf
+SUBDIRS = app mme hss sgw pgw pcrf smf upf amf
 
-noinst_LTLIBRARIES = libmme.la libhss.la libsgw.la libpgw.la libpcrf.la libsmf.la libupf.la libepc.la
+noinst_LTLIBRARIES = libmme.la libhss.la libsgw.la libpgw.la libpcrf.la libsmf.la libupf.la libamf.la libepc.la
 
 libmme_la_SOURCES = mme.c
 libmme_la_DEPENDENCIES = $(top_srcdir)/src/mme/libmme.la 
 libmme_la_LIBADD = $(top_srcdir)/src/mme/libmme.la
+
+libamf_la_SOURCES = amf.c
+libamf_la_DEPENDENCIES = $(top_srcdir)/src/amf/libamf.la 
+libamf_la_LIBADD = $(top_srcdir)/src/amf/libamf.la
 
 libhss_la_SOURCES = hss.c
 libhss_la_DEPENDENCIES = $(top_srcdir)/src/hss/libhss.la

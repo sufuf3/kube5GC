@@ -28,6 +28,7 @@ char* mme_event_get_name(event_t *e)
             return "MME_EVT_S1AP_LO_CONNREFUSED";
         case MME_EVT_S1AP_S1_HOLDING_TIMER:
             return "MME_EVT_S1AP_S1_HOLDING_TIMER";
+
             
     /******************** Added by Hu ********************/
         case MME_EVT_NGAP_MESSAGE:
@@ -43,6 +44,7 @@ char* mme_event_get_name(event_t *e)
         case MME_EVT_NGAP_NG_HOLDING_TIMER:
             return "MME_EVT_NGAP_NG_HOLDING_TIMER";
     /*****************************************************/
+
 
         case MME_EVT_EMM_MESSAGE:
             return "MME_EVT_EMM_MESSAGE";

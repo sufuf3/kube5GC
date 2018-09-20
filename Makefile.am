@@ -4,10 +4,13 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = lib src support test
 
-bin_PROGRAMS = nextepc-mmed nextepc-hssd nextepc-sgwd nextepc-pgwd nextepc-pcrfd nextepc-smfd nextepc-upfd nextepc-epcd
+bin_PROGRAMS = nextepc-mmed nextepc-hssd nextepc-sgwd nextepc-pgwd nextepc-pcrfd nextepc-smfd nextepc-upfd nextepc-amfd nextepc-epcd
 
 dist_nextepc_mmed_SOURCES = main.c
 nextepc_mmed_LDADD = $(top_srcdir)/src/libmme.la
+
+dist_nextepc_amfd_SOURCES = main.c
+nextepc_amfd_LDADD = $(top_srcdir)/src/libamf.la
 
 dist_nextepc_hssd_SOURCES = main.c
 nextepc_hssd_LDADD = $(top_srcdir)/src/libhss.la
@@ -37,6 +40,7 @@ AM_CPPFLAGS = \
 install-data-hook:
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/log/nextepc
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-mmed
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-amfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-sgwd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-pgwd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-pcrfd

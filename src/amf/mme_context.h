@@ -77,9 +77,11 @@ typedef struct _mme_context_t {
     fd_config_t     *fd_config;     /* MME freeDiameter config */
 
     c_uint16_t      s1ap_port;      /* Default S1AP Port */
+
     /***********************add by Hu********************************/
     c_uint16_t      ngap_port;      /* Default NGAP Port */ 
     /****************************************************************/
+
     c_uint16_t      gtpc_port;      /* Default GTPC Port */
 
     list_t          s1ap_list;      /* MME S1AP IPv4 Server List */
@@ -144,9 +146,11 @@ typedef struct _mme_context_t {
 
     /* Generator for unique identification */
     c_uint32_t      mme_ue_s1ap_id;         /* mme_ue_s1ap_id generator */
+
     /***********************add by Hu********************************/
     c_uint32_t      amf_ue_ngap_id;         /* mme_ue_s1ap_id generator */
     /****************************************************************/
+
     c_uint16_t      ostream_id;             /* ostream_id generator */
 
     /* M-TMSI Pool */
@@ -161,9 +165,11 @@ typedef struct _mme_context_t {
     hash_t          *enb_addr_hash;         /* hash table for ENB Address */
     hash_t          *enb_id_hash;           /* hash table for ENB-ID */
     hash_t          *mme_ue_s1ap_id_hash;   /* hash table for MME-UE-S1AP-ID */
+
     /***********************add by Hu********************************/
     hash_t          *amf_ue_ngap_id_hash;   /* hash table for MME-UE-NGAP-ID */
     /****************************************************************/
+
     hash_t          *imsi_ue_hash;          /* hash table (IMSI : MME_UE) */
     hash_t          *guti_ue_hash;          /* hash table (GUTI : MME_UE) */
 
@@ -218,6 +224,7 @@ typedef struct _amf_gnb_t {
 
 } amf_gnb_t;
 /************************************************************************/
+
 
 struct _enb_ue_t {
     lnode_t         node;   /* A node of list_t */
@@ -459,8 +466,9 @@ struct _mme_ue_t {
 };
 
 #define MME_HAVE_SGW_S1U_PATH(__sESS) \
-    ((__sESS) && (mme_bearer_first(__sESS)) && \
-     ((mme_default_bearer_in_sess(__sESS)->sgw_s1u_teid)))
+    0// ((__sESS) && (mme_bearer_first(__sESS)) && 
+    //  ((mme_default_bearer_in_sess(__sESS)->sgw_s1u_teid)))
+
 #define CLEAR_SGW_S1U_PATH(__sESS) \
     do { \
         mme_bearer_t *__bEARER = NULL; \
@@ -508,9 +516,9 @@ typedef struct _mme_sess_t {
 } mme_sess_t;
 
 #define BEARER_CONTEXT_IS_ACTIVE(__mME)  \
-    (mme_bearer_is_inactive(__mME) == 0)
+    0// (mme_bearer_is_inactive(__mME) == 0)
 #define CLEAR_BEARER_CONTEXT(__mME)   \
-    mme_bearer_set_inactive(__mME)
+    0// mme_bearer_set_inactive(__mME)
 
 #define MME_HAVE_ENB_S1U_PATH(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_s1u_teid))
@@ -682,37 +690,37 @@ CORE_DECLARE(hash_index_t *) mme_ue_first();
 CORE_DECLARE(hash_index_t *) mme_ue_next(hash_index_t *hi);
 CORE_DECLARE(mme_ue_t *)    mme_ue_this(hash_index_t *hi);
 
-CORE_DECLARE(mme_sess_t*)   mme_sess_add(mme_ue_t *mme_ue, c_uint8_t pti);
-CORE_DECLARE(status_t )     mme_sess_remove(mme_sess_t *sess);
-CORE_DECLARE(status_t )     mme_sess_remove_all(mme_ue_t *mme_ue);
-CORE_DECLARE(mme_sess_t*)   mme_sess_find(index_t index);
-CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_pti(
-                                mme_ue_t *mme_ue, c_uint8_t pti);
-CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_ebi(
-                                mme_ue_t *mme_ue, c_uint8_t ebi);
-CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_apn(
-                                mme_ue_t *mme_ue, c_int8_t *apn);
-CORE_DECLARE(mme_sess_t*)   mme_sess_first(mme_ue_t *mme_ue);
-CORE_DECLARE(mme_sess_t*)   mme_sess_next(mme_sess_t *sess);
-CORE_DECLARE(unsigned int)  mme_sess_count(mme_ue_t *mme_ue);
+// CORE_DECLARE(mme_sess_t*)   mme_sess_add(mme_ue_t *mme_ue, c_uint8_t pti);
+// CORE_DECLARE(status_t )     mme_sess_remove(mme_sess_t *sess);
+// CORE_DECLARE(status_t )     mme_sess_remove_all(mme_ue_t *mme_ue);
+// CORE_DECLARE(mme_sess_t*)   mme_sess_find(index_t index);
+// CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_pti(
+//                                 mme_ue_t *mme_ue, c_uint8_t pti);
+// CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_ebi(
+//                                 mme_ue_t *mme_ue, c_uint8_t ebi);
+// CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_apn(
+//                                 mme_ue_t *mme_ue, c_int8_t *apn);
+// CORE_DECLARE(mme_sess_t*)   mme_sess_first(mme_ue_t *mme_ue);
+// CORE_DECLARE(mme_sess_t*)   mme_sess_next(mme_sess_t *sess);
+// CORE_DECLARE(unsigned int)  mme_sess_count(mme_ue_t *mme_ue);
 
-CORE_DECLARE(mme_bearer_t*) mme_bearer_add(mme_sess_t *sess);
-CORE_DECLARE(status_t)      mme_bearer_remove(mme_bearer_t *bearer);
-CORE_DECLARE(status_t)      mme_bearer_remove_all(mme_sess_t *sess);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_find(index_t index);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_sess_ebi(
-                                mme_sess_t *sess, c_uint8_t ebi);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_ue_ebi(
-                                mme_ue_t *mme_ue, c_uint8_t ebi);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_find_or_add_by_message(
-                                mme_ue_t *mme_ue, nas_message_t *message);
-CORE_DECLARE(mme_bearer_t*) mme_default_bearer_in_sess(mme_sess_t *sess);
-CORE_DECLARE(mme_bearer_t*) mme_linked_bearer(mme_bearer_t *bearer);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_first(mme_sess_t *sess);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_next(mme_bearer_t *bearer);
+// CORE_DECLARE(mme_bearer_t*) mme_bearer_add(mme_sess_t *sess);
+// CORE_DECLARE(status_t)      mme_bearer_remove(mme_bearer_t *bearer);
+// CORE_DECLARE(status_t)      mme_bearer_remove_all(mme_sess_t *sess);
+// CORE_DECLARE(mme_bearer_t*) mme_bearer_find(index_t index);
+// CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_sess_ebi(
+//                                 mme_sess_t *sess, c_uint8_t ebi);
+// CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_ue_ebi(
+//                                 mme_ue_t *mme_ue, c_uint8_t ebi);
+// CORE_DECLARE(mme_bearer_t*) mme_bearer_find_or_add_by_message(
+//                                 mme_ue_t *mme_ue, nas_message_t *message);
+// CORE_DECLARE(mme_bearer_t*) mme_default_bearer_in_sess(mme_sess_t *sess);
+// CORE_DECLARE(mme_bearer_t*) mme_linked_bearer(mme_bearer_t *bearer);
+// CORE_DECLARE(mme_bearer_t*) mme_bearer_first(mme_sess_t *sess);
+// CORE_DECLARE(mme_bearer_t*) mme_bearer_next(mme_bearer_t *bearer);
 
-CORE_DECLARE(int)           mme_bearer_is_inactive(mme_ue_t *mme_ue);
-CORE_DECLARE(status_t)      mme_bearer_set_inactive(mme_ue_t *mme_ue);
+// CORE_DECLARE(int)           mme_bearer_is_inactive(mme_ue_t *mme_ue);
+// CORE_DECLARE(status_t)      mme_bearer_set_inactive(mme_ue_t *mme_ue);
 
 CORE_DECLARE(pdn_t*)        mme_pdn_add(mme_ue_t *mme_ue, c_int8_t *apn);
 CORE_DECLARE(status_t)      mme_pdn_remove_all(mme_ue_t *mme_ue);
