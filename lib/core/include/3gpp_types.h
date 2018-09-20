@@ -8,12 +8,14 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define S1AP_SCTP_PORT              36412
+#define NGAP_SCTP_PORT              38412 /*add by Hu*/
 #define GTPV2_C_UDP_PORT            2123
 #define GTPV1_U_UDP_PORT            2152
 #define PFCP_UDP_PORT               8805
 
 #define SCTP_S1AP_PPID              18
 #define SCTP_X2AP_PPID              27
+#define SCTP_NGAP_PPID              60 /*add by Hu*/
 
 #define MAX_NUM_OF_ENB              128
 #define MAX_NUM_OF_UE               128
@@ -88,6 +90,14 @@ typedef struct _e_cgi_t {
     c_uint32_t cell_id; /* 28 bit */
 } __attribute__ ((packed)) e_cgi_t;
 
+/****************add by Hu**************/
+typedef struct _nr_cgi_t {
+    plmn_id_t plmn_id;
+    c_uint64_t cell_id; /* 36 bit */
+} __attribute__ ((packed)) nr_cgi_t;
+/**************************************/
+
+
 typedef struct _guti_t {
     plmn_id_t plmn_id;
     c_uint16_t mme_gid;
@@ -97,6 +107,7 @@ typedef struct _guti_t {
 
 /**************************************************
  * Common Structure
+ * NGAP : 9.3.2.4 Transport Layer Address, See 38.414
  * S1AP : 9.2.2.1 Transport Layer Address, See 36.414
  * GTP : 8.22 Fully Qualified TEID (F-TEID) */
 #define IPV4_LEN                4
