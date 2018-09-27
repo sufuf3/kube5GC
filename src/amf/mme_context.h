@@ -234,6 +234,9 @@ struct _ran_ue_t {
     c_uint32_t      enb_ue_s1ap_id; /* eNB-UE-S1AP-ID received from eNB */
     c_uint32_t      mme_ue_s1ap_id; /* MME-UE-S1AP-ID received from MME */
 
+    c_uint32_t      amf_ue_ngap_id; 
+    c_uint32_t      ran_ue_ngap_id;
+
     /* Handover Info */
     S1AP_HandoverType_t handover_type;
     enb_ue_t        *source_ue;
