@@ -106,16 +106,26 @@ typedef struct _mme_context_t {
     c_sockaddr_t    *pgw_addr;      /* First IPv4 Address Selected */
     c_sockaddr_t    *pgw_addr6;     /* First IPv6 Address Selected */
 
+
+    /* Serve GUAMI */
+    NGAP_ServedGUAMIList_t served_guami_list; /* max number of served GUAMIs is 256*/
+
     /* Served GUMME */
     c_uint8_t       max_num_of_served_gummei;
     served_gummei_t served_gummei[MAX_NUM_OF_SERVED_GUMMEI];
-
+    
     /* Served TAI */
     c_uint8_t       num_of_served_tai;
     struct {
         tai0_list_t list0;
         tai2_list_t list2;
     } served_tai[MAX_NUM_OF_SERVED_TAI];
+
+    /* PLMN support list */
+    NGAP_PLMNSupportList_t plmn_support_list; /* max number of PLMNs is 12 */
+
+    /*  */
+    NGAP_UnavailableGUAMIList_t unavailable_guami_list; /* max number of served GUAMIs is 256 */
 
     /* defined in 'nas_ies.h'
      * #define NAS_SECURITY_ALGORITHMS_EIA0        0
@@ -148,7 +158,7 @@ typedef struct _mme_context_t {
     c_uint32_t      mme_ue_s1ap_id;         /* mme_ue_s1ap_id generator */
 
     /***********************add by Hu********************************/
-    c_uint32_t      amf_ue_ngap_id;         /* mme_ue_s1ap_id generator */
+    c_uint32_t      amf_ue_ngap_id;         /* amf_ue_ngap_id generator */
     /****************************************************************/
 
     c_uint16_t      ostream_id;             /* ostream_id generator */
@@ -167,7 +177,7 @@ typedef struct _mme_context_t {
     hash_t          *mme_ue_s1ap_id_hash;   /* hash table for MME-UE-S1AP-ID */
 
     /***********************add by Hu********************************/
-    hash_t          *amf_ue_ngap_id_hash;   /* hash table for MME-UE-NGAP-ID */
+    hash_t          *amf_ue_ngap_id_hash;   /* hash table for AMF-UE-NGAP-ID */
     /****************************************************************/
 
     hash_t          *imsi_ue_hash;          /* hash table (IMSI : MME_UE) */
@@ -188,6 +198,274 @@ typedef struct _mme_context_t {
 
 } mme_context_t;
 
+
+/****************************add by AMF team***********************************/
+typedef struct _amf_ran_t {
+    index_t         index;  /* An index of this node */
+    fsm_t           sm;     /* A state machine */
+
+
+    
+    NGAP_GlobalRANNodeID_t global_ran_node_id;
+
+    c_uint32_t      gnb_id;     /* gNB_ID received from gNB */
+    c_uint32_t      ngenb_id;     /* Ng-ENB_ID received from  Ng-ENB */
+
+    int             sock_type;  /* SOCK_STREAM or SOCK_SEQPACKET */
+    sock_id         sock;       /* gNB NGAP Socket */
+    c_sockaddr_t    *addr;      /* gNB NGAP Address */
+
+    c_uint16_t      outbound_streams; /* SCTP Max number of outbound streams */
+
+    /* Supported TA List */
+    NGAP_SupportedTAList_t  supported_ta_list; /* max number of TACs is 256*/
+
+
+    list_t          gnb_ue_list;
+
+} amf_gnb_t;
+
+struct _ran_ue_t {
+    lnode_t         node;   /* A node of list_t */
+    index_t         index;  /* An index of this node */
+
+    /* UE identity */
+#define INVALID_UE_S1AP_ID      0xffffffff /* Initial value of enb_ue_s1ap_id */
+    c_uint32_t      enb_ue_s1ap_id; /* eNB-UE-S1AP-ID received from eNB */
+    c_uint32_t      mme_ue_s1ap_id; /* MME-UE-S1AP-ID received from MME */
+
+    /* Handover Info */
+    S1AP_HandoverType_t handover_type;
+    enb_ue_t        *source_ue;
+    enb_ue_t        *target_ue;
+
+    /* Use mme_ue->tai, mme_ue->e_cgi.
+     * Do not access enb_ue->nas.tai enb_ue->nas.e_cgi.
+     * 
+     * Save TAI and ECGI. And then, this will copy 'mme_ue_t' context later */
+    struct {
+        tai_t       tai;
+        e_cgi_t     e_cgi;
+    } nas;
+
+    /* Store by UE Context Release Command
+     * Retrieve by UE Context Release Complete */
+#define S1AP_UE_CTX_REL_INVALID_ACTION                      0
+#define S1AP_UE_CTX_REL_NO_ACTION                           1
+#define S1AP_UE_CTX_REL_S1_NORMAL_RELEASE                   2
+#define S1AP_UE_CTX_REL_UE_CONTEXT_REMOVE                   3
+#define S1AP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL              4
+    c_uint8_t      ue_ctx_rel_action;
+
+    /* 
+     * S1 holding timer
+     *
+     * When eNodeB sends Attach Request, TAU Request, Service Request repeatly,
+     * S1(enb_ue_t) context is repeatly created. 
+     *
+     * NAS(mme_ue_t) context is associated with last created S1(enb_ue_t)
+     * context, and older S1(enb_ue_t) context might not be freed.
+     *
+     * If NAS(mme_ue_t) has already been associated with
+     * older S1(enb_ue_t) context, the holding timer(30secs) is started.
+     * Newly associated S1(enb_ue_t) context holding timer is stopped.
+     *
+     * If the holding timer expires,
+     * S1(enb_ue_t) context will be implicitly deleted.
+     */
+    tm_block_id     holding_timer;
+
+    /* Related Context */
+    mme_enb_t       *enb;
+    mme_ue_t        *mme_ue;
+}; 
+
+struct _amf_ue_t {
+    index_t         index;  /* An index of this node */
+    fsm_t           sm;     /* A state machine */
+
+    struct {
+#define MME_EPS_TYPE_ATTACH_REQUEST                 1
+#define MME_EPS_TYPE_TAU_REQUEST                    2
+#define MME_EPS_TYPE_SERVICE_REQUEST                3
+#define MME_EPS_TYPE_DETACH_REQUEST_FROM_UE         4 
+#define MME_EPS_TYPE_DETACH_REQUEST_TO_UE           5 
+        c_uint8_t   type;
+        c_uint8_t   ksi;
+        union {
+            nas_eps_attach_type_t attach;
+            nas_eps_update_type_t update;
+            nas_detach_type_t detach;
+            c_uint8_t data;
+        };
+    } nas_eps;
+
+    /* UE identity */
+#define MME_UE_HAVE_IMSI(__mME) \
+    ((__mME) && ((__mME)->imsi_len))
+    c_uint8_t       imsi[MAX_IMSI_LEN];
+    int             imsi_len;
+    c_int8_t        imsi_bcd[MAX_IMSI_BCD_LEN+1];
+
+    mme_m_tmsi_t    *m_tmsi;
+    guti_t          guti;
+    int             guti_present;
+
+    c_uint32_t      mme_s11_teid;   /* MME-S11-TEID is derived from INDEX */
+    c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is received from SGW */
+
+    c_uint16_t      ostream_id;     /* SCTP output stream identification */
+
+    /* UE Info */
+    tai_t           tai;
+    e_cgi_t         e_cgi;
+    plmn_id_t       visited_plmn_id;
+
+#define SECURITY_CONTEXT_IS_VALID(__mME) \
+    ((__mME) && \
+    ((__mME)->security_context_available == 1) && \
+     ((__mME)->mac_failed == 0) && \
+     ((__mME)->nas_eps.ksi != NAS_KSI_NO_KEY_IS_AVAILABLE))
+#define CLEAR_SECURITY_CONTEXT(__mME) \
+    do { \
+        d_assert((__mME), break, "Null param"); \
+        (__mME)->security_context_available = 0; \
+        (__mME)->mac_failed = 0; \
+        (__mME)->nas_eps.ksi = 0; \
+    } while(0)
+    int             security_context_available;
+    int             mac_failed;
+
+    /* Security Context */
+    nas_ue_network_capability_t ue_network_capability;
+    nas_ms_network_capability_t ms_network_capability;
+    c_uint8_t       xres[MAX_RES_LEN];
+    c_uint8_t       xres_len;
+    c_uint8_t       kasme[SHA256_DIGEST_SIZE];
+    c_uint8_t       rand[RAND_LEN];
+    c_uint8_t       knas_int[SHA256_DIGEST_SIZE/2]; 
+    c_uint8_t       knas_enc[SHA256_DIGEST_SIZE/2];
+    c_uint32_t      dl_count;
+    union {
+        struct {
+        ED3(c_uint8_t spare;,
+            c_uint16_t overflow;,
+            c_uint8_t sqn;)
+        } __attribute__ ((packed));
+        c_uint32_t i32;
+    } ul_count;
+    c_uint8_t       kenb[SHA256_DIGEST_SIZE];
+
+    struct {
+    ED2(c_uint8_t nhcc_spare:5;,
+        c_uint8_t nhcc:3;) /* Next Hop Channing Counter */
+    };
+    c_uint8_t       nh[SHA256_DIGEST_SIZE]; /* NH Security Key */
+
+    /* defined in 'nas_ies.h'
+     * #define NAS_SECURITY_ALGORITHMS_EIA0        0
+     * #define NAS_SECURITY_ALGORITHMS_128_EEA1    1
+     * #define NAS_SECURITY_ALGORITHMS_128_EEA2    2
+     * #define NAS_SECURITY_ALGORITHMS_128_EEA3    3 */
+    c_uint8_t       selected_enc_algorithm;
+    /* defined in 'nas_ies.h'
+     * #define NAS_SECURITY_ALGORITHMS_EIA0        0
+     * #define NAS_SECURITY_ALGORITHMS_128_EIA1    1
+     * #define NAS_SECURITY_ALGORITHMS_128_EIA1    2
+     * #define NAS_SECURITY_ALGORITHMS_128_EIA3    3 */
+    c_uint8_t       selected_int_algorithm;
+
+    /* HSS Info */
+    s6a_subscription_data_t subscription_data;
+
+    /* ESM Info */
+#define MIN_EPS_BEARER_ID           5
+#define MAX_EPS_BEARER_ID           15
+
+#define CLEAR_EPS_BEARER_ID(__mME) \
+    do { \
+        d_assert((__mME), break, "Null param"); \
+        (__mME)->ebi = MIN_EPS_BEARER_ID - 1; \
+    } while(0)
+    c_uint8_t       ebi; /* EPS Bearer ID generator */
+    list_t          sess_list;
+
+#define ECM_CONNECTED(__mME) \
+    ((__mME) && ((__mME)->enb_ue != NULL) && \
+     enb_ue_find((__mME)->enb_ue->index))
+#define ECM_IDLE(__mME) (!ECM_CONNECTED(__mME))
+    /* S1 UE context */
+    enb_ue_t        *enb_ue;
+
+    /* Save PDN Connectivity Request */
+    nas_esm_message_container_t pdn_connectivity_request;
+
+    /* Paging */
+#define CLEAR_PAGING_INFO(__mME) \
+    do { \
+        d_assert((__mME), break, "Null param"); \
+        \
+        tm_stop((__mME)->t3413); \
+        if ((__mME)->last_paging_msg) \
+        { \
+            pkbuf_free((__mME)->last_paging_msg); \
+            (__mME)->last_paging_msg = NULL; \
+        } \
+        (__mME)->max_paging_retry = 0; \
+    } while(0);
+    pkbuf_t         *last_paging_msg;
+    tm_block_id     t3413;
+#define MAX_NUM_OF_PAGING           2
+    c_uint32_t      max_paging_retry;
+
+    /* UE Radio Capability */
+#if 0
+    void            *radio_capa;
+#else
+    OCTET_STRING_t  ueRadioCapability;
+#endif
+
+    /* S1AP Transparent Container */
+    OCTET_STRING_t container;
+
+    /* GTP Request/Response Counter */
+#define GTP_COUNTER_INCREMENT(__mME, __tYPE) \
+        do { \
+            d_assert((__mME), break,); \
+            ((__mME)->gtp_counter[__tYPE].request)++; \
+        } while(0);
+
+#define GTP_COUNTER_CHECK(__mME, __tYPE, __eXPR) \
+        do { \
+            d_assert((__mME), break,); \
+            if ((__mME)->gtp_counter[__tYPE].request == 0) break; \
+            ((__mME)->gtp_counter[__tYPE].response)++; \
+            if (((__mME)->gtp_counter[__tYPE].request) == \
+                ((__mME)->gtp_counter[__tYPE].response)) \
+            { \
+                ((__mME)->gtp_counter[__tYPE].request) = 0; \
+                ((__mME)->gtp_counter[__tYPE].response) = 0; \
+                __eXPR \
+            } \
+        } while(0);
+
+#define MAX_NUM_OF_GTP_COUNTER                                  16
+
+#if 0  /* Deprecated */
+#define GTP_COUNTER_DELETE_SESSION                              0
+#endif
+#define GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH                1
+#define GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY            2
+    struct {
+        c_uint8_t request;
+        c_uint8_t response;
+    } gtp_counter[MAX_NUM_OF_GTP_COUNTER];
+
+    gtp_node_t      *gnode;
+};
+
+/************************************************************************/
+
 typedef struct _mme_enb_t {
     index_t         index;  /* An index of this node */
     fsm_t           sm;     /* A state machine */
@@ -205,26 +483,6 @@ typedef struct _mme_enb_t {
     list_t          enb_ue_list;
 
 } mme_enb_t;
-/****************************add by Hu***********************************/
-typedef struct _amf_gnb_t {
-    index_t         index;  /* An index of this node */
-    fsm_t           sm;     /* A state machine */
-
-    c_uint32_t      gnb_id;     /* gNB_ID received from gNB */
-    int             sock_type;  /* SOCK_STREAM or SOCK_SEQPACKET */
-    sock_id         sock;       /* gNB NGAP Socket */
-    c_sockaddr_t    *addr;      /* gNB NGAP Address */
-
-    c_uint16_t      outbound_streams; /* SCTP Max number of outbound streams */
-
-    c_uint8_t       num_of_supported_ta_list;
-    tai_t           supported_ta_list[MAX_NUM_OF_TAI * MAX_NUM_OF_BPLMN];
-
-    list_t          gnb_ue_list;
-
-} amf_gnb_t;
-/************************************************************************/
-
 
 struct _enb_ue_t {
     lnode_t         node;   /* A node of list_t */
