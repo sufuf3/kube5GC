@@ -284,9 +284,6 @@ struct _ran_ue_t {
     c_uint32_t      ran_ue_ngap_id; /* RAN-UE-NGAP-ID received from RAN */
     c_uint32_t      amf_ue_ngap_id; /* AMF-UE-NGAP-ID received from AMF */
 
-    c_uint32_t      amf_ue_ngap_id; 
-    c_uint32_t      ran_ue_ngap_id;
-
     /* Handover Info */
     NGAP_HandoverType_t handover_type;
     ran_ue_t        *source_ue;
