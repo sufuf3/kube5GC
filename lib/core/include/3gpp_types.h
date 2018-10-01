@@ -91,12 +91,26 @@ typedef struct _e_cgi_t {
 } __attribute__ ((packed)) e_cgi_t;
 
 /****************add by Hu**************/
+typedef struct _s_nssai_t {
+    c_uint8_t sst;
+    c_uint32_t sd; /* 24 bit */
+} __attribute__ ((packed)) s_nssai_t;
+
+
 typedef struct _nr_cgi_t {
     plmn_id_t plmn_id;
     c_uint64_t cell_id; /* 36 bit */
 } __attribute__ ((packed)) nr_cgi_t;
-/**************************************/
 
+typedef struct _guti_5g_t {
+    plmn_id_t plmn_id;
+    c_uint16_t amf_rid;
+    c_uint8_t amf_sid;
+    c_uint8_t amf_ptr;
+    c_uint32_t tmsi_5g;
+} __attribute__ ((packed)) guti_5g_t;
+
+/**************************************/
 
 typedef struct _guti_t {
     plmn_id_t plmn_id;

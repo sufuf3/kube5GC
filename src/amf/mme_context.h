@@ -18,6 +18,7 @@
 
 #include "3gpp_types.h"
 #include "s1ap/s1ap_message.h"
+#include "ngap/ngap_message.h"
 #include "nas/nas_message.h"
 #include "fd/s6a/s6a_message.h"
 
@@ -31,12 +32,21 @@ extern "C" {
 #define MAX_PLMN_ID                 6
 #define GRP_PER_MME                 256    /* According to spec it is 65535 */
 #define CODE_PER_MME                256    /* According to spec it is 256 */
+#define REG_PER_AMF                 256    /* According to spec it is 65535 */
+#define SET_PER_AMF                 16     /* According to spec it is 16 */
+#define PTR_PER_AMF                 16     /* According to spec it is 16 */
+
 
 #define MAX_NUM_OF_SERVED_TAI       16
 #define MAX_NUM_OF_SERVED_GUMMEI    8
+#define MAX_NUM_OF_SERVED_GUAMI     256
 #define MAX_NUM_OF_ALGORITHM        8
-
 #define MAX_NUM_OF_BPLMN            6
+#define MAX_NUM_OF_BPLMNs_5GC       12  
+#define MAX_NUM_OF_PLMNs_5GC        12      
+
+
+#define MAX_OF_SLICE                1024
 
 /******************** Added by Chi ********************/
 #define OVERLOAD_THRESHOLD          0.8    /* Threshold for triggering overload_start/stop */
@@ -54,6 +64,8 @@ extern "C" {
 
 typedef struct _enb_ue_t enb_ue_t;
 typedef struct _mme_ue_t mme_ue_t;
+typedef struct _ran_ue_t ran_ue_t;
+typedef struct _amf_ue_t amf_ue_t;
 
 typedef struct _gtp_node_t gtp_node_t;
 typedef struct _gtp_xact_t gtp_xact_t;
@@ -61,6 +73,7 @@ typedef struct _gtp_xact_t gtp_xact_t;
 typedef struct _fd_config_t fd_config_t;
 
 typedef c_uint32_t mme_m_tmsi_t;
+typedef c_uint32_t amf_5g_tmsi_t;
 
 typedef struct _served_gummei {
     c_uint32_t      num_of_plmn_id;
@@ -71,6 +84,39 @@ typedef struct _served_gummei {
     c_uint32_t      num_of_mme_code;
     c_uint8_t       mme_code[CODE_PER_MME];
 } served_gummei_t;
+
+typedef struct _served_guami_t {
+    c_uint32_t      num_of_plmn_id;
+    plmn_id_t       plmn_id[MAX_PLMN_ID];
+
+    c_uint32_t      num_of_amf_rid;
+    c_uint16_t      amf_rid[REG_PER_AMF];
+    c_uint32_t      num_of_amf_sid;
+    c_uint8_t       amf_sid[SET_PER_AMF];
+    c_uint32_t      num_of_amf_ptr;
+    c_uint8_t       amf_ptr[PTR_PER_AMF];
+
+} served_guami_t;
+
+typedef struct _served_guami_t unavailable_guami_t;
+
+typedef struct _plmn_support {
+    c_uint16_t      num_of_s_nssai;
+    s_nssai_t       s_nssai[MAX_OF_SLICE];
+} plmn_support_t;
+
+typedef struct _pdu_sess_t{
+    c_uint8_t psi;
+    s_nssai_t s_nssai;
+} pdu_sess_t;
+
+
+typedef struct _supported_ta_t{
+    tai_t tai;
+    c_uint16_t      num_of_s_nssai;
+    s_nssai_t       s_nssai[MAX_OF_SLICE];
+} supported_ta_t;
+
 
 typedef struct _mme_context_t {
     const char      *fd_conf_path;  /* MME freeDiameter conf path */
@@ -108,7 +154,8 @@ typedef struct _mme_context_t {
 
 
     /* Serve GUAMI */
-    NGAP_ServedGUAMIList_t served_guami_list; /* max number of served GUAMIs is 256*/
+    c_uint8_t       max_num_of_served_guami;
+    served_guami_t served_guami[MAX_NUM_OF_SERVED_GUAMI];
 
     /* Served GUMME */
     c_uint8_t       max_num_of_served_gummei;
@@ -122,10 +169,13 @@ typedef struct _mme_context_t {
     } served_tai[MAX_NUM_OF_SERVED_TAI];
 
     /* PLMN support list */
-    NGAP_PLMNSupportList_t plmn_support_list; /* max number of PLMNs is 12 */
+    c_uint8_t max_num_of_plmn_support;
+    plmn_support_t plmn_support[MAX_NUM_OF_PLMNs_5GC]; 
 
-    /*  */
-    NGAP_UnavailableGUAMIList_t unavailable_guami_list; /* max number of served GUAMIs is 256 */
+    /* unavailable guami list */
+
+    c_uint8_t      max_num_of_unavailable_guami;
+    unavailable_guami_t unavailable_guami[MAX_NUM_OF_SERVED_GUAMI];
 
     /* defined in 'nas_ies.h'
      * #define NAS_SECURITY_ALGORITHMS_EIA0        0
@@ -204,12 +254,11 @@ typedef struct _amf_ran_t {
     index_t         index;  /* An index of this node */
     fsm_t           sm;     /* A state machine */
 
+   
+    c_uint32_t      gnb_id;      /* gNB_ID received from gNB */
+    c_uint32_t      ngenb_id;    /* Ng-ENB_ID received from  Ng-ENB */
+    c_uint16_t      n3iwf_id;    /* N3IEF_ID received from  N3IWF */
 
-    
-    NGAP_GlobalRANNodeID_t global_ran_node_id;
-
-    c_uint32_t      gnb_id;     /* gNB_ID received from gNB */
-    c_uint32_t      ngenb_id;     /* Ng-ENB_ID received from  Ng-ENB */
 
     int             sock_type;  /* SOCK_STREAM or SOCK_SEQPACKET */
     sock_id         sock;       /* gNB NGAP Socket */
@@ -218,47 +267,50 @@ typedef struct _amf_ran_t {
     c_uint16_t      outbound_streams; /* SCTP Max number of outbound streams */
 
     /* Supported TA List */
-    NGAP_SupportedTAList_t  supported_ta_list; /* max number of TACs is 256*/
+    c_uint8_t       num_of_supported_ta_list;
+    supported_ta_t  supported_ta_list[MAX_NUM_OF_TAI * MAX_NUM_OF_BPLMNs_5GC];
 
+    
+    list_t          ran_ue_list;
 
-    list_t          gnb_ue_list;
-
-} amf_gnb_t;
+} amf_ran_t;
 
 struct _ran_ue_t {
     lnode_t         node;   /* A node of list_t */
     index_t         index;  /* An index of this node */
 
     /* UE identity */
-#define INVALID_UE_S1AP_ID      0xffffffff /* Initial value of enb_ue_s1ap_id */
-    c_uint32_t      enb_ue_s1ap_id; /* eNB-UE-S1AP-ID received from eNB */
-    c_uint32_t      mme_ue_s1ap_id; /* MME-UE-S1AP-ID received from MME */
+#define INVALID_UE_NGAP_ID      0xffffffff /* Initial value of gnb_ue_ngap_id */
+    c_uint32_t      ran_ue_ngap_id; /* RAN-UE-NGAP-ID received from RAN */
+    c_uint32_t      amf_ue_ngap_id; /* AMF-UE-NGAP-ID received from AMF */
 
     c_uint32_t      amf_ue_ngap_id; 
     c_uint32_t      ran_ue_ngap_id;
 
     /* Handover Info */
-    S1AP_HandoverType_t handover_type;
-    enb_ue_t        *source_ue;
-    enb_ue_t        *target_ue;
+    NGAP_HandoverType_t handover_type;
+    ran_ue_t        *source_ue;
+    ran_ue_t        *target_ue;
 
-    /* Use mme_ue->tai, mme_ue->e_cgi.
-     * Do not access enb_ue->nas.tai enb_ue->nas.e_cgi.
+    /* Use amf_ue->tai, amf_ue->nr_cgi.
+     * Do not access ran_ue->nas.tai ran_ue->nas.nr_cgi.
      * 
      * Save TAI and ECGI. And then, this will copy 'mme_ue_t' context later */
     struct {
-        tai_t       tai;
-        e_cgi_t     e_cgi;
+        tai_t        tai;
+        nr_cgi_t     nr_cgi;
+        e_cgi_t      e_cgi;
+        c_int32_t    ip;
     } nas;
 
     /* Store by UE Context Release Command
      * Retrieve by UE Context Release Complete */
-#define S1AP_UE_CTX_REL_INVALID_ACTION                      0
-#define S1AP_UE_CTX_REL_NO_ACTION                           1
-#define S1AP_UE_CTX_REL_S1_NORMAL_RELEASE                   2
-#define S1AP_UE_CTX_REL_UE_CONTEXT_REMOVE                   3
-#define S1AP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL              4
-    c_uint8_t      ue_ctx_rel_action;
+// #define S1AP_UE_CTX_REL_INVALID_ACTION                      0
+// #define S1AP_UE_CTX_REL_NO_ACTION                           1
+// #define S1AP_UE_CTX_REL_S1_NORMAL_RELEASE                   2
+// #define S1AP_UE_CTX_REL_UE_CONTEXT_REMOVE                   3
+// #define S1AP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL              4
+//     c_uint8_t      ue_ctx_rel_action;
 
     /* 
      * S1 holding timer
@@ -279,143 +331,148 @@ struct _ran_ue_t {
     tm_block_id     holding_timer;
 
     /* Related Context */
-    mme_enb_t       *enb;
-    mme_ue_t        *mme_ue;
+    amf_ran_t       *gnb;
+    amf_ue_t        *amf_ue;
 }; 
 
-struct _amf_ue_t {
+struct amf_ue_t {
     index_t         index;  /* An index of this node */
     fsm_t           sm;     /* A state machine */
 
-    struct {
-#define MME_EPS_TYPE_ATTACH_REQUEST                 1
-#define MME_EPS_TYPE_TAU_REQUEST                    2
-#define MME_EPS_TYPE_SERVICE_REQUEST                3
-#define MME_EPS_TYPE_DETACH_REQUEST_FROM_UE         4 
-#define MME_EPS_TYPE_DETACH_REQUEST_TO_UE           5 
-        c_uint8_t   type;
-        c_uint8_t   ksi;
-        union {
-            nas_eps_attach_type_t attach;
-            nas_eps_update_type_t update;
-            nas_detach_type_t detach;
-            c_uint8_t data;
-        };
-    } nas_eps;
+//     struct {
+// #define MME_EPS_TYPE_ATTACH_REQUEST                 1
+// #define MME_EPS_TYPE_TAU_REQUEST                    2
+// #define MME_EPS_TYPE_SERVICE_REQUEST                3
+// #define MME_EPS_TYPE_DETACH_REQUEST_FROM_UE         4 
+// #define MME_EPS_TYPE_DETACH_REQUEST_TO_UE           5 
+//         c_uint8_t   type;
+//         c_uint8_t   ksi;
+//         union {
+//             nas_eps_attach_type_t attach;
+//             nas_eps_update_type_t update;
+//             nas_detach_type_t detach;
+//             c_uint8_t data;
+//         };
+//     } nas_eps;
 
     /* UE identity */
-#define MME_UE_HAVE_IMSI(__mME) \
-    ((__mME) && ((__mME)->imsi_len))
+#define AMF_UE_HAVE_IMSI(__aMF) \
+    ((__aMF) && ((__aMF)->imsi_len))
     c_uint8_t       imsi[MAX_IMSI_LEN];
     int             imsi_len;
     c_int8_t        imsi_bcd[MAX_IMSI_BCD_LEN+1];
 
-    mme_m_tmsi_t    *m_tmsi;
-    guti_t          guti;
-    int             guti_present;
+    amf_5g_tmsi_t   *tmsi_5g;
+    guti_5g_t       guti_5g;
+    int             guti_5g_present;
 
-    c_uint32_t      mme_s11_teid;   /* MME-S11-TEID is derived from INDEX */
-    c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is received from SGW */
+    // c_uint32_t      mme_s11_teid;   /* MME-S11-TEID is derived from INDEX */
+    // c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is received from SGW */
 
     c_uint16_t      ostream_id;     /* SCTP output stream identification */
 
     /* UE Info */
     tai_t           tai;
+    nr_cgi_t        nr_cgi;
     e_cgi_t         e_cgi;
+    c_int32_t       ip;
     plmn_id_t       visited_plmn_id;
 
-#define SECURITY_CONTEXT_IS_VALID(__mME) \
+/* #define SECURITY_CONTEXT_IS_VALID(__mME) \
     ((__mME) && \
     ((__mME)->security_context_available == 1) && \
      ((__mME)->mac_failed == 0) && \
      ((__mME)->nas_eps.ksi != NAS_KSI_NO_KEY_IS_AVAILABLE))
-#define CLEAR_SECURITY_CONTEXT(__mME) \
+ #define CLEAR_SECURITY_CONTEXT(__mME) \
     do { \
         d_assert((__mME), break, "Null param"); \
         (__mME)->security_context_available = 0; \
         (__mME)->mac_failed = 0; \
         (__mME)->nas_eps.ksi = 0; \
     } while(0)
-    int             security_context_available;
-    int             mac_failed;
+*/
+//     int             security_context_available;
+//     int             mac_failed;
 
-    /* Security Context */
-    nas_ue_network_capability_t ue_network_capability;
-    nas_ms_network_capability_t ms_network_capability;
-    c_uint8_t       xres[MAX_RES_LEN];
-    c_uint8_t       xres_len;
-    c_uint8_t       kasme[SHA256_DIGEST_SIZE];
-    c_uint8_t       rand[RAND_LEN];
-    c_uint8_t       knas_int[SHA256_DIGEST_SIZE/2]; 
-    c_uint8_t       knas_enc[SHA256_DIGEST_SIZE/2];
-    c_uint32_t      dl_count;
-    union {
-        struct {
-        ED3(c_uint8_t spare;,
-            c_uint16_t overflow;,
-            c_uint8_t sqn;)
-        } __attribute__ ((packed));
-        c_uint32_t i32;
-    } ul_count;
-    c_uint8_t       kenb[SHA256_DIGEST_SIZE];
+//     /* Security Context */
+//     nas_ue_network_capability_t ue_network_capability;
+//     nas_ms_network_capability_t ms_network_capability;
+//     c_uint8_t       xres[MAX_RES_LEN];
+//     c_uint8_t       xres_len;
+//     c_uint8_t       kasme[SHA256_DIGEST_SIZE];
+//     c_uint8_t       rand[RAND_LEN];
+//     c_uint8_t       knas_int[SHA256_DIGEST_SIZE/2]; 
+//     c_uint8_t       knas_enc[SHA256_DIGEST_SIZE/2];
+//     c_uint32_t      dl_count;
+//     union {
+//         struct {
+//         ED3(c_uint8_t spare;,
+//             c_uint16_t overflow;,
+//             c_uint8_t sqn;)
+//         } __attribute__ ((packed));
+//         c_uint32_t i32;
+//     } ul_count;
+//     c_uint8_t       kenb[SHA256_DIGEST_SIZE];
 
-    struct {
-    ED2(c_uint8_t nhcc_spare:5;,
-        c_uint8_t nhcc:3;) /* Next Hop Channing Counter */
-    };
-    c_uint8_t       nh[SHA256_DIGEST_SIZE]; /* NH Security Key */
+    // struct {
+    // ED2(c_uint8_t nhcc_spare:5;,
+    //     c_uint8_t nhcc:3;) /* Next Hop Channing Counter */
+    // };
+    // c_uint8_t       nh[SHA256_DIGEST_SIZE]; /* NH Security Key */
 
-    /* defined in 'nas_ies.h'
-     * #define NAS_SECURITY_ALGORITHMS_EIA0        0
-     * #define NAS_SECURITY_ALGORITHMS_128_EEA1    1
-     * #define NAS_SECURITY_ALGORITHMS_128_EEA2    2
-     * #define NAS_SECURITY_ALGORITHMS_128_EEA3    3 */
-    c_uint8_t       selected_enc_algorithm;
-    /* defined in 'nas_ies.h'
-     * #define NAS_SECURITY_ALGORITHMS_EIA0        0
-     * #define NAS_SECURITY_ALGORITHMS_128_EIA1    1
-     * #define NAS_SECURITY_ALGORITHMS_128_EIA1    2
-     * #define NAS_SECURITY_ALGORITHMS_128_EIA3    3 */
-    c_uint8_t       selected_int_algorithm;
+    // /* defined in 'nas_ies.h'
+    //  * #define NAS_SECURITY_ALGORITHMS_EIA0        0
+    //  * #define NAS_SECURITY_ALGORITHMS_128_EEA1    1
+    //  * #define NAS_SECURITY_ALGORITHMS_128_EEA2    2
+    //  * #define NAS_SECURITY_ALGORITHMS_128_EEA3    3 */
+    // c_uint8_t       selected_enc_algorithm;
+    // /* defined in 'nas_ies.h'
+    //  * #define NAS_SECURITY_ALGORITHMS_EIA0        0
+    //  * #define NAS_SECURITY_ALGORITHMS_128_EIA1    1
+    //  * #define NAS_SECURITY_ALGORITHMS_128_EIA1    2
+    //  * #define NAS_SECURITY_ALGORITHMS_128_EIA3    3 */
+    // c_uint8_t       selected_int_algorithm;
 
-    /* HSS Info */
-    s6a_subscription_data_t subscription_data;
+    // /* HSS Info */
+    // s6a_subscription_data_t subscription_data;
 
-    /* ESM Info */
-#define MIN_EPS_BEARER_ID           5
-#define MAX_EPS_BEARER_ID           15
+    /* GSM Info */
 
-#define CLEAR_EPS_BEARER_ID(__mME) \
+#define MIN_PDU_SESSION_ID           5
+#define MAX_PDU_SESSION_ID           15
+
+#define CLEAR_PDU_SESSION_ID(__aMF) \
     do { \
-        d_assert((__mME), break, "Null param"); \
-        (__mME)->ebi = MIN_EPS_BEARER_ID - 1; \
+        d_assert((__aMF), break, "Null param"); \
+        (__aMF)->psi = MIN_PDU_SESSION_ID - 1; \
     } while(0)
-    c_uint8_t       ebi; /* EPS Bearer ID generator */
+    c_uint8_t       psi; /* PDU SESSION ID generator */
     list_t          sess_list;
 
-#define ECM_CONNECTED(__mME) \
-    ((__mME) && ((__mME)->enb_ue != NULL) && \
-     enb_ue_find((__mME)->enb_ue->index))
-#define ECM_IDLE(__mME) (!ECM_CONNECTED(__mME))
-    /* S1 UE context */
-    enb_ue_t        *enb_ue;
+#define GCM_CONNECTED(__aMF) \
+    ((__aMF) && ((__aMF)->ran_ue != NULL) && \
+     enb_ue_find((__aMF)->ran_ue->index))
+#define GCM_IDLE(__aMF) (!GCM_CONNECTED(__aMF))
+    /* NG UE context */
+    ran_ue_t        *ran_ue;
 
     /* Save PDN Connectivity Request */
     nas_esm_message_container_t pdn_connectivity_request;
 
     /* Paging */
-#define CLEAR_PAGING_INFO(__mME) \
+/*  #define CLEAR_PAGING_INFO(__aMF) \
     do { \
-        d_assert((__mME), break, "Null param"); \
+        d_assert((__aMF), break, "Null param"); \
         \
-        tm_stop((__mME)->t3413); \
-        if ((__mME)->last_paging_msg) \
+        tm_stop((__aMF)->t3413); \
+        if ((__aMF)->last_paging_msg) \
         { \
-            pkbuf_free((__mME)->last_paging_msg); \
-            (__mME)->last_paging_msg = NULL; \
+            pkbuf_free((__aMF)->last_paging_msg); \
+            (__aMF)->last_paging_msg = NULL; \
         } \
-        (__mME)->max_paging_retry = 0; \
-    } while(0);
+        (__aMF)->max_paging_retry = 0; \
+    } while(0); 
+*/
     pkbuf_t         *last_paging_msg;
     tm_block_id     t3413;
 #define MAX_NUM_OF_PAGING           2
@@ -428,17 +485,17 @@ struct _amf_ue_t {
     OCTET_STRING_t  ueRadioCapability;
 #endif
 
-    /* S1AP Transparent Container */
+    /* NGAP Transparent Container */
     OCTET_STRING_t container;
 
-    /* GTP Request/Response Counter */
-#define GTP_COUNTER_INCREMENT(__mME, __tYPE) \
+//     /* GTP Request/Response Counter */
+/* #define GTP_COUNTER_INCREMENT(__mME, __tYPE) \
         do { \
             d_assert((__mME), break,); \
             ((__mME)->gtp_counter[__tYPE].request)++; \
         } while(0);
 
-#define GTP_COUNTER_CHECK(__mME, __tYPE, __eXPR) \
+ #define GTP_COUNTER_CHECK(__mME, __tYPE, __eXPR) \
         do { \
             d_assert((__mME), break,); \
             if ((__mME)->gtp_counter[__tYPE].request == 0) break; \
@@ -453,10 +510,12 @@ struct _amf_ue_t {
         } while(0);
 
 #define MAX_NUM_OF_GTP_COUNTER                                  16
+*/
 
 #if 0  /* Deprecated */
 #define GTP_COUNTER_DELETE_SESSION                              0
 #endif
+/*
 #define GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH                1
 #define GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY            2
     struct {
@@ -465,6 +524,7 @@ struct _amf_ue_t {
     } gtp_counter[MAX_NUM_OF_GTP_COUNTER];
 
     gtp_node_t      *gnode;
+*/
 };
 
 /************************************************************************/
@@ -951,37 +1011,37 @@ CORE_DECLARE(hash_index_t *) mme_ue_first();
 CORE_DECLARE(hash_index_t *) mme_ue_next(hash_index_t *hi);
 CORE_DECLARE(mme_ue_t *)    mme_ue_this(hash_index_t *hi);
 
-// CORE_DECLARE(mme_sess_t*)   mme_sess_add(mme_ue_t *mme_ue, c_uint8_t pti);
-// CORE_DECLARE(status_t )     mme_sess_remove(mme_sess_t *sess);
-// CORE_DECLARE(status_t )     mme_sess_remove_all(mme_ue_t *mme_ue);
-// CORE_DECLARE(mme_sess_t*)   mme_sess_find(index_t index);
-// CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_pti(
-//                                 mme_ue_t *mme_ue, c_uint8_t pti);
-// CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_ebi(
-//                                 mme_ue_t *mme_ue, c_uint8_t ebi);
-// CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_apn(
-//                                 mme_ue_t *mme_ue, c_int8_t *apn);
-// CORE_DECLARE(mme_sess_t*)   mme_sess_first(mme_ue_t *mme_ue);
-// CORE_DECLARE(mme_sess_t*)   mme_sess_next(mme_sess_t *sess);
-// CORE_DECLARE(unsigned int)  mme_sess_count(mme_ue_t *mme_ue);
+CORE_DECLARE(mme_sess_t*)   mme_sess_add(mme_ue_t *mme_ue, c_uint8_t pti);
+CORE_DECLARE(status_t )     mme_sess_remove(mme_sess_t *sess);
+CORE_DECLARE(status_t )     mme_sess_remove_all(mme_ue_t *mme_ue);
+CORE_DECLARE(mme_sess_t*)   mme_sess_find(index_t index);
+CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_pti(
+                                mme_ue_t *mme_ue, c_uint8_t pti);
+CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_ebi(
+                                mme_ue_t *mme_ue, c_uint8_t ebi);
+CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_apn(
+                                mme_ue_t *mme_ue, c_int8_t *apn);
+CORE_DECLARE(mme_sess_t*)   mme_sess_first(mme_ue_t *mme_ue);
+CORE_DECLARE(mme_sess_t*)   mme_sess_next(mme_sess_t *sess);
+CORE_DECLARE(unsigned int)  mme_sess_count(mme_ue_t *mme_ue);
 
-// CORE_DECLARE(mme_bearer_t*) mme_bearer_add(mme_sess_t *sess);
-// CORE_DECLARE(status_t)      mme_bearer_remove(mme_bearer_t *bearer);
-// CORE_DECLARE(status_t)      mme_bearer_remove_all(mme_sess_t *sess);
-// CORE_DECLARE(mme_bearer_t*) mme_bearer_find(index_t index);
-// CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_sess_ebi(
-//                                 mme_sess_t *sess, c_uint8_t ebi);
-// CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_ue_ebi(
-//                                 mme_ue_t *mme_ue, c_uint8_t ebi);
-// CORE_DECLARE(mme_bearer_t*) mme_bearer_find_or_add_by_message(
-//                                 mme_ue_t *mme_ue, nas_message_t *message);
-// CORE_DECLARE(mme_bearer_t*) mme_default_bearer_in_sess(mme_sess_t *sess);
-// CORE_DECLARE(mme_bearer_t*) mme_linked_bearer(mme_bearer_t *bearer);
-// CORE_DECLARE(mme_bearer_t*) mme_bearer_first(mme_sess_t *sess);
-// CORE_DECLARE(mme_bearer_t*) mme_bearer_next(mme_bearer_t *bearer);
+CORE_DECLARE(mme_bearer_t*) mme_bearer_add(mme_sess_t *sess);
+CORE_DECLARE(status_t)      mme_bearer_remove(mme_bearer_t *bearer);
+CORE_DECLARE(status_t)      mme_bearer_remove_all(mme_sess_t *sess);
+CORE_DECLARE(mme_bearer_t*) mme_bearer_find(index_t index);
+CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_sess_ebi(
+                                mme_sess_t *sess, c_uint8_t ebi);
+CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_ue_ebi(
+                                mme_ue_t *mme_ue, c_uint8_t ebi);
+CORE_DECLARE(mme_bearer_t*) mme_bearer_find_or_add_by_message(
+                                mme_ue_t *mme_ue, nas_message_t *message);
+CORE_DECLARE(mme_bearer_t*) mme_default_bearer_in_sess(mme_sess_t *sess);
+CORE_DECLARE(mme_bearer_t*) mme_linked_bearer(mme_bearer_t *bearer);
+CORE_DECLARE(mme_bearer_t*) mme_bearer_first(mme_sess_t *sess);
+CORE_DECLARE(mme_bearer_t*) mme_bearer_next(mme_bearer_t *bearer);
 
-// CORE_DECLARE(int)           mme_bearer_is_inactive(mme_ue_t *mme_ue);
-// CORE_DECLARE(status_t)      mme_bearer_set_inactive(mme_ue_t *mme_ue);
+CORE_DECLARE(int)           mme_bearer_is_inactive(mme_ue_t *mme_ue);
+CORE_DECLARE(status_t)      mme_bearer_set_inactive(mme_ue_t *mme_ue);
 
 CORE_DECLARE(pdn_t*)        mme_pdn_add(mme_ue_t *mme_ue, c_int8_t *apn);
 CORE_DECLARE(status_t)      mme_pdn_remove_all(mme_ue_t *mme_ue);

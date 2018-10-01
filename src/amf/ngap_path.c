@@ -24,7 +24,7 @@ status_t ngap_open(void)
     int type = SOCK_SEQPACKET;
 #endif
 
-    rv = ngap_server_list(&mme_self()->ngap_llist, type);
+    rv = ngap_server_list(&mme_self()->ngap_list, type);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
     rv = ngap_server_list(&mme_self()->ngap_list6, type);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
