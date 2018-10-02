@@ -15,8 +15,9 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 
     NGAP_NGSetupRequestIEs_t *ie = NULL;
     NGAP_GlobalRANNodeID_t *Global_RAN_Node_ID = NULL;
-    NGAP_SupportedTAs_t *SupportedTAs = NULL;
-    //NGAP_PagingDRX_t *PagingDRX = NULL;
+    NGAP_SupportedTAList_t *SupportedTAList = NULL;
+	// NGAP_RANNodeName_t	 *RANNodeName = NULL; //Optional
+	NGAP_PagingDRX_t *PagingDRX = NULL;
 
     d_assert(message, return,);
     initiatingMessage = message->choice.initiatingMessage;
@@ -32,16 +33,23 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
         {
             case NGAP_ProtocolIE_ID_id_GlobalRANNodeID:
                 Global_RAN_Node_ID = &ie->value.choice.GlobalRANNodeID;
+                d_assert(Global_RAN_Node_ID, return,);
                 break;
             case NGAP_ProtocolIE_ID_id_SupportedTAList:
-                 SupportedTAs = &ie->value.choice.SupportedTAList;
+                SupportedTAList = &ie->value.choice.SupportedTAList;
+                d_assert(SupportedTAList, return,);
                 break;
             case NGAP_ProtocolIE_ID_id_DefaultPagingDRX:
-            //     PagingDRX = &ie->value.choice.PagingDRX;
+                PagingDRX = &ie->value.choice.PagingDRX;
+                d_assert(PagingDRX, return,);
                 break;
+            /* */    
+            // case NGAP_ProtocolIE_ID_id_RANNodeName:
+            //     RANNodeName = &ie->value.choice.RANNodeName;
+            //     break;
             default:
                 break;
         }
     }
-    d_assert(Global_RAN_Node_ID, return,);
+    
 }
