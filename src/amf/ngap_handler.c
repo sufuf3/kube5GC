@@ -15,7 +15,7 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 
     NGAP_NGSetupRequestIEs_t *ie = NULL;
     NGAP_GlobalRANNodeID_t *Global_RAN_Node_ID = NULL;
-    //NGAP_SupportedTAs_t *SupportedTAs = NULL;
+    NGAP_SupportedTAs_t *SupportedTAs = NULL;
     //NGAP_PagingDRX_t *PagingDRX = NULL;
 
     d_assert(message, return,);
@@ -34,7 +34,7 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
                 Global_RAN_Node_ID = &ie->value.choice.GlobalRANNodeID;
                 break;
             case NGAP_ProtocolIE_ID_id_SupportedTAList:
-            //     SupportedTAs = &ie->value.choice.SupportedTAs;
+                 SupportedTAs = &ie->value.choice.SupportedTAList;
                 break;
             case NGAP_ProtocolIE_ID_id_DefaultPagingDRX:
             //     PagingDRX = &ie->value.choice.PagingDRX;
