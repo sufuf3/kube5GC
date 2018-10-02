@@ -21,12 +21,12 @@ typedef enum {
     MME_EVT_S1AP_S1_HOLDING_TIMER,
 
  /******************** Added by Hu ********************/
-    MME_EVT_NGAP_MESSAGE,
-    MME_EVT_NGAP_DELAYED_SEND,
-    MME_EVT_NGAP_LO_ACCEPT,
-    MME_EVT_NGAP_LO_SCTP_COMM_UP,
-    MME_EVT_NGAP_LO_CONNREFUSED,
-    MME_EVT_NGAP_NG_HOLDING_TIMER,
+    AMF_EVT_NGAP_MESSAGE,
+    AMF_EVT_NGAP_DELAYED_SEND,
+    AMF_EVT_NGAP_LO_ACCEPT,
+    AMF_EVT_NGAP_LO_SCTP_COMM_UP,
+    AMF_EVT_NGAP_LO_CONNREFUSED,
+    AMF_EVT_NGAP_NG_HOLDING_TIMER,
   /******************************************************/
 
     MME_EVT_EMM_MESSAGE,

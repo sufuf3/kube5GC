@@ -31,18 +31,18 @@ char* mme_event_get_name(event_t *e)
 
             
     /******************** Added by Hu ********************/
-        case MME_EVT_NGAP_MESSAGE:
-            return "MME_EVT_NGAP_MESSAGE";
-        case MME_EVT_NGAP_DELAYED_SEND:
-            return "MME_EVT_NGAP_DELAYED_SEND";
-        case MME_EVT_NGAP_LO_ACCEPT:
-            return "MME_EVT_NGAP_LO_ACCEPT";
-        case MME_EVT_NGAP_LO_SCTP_COMM_UP:
-            return "MME_EVT_NGAP_LO_SCTP_COMM_UP";
-        case MME_EVT_NGAP_LO_CONNREFUSED:
-            return "MME_EVT_NGAP_LO_CONNREFUSED";
-        case MME_EVT_NGAP_NG_HOLDING_TIMER:
-            return "MME_EVT_NGAP_NG_HOLDING_TIMER";
+        case AMF_EVT_NGAP_MESSAGE:
+            return "AMF_EVT_NGAP_MESSAGE";
+        case AMF_EVT_NGAP_DELAYED_SEND:
+            return "AMF_EVT_NGAP_DELAYED_SEND";
+        case AMF_EVT_NGAP_LO_ACCEPT:
+            return "AMF_EVT_NGAP_LO_ACCEPT";
+        case AMF_EVT_NGAP_LO_SCTP_COMM_UP:
+            return "AMF_EVT_NGAP_LO_SCTP_COMM_UP";
+        case AMF_EVT_NGAP_LO_CONNREFUSED:
+            return "AMF_EVT_NGAP_LO_CONNREFUSED";
+        case AMF_EVT_NGAP_NG_HOLDING_TIMER:
+            return "AMF_EVT_NGAP_NG_HOLDING_TIMER";
     /*****************************************************/
 
 

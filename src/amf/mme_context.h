@@ -255,10 +255,11 @@ typedef struct _amf_ran_t {
     fsm_t           sm;     /* A state machine */
 
    
-    c_uint32_t      gnb_id;      /* gNB_ID received from gNB */
-    c_uint32_t      ngenb_id;    /* Ng-ENB_ID received from  Ng-ENB */
-    c_uint16_t      n3iwf_id;    /* N3IEF_ID received from  N3IWF */
-
+    union{
+        c_uint32_t      gnb_id;      /* gNB_ID received from gNB */
+        c_uint32_t      ngenb_id;    /* Ng-ENB_ID received from  Ng-ENB */
+        c_uint16_t      n3iwf_id;    /* N3IEF_ID received from  N3IWF */
+    };
 
     int             sock_type;  /* SOCK_STREAM or SOCK_SEQPACKET */
     sock_id         sock;       /* gNB NGAP Socket */
@@ -295,9 +296,11 @@ struct _ran_ue_t {
      * Save TAI and ECGI. And then, this will copy 'mme_ue_t' context later */
     struct {
         tai_t        tai;
-        nr_cgi_t     nr_cgi;
-        e_cgi_t      e_cgi;
-        c_int32_t    ip;
+        union {
+            nr_cgi_t     nr_cgi;
+            e_cgi_t      e_cgi;
+            c_uint32_t    ip;
+        };
     } nas;
 
     /* Store by UE Context Release Command
@@ -328,11 +331,11 @@ struct _ran_ue_t {
     tm_block_id     holding_timer;
 
     /* Related Context */
-    amf_ran_t       *gnb;
+    amf_ran_t       *ran;
     amf_ue_t        *amf_ue;
 }; 
 
-struct amf_ue_t {
+struct _amf_ue_t {
     index_t         index;  /* An index of this node */
     fsm_t           sm;     /* A state machine */
 
@@ -370,9 +373,11 @@ struct amf_ue_t {
 
     /* UE Info */
     tai_t           tai;
-    nr_cgi_t        nr_cgi;
-    e_cgi_t         e_cgi;
-    c_int32_t       ip;
+    union {
+        nr_cgi_t    nr_cgi;
+        e_cgi_t     e_cgi;
+        c_uint32_t  ip;
+    };
     plmn_id_t       visited_plmn_id;
 
 /* #define SECURITY_CONTEXT_IS_VALID(__mME) \

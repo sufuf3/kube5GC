@@ -107,7 +107,7 @@ static int ngap_accept_handler(sock_id id, void *data)
         d_trace(1, "gNB-NG accepted[%s]:%d in ng_path module\n", 
             CORE_ADDR(addr, buf), CORE_PORT(addr));
 
-        event_set(&e, MME_EVT_NGAP_LO_ACCEPT);
+        event_set(&e, AMF_EVT_NGAP_LO_ACCEPT);
         event_set_param1(&e, (c_uintptr_t)new);
         event_set_param2(&e, (c_uintptr_t)addr);
         if (mme_event_send(&e) != CORE_OK)
@@ -183,7 +183,7 @@ int ngap_recv_handler(sock_id sock, void *data)
                     d_assert(addr, pkbuf_free(pkbuf); return -1,);
                     memcpy(addr, sock_remote_addr(sock), sizeof(c_sockaddr_t));
 
-                    event_set(&e, MME_EVT_NGAP_LO_SCTP_COMM_UP);
+                    event_set(&e, AMF_EVT_NGAP_LO_SCTP_COMM_UP);
                     event_set_param1(&e, (c_uintptr_t)sock);
                     event_set_param2(&e, (c_uintptr_t)addr);
                     event_set_param3(&e, 
@@ -193,7 +193,7 @@ int ngap_recv_handler(sock_id sock, void *data)
 
                     if (mme_event_send(&e) != CORE_OK)
                     {
-                        d_error("Event MME_EVT_NGAP_LO_SCTP_COMM_UP failed");
+                        d_error("Event AMF_EVT_NGAP_LO_SCTP_COMM_UP failed");
                         CORE_FREE(addr);
                     }
                 }
@@ -210,13 +210,13 @@ int ngap_recv_handler(sock_id sock, void *data)
                     d_assert(addr, pkbuf_free(pkbuf); return -1,);
                     memcpy(addr, sock_remote_addr(sock), sizeof(c_sockaddr_t));
 
-                    event_set(&e, MME_EVT_NGAP_LO_CONNREFUSED);
+                    event_set(&e, AMF_EVT_NGAP_LO_CONNREFUSED);
                     event_set_param1(&e, (c_uintptr_t)sock);
                     event_set_param2(&e, (c_uintptr_t)addr);
 
                     if (mme_event_send(&e) != CORE_OK)
                     {
-                        d_error("Event MME_EVT_NGAP_LO_CONNREFUSED failed");
+                        d_error("Event AMF_EVT_NGAP_LO_CONNREFUSED failed");
                         CORE_FREE(addr);
                     }
 
@@ -235,13 +235,13 @@ int ngap_recv_handler(sock_id sock, void *data)
                 d_assert(addr, pkbuf_free(pkbuf); return -1,);
                 memcpy(addr, sock_remote_addr(sock), sizeof(c_sockaddr_t));
 
-                event_set(&e, MME_EVT_NGAP_LO_CONNREFUSED);
+                event_set(&e, AMF_EVT_NGAP_LO_CONNREFUSED);
                 event_set_param1(&e, (c_uintptr_t)sock);
                 event_set_param2(&e, (c_uintptr_t)addr);
 
                 if (mme_event_send(&e) != CORE_OK)
                 {
-                    d_error("Event MME_EVT_NGAP_LO_CONNREFUSED failed");
+                    d_error("Event AMF_EVT_NGAP_LO_CONNREFUSED failed");
                     CORE_FREE(addr);
                 }
 
@@ -286,13 +286,13 @@ int ngap_recv_handler(sock_id sock, void *data)
         d_assert(addr, pkbuf_free(pkbuf); return -1,);
         memcpy(addr, sock_remote_addr(sock), sizeof(c_sockaddr_t));
 
-        event_set(&e, MME_EVT_NGAP_MESSAGE);
+        event_set(&e, AMF_EVT_NGAP_MESSAGE);
         event_set_param1(&e, (c_uintptr_t)sock);
         event_set_param2(&e, (c_uintptr_t)addr);
         event_set_param3(&e, (c_uintptr_t)pkbuf);
         if (mme_event_send(&e) != CORE_OK)
         {
-            d_error("Event MME_EVT_NGAP_MESSAGE failed");
+            d_error("Event AMF_EVT_NGAP_MESSAGE failed");
             pkbuf_free(pkbuf);
             CORE_FREE(addr);
         }

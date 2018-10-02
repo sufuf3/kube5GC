@@ -75,6 +75,7 @@ void ngap_GNB_ID_to_uint32(NGAP_GNB_ID_t *gNB_ID, c_uint32_t *uint32)
     d_assert(uint32, return, "Null param");
     d_assert(gNB_ID, return, "Null param");
 
+    
     if (gNB_ID->present == NGAP_GNB_ID_PR_gNB_ID)
     {
         c_uint8_t *buf = gNB_ID->choice.gNB_ID.buf;
