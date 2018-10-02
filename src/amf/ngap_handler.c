@@ -1,3 +1,4 @@
+#define TRACE_MODULE _ngap_handler
 #include "core_debug.h"
 
 /* TODO: remove 3gpp_type.h head file, until ngap_conv.c done*/
@@ -8,7 +9,7 @@
 
 void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 {
-    int i = 0;
+    int i = 0, j = 0;
                               
     NGAP_InitiatingMessage_t *initiatingMessage = NULL;
     NGAP_NGSetupRequest_t *NGSetupRequest = NULL;
@@ -19,12 +20,19 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 	// NGAP_RANNodeName_t	 *RANNodeName = NULL; //Optional
 	NGAP_PagingDRX_t *PagingDRX = NULL;
 
+    //c_uint32_t gnb_id = 0;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
     d_assert(message, return,);
     initiatingMessage = message->choice.initiatingMessage;
     d_assert(initiatingMessage, return,);
 
     NGSetupRequest = &initiatingMessage->value.choice.NGSetupRequest;
     d_assert(NGSetupRequest, return,);
+
+    d_trace(3, "[AMF] NG-Setup request\n");
 
     for (i = 0; i < NGSetupRequest->protocolIEs.list.count; i++)
     {
@@ -52,4 +60,47 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
         }
     }
     
+    // ngap_RAN_ID_to_unit32(&Global_RAN_Node_ID->gNB_ID, &gnb_id);
+    // amf_ran_set_gnb_id(ran, gnb_id);
+
+    /* Parse Supported TA */
+    ran->num_of_supported_ta_list = 0;
+    for (i = 0; i < SupportedTAList->list.count; i++)
+    {
+        NGAP_SupportedTAItem_t *SupportedTAs_Item = NULL;
+        NGAP_TAC_t *tAC = NULL;
+
+        SupportedTAs_Item = 
+            (NGAP_SupportedTAItem_t *)SupportedTAList->list.array[i];
+        d_assert(SupportedTAs_Item, return,);
+        tAC = &SupportedTAs_Item->tAC;
+        d_assert(tAC, return,);
+
+        for (j = 0; j < SupportedTAs_Item->broadcastPLMNList.list.count; j++)
+        {
+            NGAP_PLMNIdentity_t *pLMNidentity = NULL;
+            pLMNidentity = (NGAP_PLMNIdentity_t *)
+                SupportedTAs_Item->broadcastPLMNList.list.array[j];
+            d_assert(pLMNidentity, return,);
+
+            memcpy(&ran->supported_ta_list[ran->num_of_supported_ta_list].tai.tac,
+                    tAC->buf, sizeof(c_uint16_t));
+            ran->supported_ta_list[ran->num_of_supported_ta_list].tai.tac = 
+                ntohs(ran->supported_ta_list
+                        [ran->num_of_supported_ta_list].tai.tac);
+            memcpy(&ran->supported_ta_list
+                        [ran->num_of_supported_ta_list].tai.plmn_id,
+                    pLMNidentity->buf, sizeof(plmn_id_t));
+            d_trace(5, "    PLMN_ID[MCC:%d MNC:%d] TAC[%d]\n",
+                plmn_id_mcc(&ran->supported_ta_list
+                    [ran->num_of_supported_ta_list].tai.plmn_id),
+                plmn_id_mnc(&ran->supported_ta_list
+                    [ran->num_of_supported_ta_list].tai.plmn_id),
+                ran->supported_ta_list[ran->num_of_supported_ta_list].tai.tac);
+            ran->num_of_supported_ta_list++;
+        }
+    }
+
+
+
 }
