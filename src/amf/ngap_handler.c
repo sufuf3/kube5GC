@@ -9,7 +9,7 @@
 
 void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 {
-    int i = 0, j = 0;
+    int i = 0, j = 0, k = 0;
                               
     NGAP_InitiatingMessage_t *initiatingMessage = NULL;
     NGAP_NGSetupRequest_t *NGSetupRequest = NULL;
@@ -78,10 +78,10 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 
         for (j = 0; j < SupportedTAs_Item->broadcastPLMNList.list.count; j++)
         {
-            NGAP_PLMNIdentity_t *pLMNidentity = NULL;
-            pLMNidentity = (NGAP_PLMNIdentity_t *)
+            NGAP_BroadcastPLMNItem_t *pBoradcastPLMNItem = NULL;
+            pBoradcastPLMNItem = (NGAP_BroadcastPLMNItem_t *) 
                 SupportedTAs_Item->broadcastPLMNList.list.array[j];
-            d_assert(pLMNidentity, return,);
+            d_assert(pBoradcastPLMNItem, return,);
 
             memcpy(&ran->supported_ta_list[ran->num_of_supported_ta_list].tai.tac,
                     tAC->buf, sizeof(c_uint16_t));
@@ -90,7 +90,24 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
                         [ran->num_of_supported_ta_list].tai.tac);
             memcpy(&ran->supported_ta_list
                         [ran->num_of_supported_ta_list].tai.plmn_id,
-                    pLMNidentity->buf, sizeof(plmn_id_t));
+                    pBoradcastPLMNItem->pLMNIdentity.buf, sizeof(plmn_id_t));
+
+            c_uint16_t  tmp_num_of_s_nssai = ran->supported_ta_list[ran->num_of_supported_ta_list].num_of_s_nssai;
+            for( k = 0; k < pBoradcastPLMNItem->tAISliceSupportList.list.count; k++)
+            {
+                NGAP_S_NSSAI_t *s_NSSAI;
+                
+                NGAP_SliceSupportItem_t *pSliceSupportItem = NULL;
+                pSliceSupportItem = (NGAP_SliceSupportItem_t *)
+                    pBoradcastPLMNItem->tAISliceSupportList.list.array[j];
+                    d_assert(pSliceSupportItem, return,);
+                s_NSSAI = &pSliceSupportItem->s_NSSAI;
+                memcpy(&ran->supported_ta_list[ran->num_of_supported_ta_list].s_nssai[tmp_num_of_s_nssai],
+                s_NSSAI->sST.buf, sizeof(c_uint16_t));
+                tmp_num_of_s_nssai++;
+                ran->supported_ta_list[ran->num_of_supported_ta_list].num_of_s_nssai++;
+            }
+
             d_trace(5, "    PLMN_ID[MCC:%d MNC:%d] TAC[%d]\n",
                 plmn_id_mcc(&ran->supported_ta_list
                     [ran->num_of_supported_ta_list].tai.plmn_id),
