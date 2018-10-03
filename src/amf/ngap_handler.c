@@ -4,7 +4,9 @@
 /* TODO: remove 3gpp_type.h head file, until ngap_conv.c done*/
 #include "3gpp_types.h"
 
+#include "ngap_path.h"
 #include "ngap_conv.h"
+#include "ngap_build.h"
 #include "ngap_handler.h"
 
 void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
@@ -20,7 +22,10 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 	// NGAP_RANNodeName_t	 *RANNodeName = NULL; //Optional
 	NGAP_PagingDRX_t *PagingDRX = NULL;
 
+    pkbuf_t *ngapbuf = NULL;
     //c_uint32_t gnb_id = 0;
+    NGAP_Cause_PR group = NGAP_Cause_PR_NOTHING;
+    long cause = 0;
 
     d_assert(ran, return,);
     d_assert(ran->sock, return,);
@@ -118,6 +123,50 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
         }
     }
 
+    if (ran->num_of_supported_ta_list == 0) 
+    {
+        d_warn("NG-Setup failure:");
+        d_warn("    No supported TA exist in NG-Setup request");
+        group = NGAP_Cause_PR_misc;
+        cause = NGAP_CauseMisc_unspecified;
+    }
+    else
+    {
+        int served_tai_index = -1;
+        for (i = 0; i < ran->num_of_supported_ta_list; i++)
+        {
+            served_tai_index =  amf_find_served_tai(&ran->supported_ta_list[i].tai);
+            if (served_tai_index >= 0 &&
+                served_tai_index < MAX_NUM_OF_SERVED_TAI)
+            {
+                d_trace(5, "    SERVED_TAI_INDEX[%d]\n", served_tai_index);
+                break;
+            }
+        }
 
+        if (served_tai_index < 0)
+        {
+            d_warn("S1-Setup failure:");
+            d_warn("    Cannot find Served TAI. Check 'amf.tai' configuration");
+            group = S1AP_Cause_PR_misc;
+            cause = S1AP_CauseMisc_unknown_PLMN;
+        }
+    }
 
+    if (group == NGAP_Cause_PR_NOTHING)
+    {
+        d_trace(3, "[AMF] NG-Setup response\n");
+        d_assert(ngap_build_setup_rsp(&ngapbuf) == CORE_OK, 
+                return, "ngap_build_setup_rsp() failed");
+    }
+    else
+    {
+        d_trace(3, "[AMF] N{-Setup failure\n");
+        d_assert(ngap_build_setup_failure(
+                &ngapbuf, group, cause, NGAP_TimeToWait_v10s) == CORE_OK, 
+                return, "ngap_build_setup_failure() failed");
+    }
+
+    d_assert(ngap_send_to_ran(ran, ngapbuf, NGAP_NON_UE_SIGNALLING) == CORE_OK,,
+             "ngap_send_to_ran() failed");
 }

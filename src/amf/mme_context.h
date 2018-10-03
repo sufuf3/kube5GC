@@ -1052,6 +1052,7 @@ CORE_DECLARE(pdn_t*)        mme_pdn_find_by_apn(
 CORE_DECLARE(pdn_t*)        mme_default_pdn(mme_ue_t *mme_ue);
 
 CORE_DECLARE(int)           mme_find_served_tai(tai_t *tai);
+CORE_DECLARE(int)           amf_find_served_tai(tai_t *tai);
 
 CORE_DECLARE(status_t)     mme_m_tmsi_pool_generate();
 CORE_DECLARE(mme_m_tmsi_t *) mme_m_tmsi_alloc();

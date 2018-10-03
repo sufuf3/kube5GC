@@ -6,7 +6,7 @@ libamf_la_SOURCES = \
 	mme_kdf.h kasumi.h snow_3g.h zuc.h \
     mme_event.h mme_context.h \
 	s1ap_build.h s1ap_handler.h s1ap_conv.h s1ap_path.h \
-	ngap_conv.h ngap_path.h\
+	ngap_build.h ngap_conv.h ngap_path.h\
 	ngap_handler.h \
 	mme_fd_path.h mme_s6a_handler.h \
 	nas_conv.h nas_security.h nas_path.h \
@@ -17,7 +17,7 @@ libamf_la_SOURCES = \
 	mme_kdf.c kasumi.c snow_3g.c zuc.c \
     mme_init.c mme_event.c mme_context.c \
 	s1ap_sm.c s1ap_build.c s1ap_handler.c s1ap_conv.c s1ap_path.c \
-	ngap_conv.c ngap_path.c\
+	ngap_build.c ngap_conv.c ngap_path.c\
 	ngap_handler.c \
 	mme_fd_path.c mme_s6a_handler.c \
 	nas_conv.c nas_security.c nas_path.c \
