@@ -303,30 +303,21 @@ struct _ran_ue_t {
         };
     } nas;
 
-    /* Store by UE Context Release Command
-     * Retrieve by UE Context Release Complete */
-// #define S1AP_UE_CTX_REL_INVALID_ACTION                      0
-// #define S1AP_UE_CTX_REL_NO_ACTION                           1
-// #define S1AP_UE_CTX_REL_S1_NORMAL_RELEASE                   2
-// #define S1AP_UE_CTX_REL_UE_CONTEXT_REMOVE                   3
-// #define S1AP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL              4
-//     c_uint8_t      ue_ctx_rel_action;
-
     /* 
-     * S1 holding timer
+     * NG holding timer
      *
      * When eNodeB sends Attach Request, TAU Request, Service Request repeatly,
-     * S1(enb_ue_t) context is repeatly created. 
+     * NG(ran_ue_t) context is repeatly created. 
      *
-     * NAS(mme_ue_t) context is associated with last created S1(enb_ue_t)
-     * context, and older S1(enb_ue_t) context might not be freed.
+     * NAS(amf_ue_t) context is associated with last created NG(ran_ue_t)
+     * context, and older NG(ran_ue_t) context might not be freed.
      *
      * If NAS(mme_ue_t) has already been associated with
-     * older S1(enb_ue_t) context, the holding timer(30secs) is started.
-     * Newly associated S1(enb_ue_t) context holding timer is stopped.
+     * older NG(ran_ue_t) context, the holding timer(30secs) is started.
+     * Newly associated NG(ran_ue_t) context holding timer is stopped.
      *
      * If the holding timer expires,
-     * S1(enb_ue_t) context will be implicitly deleted.
+     * NG(ran_ue_t) context will be implicitly deleted.
      */
     tm_block_id     holding_timer;
 
@@ -339,22 +330,6 @@ struct _amf_ue_t {
     index_t         index;  /* An index of this node */
     fsm_t           sm;     /* A state machine */
 
-//     struct {
-// #define MME_EPS_TYPE_ATTACH_REQUEST                 1
-// #define MME_EPS_TYPE_TAU_REQUEST                    2
-// #define MME_EPS_TYPE_SERVICE_REQUEST                3
-// #define MME_EPS_TYPE_DETACH_REQUEST_FROM_UE         4 
-// #define MME_EPS_TYPE_DETACH_REQUEST_TO_UE           5 
-//         c_uint8_t   type;
-//         c_uint8_t   ksi;
-//         union {
-//             nas_eps_attach_type_t attach;
-//             nas_eps_update_type_t update;
-//             nas_detach_type_t detach;
-//             c_uint8_t data;
-//         };
-//     } nas_eps;
-
     /* UE identity */
 #define AMF_UE_HAVE_IMSI(__aMF) \
     ((__aMF) && ((__aMF)->imsi_len))
@@ -366,9 +341,6 @@ struct _amf_ue_t {
     guti_5g_t       guti_5g;
     int             guti_5g_present;
 
-    // c_uint32_t      mme_s11_teid;   /* MME-S11-TEID is derived from INDEX */
-    // c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is received from SGW */
-
     c_uint16_t      ostream_id;     /* SCTP output stream identification */
 
     /* UE Info */
@@ -379,64 +351,6 @@ struct _amf_ue_t {
         c_uint32_t  ip;
     };
     plmn_id_t       visited_plmn_id;
-
-/* #define SECURITY_CONTEXT_IS_VALID(__mME) \
-    ((__mME) && \
-    ((__mME)->security_context_available == 1) && \
-     ((__mME)->mac_failed == 0) && \
-     ((__mME)->nas_eps.ksi != NAS_KSI_NO_KEY_IS_AVAILABLE))
- #define CLEAR_SECURITY_CONTEXT(__mME) \
-    do { \
-        d_assert((__mME), break, "Null param"); \
-        (__mME)->security_context_available = 0; \
-        (__mME)->mac_failed = 0; \
-        (__mME)->nas_eps.ksi = 0; \
-    } while(0)
-*/
-//     int             security_context_available;
-//     int             mac_failed;
-
-//     /* Security Context */
-//     nas_ue_network_capability_t ue_network_capability;
-//     nas_ms_network_capability_t ms_network_capability;
-//     c_uint8_t       xres[MAX_RES_LEN];
-//     c_uint8_t       xres_len;
-//     c_uint8_t       kasme[SHA256_DIGEST_SIZE];
-//     c_uint8_t       rand[RAND_LEN];
-//     c_uint8_t       knas_int[SHA256_DIGEST_SIZE/2]; 
-//     c_uint8_t       knas_enc[SHA256_DIGEST_SIZE/2];
-//     c_uint32_t      dl_count;
-//     union {
-//         struct {
-//         ED3(c_uint8_t spare;,
-//             c_uint16_t overflow;,
-//             c_uint8_t sqn;)
-//         } __attribute__ ((packed));
-//         c_uint32_t i32;
-//     } ul_count;
-//     c_uint8_t       kenb[SHA256_DIGEST_SIZE];
-
-    // struct {
-    // ED2(c_uint8_t nhcc_spare:5;,
-    //     c_uint8_t nhcc:3;) /* Next Hop Channing Counter */
-    // };
-    // c_uint8_t       nh[SHA256_DIGEST_SIZE]; /* NH Security Key */
-
-    // /* defined in 'nas_ies.h'
-    //  * #define NAS_SECURITY_ALGORITHMS_EIA0        0
-    //  * #define NAS_SECURITY_ALGORITHMS_128_EEA1    1
-    //  * #define NAS_SECURITY_ALGORITHMS_128_EEA2    2
-    //  * #define NAS_SECURITY_ALGORITHMS_128_EEA3    3 */
-    // c_uint8_t       selected_enc_algorithm;
-    // /* defined in 'nas_ies.h'
-    //  * #define NAS_SECURITY_ALGORITHMS_EIA0        0
-    //  * #define NAS_SECURITY_ALGORITHMS_128_EIA1    1
-    //  * #define NAS_SECURITY_ALGORITHMS_128_EIA1    2
-    //  * #define NAS_SECURITY_ALGORITHMS_128_EIA3    3 */
-    // c_uint8_t       selected_int_algorithm;
-
-    // /* HSS Info */
-    // s6a_subscription_data_t subscription_data;
 
     /* GSM Info */
 
@@ -461,20 +375,6 @@ struct _amf_ue_t {
     /* Save PDN Connectivity Request */
     nas_esm_message_container_t pdn_connectivity_request;
 
-    /* Paging */
-/*  #define CLEAR_PAGING_INFO(__aMF) \
-    do { \
-        d_assert((__aMF), break, "Null param"); \
-        \
-        tm_stop((__aMF)->t3413); \
-        if ((__aMF)->last_paging_msg) \
-        { \
-            pkbuf_free((__aMF)->last_paging_msg); \
-            (__aMF)->last_paging_msg = NULL; \
-        } \
-        (__aMF)->max_paging_retry = 0; \
-    } while(0); 
-*/
     pkbuf_t         *last_paging_msg;
     tm_block_id     t3413;
 #define MAX_NUM_OF_PAGING           2
@@ -490,43 +390,7 @@ struct _amf_ue_t {
     /* NGAP Transparent Container */
     OCTET_STRING_t container;
 
-//     /* GTP Request/Response Counter */
-/* #define GTP_COUNTER_INCREMENT(__mME, __tYPE) \
-        do { \
-            d_assert((__mME), break,); \
-            ((__mME)->gtp_counter[__tYPE].request)++; \
-        } while(0);
 
- #define GTP_COUNTER_CHECK(__mME, __tYPE, __eXPR) \
-        do { \
-            d_assert((__mME), break,); \
-            if ((__mME)->gtp_counter[__tYPE].request == 0) break; \
-            ((__mME)->gtp_counter[__tYPE].response)++; \
-            if (((__mME)->gtp_counter[__tYPE].request) == \
-                ((__mME)->gtp_counter[__tYPE].response)) \
-            { \
-                ((__mME)->gtp_counter[__tYPE].request) = 0; \
-                ((__mME)->gtp_counter[__tYPE].response) = 0; \
-                __eXPR \
-            } \
-        } while(0);
-
-#define MAX_NUM_OF_GTP_COUNTER                                  16
-*/
-
-#if 0  /* Deprecated */
-#define GTP_COUNTER_DELETE_SESSION                              0
-#endif
-/*
-#define GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH                1
-#define GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY            2
-    struct {
-        c_uint8_t request;
-        c_uint8_t response;
-    } gtp_counter[MAX_NUM_OF_GTP_COUNTER];
-
-    gtp_node_t      *gnode;
-*/
 };
 
 /************************************************************************/
