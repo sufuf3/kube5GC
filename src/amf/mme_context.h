@@ -765,9 +765,140 @@ typedef struct _mme_bearer_t {
     gtp_xact_t      *xact;
 } mme_bearer_t;
 
+typedef struct _amf_context_t {
+    const char      *fd_conf_path;  /* MME freeDiameter conf path */
+    fd_config_t     *fd_config;     /* MME freeDiameter config */
+
+    c_uint16_t      s1ap_port;      /* Default S1AP Port */
+
+    /***********************add by Hu********************************/
+    c_uint16_t      ngap_port;      /* Default NGAP Port */ 
+    /****************************************************************/
+
+    c_uint16_t      gtpc_port;      /* Default GTPC Port */
+
+    list_t          s1ap_list;      /* MME S1AP IPv4 Server List */
+    list_t          s1ap_list6;     /* MME S1AP IPv6 Server List */
+
+    /***********************add by Hu********************************/
+    list_t          ngap_list;      /* MME NGAP IPv4 Server List */
+    list_t          ngap_list6;     /* MME NGAP IPv6 Server List */
+    /****************************************************************/
+
+    list_t          gtpc_list;      /* MME GTPC IPv4 Server List */
+    list_t          gtpc_list6;     /* MME GTPC IPv6 Server List */
+    sock_id         gtpc_sock;      /* MME GTPC IPv4 Socket */
+    sock_id         gtpc_sock6;     /* MME GTPC IPv6 Socket */
+    c_sockaddr_t    *gtpc_addr;     /* MME GTPC IPv4 Address */
+    c_sockaddr_t    *gtpc_addr6;    /* MME GTPC IPv6 Address */
+
+    list_t          sgw_list;       /* SGW GTPC Client List */
+    gtp_node_t      *sgw;           /* Iterator for SGW round-robin */
+
+    list_t          pgw_list;       /* PGW GTPC Client List */
+    c_sockaddr_t    *pgw_addr;      /* First IPv4 Address Selected */
+    c_sockaddr_t    *pgw_addr6;     /* First IPv6 Address Selected */
+
+
+    /* Serve GUAMI */
+    c_uint8_t       max_num_of_served_guami;
+    served_guami_t served_guami[MAX_NUM_OF_SERVED_GUAMI];
+
+    /* Served GUMME */
+    c_uint8_t       max_num_of_served_gummei;
+    served_gummei_t served_gummei[MAX_NUM_OF_SERVED_GUMMEI];
+    
+    /* Served TAI */
+    c_uint8_t       num_of_served_tai;
+    struct {
+        tai0_list_t list0;
+        tai2_list_t list2;
+    } served_tai[MAX_NUM_OF_SERVED_TAI];
+
+    /* PLMN support list */
+    c_uint8_t max_num_of_plmn_support;
+    plmn_support_t plmn_support[MAX_NUM_OF_PLMNs_5GC]; 
+
+    /* unavailable guami list */
+
+    c_uint8_t      max_num_of_unavailable_guami;
+    unavailable_guami_t unavailable_guami[MAX_NUM_OF_SERVED_GUAMI];
+
+    /* defined in 'nas_ies.h'
+     * #define NAS_SECURITY_ALGORITHMS_EIA0        0
+     * #define NAS_SECURITY_ALGORITHMS_128_EEA1    1
+     * #define NAS_SECURITY_ALGORITHMS_128_EEA2    2
+     * #define NAS_SECURITY_ALGORITHMS_128_EEA3    3 */
+    c_uint8_t       num_of_ciphering_order;
+    c_uint8_t       ciphering_order[MAX_NUM_OF_ALGORITHM];
+    /* defined in 'nas_ies.h'
+     * #define NAS_SECURITY_ALGORITHMS_EIA0        0
+     * #define NAS_SECURITY_ALGORITHMS_128_EIA1    1
+     * #define NAS_SECURITY_ALGORITHMS_128_EIA1    2
+     * #define NAS_SECURITY_ALGORITHMS_128_EIA3    3 */
+    c_uint8_t       num_of_integrity_order;
+    c_uint8_t       integrity_order[MAX_NUM_OF_ALGORITHM];
+
+    /* S1SetupResponse */
+    c_uint8_t       relative_capacity;
+
+    /******************** Added by Chi ********************/
+    /* Timer */
+    tm_block_id     overloading_checking_timer; /* For firing MME_EVT_CHECK_OVERLOAD event periodically */
+    /******************************************************/
+
+    /* Timer value */
+    c_uint32_t      t3413_value;            /* Paging retry timer value */
+    c_uint32_t      s1_holding_timer_value; /* S1 holding timer value */
+
+    /* Generator for unique identification */
+    c_uint32_t      mme_ue_s1ap_id;         /* mme_ue_s1ap_id generator */
+
+    /***********************add by Hu********************************/
+    c_uint32_t      amf_ue_ngap_id;         /* amf_ue_ngap_id generator */
+    /****************************************************************/
+
+    c_uint16_t      ostream_id;             /* ostream_id generator */
+
+    /* M-TMSI Pool */
+    struct {
+        int head, tail;
+        int size, avail;
+        mutex_id mut;
+        mme_m_tmsi_t *free[MAX_POOL_OF_SESS], pool[MAX_POOL_OF_SESS];
+    } m_tmsi;
+
+    hash_t          *enb_sock_hash;         /* hash table for ENB Socket */
+    hash_t          *enb_addr_hash;         /* hash table for ENB Address */
+    hash_t          *enb_id_hash;           /* hash table for ENB-ID */
+    hash_t          *mme_ue_s1ap_id_hash;   /* hash table for MME-UE-S1AP-ID */
+
+    /***********************add by Hu********************************/
+    hash_t          *amf_ue_ngap_id_hash;   /* hash table for AMF-UE-NGAP-ID */
+    /****************************************************************/
+
+    hash_t          *imsi_ue_hash;          /* hash table (IMSI : MME_UE) */
+    hash_t          *guti_ue_hash;          /* hash table (GUTI : MME_UE) */
+
+    /* System */
+    msgq_id         queue_id;       /* Queue for processing MME control plane */
+    tm_service_t    tm_service;     /* Timer Service */
+    
+    /* Network Name */    
+    nas_network_name_t short_name; /* Network short name */
+    nas_network_name_t full_name; /* Network Full Name */
+
+    /******************** Added by Chi ********************/
+    /* Status */
+    bool overload_started;
+    /******************************************************/
+
+} amf_context_t;
+
 CORE_DECLARE(status_t)      mme_context_init(void);
 CORE_DECLARE(status_t)      mme_context_final(void);
-CORE_DECLARE(mme_context_t*) mme_self(void);
+//CORE_DECLARE(mme_context_t*) mme_self(void);
+CORE_DECLARE(amf_context_t*) mme_self(void);
 
 CORE_DECLARE(status_t)      mme_context_parse_config(void);
 CORE_DECLARE(status_t)      mme_context_setup_trace_module(void);

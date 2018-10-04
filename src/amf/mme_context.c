@@ -32,7 +32,7 @@
 
 #define MAX_CELL_PER_ENB            8
 
-static mme_context_t self;
+static amf_context_t self;
 static fd_config_t g_fd_conf;
 
 index_declare(mme_enb_pool, mme_enb_t, MAX_NUM_OF_ENB);
@@ -52,7 +52,7 @@ status_t mme_context_init()
     memset(&g_fd_conf, 0, sizeof(fd_config_t));
 
     /* Initialize MME context */
-    memset(&self, 0, sizeof(mme_context_t));
+    memset(&self, 0, sizeof(amf_context_t));
     self.fd_config = &g_fd_conf;
 
     list_init(&self.s1ap_list);
@@ -151,7 +151,7 @@ status_t mme_context_final()
     return CORE_OK;
 }
 
-mme_context_t* mme_self()
+amf_context_t* mme_self()
 {
     return &self;
 }
