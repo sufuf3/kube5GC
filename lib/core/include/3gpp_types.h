@@ -38,6 +38,11 @@ extern "C" {
 
 #define MAX_SDU_LEN             8192
 #define PLMN_ID_LEN             3
+#define AMF_REGION_ID_LEN       2
+#define AMF_SET_ID_LEN          4
+#define AMF_POINTER_LEN         4
+#define SST_LEN                 1
+#define SD_LEN                  3
 
 #define BCD_TO_BUFFER_LEN(x)    (((x)+1)/2)
 #define MAX_IMSI_BCD_LEN        15

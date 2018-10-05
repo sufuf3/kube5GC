@@ -101,6 +101,8 @@ typedef struct _served_guami_t {
 typedef struct _served_guami_t unavailable_guami_t;
 
 typedef struct _plmn_support {
+    c_uint32_t      num_of_plmn_id;
+    plmn_id_t       plmn_id[MAX_PLMN_ID];
     c_uint16_t      num_of_s_nssai;
     s_nssai_t       s_nssai[MAX_OF_SLICE];
 } plmn_support_t;
