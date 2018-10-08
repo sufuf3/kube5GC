@@ -11,6 +11,7 @@ testepc_SOURCES = \
 	basic/testutil.c basic/s1ap_message_test.c basic/nas_message_test.c \
 	basic/gtp_message_test.c basic/security_test.c basic/s1setup_test.c \
 	basic/attach_test.c basic/volte_test.c basic/handover_test.c \
+	basic/ngsetup_test.c \
 	$(NULL)
 
 testvolte_SOURCES = \
