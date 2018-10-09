@@ -17,7 +17,6 @@
 
 #include "mme_event.h"
 #include "mme_sm.h"
-
 #include "s1ap_handler.h"
 #include "s1ap_path.h"
 /******************** Added by Chi ********************/
@@ -27,8 +26,8 @@
 #include "nas_path.h"
 #include "emm_handler.h"
 #include "esm_handler.h"
-// #include "mme_gtp_path.h"
-// #include "mme_s11_handler.h"
+#include "mme_gtp_path.h"
+#include "mme_s11_handler.h"
 #include "mme_fd_path.h"
 #include "mme_s6a_handler.h"
 #include "mme_path.h"
@@ -62,12 +61,12 @@ void mme_state_operational(fsm_t *s, event_t *e)
     {
         case FSM_ENTRY_SIG:
         {
-            // rv = mme_gtp_open();
-            // if (rv != CORE_OK)
-            // {
-            //     d_error("Can't establish S11-GTP path");
-            //     break;
-            // }
+            rv = mme_gtp_open();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't establish S11-GTP path");
+                break;
+            }
             rv = s1ap_open();
             if (rv != CORE_OK)
             {
@@ -79,11 +78,11 @@ void mme_state_operational(fsm_t *s, event_t *e)
         }
         case FSM_EXIT_SIG:
         {
-            // rv = mme_gtp_close();
-            // if (rv != CORE_OK)
-            // {
-            //     d_error("Can't close S11-GTP path");
-            // }
+            rv = mme_gtp_close();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't close S11-GTP path");
+            }
             rv = s1ap_close();
             if (rv != CORE_OK)
             {
@@ -391,11 +390,11 @@ void mme_state_operational(fsm_t *s, event_t *e)
             d_assert(nas_esm_decode(&message, pkbuf) == CORE_OK,
                     pkbuf_free(pkbuf); break, "Can't decode NAS_ESM");
 
-            // bearer = mme_bearer_find_or_add_by_message(mme_ue, &message);
+            bearer = mme_bearer_find_or_add_by_message(mme_ue, &message);
             d_assert(bearer, pkbuf_free(pkbuf); break, "No Bearer context");
             sess = bearer->sess;
             d_assert(sess, pkbuf_free(pkbuf); break, "Null param");
-            // default_bearer = mme_default_bearer_in_sess(sess);
+            default_bearer = mme_default_bearer_in_sess(sess);
             d_assert(default_bearer, pkbuf_free(pkbuf); break, "Null param");
 
             event_set_param1(e, (c_uintptr_t)bearer->index);
@@ -409,13 +408,13 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 {
                     /* if the bearer is a default bearer,
                      * remove all session context linked the default bearer */
-                    // mme_sess_remove(sess);
+                    mme_sess_remove(sess);
                 }
                 else
                 {
                     /* if the bearer is not a default bearer,
                      * just remove the bearer context */
-                    // mme_bearer_remove(bearer);
+                    mme_bearer_remove(bearer);
                 }
             }
             else if (FSM_CHECK(&bearer->sm, esm_state_pdn_did_disconnect))
@@ -424,7 +423,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
                         pkbuf_free(pkbuf); break,
                         "Bearer[%d] is not Default Bearer",
                         default_bearer->ebi, bearer->ebi);
-                // mme_sess_remove(sess);
+                mme_sess_remove(sess);
             }
 
             pkbuf_free(pkbuf);
@@ -525,107 +524,107 @@ void mme_state_operational(fsm_t *s, event_t *e)
             pkbuf_free(s6abuf);
             break;
         }
-//         case MME_EVT_S11_MESSAGE:
-//         {
-//             status_t rv;
-//             pkbuf_t *pkbuf = (pkbuf_t *)event_get_param1(e);
-//             gtp_xact_t *xact = NULL;
-//             gtp_message_t message;
-//             mme_ue_t *mme_ue = NULL;
+        case MME_EVT_S11_MESSAGE:
+        {
+            status_t rv;
+            pkbuf_t *pkbuf = (pkbuf_t *)event_get_param1(e);
+            gtp_xact_t *xact = NULL;
+            gtp_message_t message;
+            mme_ue_t *mme_ue = NULL;
 
-//             d_assert(pkbuf, break, "Null param");
-//             rv = gtp_parse_msg(&message, pkbuf);
-//             d_assert(rv == CORE_OK, pkbuf_free(pkbuf); break, "parse error");
+            d_assert(pkbuf, break, "Null param");
+            rv = gtp_parse_msg(&message, pkbuf);
+            d_assert(rv == CORE_OK, pkbuf_free(pkbuf); break, "parse error");
 
-//             mme_ue = mme_ue_find_by_teid(message.h.teid);
-//             d_assert(mme_ue, pkbuf_free(pkbuf); break, 
-//                     "No UE Context(TEID:%d)", message.h.teid);
+            mme_ue = mme_ue_find_by_teid(message.h.teid);
+            d_assert(mme_ue, pkbuf_free(pkbuf); break, 
+                    "No UE Context(TEID:%d)", message.h.teid);
 
-//             rv = gtp_xact_receive(mme_ue->gnode, &message.h, &xact);
-//             if (rv != CORE_OK)
-//             {
-//                 pkbuf_free(pkbuf);
-//                 break;
-//             }
+            rv = gtp_xact_receive(mme_ue->gnode, &message.h, &xact);
+            if (rv != CORE_OK)
+            {
+                pkbuf_free(pkbuf);
+                break;
+            }
 
-//             switch(message.h.type)
-//             {
-//                 case GTP_CREATE_SESSION_RESPONSE_TYPE:
-//                     mme_s11_handle_create_session_response(
-//                         xact, mme_ue, &message.create_session_response);
-//                     break;
-//                 case GTP_MODIFY_BEARER_RESPONSE_TYPE:
-//                     mme_s11_handle_modify_bearer_response(
-//                         xact, mme_ue, &message.modify_bearer_response);
-//                     break;
-//                 case GTP_DELETE_SESSION_RESPONSE_TYPE:
-//                     mme_s11_handle_delete_session_response(
-//                         xact, mme_ue, &message.delete_session_response);
-//                     break;
-//                 case GTP_CREATE_BEARER_REQUEST_TYPE:
-//                     mme_s11_handle_create_bearer_request(
-//                         xact, mme_ue, &message.create_bearer_request);
-//                     break;
-//                 case GTP_UPDATE_BEARER_REQUEST_TYPE:
-//                     mme_s11_handle_update_bearer_request(
-//                         xact, mme_ue, &message.update_bearer_request);
-//                     break;
-//                 case GTP_DELETE_BEARER_REQUEST_TYPE:
-//                     mme_s11_handle_delete_bearer_request(
-//                         xact, mme_ue, &message.delete_bearer_request);
-//                     break;
-//                 case GTP_RELEASE_ACCESS_BEARERS_RESPONSE_TYPE:
-//                     mme_s11_handle_release_access_bearers_response(
-//                         xact, mme_ue, &message.release_access_bearers_response);
-//                     break;
-//                 case GTP_DOWNLINK_DATA_NOTIFICATION_TYPE:
-//                     mme_s11_handle_downlink_data_notification(
-//                         xact, mme_ue, &message.downlink_data_notification);
+            switch(message.h.type)
+            {
+                case GTP_CREATE_SESSION_RESPONSE_TYPE:
+                    mme_s11_handle_create_session_response(
+                        xact, mme_ue, &message.create_session_response);
+                    break;
+                case GTP_MODIFY_BEARER_RESPONSE_TYPE:
+                    mme_s11_handle_modify_bearer_response(
+                        xact, mme_ue, &message.modify_bearer_response);
+                    break;
+                case GTP_DELETE_SESSION_RESPONSE_TYPE:
+                    mme_s11_handle_delete_session_response(
+                        xact, mme_ue, &message.delete_session_response);
+                    break;
+                case GTP_CREATE_BEARER_REQUEST_TYPE:
+                    mme_s11_handle_create_bearer_request(
+                        xact, mme_ue, &message.create_bearer_request);
+                    break;
+                case GTP_UPDATE_BEARER_REQUEST_TYPE:
+                    mme_s11_handle_update_bearer_request(
+                        xact, mme_ue, &message.update_bearer_request);
+                    break;
+                case GTP_DELETE_BEARER_REQUEST_TYPE:
+                    mme_s11_handle_delete_bearer_request(
+                        xact, mme_ue, &message.delete_bearer_request);
+                    break;
+                case GTP_RELEASE_ACCESS_BEARERS_RESPONSE_TYPE:
+                    mme_s11_handle_release_access_bearers_response(
+                        xact, mme_ue, &message.release_access_bearers_response);
+                    break;
+                case GTP_DOWNLINK_DATA_NOTIFICATION_TYPE:
+                    mme_s11_handle_downlink_data_notification(
+                        xact, mme_ue, &message.downlink_data_notification);
 
-// /*
-//  * 5.3.4.2 in Spec 23.401
-//  * Under certain conditions, the current UE triggered Service Request 
-//  * procedure can cause unnecessary Downlink Packet Notification messages 
-//  * which increase the load of the MME.
-//  *
-//  * This can occur when uplink data sent in step 6 causes a response 
-//  * on the downlink which arrives at the Serving GW before the Modify Bearer 
-//  * Request message, step 8. This data cannot be forwarded from the Serving GW 
-//  * to the eNodeB and hence it triggers a Downlink Data Notification message.
-//  *
-//  * If the MME receives a Downlink Data Notification after step 2 and 
-//  * before step 9, the MME shall not send S1 interface paging messages
-//  */
-//                     if (ECM_IDLE(mme_ue))
-//                     {
-//                         s1ap_handle_paging(mme_ue);
-//                         /* Start T3413 */
-//                         tm_start(mme_ue->t3413);
-//                     }
-//                     break;
-//                 case GTP_CREATE_INDIRECT_DATA_FORWARDING_TUNNEL_RESPONSE_TYPE:
-//                     mme_s11_handle_create_indirect_data_forwarding_tunnel_response(
-//                         xact, mme_ue,
-//                         &message.create_indirect_data_forwarding_tunnel_response);
-//                     break;
-//                 case GTP_DELETE_INDIRECT_DATA_FORWARDING_TUNNEL_RESPONSE_TYPE:
-//                     mme_s11_handle_delete_indirect_data_forwarding_tunnel_response(
-//                         xact, mme_ue,
-//                         &message.delete_indirect_data_forwarding_tunnel_response);
-//                     break;
-//                 default:
-//                     d_warn("Not implmeneted(type:%d)", message.h.type);
-//                     break;
-//             }
-//             pkbuf_free(pkbuf);
-//             break;
-//         }
-//         case MME_EVT_S11_T3_RESPONSE:
-//         case MME_EVT_S11_T3_HOLDING:
-//         {
-//             gtp_xact_timeout(event_get_param1(e), event_get(e));
-//             break;
-//         }
+/*
+ * 5.3.4.2 in Spec 23.401
+ * Under certain conditions, the current UE triggered Service Request 
+ * procedure can cause unnecessary Downlink Packet Notification messages 
+ * which increase the load of the MME.
+ *
+ * This can occur when uplink data sent in step 6 causes a response 
+ * on the downlink which arrives at the Serving GW before the Modify Bearer 
+ * Request message, step 8. This data cannot be forwarded from the Serving GW 
+ * to the eNodeB and hence it triggers a Downlink Data Notification message.
+ *
+ * If the MME receives a Downlink Data Notification after step 2 and 
+ * before step 9, the MME shall not send S1 interface paging messages
+ */
+                    if (ECM_IDLE(mme_ue))
+                    {
+                        s1ap_handle_paging(mme_ue);
+                        /* Start T3413 */
+                        tm_start(mme_ue->t3413);
+                    }
+                    break;
+                case GTP_CREATE_INDIRECT_DATA_FORWARDING_TUNNEL_RESPONSE_TYPE:
+                    mme_s11_handle_create_indirect_data_forwarding_tunnel_response(
+                        xact, mme_ue,
+                        &message.create_indirect_data_forwarding_tunnel_response);
+                    break;
+                case GTP_DELETE_INDIRECT_DATA_FORWARDING_TUNNEL_RESPONSE_TYPE:
+                    mme_s11_handle_delete_indirect_data_forwarding_tunnel_response(
+                        xact, mme_ue,
+                        &message.delete_indirect_data_forwarding_tunnel_response);
+                    break;
+                default:
+                    d_warn("Not implmeneted(type:%d)", message.h.type);
+                    break;
+            }
+            pkbuf_free(pkbuf);
+            break;
+        }
+        case MME_EVT_S11_T3_RESPONSE:
+        case MME_EVT_S11_T3_HOLDING:
+        {
+            gtp_xact_timeout(event_get_param1(e), event_get(e));
+            break;
+        }
         /******************** Added by Chi ********************/
         case MME_EVT_CHECK_OVERLOAD:
         {

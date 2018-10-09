@@ -8,9 +8,9 @@
 #include "s1ap_conv.h"
 #include "s1ap_path.h"
 #include "nas_path.h"
-// #include "mme_gtp_path.h"
+#include "mme_gtp_path.h"
 
-// #include "mme_s11_build.h"
+#include "mme_s11_build.h"
 #include "s1ap_build.h"
 #include "s1ap_handler.h"
 
@@ -1199,9 +1199,9 @@ void s1ap_handle_initial_context_setup_response(
         e_rab = &ie2->value.choice.E_RABSetupItemCtxtSURes;
         d_assert(e_rab, return, "Null param");
 
-        // sess = mme_sess_find_by_ebi(mme_ue, e_rab->e_RAB_ID);
+        sess = mme_sess_find_by_ebi(mme_ue, e_rab->e_RAB_ID);
         d_assert(sess, return, "Null param");
-        // bearer = mme_default_bearer_in_sess(sess);
+        bearer = mme_default_bearer_in_sess(sess);
         d_assert(bearer, return, "Null param");
         memcpy(&bearer->enb_s1u_teid, e_rab->gTP_TEID.buf, 
                 sizeof(bearer->enb_s1u_teid));
@@ -1216,14 +1216,14 @@ void s1ap_handle_initial_context_setup_response(
         if (FSM_CHECK(&bearer->sm, esm_state_active))
         {
             d_trace(5, "    NAS_EPS Type[%d]\n", mme_ue->nas_eps.type);
-            // int uli_presence = 0;
+            int uli_presence = 0;
             if (mme_ue->nas_eps.type != MME_EPS_TYPE_ATTACH_REQUEST)
             {
                 d_trace(5, "    ### ULI PRESENT ###\n");
-                // uli_presence = 1;
+                uli_presence = 1;
             }
-            // rv = mme_gtp_send_modify_bearer_request(bearer, uli_presence);
-            // d_assert(rv == CORE_OK, return, "gtp send failed");
+            rv = mme_gtp_send_modify_bearer_request(bearer, uli_presence);
+            d_assert(rv == CORE_OK, return, "gtp send failed");
         }
         
     }

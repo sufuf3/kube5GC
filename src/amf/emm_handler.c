@@ -14,7 +14,7 @@
 #include "s1ap_path.h"
 #include "nas_path.h"
 #include "mme_fd_path.h"
-// #include "mme_gtp_path.h"
+#include "mme_gtp_path.h"
 
 #include "emm_handler.h"
 

@@ -112,10 +112,10 @@ status_t esm_build_activate_default_bearer_context_request(
     d_assert(mme_ue, return CORE_ERROR, "Null param");
     pdn = sess->pdn;
     d_assert(pdn, return CORE_ERROR, "Null param");
-    // bearer = mme_default_bearer_in_sess(sess);
+    bearer = mme_default_bearer_in_sess(sess);
     d_assert(bearer, return CORE_ERROR, "Null param");
-    // d_assert(mme_bearer_next(bearer) == NULL,
-    //         return CORE_ERROR, "there is dedicated bearer");
+    d_assert(mme_bearer_next(bearer) == NULL,
+            return CORE_ERROR, "there is dedicated bearer");
 
     d_trace(3, "[ESM] Activate default bearer context request\n");
     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
@@ -221,7 +221,7 @@ status_t esm_build_activate_dedicated_bearer_context_request(
     d_assert(bearer, return CORE_ERROR, "Null param");
     mme_ue = bearer->mme_ue;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
-    // linked_bearer = mme_linked_bearer(bearer); 
+    linked_bearer = mme_linked_bearer(bearer); 
     d_assert(linked_bearer, return CORE_ERROR, "Null param");
 
     d_trace(3, "[ESM] Activate dedicated bearer context request\n");

@@ -369,31 +369,31 @@ status_t emm_build_tau_accept(pkbuf_t **emmbuf, mme_ue_t *mme_ue)
     tau_accept->presencemask |= 
         NAS_TRACKING_AREA_UPDATE_ACCEPT_EPS_BEARER_CONTEXT_STATUS_PRESENT;
     tau_accept->eps_bearer_context_status.length = 2;
-    // sess = mme_sess_first(mme_ue);
+    sess = mme_sess_first(mme_ue);
     while(sess)
     {
-        // mme_bearer_t *bearer = mme_bearer_first(sess);
-        // while(bearer)
-        // {
-        //     switch(bearer->ebi)
-        //     {
-        //         case 5: tau_accept->eps_bearer_context_status.ebi5 = 1; break;
-        //         case 6: tau_accept->eps_bearer_context_status.ebi6 = 1; break;
-        //         case 7: tau_accept->eps_bearer_context_status.ebi7 = 1; break;
-        //         case 8: tau_accept->eps_bearer_context_status.ebi8 = 1; break;
-        //         case 9: tau_accept->eps_bearer_context_status.ebi9 = 1; break;
-        //         case 10: tau_accept->eps_bearer_context_status.ebi10 = 1; break;
-        //         case 11: tau_accept->eps_bearer_context_status.ebi11 = 1; break;
-        //         case 12: tau_accept->eps_bearer_context_status.ebi12 = 1; break;
-        //         case 13: tau_accept->eps_bearer_context_status.ebi13 = 1; break;
-        //         case 14: tau_accept->eps_bearer_context_status.ebi14 = 1; break;
-        //         case 15: tau_accept->eps_bearer_context_status.ebi15 = 1; break;
-        //         default: break;
-        //     }
+        mme_bearer_t *bearer = mme_bearer_first(sess);
+        while(bearer)
+        {
+            switch(bearer->ebi)
+            {
+                case 5: tau_accept->eps_bearer_context_status.ebi5 = 1; break;
+                case 6: tau_accept->eps_bearer_context_status.ebi6 = 1; break;
+                case 7: tau_accept->eps_bearer_context_status.ebi7 = 1; break;
+                case 8: tau_accept->eps_bearer_context_status.ebi8 = 1; break;
+                case 9: tau_accept->eps_bearer_context_status.ebi9 = 1; break;
+                case 10: tau_accept->eps_bearer_context_status.ebi10 = 1; break;
+                case 11: tau_accept->eps_bearer_context_status.ebi11 = 1; break;
+                case 12: tau_accept->eps_bearer_context_status.ebi12 = 1; break;
+                case 13: tau_accept->eps_bearer_context_status.ebi13 = 1; break;
+                case 14: tau_accept->eps_bearer_context_status.ebi14 = 1; break;
+                case 15: tau_accept->eps_bearer_context_status.ebi15 = 1; break;
+                default: break;
+            }
 
-        //     bearer = mme_bearer_next(bearer);
-        // }
-        // sess = mme_sess_next(sess);
+            bearer = mme_bearer_next(bearer);
+        }
+        sess = mme_sess_next(sess);
     }
 
 #if 0 /* Need not to include T3402 */

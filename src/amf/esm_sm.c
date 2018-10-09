@@ -10,9 +10,9 @@
 #include "emm_handler.h"
 #include "esm_build.h"
 #include "esm_handler.h"
-// #include "mme_s11_handler.h"
+#include "mme_s11_handler.h"
 #include "nas_path.h"
-// #include "mme_gtp_path.h"
+#include "mme_gtp_path.h"
 
 void esm_state_initial(fsm_t *s, event_t *e)
 {
@@ -42,7 +42,7 @@ void esm_state_inactive(fsm_t *s, event_t *e)
 
     mme_sm_trace(3, e);
 
-    // bearer = mme_bearer_find(event_get_param1(e));
+    bearer = mme_bearer_find(event_get_param1(e));
     d_assert(bearer, return, "Null param");
     sess = bearer->sess;
     d_assert(sess, return, "Null param");
@@ -104,8 +104,8 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                      *          E-RAB Setup Response is received */
                     if (MME_HAVE_ENB_S1U_PATH(bearer))
                     {
-                        // rv = mme_gtp_send_modify_bearer_request(bearer, 0);
-                        // d_assert(rv == CORE_OK,, "gtp send failed");
+                        rv = mme_gtp_send_modify_bearer_request(bearer, 0);
+                        d_assert(rv == CORE_OK,, "gtp send failed");
                     }
 
                     rv = nas_send_activate_all_dedicated_bearers(bearer);
@@ -124,8 +124,8 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                      *          E-RAB Setup Response is received */
                     if (MME_HAVE_ENB_S1U_PATH(bearer))
                     {
-                        // rv = mme_gtp_send_create_bearer_response(bearer);
-                        // d_assert(rv == CORE_OK,, "gtp send failed");
+                        rv = mme_gtp_send_create_bearer_response(bearer);
+                        d_assert(rv == CORE_OK,, "gtp send failed");
                     }
 
                     FSM_TRAN(s, esm_state_active);
@@ -161,7 +161,7 @@ void esm_state_active(fsm_t *s, event_t *e)
 
     mme_sm_trace(3, e);
 
-    // bearer = mme_bearer_find(event_get_param1(e));
+    bearer = mme_bearer_find(event_get_param1(e));
     d_assert(bearer, return, "Null param");
     sess = bearer->sess;
     d_assert(sess, return, "Null param");
@@ -208,9 +208,9 @@ void esm_state_active(fsm_t *s, event_t *e)
                             mme_ue->imsi_bcd, sess->pti, bearer->ebi);
                     if (MME_HAVE_SGW_S1U_PATH(sess))
                     {
-                        // rv = mme_gtp_send_delete_session_request(sess);
-                        // d_assert(rv == CORE_OK, return,
-                        //         "mme_gtp_send_delete_session_request error");
+                        rv = mme_gtp_send_delete_session_request(sess);
+                        d_assert(rv == CORE_OK, return,
+                                "mme_gtp_send_delete_session_request error");
                     }
                     else
                     {
@@ -227,9 +227,9 @@ void esm_state_active(fsm_t *s, event_t *e)
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
                             mme_ue->imsi_bcd, sess->pti, bearer->ebi);
 
-                    // rv = mme_gtp_send_update_bearer_response(bearer);
-                    // d_assert(rv == CORE_OK, return,
-                    //         "mme_gtp_send_update_session_request error");
+                    rv = mme_gtp_send_update_bearer_response(bearer);
+                    d_assert(rv == CORE_OK, return,
+                            "mme_gtp_send_update_session_request error");
                     break;
                 }
                 case NAS_DEACTIVATE_EPS_BEARER_CONTEXT_ACCEPT:
@@ -238,9 +238,9 @@ void esm_state_active(fsm_t *s, event_t *e)
                             "context accept\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
                             mme_ue->imsi_bcd, sess->pti, bearer->ebi);
-                    // rv = mme_gtp_send_delete_bearer_response(bearer);
-                    // d_assert(rv == CORE_OK, return,
-                    //         "mme_gtp_send_delete_session_request error");
+                    rv = mme_gtp_send_delete_bearer_response(bearer);
+                    d_assert(rv == CORE_OK, return,
+                            "mme_gtp_send_delete_session_request error");
                     FSM_TRAN(s, esm_state_bearer_deactivated);
                     break;
                 }
@@ -273,7 +273,7 @@ void esm_state_pdn_will_disconnect(fsm_t *s, event_t *e)
 
     mme_sm_trace(3, e);
 
-    // bearer = mme_bearer_find(event_get_param1(e));
+    bearer = mme_bearer_find(event_get_param1(e));
     d_assert(bearer, return, "Null param");
     sess = bearer->sess;
     d_assert(sess, return, "Null param");

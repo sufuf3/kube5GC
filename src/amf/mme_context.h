@@ -655,8 +655,8 @@ struct _mme_ue_t {
 };
 
 #define MME_HAVE_SGW_S1U_PATH(__sESS) \
-    0// ((__sESS) && (mme_bearer_first(__sESS)) && 
-    //  ((mme_default_bearer_in_sess(__sESS)->sgw_s1u_teid)))
+    ((__sESS) && (mme_bearer_first(__sESS)) && \
+    ((mme_default_bearer_in_sess(__sESS)->sgw_s1u_teid)))
 
 #define CLEAR_SGW_S1U_PATH(__sESS) \
     do { \
@@ -674,6 +674,7 @@ struct _mme_ue_t {
         d_assert((__mME), break, "Null param"); \
         (__mME)->sgw_s11_teid = 0; \
     } while(0)
+
 typedef struct _mme_sess_t {
     lnode_t         node;       /* A node of list_t */
     index_t         index;      /* An index of this node */
@@ -705,9 +706,9 @@ typedef struct _mme_sess_t {
 } mme_sess_t;
 
 #define BEARER_CONTEXT_IS_ACTIVE(__mME)  \
-    0// (mme_bearer_is_inactive(__mME) == 0)
+    (mme_bearer_is_inactive(__mME) == 0)
 #define CLEAR_BEARER_CONTEXT(__mME)   \
-    0// mme_bearer_set_inactive(__mME)
+    mme_bearer_set_inactive(__mME)
 
 #define MME_HAVE_ENB_S1U_PATH(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_s1u_teid))

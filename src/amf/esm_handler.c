@@ -6,7 +6,7 @@
 
 #include "mme_context.h"
 #include "nas_path.h"
-// #include "mme_gtp_path.h"
+#include "mme_gtp_path.h"
 
 #include "esm_build.h"
 
@@ -87,9 +87,9 @@ status_t esm_handle_pdn_connectivity_request(mme_bearer_t *bearer,
 
     if (sess->pdn)
     {
-        // d_trace(5, "    APN[%s]\n", sess->pdn->apn);
-        // rv = mme_gtp_send_create_session_request(sess);
-        // d_assert(rv == CORE_OK, return CORE_ERROR, "gtp send failed");
+        d_trace(5, "    APN[%s]\n", sess->pdn->apn);
+        rv = mme_gtp_send_create_session_request(sess);
+        d_assert(rv == CORE_OK, return CORE_ERROR, "gtp send failed");
     }
     else
     {
@@ -138,8 +138,8 @@ status_t esm_handle_information_response(mme_sess_t *sess,
         }
         else
         {
-            // rv = mme_gtp_send_create_session_request(sess);
-            // d_assert(rv == CORE_OK, return CORE_ERROR, "gtp send failed");
+            rv = mme_gtp_send_create_session_request(sess);
+            d_assert(rv == CORE_OK, return CORE_ERROR, "gtp send failed");
         }
     }
     else

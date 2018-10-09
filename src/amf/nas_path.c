@@ -70,14 +70,14 @@ status_t nas_send_attach_accept(mme_ue_t *mme_ue)
     pkbuf_t *esmbuf = NULL, *emmbuf = NULL, *s1apbuf = NULL;
 
     d_assert(mme_ue, return CORE_ERROR, "Null param");
-    // sess = mme_sess_first(mme_ue);
+    sess = mme_sess_first(mme_ue);
     d_assert(sess, return CORE_ERROR, "Null param");
-    // d_assert(mme_sess_next(sess) == NULL,
-    //         return CORE_ERROR, "there is another session");
-    // bearer = mme_default_bearer_in_sess(sess);
+    d_assert(mme_sess_next(sess) == NULL,
+            return CORE_ERROR, "there is another session");
+    bearer = mme_default_bearer_in_sess(sess);
     d_assert(bearer, return CORE_ERROR, "Null param");
-    // d_assert(mme_bearer_next(bearer) == NULL,
-            // return CORE_ERROR, "there is dedicated bearer");
+    d_assert(mme_bearer_next(bearer) == NULL,
+            return CORE_ERROR, "there is dedicated bearer");
 
     rv = esm_build_activate_default_bearer_context_request(&esmbuf, sess);
     d_assert(rv == CORE_OK && esmbuf, return CORE_ERROR, "esm build error");
@@ -108,7 +108,7 @@ status_t nas_send_attach_reject(mme_ue_t *mme_ue,
     d_trace(3, "[EMM] Attach reject\n");
     d_trace(5, "    IMSI[%s] Cause[%d]\n", mme_ue->imsi_bcd, emm_cause);
 
-    // sess = mme_sess_first(mme_ue);
+    sess = mme_sess_first(mme_ue);
     if (sess)
     {
         rv = esm_build_pdn_connectivity_reject(&esmbuf, sess, esm_cause);
@@ -313,8 +313,7 @@ status_t nas_send_activate_all_dedicated_bearers(mme_bearer_t *default_bearer)
 
     d_assert(default_bearer, return CORE_ERROR, "Null param");
 
-    mme_bearer_t *dedicated_bearer = default_bearer ;
-    // = mme_bearer_next(default_bearer);
+    mme_bearer_t *dedicated_bearer = mme_bearer_next(default_bearer);
     while(dedicated_bearer)
     {
         rv = nas_send_activate_dedicated_bearer_context_request(
@@ -322,7 +321,7 @@ status_t nas_send_activate_all_dedicated_bearers(mme_bearer_t *default_bearer)
         d_assert(rv == CORE_OK, return CORE_ERROR,
             "nas_send_activate_dedicated_bearer_context failed");
 
-        // dedicated_bearer = mme_bearer_next(dedicated_bearer);
+        dedicated_bearer = mme_bearer_next(dedicated_bearer);
     }
 
     return CORE_OK;
