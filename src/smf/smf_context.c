@@ -9,10 +9,12 @@
 #include "3gpp_types.h"
 #include "app/context.h"
 
+#include <time.h>
 #include <yaml.h>
 #include "app/yaml_helper.h"
 
 #include "gtp/gtp_node.h"
+#include "pfcp/pfcp_node.h"
 
 #include "smf_context.h"
 
@@ -23,6 +25,11 @@ index_declare(smf_sess_pool, smf_sess_t, MAX_POOL_OF_SESS);
 index_declare(smf_bearer_pool, smf_bearer_t, MAX_POOL_OF_BEARER);
 
 pool_declare(smf_subnet_pool, smf_subnet_t, MAX_NUM_OF_SUBNET);
+
+index_declare(smf_pdr_pool, smf_pdr_t, MAX_POOL_OF_SESS * 2);
+index_declare(smf_far_pool, smf_far_t, MAX_POOL_OF_SESS);
+index_declare(smf_urr_pool, smf_urr_t, MAX_POOL_OF_SESS);
+index_declare(smf_qer_pool, smf_qer_t, MAX_POOL_OF_SESS);
 
 status_t smf_context_init()
 {
@@ -35,12 +42,25 @@ status_t smf_context_init()
     index_init(&smf_sess_pool, MAX_POOL_OF_SESS);
     index_init(&smf_bearer_pool, MAX_POOL_OF_BEARER);
     
+    index_init(&smf_pdr_pool, MAX_POOL_OF_SESS * 2);
+    index_init(&smf_far_pool, MAX_POOL_OF_SESS);
+    index_init(&smf_urr_pool, MAX_POOL_OF_SESS);
+    index_init(&smf_qer_pool, MAX_POOL_OF_SESS);
+    
     list_init(&self.gtpc_list);
     list_init(&self.gtpc_list6);
     gtp_node_init();
     
+    list_init(&self.pfcp_list);
+    list_init(&self.pfcp_list6);
+    list_init(&self.upf_n4_list);
+    pfcp_node_init();
+    
     list_init(&self.subnet_list);
     pool_init(&smf_subnet_pool, MAX_NUM_OF_SUBNET);
+    
+    self.start_time = time((time_t*)NULL);
+    self.cp_function_features = 0;
     
     self.sess_hash = hash_make();
 
@@ -56,10 +76,19 @@ status_t smf_context_final()
 
     index_final(&smf_sess_pool);
     index_final(&smf_bearer_pool);
+
+    index_final(&smf_pdr_pool);
+    index_final(&smf_far_pool);
+    index_final(&smf_urr_pool);
+    index_final(&smf_qer_pool);
     
     sock_remove_all_nodes(&self.gtpc_list);
     sock_remove_all_nodes(&self.gtpc_list6);
     gtp_node_final();
+    
+    sock_remove_all_nodes(&self.pfcp_list);
+    sock_remove_all_nodes(&self.pfcp_list6);
+    pfcp_node_final();
 
     pool_final(&smf_subnet_pool);
     smf_subnet_remove_all();
@@ -79,6 +108,7 @@ smf_context_t* smf_self()
 static status_t smf_context_prepare()
 {
     self.gtpc_port = GTPV2_C_UDP_PORT;
+    self.pfcp_port = PFCP_UDP_PORT;
 
     return CORE_OK;
 }
@@ -95,6 +125,19 @@ static status_t smf_context_validation()
     if (list_first(&self.subnet_list) == NULL)
     {
         d_error("No smf.ue_pool in '%s'",
+                context_self()->config.path);
+        return CORE_ERROR;
+    }
+    if (list_first(&self.pfcp_list) == NULL &&
+        list_first(&self.pfcp_list6) == NULL)
+    {
+        d_error("No smf.pfcp in '%s'",
+                context_self()->config.path);
+        return CORE_ERROR;
+    }
+    if (list_first(&self.upf_n4_list) == NULL)
+    {
+        d_error("No smf.upf in '%s'",
                 context_self()->config.path);
         return CORE_ERROR;
     }
@@ -349,6 +392,205 @@ status_t smf_context_parse_config()
                     } while(yaml_iter_type(&ue_pool_array) ==
                             YAML_SEQUENCE_NODE);
                 }
+                if (!strcmp(smf_key, "pfcp"))
+                {
+                    yaml_iter_t pfcp_array, pfcp_iter;
+                    yaml_iter_recurse(&smf_iter, &pfcp_array);
+                    do
+                    {
+                        int family = AF_UNSPEC;
+                        int i, num = 0;
+                        const char *hostname[MAX_NUM_OF_HOSTNAME];
+                        c_uint16_t port = self.pfcp_port;
+                        c_sockaddr_t *list = NULL;
+                        sock_node_t *node = NULL;
+
+                        if (yaml_iter_type(&pfcp_array) == YAML_MAPPING_NODE)
+                        {
+                            memcpy(&pfcp_iter, &pfcp_array,
+                                    sizeof(yaml_iter_t));
+                        }
+                        else if (yaml_iter_type(&pfcp_array) ==
+                            YAML_SEQUENCE_NODE)
+                        {
+                            if (!yaml_iter_next(&pfcp_array))
+                                break;
+                            yaml_iter_recurse(&pfcp_array, &pfcp_iter);
+                        }
+                        else if (yaml_iter_type(&pfcp_array) ==
+                            YAML_SCALAR_NODE)
+                        {
+                            break;
+                        }
+                        else
+                            d_assert(0, return CORE_ERROR,);
+
+                        while(yaml_iter_next(&pfcp_iter))
+                        {
+                            const char *pfcp_key =
+                                yaml_iter_key(&pfcp_iter);
+                            d_assert(pfcp_key,
+                                    return CORE_ERROR,);
+                            if (!strcmp(pfcp_key, "addr") ||
+                                    !strcmp(pfcp_key, "name"))
+                            {
+                                yaml_iter_t hostname_iter;
+                                yaml_iter_recurse(&pfcp_iter, &hostname_iter);
+                                d_assert(yaml_iter_type(&hostname_iter) !=
+                                    YAML_MAPPING_NODE, return CORE_ERROR,);
+
+                                do
+                                {
+                                    if (yaml_iter_type(&hostname_iter) ==
+                                            YAML_SEQUENCE_NODE)
+                                    {
+                                        if (!yaml_iter_next(&hostname_iter))
+                                            break;
+                                    }
+
+                                    d_assert(num <= MAX_NUM_OF_HOSTNAME,
+                                            return CORE_ERROR,);
+                                    hostname[num++] = 
+                                        yaml_iter_value(&hostname_iter);
+                                } while(
+                                    yaml_iter_type(&hostname_iter) ==
+                                        YAML_SEQUENCE_NODE);
+                            }
+                            else
+                                d_warn("unknown key `%s`", pfcp_key);
+                        }
+
+                        list = NULL;
+                        for (i = 0; i < num; i++)
+                        {
+                            rv = core_addaddrinfo(&list,
+                                    family, hostname[i], port, 0);
+                            d_assert(rv == CORE_OK, return CORE_ERROR,);
+                        }
+
+                        if (list)
+                        {
+                            if (context_self()->parameter.no_ipv4 == 0)
+                            {
+                                rv = sock_add_node(&self.pfcp_list,
+                                        &node, list, AF_INET);
+                                d_assert(rv == CORE_OK, return CORE_ERROR,);
+                            }
+
+                            if (context_self()->parameter.no_ipv6 == 0)
+                            {
+                                rv = sock_add_node(&self.pfcp_list6,
+                                        &node, list, AF_INET6);
+                                d_assert(rv == CORE_OK, return CORE_ERROR,);
+                            }
+
+                            core_freeaddrinfo(list);
+                        }
+
+                    } while(yaml_iter_type(&pfcp_array) == YAML_SEQUENCE_NODE);
+
+                    if (list_first(&self.pfcp_list) == NULL &&
+                        list_first(&self.pfcp_list6) == NULL)
+                    {
+                        rv = sock_probe_node(
+                                context_self()->parameter.no_ipv4 ?
+                                    NULL : &self.pfcp_list,
+                                context_self()->parameter.no_ipv6 ?
+                                    NULL : &self.pfcp_list6,
+                                NULL, self.pfcp_port);
+                        d_assert(rv == CORE_OK, return CORE_ERROR,);
+                    }
+                }
+                else if (!strcmp(smf_key, "upf"))
+                {
+                    yaml_iter_t upf_array, upf_iter;
+                    yaml_iter_recurse(&smf_iter, &upf_array);
+                    do
+                    {
+                        int family = AF_UNSPEC;
+                        int i, num = 0;
+                        const char *hostname[MAX_NUM_OF_HOSTNAME];
+                        c_uint16_t port = self.pfcp_port;
+                        //const char *dev = NULL;
+                        c_sockaddr_t *list = NULL;
+                        pfcp_node_t *upf = NULL;
+
+                        if (yaml_iter_type(&upf_array) == YAML_MAPPING_NODE)
+                        {
+                            memcpy(&upf_iter, &upf_array,
+                                    sizeof(yaml_iter_t));
+                        }
+                        else if (yaml_iter_type(&upf_array) ==
+                            YAML_SEQUENCE_NODE)
+                        {
+                            if (!yaml_iter_next(&upf_array))
+                                break;
+                            yaml_iter_recurse(&upf_array, &upf_iter);
+                        }
+                        else if (yaml_iter_type(&upf_array) ==
+                            YAML_SCALAR_NODE)
+                        {
+                            break;
+                        }
+                        else
+                            d_assert(0, return CORE_ERROR,);
+
+                        while(yaml_iter_next(&upf_iter))
+                        {
+                            const char *upf_key =
+                                yaml_iter_key(&upf_iter);
+                            d_assert(upf_key,
+                                    return CORE_ERROR,);
+                            if (!strcmp(upf_key, "addr") ||
+                                    !strcmp(upf_key, "name"))
+                            {
+                                yaml_iter_t hostname_iter;
+                                yaml_iter_recurse(&upf_iter, &hostname_iter);
+                                d_assert(yaml_iter_type(&hostname_iter) !=
+                                    YAML_MAPPING_NODE, return CORE_ERROR,);
+
+                                do
+                                {
+                                    if (yaml_iter_type(&hostname_iter) ==
+                                            YAML_SEQUENCE_NODE)
+                                    {
+                                        if (!yaml_iter_next(&hostname_iter))
+                                            break;
+                                    }
+
+                                    d_assert(num <= MAX_NUM_OF_HOSTNAME,
+                                            return CORE_ERROR,);
+                                    hostname[num++] = 
+                                        yaml_iter_value(&hostname_iter);
+                                } while(
+                                    yaml_iter_type(&hostname_iter) ==
+                                        YAML_SEQUENCE_NODE);
+                            }
+                            else
+                                d_warn("unknown key `%s`", upf_key);
+                        }
+
+                        list = NULL;
+                        for (i = 0; i < num; i++)
+                        {
+                            rv = core_addaddrinfo(&list,
+                                    family, hostname[i], port, 0);
+                            d_assert(rv == CORE_OK, return CORE_ERROR,);
+                        }
+
+                        if (list)
+                        {
+                            rv = pfcp_add_node(&self.upf_n4_list, &upf, list,
+                                context_self()->parameter.no_ipv4,
+                                context_self()->parameter.no_ipv6,
+                                context_self()->parameter.prefer_ipv4);
+                            d_assert(rv == CORE_OK, return CORE_ERROR,);
+
+                            core_freeaddrinfo(list);
+                        }
+
+                    } while(yaml_iter_type(&upf_array) == YAML_SEQUENCE_NODE);
+                }
             }
         }
     }
@@ -363,6 +605,7 @@ status_t smf_context_setup_trace_module()
 {
     int app = context_self()->logger.trace.app;
     int gtpv2 = context_self()->logger.trace.gtpv2;
+    int pfcp = context_self()->logger.trace.pfcp;
 
     if (app)
     {
@@ -388,6 +631,22 @@ status_t smf_context_setup_trace_module()
 
         extern int _tlv_msg;
         d_trace_level(&_tlv_msg, gtpv2);
+    }
+    
+    if (pfcp)
+    {
+        extern int _pfcp_node;
+        d_trace_level(&_pfcp_node, pfcp);
+        extern int _pfcp_message;
+        d_trace_level(&_pfcp_message, pfcp);
+        extern int _pfcp_path;
+        d_trace_level(&_pfcp_path, pfcp);
+        extern int _pfcp_xact;
+        d_trace_level(&_pfcp_xact, pfcp);
+        extern int _smf_n4_handler;
+        d_trace_level(&_smf_n4_handler, pfcp);
+        extern int _smf_n4_build;
+        d_trace_level(&_smf_n4_build, pfcp);
     }
     return CORE_OK;
 }
@@ -526,6 +785,26 @@ smf_sess_t* smf_sess_add(
             imsi, imsi_len, apn);
     hash_set(self.sess_hash, sess->hash_keybuf, sess->hash_keylen, sess);
     
+    sess->upf_node = list_first(&smf_self()->upf_n4_list);
+    
+    smf_pdr_t *ul_pdr = smf_pdr_add(bearer);
+    sess->ul_pdr = ul_pdr;
+    ul_pdr->precedence = PGWC_PRECEDENCE_BASE;
+    ul_pdr->outer_header_removal = PFCP_OUTER_HDR_RMV_DESC_GTPU_IP4;
+    ul_pdr->source_interface = PFCP_SRC_INTF_ACCESS;
+    ul_pdr->far = smf_far_add(bearer);
+    ul_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
+    ul_pdr->far->destination_interface = PFCP_FAR_DEST_INTF_CORE;
+    
+    smf_pdr_t *dl_pdr = smf_pdr_add(bearer);
+    sess->dl_pdr = dl_pdr;
+    dl_pdr->precedence = PGWC_PRECEDENCE_BASE;
+    dl_pdr->outer_header_removal = PFCP_OUTER_HDR_RMV_DESC_NULL;
+    dl_pdr->source_interface = PFCP_SRC_INTF_CORE;
+    dl_pdr->far = smf_far_add(bearer);
+    dl_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
+    dl_pdr->far->destination_interface = PFCP_FAR_DEST_INTF_ACCESS;
+    
     return sess;
 }
 
@@ -589,6 +868,21 @@ smf_sess_t* smf_sess_find_by_imsi_apn(
     return (smf_sess_t *)hash_get(self.sess_hash, keybuf, keylen);
 }
 
+smf_sess_t* smf_sess_find(index_t index)
+{
+    return index_find(&smf_sess_pool, index);
+}
+
+smf_sess_t* smf_sess_find_by_seid(c_uint64_t seid)
+{
+    return smf_sess_find(seid & 0xFFFFFFFF);
+}
+
+smf_sess_t* smf_sess_find_by_teid(c_uint32_t teid)
+{
+    return smf_sess_find(teid);
+}
+
 smf_bearer_t* smf_bearer_add(smf_sess_t *sess)
 {
     smf_bearer_t *bearer = NULL;
@@ -610,8 +904,154 @@ smf_bearer_t* smf_bearer_add(smf_sess_t *sess)
     return bearer;
 }
 
+smf_pdr_t* smf_pdr_add(smf_bearer_t *bearer)
+{
+    smf_pdr_t *pdr = NULL;
+
+    d_assert(bearer, return NULL, "Null param");
+
+    index_alloc(&smf_pdr_pool, &pdr);
+    d_assert(pdr, return NULL, "PDR context allocation failed");
+
+    pdr->pdr_id = htons(pdr->index);
+    
+    pdr->bearer = bearer;
+
+    return pdr;
+}
+
+status_t smf_pdr_remove(smf_pdr_t *pdr)
+{
+    d_assert(pdr, return CORE_ERROR, "Null param");
+    d_assert(pdr->bearer, return CORE_ERROR, "Null param");
+    d_assert(pdr->bearer->sess, return CORE_ERROR, "Null param");
+
+    if (pdr->far)
+    {
+        smf_far_remove(pdr->far);
+    }    
+
+    index_free(&smf_pdr_pool, pdr);
+
+    return CORE_OK;
+}
+
+smf_pdr_t* smf_pdr_find(index_t index)
+{
+    d_assert(index, return NULL, "Invalid Index");
+    return index_find(&smf_pdr_pool, index);
+}
+
+smf_pdr_t* smf_pdr_find_by_pdr_id(c_uint16_t pdr_id)
+{
+    return smf_pdr_find(pdr_id);
+}
+
+smf_far_t* smf_far_add(smf_bearer_t *bearer)
+{
+    smf_far_t *far = NULL;
+
+    d_assert(bearer, return NULL, "Null param");
+
+    index_alloc(&smf_far_pool, &far);
+    d_assert(far, return NULL, "FAR context allocation failed");
+
+    far->far_id = htonl(far->index);
+    
+    far->bearer = bearer;
+
+
+    return far;
+}
+
+status_t smf_far_remove(smf_far_t *far)
+{
+    d_assert(far, return CORE_ERROR, "Null param");
+
+    index_free(&smf_far_pool, far);
+
+    return CORE_OK;
+}
+
+
 status_t smf_ue_pool_generate()
 {
+    int j;
+    smf_subnet_t *subnet = NULL;
+
+    for (subnet = smf_subnet_first(); subnet; subnet = smf_subnet_next(subnet))
+    {
+        int index = 0;
+        c_uint32_t mask_count;
+        c_uint32_t broadcast[4];
+
+        if (subnet->family == AF_INET)
+        {
+            if (subnet->prefixlen == 32)
+                mask_count = 1;
+            else if (subnet->prefixlen < 32)
+                mask_count = (0xffffffff >> subnet->prefixlen) + 1;
+            else
+                d_assert(0, return CORE_ERROR,);
+        }
+        else if (subnet->family == AF_INET6)
+        {
+            if (subnet->prefixlen == 128)
+                mask_count = 1;
+            else if (subnet->prefixlen > 96 && subnet->prefixlen < 128)
+                mask_count = (0xffffffff >> (subnet->prefixlen - 96)) + 1;
+            else if (subnet->prefixlen <= 96)
+                mask_count = 0xffffffff;
+            else
+                d_assert(0, return CORE_ERROR,);
+        }
+        else
+            d_assert(0, return CORE_ERROR,);
+        
+        for (j = 0; j < 4; j++)
+        {
+            broadcast[j] = subnet->sub.sub[j] + ~subnet->sub.mask[j];
+        }
+
+        for (j = 0; j < mask_count && index < MAX_POOL_OF_SESS; j++)
+        {
+            smf_ue_ip_t *ue_ip = NULL;
+            int maxbytes = 0;
+            int lastindex = 0;
+
+            ue_ip = &subnet->pool.pool[index];
+            d_assert(ue_ip, return CORE_ERROR,);
+            memset(ue_ip, 0, sizeof *ue_ip);
+
+            if (subnet->family == AF_INET)
+            {
+                maxbytes = 4;
+                lastindex = 0;
+            }
+            else if (subnet->family == AF_INET6)
+            {
+                maxbytes = 16;
+                lastindex = 3;
+            }
+
+            memcpy(ue_ip->addr, subnet->sub.sub, maxbytes);
+            ue_ip->addr[lastindex] += htonl(j);
+            ue_ip->subnet = subnet;
+
+            /* Exclude Network Address */
+            if (memcmp(ue_ip->addr, subnet->sub.sub, maxbytes) == 0) continue;
+
+            /* Exclude Broadcast Address */
+            if (memcmp(ue_ip->addr, broadcast, maxbytes) == 0) continue;
+
+            /* Exclude TUN IP Address */
+            if (memcmp(ue_ip->addr, subnet->gw.sub, maxbytes) == 0) continue;
+
+            index++;
+        }
+        subnet->pool.size = subnet->pool.avail = index;
+    }
+
     return CORE_OK;
 }
 

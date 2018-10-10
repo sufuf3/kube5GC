@@ -9,6 +9,7 @@ logger:
         diameter: 1
         gtpv2: 1
         gtp: 1
+        pfcp: 1
 
 # 
 # parameter:
@@ -346,6 +347,13 @@ smf:
     gtpc:
       - addr: 127.0.0.10
       - addr: ::1
+
+    pfcp:
+      - addr: 127.0.0.10
+      - addr: ::1
+
+    upf:
+      - addr: 127.0.0.2
 
     ue_pool:
       - addr: 45.45.0.1/16

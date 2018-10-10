@@ -6,6 +6,8 @@
 
 #include "gtp/gtp_xact.h"
 
+#include "pfcp/pfcp_xact.h"
+
 #include "smf_context.h"
 #include "smf_event.h"
 #include "smf_sm.h"
@@ -48,6 +50,8 @@ void smf_terminate(void)
 
     gtp_xact_final();
     
+    pfcp_xact_final();
+    
     smf_context_final();
 }
 
@@ -65,6 +69,8 @@ static void *THREAD_FUNC smf_main(thread_id id, void *data)
             "SMF event queue creation failed");
     tm_service_init(&smf_self()->tm_service);
     gtp_xact_init(&smf_self()->tm_service, 
+            SMF_EVT_S11_T3_RESPONSE, SMF_EVT_S11_T3_RESPONSE);
+    pfcp_xact_init(&smf_self()->tm_service, 
             SMF_EVT_S11_T3_RESPONSE, SMF_EVT_S11_T3_RESPONSE);
     fsm_create(&smf_sm, smf_state_initial, smf_state_final);
     fsm_init(&smf_sm, 0);

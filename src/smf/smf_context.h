@@ -12,6 +12,8 @@
 #include "3gpp_types.h"
 #include "gtp/gtp_node.h"
 #include "gtp/gtp_message.h"
+#include "pfcp/pfcp_types.h"
+#include "pfcp/pfcp_node.h"
 
 #include "fd/fd_lib.h"
 
@@ -31,6 +33,7 @@ typedef struct _smf_context_t {
 
     c_uint32_t          pfcp_port;      /* Default: SMF PFCP local port */
     c_uint32_t          gtpc_port;      /* Default: SMF GTP-C local port */
+    c_uint8_t           cp_function_features;
 
     list_t              gtpc_list;      /* SMF GTP-C IPv4 Server List */
     list_t              gtpc_list6;     /* SMF GTP-C IPv6 Server List */
@@ -39,7 +42,18 @@ typedef struct _smf_context_t {
     c_sockaddr_t        *gtpc_addr;     /* SMF GTP-C IPv4 Address */
     c_sockaddr_t        *gtpc_addr6;    /* SMF GTP-C IPv6 Address */
 
+    list_t              pfcp_list;      /* SMF PFCP IPv4 Server List */
+    list_t              pfcp_list6;     /* SMF PFCP IPv6 Server List */
+    sock_id             pfcp_sock;      /* SMF PFCP IPv4 Socket */
+    sock_id             pfcp_sock6;     /* SMF PFCP IPv6 Socket */
+    c_sockaddr_t        *pfcp_addr;     /* SMF PFCP IPv4 Address */
+    c_sockaddr_t        *pfcp_addr6;    /* SMF PFCP IPv6 Address */
+    pfcp_node_id_t      pfcp_node_id;   /* SMF PFCP Node ID (IPv4) */
+    pfcp_node_id_t      pfcp_node_id6;  /* SMF PFCP Node ID (IPv6) */
+    
     list_t              subnet_list;    /* SMF UE Subnet List */
+    
+    list_t              upf_n4_list;    /* UPF PFCP client List */
     
     hash_t              *sess_hash;     /* Session Hash Table (IMSI + APN) */
     
@@ -48,8 +62,16 @@ typedef struct _smf_context_t {
     tm_service_t        tm_service;     /* Timer Service */
 } smf_context_t;
 
+typedef struct _smf_far_t smf_far_t;
+typedef struct _smf_urr_t smf_urr_t;
+typedef struct _smf_qer_t smf_qer_t;
+typedef struct _smf_pdr_t smf_pdr_t;
+
 typedef struct _smf_sess_t {
     index_t         index;              /**< An index of this node */
+    
+    c_uint64_t      smf_n4_seid;    /* SMF SEID is derived from INDEX */
+    c_uint64_t      upf_n4_seid;    /* UPF SEID is received from UPF */
     
     /* User-Lication-Info */
     tai_t           tai;
@@ -69,10 +91,15 @@ typedef struct _smf_sess_t {
     c_uint8_t       hash_keybuf[MAX_SMF_SESS_HASH_LEN];
     int             hash_keylen;
     
+    /* Session Related Rules */
+    smf_pdr_t       *ul_pdr;
+    smf_pdr_t       *dl_pdr;
+    
     list_t          bearer_list;
     
     /* Related Context */
     gtp_node_t      *mme_node;
+    pfcp_node_t     *upf_node;
 } smf_sess_t;
 
 typedef struct _smf_bearer_t {
@@ -120,6 +147,43 @@ typedef struct _smf_subnet_t {
     
 } smf_subnet_t;
 
+typedef struct _smf_pdr_t {
+    index_t         index;
+    
+    c_uint16_t      pdr_id;
+    c_uint32_t      precedence;
+    c_uint8_t       outer_header_removal;
+    c_uint8_t       source_interface;
+    
+    smf_bearer_t    *bearer;
+    smf_far_t       *far;
+    smf_qer_t       *qer;
+    smf_urr_t       *urr;
+    
+    smf_sess_t      *sess;
+} smf_pdr_t;
+
+typedef struct _smf_far_t {
+    index_t         index;
+    
+    c_uint16_t      far_id;
+    c_uint8_t       apply_action;
+    c_uint8_t       destination_interface;
+    smf_bearer_t    *bearer;
+} smf_far_t;
+
+typedef struct _smf_urr_t {
+    index_t         index;
+    
+    c_uint16_t      urr_id;
+} smf_urr_t;
+
+typedef struct _smf_qer_t {
+    index_t         index;
+    
+    c_uint16_t      qer_id;
+} smf_qer_t;
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
@@ -152,6 +216,13 @@ CORE_DECLARE(hash_index_t*)     smf_sess_next(hash_index_t *hi);
 
 CORE_DECLARE(smf_bearer_t*)     smf_bearer_add(smf_sess_t *sess);
 CORE_DECLARE(status_t)          smf_bearer_remove(smf_bearer_t *bearer);
+
+CORE_DECLARE(smf_pdr_t*)        smf_pdr_add(smf_bearer_t *bearer);
+CORE_DECLARE(status_t)          smf_pdr_remove(smf_pdr_t *pdr);
+CORE_DECLARE(smf_pdr_t*)        smf_pdr_find(index_t index);
+CORE_DECLARE(smf_pdr_t*)        smf_pdr_find_by_pdr_id(c_uint16_t pdr_id);
+CORE_DECLARE(smf_far_t*)        smf_far_add(smf_bearer_t *bearer);
+CORE_DECLARE(status_t)          smf_far_remove(smf_far_t *far);
 
 CORE_DECLARE(status_t )         smf_ue_pool_generate(void);
 CORE_DECLARE(smf_ue_ip_t*)      smf_ue_ip_alloc(int family, const char *apn);
