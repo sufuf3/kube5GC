@@ -15,11 +15,6 @@ extern "C" {
 CORE_DECLARE(status_t) ngap_init(int sctp_streams, c_uint16_t port);
 CORE_DECLARE(status_t) ngap_final();
 
-// CORE_DECLARE(status_t) ngap_send_amf_configuration_update(
-//     amf_ran_t *target_ran);
-// CORE_DECLARE(status_t) ngap_send_amf_cp_relocation_indication(
-//         ran_ue_t *source_ue);
-
 CORE_DECLARE(status_t) ngap_open();
 CORE_DECLARE(status_t) ngap_close();
 
@@ -37,77 +32,6 @@ CORE_DECLARE(status_t) ngap_send_to_ran(
 CORE_DECLARE(status_t) ngap_send_to_ran_ue(ran_ue_t *ran_ue, pkbuf_t *pkbuf);
 CORE_DECLARE(status_t) ngap_delayed_send_to_ran_ue(ran_ue_t *ran_ue,
         pkbuf_t *pkbuf, c_uint32_t duration);
-
-// CORE_DECLARE(status_t) s1ap_send_to_nas(enb_ue_t *enb_ue,
-//         S1AP_ProcedureCode_t procedureCode, S1AP_NAS_PDU_t *nasPdu);
-// CORE_DECLARE(status_t) s1ap_send_to_esm(mme_ue_t *mme_ue, pkbuf_t *esmbuf);
-
-// CORE_DECLARE(status_t) s1ap_send_initial_context_setup_request(
-//         mme_ue_t *mme_ue);
-// CORE_DECLARE(status_t) s1ap_send_ue_context_release_command(
-//     enb_ue_t *enb_ue, S1AP_Cause_PR group, long cause,
-//     c_uint8_t action, c_uint32_t delay);
-
-// CORE_DECLARE(status_t) s1ap_send_ue_context_modification_request(
-// 	enb_ue_t *enb_ue);
-
-// CORE_DECLARE(status_t) s1ap_send_initial_context_setup_request(
-//         mme_ue_t *mme_ue);
-
-// CORE_DECLARE(status_t) s1ap_send_ue_context_modification_confirm(
-//         enb_ue_t *enb_ue);
-
-// CORE_DECLARE(status_t) s1ap_send_mme_configuration_transfer(
-//         mme_enb_t *target_enb,
-//         S1AP_SONConfigurationTransfer_t *SONConfigurationTransfer);
-
-// CORE_DECLARE(status_t) s1ap_send_mme_direct_information_transfer(
-// 	mme_enb_t *target_enb);
-// CORE_DECLARE(status_t) s1ap_send_ERAB_release_command(mme_enb_t *enb,
-//     c_uint32_t enb_ue_s1ap_id, c_uint32_t mme_ue_s1ap_id);
-
-// CORE_DECLARE(status_t) s1ap_send_path_switch_ack(mme_ue_t *mme_ue);
-
-// CORE_DECLARE(status_t) s1ap_send_handover_command(enb_ue_t *source_ue);
-// CORE_DECLARE(status_t) s1ap_send_handover_preparation_failure(
-//         enb_ue_t *source_ue, S1AP_Cause_t *cause);
-
-// CORE_DECLARE(status_t) s1ap_send_handover_request(
-//         mme_ue_t *mme_ue,
-//         mme_enb_t *target_enb,
-//         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
-//         S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
-//         S1AP_HandoverType_t *handovertype,
-//         S1AP_Cause_t *cause,
-//         S1AP_Source_ToTarget_TransparentContainer_t
-//             *source_totarget_transparentContainer);
-
-// CORE_DECLARE(status_t) s1ap_send_handover_cancel_ack(enb_ue_t *source_ue);
-
-// CORE_DECLARE(status_t) s1ap_send_mme_status_transfer(
-//         enb_ue_t *target_ue,
-//         S1AP_ENB_StatusTransfer_TransparentContainer_t
-//             *enb_statustransfer_transparentContainer);
-// CORE_DECLARE(status_t) s1ap_send_error_indication(
-//         mme_enb_t *enb,
-//         S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
-//         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
-//         S1AP_Cause_PR group, long cause);
-// CORE_DECLARE(status_t) s1ap_send_s1_reset_ack(
-//         mme_enb_t *enb,
-//         S1AP_UE_associatedLogicalS1_ConnectionListRes_t *partOfS1_Interface);
-// CORE_DECLARE(status_t) s1ap_send_e_rab_modification_confirm(
-//         enb_ue_t *source_ue);
-
-// CORE_DECLARE(status_t) s1ap_send_connection_establishment_indication(
-//         mme_enb_t *enb,
-//         S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
-//         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
-// 	mme_ue_t *mme_ue);
-
-// CORE_DECLARE(status_t) s1ap_send_ue_information_transfer(
-// 	mme_ue_t *mme_ue, 
-// 	S1AP_S_TMSI_t *S_TMSI);
 
 #ifdef __cplusplus
 }

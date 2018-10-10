@@ -23,7 +23,7 @@ status_t s1ap_build_ue_radio_capability_match_request(
     S1AP_UERadioCapabilityMatchRequestIEs_t *ie = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
-    //S1AP_UERadioCapability_t *UERadioCapability = NULL;//Optional
+    // S1AP_UERadioCapability_t *UERadioCapability = NULL;//Optional
     
 
     d_assert(enb_ue, return CORE_ERROR, "Null param");
@@ -1318,10 +1318,10 @@ status_t s1ap_build_initial_context_setup_request(
             &UEAggregateMaximumBitrate->uEaggregateMaximumBitRateDL, 
             subscription_data->ambr.downlink);
 
-    // sess = mme_sess_first(mme_ue);
+    sess = mme_sess_first(mme_ue);
     while(sess)
     {
-        // bearer = mme_bearer_first(sess);
+        bearer = mme_bearer_first(sess);
         while(bearer)
         {
             S1AP_E_RABToBeSetupItemCtxtSUReqIEs_t *item = NULL;
@@ -1396,9 +1396,9 @@ status_t s1ap_build_initial_context_setup_request(
                 pkbuf_free(emmbuf);
             }
 
-            // bearer = mme_bearer_next(bearer);
+            bearer = mme_bearer_next(bearer);
         }
-        // sess = mme_sess_next(sess);
+        sess = mme_sess_next(sess);
     }
 
     UESecurityCapabilities->encryptionAlgorithms.size = 2;
@@ -2841,10 +2841,10 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
 
-    // sess = mme_sess_first(mme_ue);
+    sess = mme_sess_first(mme_ue);
     while(sess)
     {
-        // bearer = mme_bearer_first(sess);
+        bearer = mme_bearer_first(sess);
         while(bearer)
         {
             S1AP_E_RABDataForwardingItem_t *e_rab = NULL;
@@ -2920,9 +2920,9 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
                 d_trace(5, "    SGW-UL-TEID[%d]\n", bearer->sgw_dl_teid);
             }
 
-            // bearer = mme_bearer_next(bearer);
+            bearer = mme_bearer_next(bearer);
         }
-        // sess = mme_sess_next(sess);
+        sess = mme_sess_next(sess);
     }
 
     ie = core_calloc(1, sizeof(S1AP_HandoverCommandIEs_t));
@@ -3180,10 +3180,10 @@ status_t s1ap_build_handover_request(
             &UEAggregateMaximumBitrate->uEaggregateMaximumBitRateDL, 
             subscription_data->ambr.downlink);
 
-    // sess = mme_sess_first(mme_ue);
+    sess = mme_sess_first(mme_ue);
     while(sess)
     {
-        // bearer = mme_bearer_first(sess);
+        bearer = mme_bearer_first(sess);
         while(bearer)
         {
             S1AP_E_RABToBeSetupItemHOReqIEs_t *item = NULL;
@@ -3244,9 +3244,9 @@ status_t s1ap_build_handover_request(
             s1ap_uint32_to_OCTET_STRING(bearer->sgw_s1u_teid, &e_rab->gTP_TEID);
             d_trace(5, "    SGW-S1U-TEID[%d]\n", bearer->sgw_s1u_teid);
 
-            // bearer = mme_bearer_next(bearer);
+            bearer = mme_bearer_next(bearer);
         }
-        // sess = mme_sess_next(sess);
+        sess = mme_sess_next(sess);
     }
 
     s1ap_buffer_to_OCTET_STRING(
@@ -3890,10 +3890,10 @@ status_t s1ap_build_ue_information_transfer(
 	c_uint8_t lowest_priority = 99;
 	c_uint8_t ebi = -1;
 		
-	// sess = mme_sess_first(mme_ue);
+	sess = mme_sess_first(mme_ue);
 	while(sess)
 	{
-	    // bearer = mme_bearer_first(sess);
+	    bearer = mme_bearer_first(sess);
 	    while(bearer)
 	    {
 	        /* Non-GBR */
@@ -3906,18 +3906,18 @@ status_t s1ap_build_ue_information_transfer(
 		    }
 		}  
 
-	        // bearer = mme_bearer_next(bearer);
+	        bearer = mme_bearer_next(bearer);
 	    }
-	    // sess = mme_sess_next(sess);
+	    sess = mme_sess_next(sess);
 	}
 		
 	/* Find bearer */
 	if (lowest_priority == 99 || ebi == -1)
 	{
-	    // sess = mme_sess_first(mme_ue);
-	    // bearer = mme_bearer_first(sess);
+	    sess = mme_sess_first(mme_ue);
+	    bearer = mme_bearer_first(sess);
 	}
-	// else  bearer = mme_bearer_find_by_ue_ebi(mme_ue, ebi);
+	else  bearer = mme_bearer_find_by_ue_ebi(mme_ue, ebi);
 
 	if (bearer)
 	{

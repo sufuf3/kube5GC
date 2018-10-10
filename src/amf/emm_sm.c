@@ -288,9 +288,9 @@ static void common_register_state(fsm_t *s, event_t *e)
             {
                 if (SESSION_CONTEXT_IS_AVAILABLE(mme_ue))
                 {
-                    // rv = mme_gtp_send_delete_all_sessions(mme_ue);
-                    // d_assert(rv == CORE_OK,,
-                    //     "mme_gtp_send_delete_all_sessions() failed");
+                    rv = mme_gtp_send_delete_all_sessions(mme_ue);
+                    d_assert(rv == CORE_OK,,
+                        "mme_gtp_send_delete_all_sessions() failed");
                 }
                 else
                 {

@@ -1619,7 +1619,7 @@ void s1ap_handle_e_rab_setup_response(
         e_rab = &ie2->value.choice.E_RABSetupItemBearerSURes;
         d_assert(e_rab, return, "Null param");
 
-        // bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
+        bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
         d_assert(bearer, return, "Null param");
 
         memcpy(&bearer->enb_s1u_teid, e_rab->gTP_TEID.buf, 
@@ -1633,22 +1633,22 @@ void s1ap_handle_e_rab_setup_response(
 
         if (FSM_CHECK(&bearer->sm, esm_state_active))
         {
-            // status_t rv;
+            status_t rv;
 
-            // mme_bearer_t *linked_bearer = mme_linked_bearer(bearer);
-            // d_assert(linked_bearer, return, "Null param");
-            // d_trace(5, "    Linked-EBI[%d]\n", linked_bearer->ebi);
+            mme_bearer_t *linked_bearer = mme_linked_bearer(bearer);
+            d_assert(linked_bearer, return, "Null param");
+            d_trace(5, "    Linked-EBI[%d]\n", linked_bearer->ebi);
 
-            // if (bearer->ebi == linked_bearer->ebi)
-            // {
-            //     rv = mme_gtp_send_modify_bearer_request(bearer, 0);
-            //     d_assert(rv == CORE_OK, return, "gtp send failed");
-            // }
-            // else
-            // {
-            //     rv = mme_gtp_send_create_bearer_response(bearer);
-            //     d_assert(rv == CORE_OK, return, "gtp send failed");
-            // }
+            if (bearer->ebi == linked_bearer->ebi)
+            {
+                rv = mme_gtp_send_modify_bearer_request(bearer, 0);
+                d_assert(rv == CORE_OK, return, "gtp send failed");
+            }
+            else
+            {
+                rv = mme_gtp_send_create_bearer_response(bearer);
+                d_assert(rv == CORE_OK, return, "gtp send failed");
+            }
         }
     }
 }
@@ -1730,31 +1730,31 @@ void s1ap_handle_e_rab_modify_response(
         e_rab = &ie2->value.choice.E_RABModifyItemBearerModRes;
         d_assert(e_rab, return, "Null param");
 
-        // bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
+        bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
         d_assert(bearer, return, "Null param");
 
-        // if (FSM_CHECK(&bearer->sm, esm_state_active))
-        // {
-        //     status_t rv;
-        //     if (bearer->enb_s1u_teid != bearer->sgw_s1u_teid)
-        //     {
-        //         //if(SecondaryRATDataUsageReportList != NULL)
-        //         {
-        //             //rv = mme_gtp_send_change_notification_request(mme_ue, NULL);
-        //             //d_assert(rv == CORE_OK, return, "gtp send failed");
-        //         }
-        // //else
-        // {
-        //     rv = mme_gtp_send_delete_session_request(bearer->sess);
-        //     d_assert(rv == CORE_OK, return, "gtp send failed");
-        // } 
-        //     }
-        //     else
-        //     {
-        //         rv = mme_gtp_send_update_bearer_response(bearer);
-        //         d_assert(rv == CORE_OK, return, "gtp send failed");
-        //     }  
-        // }
+        if (FSM_CHECK(&bearer->sm, esm_state_active))
+        {
+            status_t rv;
+            if (bearer->enb_s1u_teid != bearer->sgw_s1u_teid)
+            {
+                //if(SecondaryRATDataUsageReportList != NULL)
+                {
+                    //rv = mme_gtp_send_change_notification_request(mme_ue, NULL);
+                    //d_assert(rv == CORE_OK, return, "gtp send failed");
+                }
+        //else
+        {
+            rv = mme_gtp_send_delete_session_request(bearer->sess);
+            d_assert(rv == CORE_OK, return, "gtp send failed");
+        } 
+            }
+            else
+            {
+                rv = mme_gtp_send_update_bearer_response(bearer);
+                d_assert(rv == CORE_OK, return, "gtp send failed");
+            }  
+        }
     }
 }
 
@@ -1979,9 +1979,9 @@ void s1ap_handle_ue_context_release_complete(
             d_assert(mme_ue,,);
             if (mme_ue_have_indirect_tunnel(mme_ue))
             {
-                // rv = mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(mme_ue);
-                // d_assert(rv == CORE_OK,, "mme_gtp_send_delete_indirect_data_"
-                //     "forwarding_tunnel_request() failed");
+                rv = mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(mme_ue);
+                d_assert(rv == CORE_OK,, "mme_gtp_send_delete_indirect_data_"
+                    "forwarding_tunnel_request() failed");
             }
             else
             {
@@ -2480,7 +2480,7 @@ void s1ap_handle_path_switch_request(
         e_rab = &ie2->value.choice.E_RABToBeSwitchedDLItem;
         d_assert(e_rab, return, "Null param");
 
-        // bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
+        bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
         d_assert(bearer, return, "Cannot find e_RAB_ID[%d]", e_rab->e_RAB_ID);
 
         memcpy(&bearer->enb_s1u_teid, e_rab->gTP_TEID.buf, 
@@ -2490,11 +2490,11 @@ void s1ap_handle_path_switch_request(
                 &e_rab->transportLayerAddress, &bearer->enb_s1u_ip);
         d_assert(rv == CORE_OK, return,);
 
-        // GTP_COUNTER_INCREMENT(
-        //         mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH);
+        GTP_COUNTER_INCREMENT(
+                mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH);
 
-        // rv = mme_gtp_send_modify_bearer_request(bearer, 1);
-        // d_assert(rv == CORE_OK, return, "gtp send failed");
+        rv = mme_gtp_send_modify_bearer_request(bearer, 1);
+        d_assert(rv == CORE_OK, return, "gtp send failed");
     }
 
     /* Switch to enb */
@@ -2816,7 +2816,7 @@ void s1ap_handle_handover_request_ack(mme_enb_t *enb, s1ap_message_t *message)
         e_rab = &ie2->value.choice.E_RABAdmittedItem;
         d_assert(e_rab, return,);
 
-        // bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
+        bearer = mme_bearer_find_by_ue_ebi(mme_ue, e_rab->e_RAB_ID);
         d_assert(bearer, return,);
 
         memcpy(&bearer->target_s1u_teid, e_rab->gTP_TEID.buf, 
@@ -2855,9 +2855,9 @@ void s1ap_handle_handover_request_ack(mme_enb_t *enb, s1ap_message_t *message)
 
     if (mme_ue_have_indirect_tunnel(mme_ue) == 1)
     {
-        // rv = mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
-        //         mme_ue);
-        // d_assert(rv == CORE_OK, return, "gtp send failed");
+        rv = mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
+                mme_ue);
+        d_assert(rv == CORE_OK, return, "gtp send failed");
     }
     else
     {
@@ -3099,7 +3099,7 @@ void s1ap_handle_enb_status_transfer(mme_enb_t *enb, s1ap_message_t *message)
 
 void s1ap_handle_handover_notification(mme_enb_t *enb, s1ap_message_t *message)
 {
-    // status_t rv;
+    status_t rv;
     char buf[CORE_ADDRSTRLEN];
     int i;
 
@@ -3215,24 +3215,24 @@ void s1ap_handle_handover_notification(mme_enb_t *enb, s1ap_message_t *message)
     memcpy(&mme_ue->tai, &target_ue->nas.tai, sizeof(tai_t));
     memcpy(&mme_ue->e_cgi, &target_ue->nas.e_cgi, sizeof(e_cgi_t));
 
-    // sess = mme_sess_first(mme_ue);
+    sess = mme_sess_first(mme_ue);
     while(sess)
     {
-        // bearer = mme_bearer_first(sess);
+        bearer = mme_bearer_first(sess);
         while(bearer)
         {
             bearer->enb_s1u_teid = bearer->target_s1u_teid;
             memcpy(&bearer->enb_s1u_ip, &bearer->target_s1u_ip, sizeof(ip_t));
 
-            // GTP_COUNTER_INCREMENT(
-            //         mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY);
+            GTP_COUNTER_INCREMENT(
+                    mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY);
 
-            // rv = mme_gtp_send_modify_bearer_request(bearer, 1);
-            // d_assert(rv == CORE_OK, return, "gtp send failed");
+            rv = mme_gtp_send_modify_bearer_request(bearer, 1);
+            d_assert(rv == CORE_OK, return, "gtp send failed");
 
-            // bearer = mme_bearer_next(bearer);
+            bearer = mme_bearer_next(bearer);
         }
-        // sess = mme_sess_next(sess);
+        sess = mme_sess_next(sess);
     }
 }
 

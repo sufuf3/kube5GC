@@ -71,7 +71,7 @@ void mme_terminate(void)
 
     s1ap_final();
 
-    // gtp_xact_final();
+    gtp_xact_final();
 }
 
 static void *THREAD_FUNC sm_main(thread_id id, void *data)
@@ -87,8 +87,8 @@ static void *THREAD_FUNC sm_main(thread_id id, void *data)
     d_assert(mme_self()->queue_id, return NULL, 
             "MME event queue creation failed");
     tm_service_init(&mme_self()->tm_service);
-    // gtp_xact_init(&mme_self()->tm_service,
-    //         MME_EVT_S11_T3_RESPONSE, MME_EVT_S11_T3_HOLDING);
+    gtp_xact_init(&mme_self()->tm_service,
+            MME_EVT_S11_T3_RESPONSE, MME_EVT_S11_T3_HOLDING);
 
     fsm_create(&mme_sm, mme_state_initial, mme_state_final);
     fsm_init(&mme_sm, 0);
