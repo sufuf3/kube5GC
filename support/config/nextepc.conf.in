@@ -346,3 +346,7 @@ smf:
     gtpc:
       - addr: 127.0.0.10
       - addr: ::1
+
+    ue_pool:
+      - addr: 45.45.0.1/16
+      - addr: cafe:1::1/64

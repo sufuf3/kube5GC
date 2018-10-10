@@ -4,7 +4,10 @@
 #include "core_network.h"
 #include "core_thread.h"
 
+#include "gtp/gtp_xact.h"
+
 #include "smf_context.h"
+#include "smf_event.h"
 #include "smf_sm.h"
 
 static thread_id smf_thread;
@@ -42,6 +45,8 @@ void smf_terminate(void)
     if (!initialized) return;
 
     thread_delete(smf_thread);
+
+    gtp_xact_final();
     
     smf_context_final();
 }
@@ -59,6 +64,8 @@ static void *THREAD_FUNC smf_main(thread_id id, void *data)
     d_assert(smf_self()->queue_id, return NULL, 
             "SMF event queue creation failed");
     tm_service_init(&smf_self()->tm_service);
+    gtp_xact_init(&smf_self()->tm_service, 
+            SMF_EVT_S11_T3_RESPONSE, SMF_EVT_S11_T3_RESPONSE);
     fsm_create(&smf_sm, smf_state_initial, smf_state_final);
     fsm_init(&smf_sm, 0);
 
