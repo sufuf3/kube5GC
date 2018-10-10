@@ -51,6 +51,7 @@ nextepc-pgwd
 nextepc-sgwd
 nextepc-epcd
 nextepc-hssd
+nextepc-smfd
 
 # debian
 debian/*.debhelper.log
@@ -77,3 +78,4 @@ install
 # development env
 .idea
 .vscode
+nbproject/
