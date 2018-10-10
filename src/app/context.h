@@ -42,6 +42,7 @@ typedef struct _context_t {
             int nas;
             int gtpv2;
             int gtp;
+            int pfcp;
             int diameter;
         } trace;
     } logger;
