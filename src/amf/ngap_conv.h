@@ -16,14 +16,11 @@ CORE_DECLARE(void) ngap_uint32_to_OCTET_STRING(
 
 CORE_DECLARE(void) ngap_buffer_to_OCTET_STRING(
         void *buf, int size, OCTET_STRING_t *octet_string);
-/********************************add GNB ID convert by Hu***************************/
 
 CORE_DECLARE(void) ngap_uint32_to_GNB_ID(
         NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_GNB_ID_t *gNB_ID);
 CORE_DECLARE(void) ngap_GNB_ID_to_uint32(
         NGAP_GNB_ID_t *gNB_ID, c_uint32_t *uint32);
-
-/*********************************************************************************/
 
 CORE_DECLARE(status_t) ngap_BIT_STRING_to_ip(
         BIT_STRING_t *bit_string, ip_t *ip);

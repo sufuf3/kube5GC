@@ -9,7 +9,7 @@
 #include "nas_path.h"
 
 #include "ngap_conv.h"
-// #include "ngap_build.h"
+#include "ngap_build.h"
 #include "ngap_path.h"
 
 static status_t ngap_server_list(list_t *list, int type);

@@ -37,7 +37,9 @@ status_t mme_send_delete_session_or_ue_context_release(
 
     if (SESSION_CONTEXT_IS_AVAILABLE(mme_ue))
     {
-         rv = mme_gtp_send_delete_all_sessions(mme_ue);
+        rv = mme_gtp_send_delete_all_sessions(mme_ue);
+        d_assert(rv == CORE_OK,,
+            "mme_gtp_send_delete_all_sessions failed");
     }
     else
     {

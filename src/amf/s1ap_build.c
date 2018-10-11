@@ -677,6 +677,7 @@ status_t s1ap_build_mme_configuration_update(pkbuf_t **pkbuf)
 
 status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
 {
+    
     status_t rv;
     int i, j;
 
@@ -768,7 +769,6 @@ status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
 
     rv = s1ap_encode_pdu(pkbuf, &pdu);
     s1ap_free_pdu(&pdu);
-
     if (rv != CORE_OK)
     {
         d_error("s1ap_encode_pdu() failed");

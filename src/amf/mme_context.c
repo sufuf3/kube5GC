@@ -12,11 +12,6 @@
 #include "app/yaml_helper.h"
 
 #include "s1ap/s1ap_message.h"
-
-#include "gtp/gtp_xact.h"
-#include "gtp/gtp_node.h"
-#include "gtp/gtp_path.h"
-
 #include "gtp/gtp_xact.h"
 #include "gtp/gtp_node.h"
 #include "gtp/gtp_path.h"
@@ -34,6 +29,12 @@
 
 static amf_context_t self;
 static fd_config_t g_fd_conf;
+
+/*******************add by HU************************/
+index_declare(amf_ran_pool, amf_ran_t, MAX_NUM_OF_RAN);
+index_declare(amf_ue_pool, amf_ue_t, MAX_POOL_OF_5G_UE);
+index_declare(ran_ue_pool, ran_ue_t, MAX_NUM_OF_5G_UE);
+/****************************************************/
 
 index_declare(mme_enb_pool, mme_enb_t, MAX_NUM_OF_ENB);
 index_declare(mme_ue_pool, mme_ue_t, MAX_POOL_OF_UE);
@@ -133,8 +134,8 @@ status_t mme_context_final()
 
     index_final(&mme_enb_pool);
 
-    gtp_remove_all_nodes(&self.pgw_list);
     gtp_remove_all_nodes(&self.sgw_list);
+    gtp_remove_all_nodes(&self.pgw_list);
     gtp_node_final();
 
     sock_remove_all_nodes(&self.s1ap_list);
@@ -1759,6 +1760,145 @@ int mme_enb_sock_type(sock_id sock)
     return SOCK_STREAM;
 }
 
+/*************************add by HU***************************/
+/** ran_ue_context handlinf function **/
+
+ran_ue_t* ran_ue_add(amf_ran_t *ran)
+{
+    ran_ue_t *ran_ue = NULL;
+
+    d_assert(self.amf_ue_ngap_id_hash, return NULL, "Null param");
+    d_assert(ran, return NULL, "Null param");
+
+    index_alloc(&ran_ue_pool, &ran_ue);
+    d_assert(ran_ue, return NULL, "Null param");
+
+    ran_ue->ran_ue_ngap_id = INVALID_UE_NGAP_ID;
+    ran_ue->amf_ue_ngap_id = NEXT_ID(self.amf_ue_ngap_id, 1, 0xffffffff);
+    ran_ue->ran = ran;
+
+    hash_set(self.amf_ue_ngap_id_hash, &ran_ue->amf_ue_ngap_id, 
+            sizeof(ran_ue->amf_ue_ngap_id), ran_ue);
+    list_append(&ran->ran_ue_list, ran_ue);
+
+    /* Create S1 holding timer */
+    ran_ue->holding_timer = timer_create(&self.tm_service,
+            AMF_EVT_NGAP_NG_HOLDING_TIMER, self.ng_holding_timer_value * 1000);
+    d_assert(ran_ue->holding_timer, return NULL, "Null param");
+    timer_set_param1(ran_ue->holding_timer, ran_ue->index);
+
+    return ran_ue;
+
+}
+
+
+unsigned int ran_ue_count()
+{
+    d_assert(self.amf_ue_ngap_id_hash, return 0, "Null param");
+    return hash_count(self.amf_ue_ngap_id_hash);
+}
+
+status_t ran_ue_remove(ran_ue_t *ran_ue)
+{
+    status_t rv;
+
+    d_assert(self.amf_ue_ngap_id_hash, return CORE_ERROR, "Null param");
+    d_assert(ran_ue, return CORE_ERROR, "Null param");
+    d_assert(ran_ue->ran, return CORE_ERROR, "Null param");
+
+    /* De-associate NG with NAS/GMM */
+    rv = ran_ue_deassociate(ran_ue);
+    d_assert(rv == CORE_OK,,);
+
+   /* Delete All Timers */
+    tm_delete(ran_ue->holding_timer);
+
+    list_remove(&ran_ue->ran->ran_ue_list, ran_ue);
+    hash_set(self.amf_ue_ngap_id_hash, &ran_ue->amf_ue_ngap_id, 
+            sizeof(ran_ue->amf_ue_ngap_id), NULL);
+
+    index_free(&ran_ue_pool, ran_ue);
+
+    return CORE_OK;
+}
+
+status_t ran_ue_remove_in_ran(amf_ran_t *ran)
+{
+    ran_ue_t *ran_ue = NULL, *next_ran_ue = NULL;
+    
+    ran_ue = ran_ue_first_in_ran(ran);
+    while (ran_ue)
+    {
+        next_ran_ue = ran_ue_next_in_ran(ran_ue);
+
+        ran_ue_remove(ran_ue);
+
+        ran_ue = next_ran_ue;
+    }
+
+    return CORE_OK;
+}
+
+status_t ran_ue_switch_to_ran(ran_ue_t *ran_ue, amf_ran_t *new_ran)
+{
+    d_assert(ran_ue, return CORE_ERROR, "Null param");
+    d_assert(ran_ue->ran, return CORE_ERROR, "Null param");
+    d_assert(new_ran, return CORE_ERROR, "Null param");
+
+    /* Remove from the old ran */
+    list_remove(&ran_ue->ran->ran_ue_list, ran_ue);
+
+    /* Add to the new ran */
+    list_append(&new_ran->ran_ue_list, ran_ue);
+
+    /* Switch to ran */
+    ran_ue->ran = new_ran;
+
+    return CORE_OK;
+}
+
+ran_ue_t* ran_ue_find(index_t index)
+{
+    d_assert(index, return NULL, "Invalid Index");
+    return index_find(&ran_ue_pool, index);
+}
+
+ran_ue_t* ran_ue_find_by_ran_ue_ngap_id(
+        amf_ran_t *ran, c_uint32_t ran_ue_ngap_id)
+{
+    ran_ue_t *ran_ue = NULL;
+    
+    ran_ue = ran_ue_first_in_ran(ran);
+    while (ran_ue)
+    {
+        if (ran_ue_ngap_id == ran_ue->ran_ue_ngap_id)
+            break;
+
+        ran_ue = ran_ue_next_in_ran(ran_ue);
+    }
+
+    return ran_ue;
+}
+
+ran_ue_t* ran_ue_find_by_amf_ue_ngap_id(c_uint32_t amf_ue_ngap_id)
+{
+    d_assert(self.amf_ue_ngap_id_hash, return NULL, "Null param");
+    return hash_get(self.amf_ue_ngap_id_hash, 
+            &amf_ue_ngap_id, sizeof(amf_ue_ngap_id));
+}
+
+ran_ue_t* ran_ue_first_in_ran(amf_ran_t *ran)
+{
+    return list_first(&ran->ran_ue_list);
+}
+
+ran_ue_t* ran_ue_next_in_ran(ran_ue_t *ran_ue)
+{
+    return list_next(ran_ue);
+}
+
+/*************************************************************/
+
 /** enb_ue_context handling function */
 enb_ue_t* enb_ue_add(mme_enb_t *enb)
 {
@@ -1773,7 +1913,7 @@ enb_ue_t* enb_ue_add(mme_enb_t *enb)
     enb_ue->enb_ue_s1ap_id = INVALID_UE_S1AP_ID;
     enb_ue->mme_ue_s1ap_id = NEXT_ID(self.mme_ue_s1ap_id, 1, 0xffffffff);
     enb_ue->enb = enb;
-
+    
     hash_set(self.mme_ue_s1ap_id_hash, &enb_ue->mme_ue_s1ap_id, 
             sizeof(enb_ue->mme_ue_s1ap_id), enb_ue);
     list_append(&enb->enb_ue_list, enb_ue);
@@ -2322,7 +2462,15 @@ status_t enb_ue_deassociate(enb_ue_t *enb_ue)
     
     return CORE_OK;
 }
-
+/***********************add bu HU*****************************/
+status_t ran_ue_deassociate(ran_ue_t *ran_ue)
+{
+    d_assert(ran_ue, return CORE_ERROR, "Null param");
+    ran_ue->amf_ue = NULL;
+    
+    return CORE_OK;
+}
+/**************************************************************/
 status_t mme_ue_deassociate(mme_ue_t *mme_ue)
 {
     d_assert(mme_ue, return CORE_ERROR, "Null param");

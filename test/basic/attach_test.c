@@ -5,8 +5,8 @@
 #include <mongoc.h>
 
 #include "app/context.h"
-#include "mme/mme_context.h"
-#include "mme/s1ap_build.h"
+#include "amf/mme_context.h"
+#include "amf/s1ap_build.h"
 #include "s1ap/s1ap_message.h"
 
 #include "testutil.h"

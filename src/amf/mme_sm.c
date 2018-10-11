@@ -19,6 +19,10 @@
 #include "mme_sm.h"
 #include "s1ap_handler.h"
 #include "s1ap_path.h"
+/******************** Added by HU ********************/
+#include "ngap_handler.h"
+#include "ngap_path.h"
+/******************************************************/
 /******************** Added by Chi ********************/
 #include "s1ap_build.h"
 /******************************************************/
@@ -264,6 +268,43 @@ void mme_state_operational(fsm_t *s, event_t *e)
             d_assert(rv == CORE_OK,,);
             break;
         }
+        /*****************************add by HU*********************************/
+        case AMF_EVT_NGAP_DELAYED_SEND:
+        {
+            ran_ue_t *ran_ue = NULL;
+            pkbuf_t *pkbuf = NULL;
+            tm_block_id timer = 0;
+
+            ran_ue = ran_ue_find(event_get_param1(e));
+            d_assert(ran_ue, break,);
+
+            pkbuf = (pkbuf_t *)event_get_param2(e);
+            d_assert(pkbuf, break,);
+
+            timer = event_get_param3(e);
+            d_assert(timer, pkbuf_free(pkbuf); break,);
+
+            rv = ngap_send_to_ran_ue(ran_ue, pkbuf);
+            d_assert(rv == CORE_OK, pkbuf_free(pkbuf),);
+
+            tm_delete(timer);
+            break;
+        }
+        case AMF_EVT_NGAP_NG_HOLDING_TIMER:
+        {
+            ran_ue_t *ran_ue = NULL;
+
+            ran_ue = ran_ue_find(event_get_param1(e));
+            d_assert(ran_ue, break, "No RAN UE context");
+            d_warn("Implicit NG release");
+            d_warn("    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]",
+                ran_ue->ran_ue_ngap_id, ran_ue->amf_ue_ngap_id);
+
+            rv = ran_ue_remove(ran_ue);
+            d_assert(rv == CORE_OK,,);
+            break;
+        }
+        /***********************************************************************/
         case MME_EVT_EMM_MESSAGE:
         {
             nas_message_t message;

@@ -7,7 +7,7 @@
 
 #include "hss/milenage.h"
 #include "hss/hss_auc.h"
-#include "mme/nas_security.h"
+#include "amf/nas_security.h"
 
 #include "testutil.h"
 

@@ -3,10 +3,10 @@
 #include "core_debug.h"
 #include "core_lib.h"
 
-#include "mme/s1ap_build.h"
-#include "mme/s1ap_conv.h"
-#include "mme/s1ap_path.h"
-#include "mme/snow_3g.h"
+#include "amf/s1ap_build.h"
+#include "amf/s1ap_conv.h"
+#include "amf/s1ap_path.h"
+#include "amf/snow_3g.h"
 
 #include "gtp/gtp_message.h"
 #include "gtp/gtp_conv.h"
@@ -31,6 +31,10 @@ static c_sockaddr_t *test_enb2_addr6 = NULL;
 
 static list_t s1ap_list;
 static list_t s1ap_list6;
+/*****************add by HU*************/
+static list_t ngap_list;
+static list_t ngap_list6;
+/***************************************/
 
 status_t testpacket_init()
 {
@@ -58,6 +62,15 @@ status_t testpacket_init()
     rv = sock_probe_node(&s1ap_list, &s1ap_list6, NULL, 36412);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
+    /*****************add by HU*************/
+    list_init(&ngap_list);
+    list_init(&ngap_list6);
+
+    rv = sock_probe_node(&ngap_list, &ngap_list6, NULL, 38412);
+    d_assert(rv == CORE_OK, return CORE_ERROR,);
+    /***************************************/
+
+
     return CORE_OK;
 }
 
@@ -83,6 +96,10 @@ status_t testpacket_final()
 
     sock_remove_all_nodes(&s1ap_list);
     sock_remove_all_nodes(&s1ap_list6);
+    /*****************add by HU*************/
+    sock_remove_all_nodes(&ngap_list);
+    sock_remove_all_nodes(&ngap_list6);
+    /***************************************/
 
     return CORE_OK;
 }

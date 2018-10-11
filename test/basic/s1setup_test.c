@@ -3,8 +3,8 @@
 
 #include "3gpp_types.h"
 
-#include "mme/s1ap_build.h"
-#include "mme/s1ap_conv.h"
+#include "amf/s1ap_build.h"
+#include "amf/s1ap_conv.h"
 
 #include "testutil.h"
 #include "testpacket.h"

@@ -617,6 +617,7 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
     enb_ue = enb_ue_find_by_enb_ue_s1ap_id(enb, *ENB_UE_S1AP_ID);
     if (!enb_ue)
     {
+        
         enb_ue = enb_ue_add(enb);
         d_assert(enb_ue, return, "Null param");
 

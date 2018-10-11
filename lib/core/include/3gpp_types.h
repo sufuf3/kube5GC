@@ -17,6 +17,13 @@ extern "C" {
 #define SCTP_X2AP_PPID              27
 #define SCTP_NGAP_PPID              60 /*add by Hu*/
 
+/*******************add by HU************************/
+#define MAX_NUM_OF_RAN              128
+#define MAX_NUM_OF_5G_UE            128
+
+#define MAX_POOL_OF_5G_UE           (MAX_NUM_OF_RAN * MAX_NUM_OF_5G_UE)
+/****************************************************/
+
 #define MAX_NUM_OF_ENB              128
 #define MAX_NUM_OF_UE               128
 #define MAX_NUM_OF_SESS             4

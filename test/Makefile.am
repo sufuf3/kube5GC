@@ -34,6 +34,7 @@ AM_CPPFLAGS = \
     -I$(top_srcdir)/lib \
     -I$(top_srcdir)/src \
     -I$(top_srcdir)/lib/s1ap/asn1c \
+	-I$(top_srcdir)/lib/ngap/asn1c \
 	-I$(top_srcdir)/lib/@FREEDIAMETER_DIR@/include \
 	-I$(top_srcdir)/test/common \
 	@MONGOC_CFLAGS@ \

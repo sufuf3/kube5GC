@@ -35,8 +35,8 @@ libamf_la_SOURCES += ngap_sctp.c
 endif
 
 libamf_la_DEPENDENCIES = \
-	$(top_srcdir)/lib/ngap/libngap.la \
     $(top_srcdir)/lib/s1ap/libs1ap.la \
+	$(top_srcdir)/lib/ngap/libngap.la \
     $(top_srcdir)/lib/nas/libnas.la \
 	$(top_srcdir)/lib/fd/libfd.la \
     $(top_srcdir)/lib/gtp/libgtp.la \
@@ -44,8 +44,8 @@ libamf_la_DEPENDENCIES = \
 	$(NULL)
 
 libamf_la_LIBADD = \
-	$(top_srcdir)/lib/ngap/libngap.la \
     $(top_srcdir)/lib/s1ap/libs1ap.la \
+	$(top_srcdir)/lib/ngap/libngap.la \
     $(top_srcdir)/lib/nas/libnas.la \
     $(top_srcdir)/lib/fd/libfd.la \
     $(top_srcdir)/lib/gtp/libgtp.la \
