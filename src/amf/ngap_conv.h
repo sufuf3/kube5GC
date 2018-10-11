@@ -30,6 +30,18 @@ CORE_DECLARE(status_t) ngap_ip_to_BIT_STRING(
 CORE_DECLARE(status_t) ngap_copy_ie(
         const asn_TYPE_descriptor_t *td, void *src, void *dst);
 
+CORE_DECLARE(void) ngap_uint32_to_longMacroNgENB_ID(
+    NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_NgENB_ID_t *NgENB_ID);
+
+CORE_DECLARE(void) ngap_uint32_to_shortMacroNgENB_ID(
+    NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_NgENB_ID_t *NgENB_ID);
+
+CORE_DECLARE(void) ngap_uint32_to_macroNgENB_ID(
+    NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_NgENB_ID_t *NgENB_ID);
+
+CORE_DECLARE(void) ngap_uint32_to_3IWF_ID(
+    NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_N3IWF_ID_t *n3IWF_ID);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

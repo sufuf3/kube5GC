@@ -20,7 +20,7 @@ status_t ngap_encode_pdu(pkbuf_t **pkbuf, ngap_message_t *message)
                     message, (*pkbuf)->payload, MAX_SDU_LEN);
     if (enc_ret.encoded < 0)
     {
-        d_error("Failed to decode NGAP-PDU[%d]", enc_ret.encoded);
+        d_error("Failed to encoded NGAP-PDU[%d]", enc_ret.encoded);
         pkbuf_free(*pkbuf);
         return CORE_ERROR;
     }

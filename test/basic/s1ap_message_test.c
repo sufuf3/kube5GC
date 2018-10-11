@@ -7,6 +7,7 @@
 #include "amf/s1ap_build.h"
 #include "amf/s1ap_conv.h"
 
+#include "amf/ngap_conv.h"
 #include "testutil.h"
 #include "testpacket.h"
 

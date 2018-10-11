@@ -5,6 +5,7 @@
 #include "core_pkbuf.h"
 
 #include "s1ap/s1ap_message.h"
+#include "ngap/ngap_message.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -119,6 +120,9 @@ CORE_DECLARE(status_t) tests1ap_build_enb_direct_information_transfer(
 CORE_DECLARE(status_t) tests1ap_build_enb_cp_relocation_indication(pkbuf_t **pkbuf, 
         c_uint32_t enb_ue_s1ap_id);
 /******************************************************/
+
+CORE_DECLARE(status_t) testngap_build_setup_req(
+        pkbuf_t **pkbuf, NGAP_NgENB_ID_PR present, c_uint32_t enb_id);
 
 #ifdef __cplusplus
 }

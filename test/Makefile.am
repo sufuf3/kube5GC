@@ -23,10 +23,14 @@ testvolte_SOURCES = \
 
 LDADD = \
     $(top_srcdir)/src/libepc.la \
+	$(top_srcdir)/lib/ngap/libngap.la \
+	$(top_srcdir)/src/amf/libamf.la \
 	$(NULL)
 
 DEPENDENCIES = \
     $(top_srcdir)/src/libepc.la \
+	$(top_srcdir)/lib/ngap/libngap.la \
+	$(top_srcdir)/src/amf/libamf.la \
 	$(NULL)
 
 AM_CPPFLAGS = \

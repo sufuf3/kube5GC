@@ -190,3 +190,112 @@ status_t ngap_copy_ie(const asn_TYPE_descriptor_t *td, void *src, void *dst)
 
     return CORE_OK;
 }
+
+void ngap_uint32_to_macroNgENB_ID(
+    NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_NgENB_ID_t *NgENB_ID)
+{
+    d_assert(NgENB_ID, return, "Null param");
+
+    NgENB_ID->present = present;
+    if (present == NGAP_GNB_ID_PR_gNB_ID)
+    {
+        BIT_STRING_t *bit_string = &NgENB_ID->choice.macroNgENB_ID;
+        d_assert(bit_string, return, "Null param");
+
+        bit_string->size = 3;
+        bit_string->buf = core_calloc(bit_string->size, sizeof(c_uint8_t));
+
+        bit_string->buf[0] = gnb_id >> 24;
+        bit_string->buf[1] = gnb_id >> 16;
+        bit_string->buf[2] = gnb_id >> 8;
+        // bit_string->buf[3] = gnb_id & 0xff;
+
+    } 
+    else
+    {
+        d_assert(0, return, "Invalid param");
+    }
+
+}
+
+void ngap_uint32_to_shortMacroNgENB_ID(
+    NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_NgENB_ID_t *NgENB_ID)
+{
+    d_assert(NgENB_ID, return, "Null param");
+
+    NgENB_ID->present = present;
+    if (present == NGAP_GNB_ID_PR_gNB_ID)
+    {
+        BIT_STRING_t *bit_string = &NgENB_ID->choice.shortMacroNgENB_ID;
+        d_assert(bit_string, return, "Null param");
+
+        bit_string->size = 3;
+        bit_string->buf = core_calloc(bit_string->size, sizeof(c_uint8_t));
+
+        bit_string->buf[0] = gnb_id >> 24;
+        bit_string->buf[1] = gnb_id >> 16;
+        bit_string->buf[2] = gnb_id >> 8;
+        // bit_string->buf[3] = gnb_id & 0xff;
+
+    } 
+    else
+    {
+        d_assert(0, return, "Invalid param");
+    }
+
+}
+
+void ngap_uint32_to_longMacroNgENB_ID(
+    NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_NgENB_ID_t *NgENB_ID)
+{
+    d_assert(NgENB_ID, return, "Null param");
+
+    NgENB_ID->present = present;
+    if (present == NGAP_GNB_ID_PR_gNB_ID)
+    {
+        BIT_STRING_t *bit_string = &NgENB_ID->choice.longMacroNgENB_ID;
+        d_assert(bit_string, return, "Null param");
+
+        bit_string->size = 3;
+        bit_string->buf = core_calloc(bit_string->size, sizeof(c_uint8_t));
+
+        bit_string->buf[0] = gnb_id >> 24;
+        bit_string->buf[1] = gnb_id >> 16;
+        bit_string->buf[2] = gnb_id >> 8;
+        // bit_string->buf[3] = gnb_id & 0xff;
+
+    } 
+    else
+    {
+        d_assert(0, return, "Invalid param");
+    }
+
+}
+
+
+void ngap_uint32_to_3IWF_ID(
+    NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_N3IWF_ID_t *n3IWF_ID)
+{
+    d_assert(n3IWF_ID, return, "Null param");
+
+    n3IWF_ID->present = present;
+    if (present == NGAP_GNB_ID_PR_gNB_ID)
+    {
+        BIT_STRING_t *bit_string = &n3IWF_ID->choice.n3IWF_ID;
+        d_assert(bit_string, return, "Null param");
+
+        bit_string->size = 3;
+        bit_string->buf = core_calloc(bit_string->size, sizeof(c_uint8_t));
+
+        bit_string->buf[0] = gnb_id >> 24;
+        bit_string->buf[1] = gnb_id >> 16;
+        bit_string->buf[2] = gnb_id >> 8;
+        // bit_string->buf[3] = gnb_id & 0xff;
+
+    } 
+    else
+    {
+        d_assert(0, return, "Invalid param");
+    }
+
+}
