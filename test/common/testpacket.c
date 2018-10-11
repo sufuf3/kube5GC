@@ -64,7 +64,7 @@ status_t testpacket_init()
     list_init(&s1ap_list);
     list_init(&s1ap_list6);
 
-    rv = sock_probe_node(&s1ap_list, &s1ap_list6, NULL, 38412);
+    rv = sock_probe_node(&s1ap_list, &s1ap_list6, NULL, 36412);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
     /*****************add by HU*************/
