@@ -249,15 +249,85 @@ void ngap_handle_initial_context_setup_response(amf_ran_t *ran, ngap_message_t *
 
 void ngap_handle_initial_context_setup_failure(amf_ran_t *ran, ngap_message_t *message)
 {
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];
+
     NGAP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
     NGAP_InitialContextSetupFailure_t *InitialContextSetupFailure = NULL;
 
+    NGAP_InitialContextSetupFailureIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_Cause_t *Cause = NULL;
+
     d_assert(ran, return,);
     d_assert(message, return,);
+
+    amf_ue_t *amf_ue = NULL;
+    ran_ue_t *ran_ue = NULL;
 
     unsuccessfulOutcome = message->choice.unsuccessfulOutcome;
     d_assert(unsuccessfulOutcome, return,);
     InitialContextSetupFailure =
         &unsuccessfulOutcome->value.choice.InitialContextSetupFailure;
     d_assert(InitialContextSetupFailure, return,);
+
+    for (i = 0; i < InitialContextSetupFailure->protocolIEs.list.count; i++)
+    {
+        ie = InitialContextSetupFailure->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_Cause:
+                Cause = &ie->value.choice.Cause;
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+
+    d_assert(AMF_UE_NGAP_ID, return,);
+    d_assert(RAN_UE_NGAP_ID, return,);
+    d_assert(Cause, return,);
+
+    ran_ue = ran_ue_find_by_amf_ue_ngap_id(*AMF_UE_NGAP_ID);
+    d_trace(5, "    AMF_UE_NGAP_ID[%d] RAN_UE_NGAP_ID[%d]\n",
+            ran_ue->amf_ue_ngap_id, ran_ue->ran_ue_ngap_id);
+
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
+    amf_ue = ran_ue->amf_ue;
+    if (amf_ue == NULL) 
+    {
+        d_warn("Initial context setup failure : cannot find RAN-UE-NGAP-ID[%d]",
+        *RAN_UE_NGAP_ID);
+        return;
+    }
+
+    d_trace(5, "    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+             ran_ue->ran_ue_ngap_id, ran_ue->amf_ue_ngap_id);
+    d_trace(5, "    Cause[Group:%d Cause:%d]\n",
+            Cause->present, Cause->choice.radioNetwork);
+
+    d_assert(amf_ue, ,);
+    //TODO : add  FSM_CHECK
+    if (0)
+    {
+
+    }
+    else
+    {
+        //d_trace(5, "    NOT EMM-Registered\n");
+        //d_assert(mme_ue,,);
+        //rv = mme_send_delete_session_or_ue_context_release(mme_ue, enb_ue);
+        //d_assert(rv == CORE_OK,,
+        //        "mme_send_delete_session_or_ue_context_release() failed");
+    }
 }
