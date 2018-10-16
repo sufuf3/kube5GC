@@ -3,7 +3,7 @@
 #include "core_debug.h"
 
 #include "3gpp_types.h"
-#include "s1ap_conv.h"
+#include "ngap_conv.h"
 #include "ngap_build.h"
 
 status_t ngap_build_setup_rsp(pkbuf_t **pkbuf)
@@ -67,27 +67,18 @@ status_t ngap_build_setup_rsp(pkbuf_t **pkbuf)
         served_guami_t *served_guami = &mme_self()->served_guami[i];
         //for (j = 0; j < served_guami->num_of_plmn_id, j++)
         //{
-        NGAP_PLMNIdentity_t *PLMNidentity = NULL;
-        PLMNidentity = (NGAP_PLMNIdentity_t *) core_calloc(1, sizeof(NGAP_PLMNIdentity_t));
+        
         //TODO: fix it, modify the api to ngap_buffer to OCTET String
-        s1ap_buffer_to_OCTET_STRING(&served_guami->plmn_id, PLMN_ID_LEN, PLMNidentity);
-        //TODO: need to check 
-        ASN_SEQUENCE_ADD(&ServedGUAMIItem->gUAMI.pLMNIdentity, PLMNidentity);
-        //}
-	    NGAP_AMFRegionID_t	*aMFRegionID = NULL;
-        aMFRegionID = (NGAP_AMFRegionID_t *) core_calloc(1, sizeof(NGAP_AMFRegionID_t));
+        ngap_buffer_to_OCTET_STRING(&served_guami->plmn_id, PLMN_ID_LEN, &ServedGUAMIItem->gUAMI.pLMNIdentity);
+        
         //TODO: fix it, modify the api to ngap_buffer to OCTET String
-        ASN_SEQUENCE_ADD(&ServedGUAMIItem->gUAMI.aMFRegionID, aMFRegionID);
+        // ASN_SEQUENCE_ADD(&ServedGUAMIItem->gUAMI.aMFRegionID, aMFRegionID);
 
-        NGAP_AMFSetID_t	 *aMFSetID = NULL;
-        aMFSetID = (NGAP_AMFSetID_t *) core_calloc(1, sizeof(NGAP_AMFSetID_t));
         //TODO: fix it, modify the api to ngap_buffer to OCTET String
-        ASN_SEQUENCE_ADD(&ServedGUAMIItem->gUAMI.aMFSetID, aMFSetID);
+        // ASN_SEQUENCE_ADD(&ServedGUAMIItem->gUAMI.aMFSetID, aMFSetID);
             
-	    NGAP_AMFPointer_t *aMFPointer = NULL;
-        aMFPointer = (NGAP_AMFPointer_t *) core_calloc(1, sizeof(NGAP_AMFPointer_t));
         //TODO: fix it, modify the api to ngap_buffer to OCTET String
-        ASN_SEQUENCE_ADD(&ServedGUAMIItem->gUAMI.aMFPointer, aMFPointer);
+        // ASN_SEQUENCE_ADD(&ServedGUAMIItem->gUAMI.aMFPointer, aMFPointer);
 
         ASN_SEQUENCE_ADD(&ServedGUAMIList->list, ServedGUAMIItem);
     }
@@ -101,7 +92,7 @@ status_t ngap_build_setup_rsp(pkbuf_t **pkbuf)
 
 	    NGAP_PLMNIdentity_t	*pLMNIdentity = NULL;
         pLMNIdentity = (NGAP_PLMNIdentity_t *) core_calloc(1, sizeof(NGAP_PLMNIdentity_t));
-        s1ap_buffer_to_OCTET_STRING(&plmn_support->plmn_id[i], PLMN_ID_LEN, pLMNIdentity);
+        ngap_buffer_to_OCTET_STRING(&plmn_support->plmn_id[i], PLMN_ID_LEN, pLMNIdentity);
         //TODO: need to check 
         ASN_SEQUENCE_ADD(&PLMNSupportItem->pLMNIdentity, pLMNIdentity);
 
@@ -112,7 +103,7 @@ status_t ngap_build_setup_rsp(pkbuf_t **pkbuf)
              NGAP_SliceSupportItem_t *SliceSupportItem = NULL;
             // SliceSupportItem = (NGAP_SliceSupportItem_t *) core_calloc(1, sizeof(NGAP_SliceSupportItem_t));
             // memcpy( SliceSupportItem->s_NSSAI.sST, &plmn_support->s_nssai[j].sst,SST_LEN );
-            s1ap_buffer_to_OCTET_STRING(&plmn_support->s_nssai[j].sst, SST_LEN, &SliceSupportItem->s_NSSAI.sST);
+            ngap_buffer_to_OCTET_STRING(&plmn_support->s_nssai[j].sst, SST_LEN, &SliceSupportItem->s_NSSAI.sST);
            
            ASN_SEQUENCE_ADD(&sliceSupportList->list, SliceSupportItem);
         }
@@ -136,6 +127,7 @@ status_t ngap_build_setup_failure(pkbuf_t **pkbuf, NGAP_Cause_PR group, long cau
 status_t ngap_build_initial_context_setup_request(
             pkbuf_t **ngapbuf, amf_ue_t *amf_ue, pkbuf_t *naspdubuf)
 {
+    int i = 0;
     status_t rv;
     NGAP_NGAP_PDU_t pdu;
     NGAP_InitiatingMessage_t *initiatingMessage = NULL;
@@ -146,9 +138,125 @@ status_t ngap_build_initial_context_setup_request(
     NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
 	NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
     NGAP_GUAMI_t *GUAMI = NULL;
+    NGAP_PDUSessionResourceSetupListCxtReq_t *PDUSessionResourceSetupListCxtReq = NULL;
     NGAP_AllowedNSSAI_t	*AllowedNSSAI = NULL;
     NGAP_UESecurityCapabilities_t *UESecurityCapabilities = NULL;
 	NGAP_SecurityKey_t *SecurityKey = NULL;
+
+    ran_ue_t *ran_ue = NULL;
+
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+    ran_ue = amf_ue->ran_ue;
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+    
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode =
+        NGAP_ProcedureCode_id_InitialContextSetup;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present =
+        NGAP_InitiatingMessage__value_PR_InitialContextSetupRequest;
+
+    InitialContextSetupRequest = 
+        &initiatingMessage->value.choice.InitialContextSetupRequest;
+    
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = ran_ue->amf_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = ran_ue->ran_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_GUAMI;
+    GUAMI = &ie->value.choice.GUAMI;
+    /* which guami plmn/rid/ should be selete ?*/
+    served_guami_t *served_guami = &mme_self()->served_guami[0];
+    ngap_buffer_to_OCTET_STRING( &served_guami->plmn_id[0], 3, &GUAMI->pLMNIdentity);
+    ngap_buffer_to_OCTET_STRING( &served_guami->amf_rid[0], 3, &GUAMI->aMFRegionID);
+	//ngap_buffer_to_OCTET_STRING( &served_guami->amf_sid[0], 3, &GUAMI->aMFSetID);  //BIT_STRING_t
+	// ngap_buffer_to_OCTET_STRING( &served_guami->amf_ptr[0], 3, &GUAMI->aMFPointer); //BIT_STRING_t
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceSetupListCxtReq;
+    PDUSessionResourceSetupListCxtReq = &ie->value.choice.PDUSessionResourceSetupListCxtReq;
+    /* TODO: max number of PDU Sesssions*/
+    for (i = 0; i <  1 ; i++)
+    {
+        NGAP_PDUSessionResourceSetupItemCxtReqIEs_t *PDUSessionResourceSetupItemCxtReqIEs = NULL;
+        PDUSessionResourceSetupItemCxtReqIEs = (NGAP_PDUSessionResourceSetupItemCxtReqIEs_t *) core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupItemCxtReqIEs_t));
+        NGAP_PDUSessionResourceSetupItemCxtReq_t *PDUSessionResourceSetupItemCxtReq =
+                &PDUSessionResourceSetupItemCxtReqIEs->value.choice.PDUSessionResourceSetupItemCxtReq;
+        PDUSessionResourceSetupItemCxtReqIEs->criticality = NGAP_Criticality_reject;
+        PDUSessionResourceSetupItemCxtReq->pDUSessionID = ran_ue->amf_ue->psi;
+        /* TODO: add sst value, slice service Type*/
+        // ngap_buffer_to_OCTET_STRING( 1, 1, &PDUSessionResourceSetupItemCxtReq->s_NSSAI.sST);
+        // NGAP_PDUSessionResourceSetupRequestTransfer_t *PDUSessionResourceSetupRequestTransfer = NULL;
+        // PDUSessionResourceSetupRequestTransfer = &PDUSessionResourceSetupItemCxtReq->pDUSessionResourceSetupRequestTransfer;
+            // asn_uint642INTEGER((INTEGER_t *)&PDUSessionResourceSetupRequestTransfer->pDUSessionAggregateMaximumBitRate,
+            //                     amf_ue->pdn->qos->mbr);
+            // NGAP_BitRate_t	 pDUSessionAggregateMaximumBitRate;
+            // NGAP_UPTransportLayerInformation_t	 uL_NGU_UP_TNLInformation;
+            // NGAP_PDUSessionType_t	 pDUSessionType;
+            // NGAP_QosFlowSetupRequestList_t	 qosFlowSetupRequestList;
+        ASN_SEQUENCE_ADD(&PDUSessionResourceSetupListCxtReq->list, PDUSessionResourceSetupItemCxtReqIEs);
+    }
+    
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AllowedNSSAI;
+    ie->criticality = NGAP_Criticality_ignore;
+    AllowedNSSAI = &ie->value.choice.AllowedNSSAI;
+    NGAP_AllowedNSSAI_Item_t *AllowedNSSAI_Item = NULL;
+    for (i = 0 ; i < mme_self()->plmn_support->num_of_s_nssai; i++)
+    {
+        plmn_support_t *plmn_support = &mme_self()->plmn_support[i];
+        AllowedNSSAI_Item = (NGAP_AllowedNSSAI_Item_t *) core_calloc(1, sizeof(NGAP_AllowedNSSAI_Item_t));
+        ngap_buffer_to_OCTET_STRING(&plmn_support->s_nssai[i].sst, SST_LEN, &AllowedNSSAI_Item->s_NSSAI.sST);
+        ASN_SEQUENCE_ADD(&AllowedNSSAI->list, AllowedNSSAI_Item);
+    }       
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_UESecurityCapabilities;
+    UESecurityCapabilities = &ie->value.choice.UESecurityCapabilities;
+	
+    //nas_ue_network_capability_t ue_network_capability
+    memcpy(&UESecurityCapabilities->nRencryptionAlgorithms, "\xff\xff", 2);  //BIT_STRING_t
+    memcpy(&UESecurityCapabilities->nRintegrityProtectionAlgorithms, "\xff\xff", 2);  //BIT_STRING_t
+    memcpy(&UESecurityCapabilities->eUTRAencryptionAlgorithms, "\xff\xff", 2);  //BIT_STRING_t
+    memcpy(&UESecurityCapabilities->eUTRAintegrityProtectionAlgorithms, "\xff\xff", 2);  //BIT_STRING_t
+	
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_SecurityKey;
+    SecurityKey = &ie->value.choice.SecurityKey;
+  
+    SecurityKey->size = SHA256_DIGEST_SIZE;
+    SecurityKey->buf = 
+        core_calloc(SecurityKey->size, sizeof(c_uint8_t));
+    SecurityKey->bits_unused = 0;
+    memcpy(SecurityKey->buf, "\xff\xff\xff\xff\xff\xff\xff\xff", SecurityKey->size); //NG-RAN key
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
 
     return rv;
 }
