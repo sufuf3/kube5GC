@@ -246,3 +246,18 @@ void ngap_handle_initial_context_setup_response(amf_ran_t *ran, ngap_message_t *
     }
 
 }
+
+void ngap_handle_initial_context_setup_failure(amf_ran_t *ran, ngap_message_t *message)
+{
+    NGAP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
+    NGAP_InitialContextSetupFailure_t *InitialContextSetupFailure = NULL;
+
+    d_assert(ran, return,);
+    d_assert(message, return,);
+
+    unsuccessfulOutcome = message->choice.unsuccessfulOutcome;
+    d_assert(unsuccessfulOutcome, return,);
+    InitialContextSetupFailure =
+        &unsuccessfulOutcome->value.choice.InitialContextSetupFailure;
+    d_assert(InitialContextSetupFailure, return,);
+}

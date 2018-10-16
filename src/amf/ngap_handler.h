@@ -13,6 +13,7 @@ extern "C" {
 CORE_DECLARE(void) ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message);
 
 CORE_DECLARE(void) ngap_handle_initial_context_setup_response(amf_ran_t *ran, ngap_message_t *message);
+CORE_DECLARE(void) ngap_handle_initial_context_setup_failure(amf_ran_t *ran, ngap_message_t *message);
 
 #ifdef __cplusplus
 }
