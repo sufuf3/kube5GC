@@ -79,7 +79,7 @@ status_t ngap_send_to_ran(amf_ran_t *ran, pkbuf_t *pkbuf, c_uint16_t stream_no)
     d_assert(ran->sock, return CORE_ERROR,);
 
     d_trace(5, "    IP[%s] GNB_ID[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
 
     rv = ngap_send(ran->sock, pkbuf,
             ran->sock_type == SOCK_STREAM ? NULL : ran->addr,

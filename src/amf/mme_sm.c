@@ -77,6 +77,14 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 d_error("Can't establish S1AP path");
                 break;
             }
+            /******************add by HU***********************/
+            rv = ngap_open();
+            if(rv != CORE_OK)
+            {
+                d_error("Can't establish NGAP path");
+                break;
+            }
+            /**************************************************/
     
             break;
         }
@@ -92,7 +100,14 @@ void mme_state_operational(fsm_t *s, event_t *e)
             {
                 d_error("Can't close S1AP path");
             }
-
+            /******************add by HU***********************/
+            rv = ngap_close();
+            if(rv != CORE_OK)
+            {
+                d_error("Can't close NGAP path");
+                break;
+            }
+            /**************************************************/
             break;
         }
         case MME_EVT_S1AP_LO_ACCEPT:
@@ -269,6 +284,144 @@ void mme_state_operational(fsm_t *s, event_t *e)
             break;
         }
         /*****************************add by HU*********************************/
+        case AMF_EVT_NGAP_LO_ACCEPT:
+        {
+            sock_id sock = (sock_id)event_get_param1(e);
+            d_assert(sock, break,);
+            c_sockaddr_t *addr = (c_sockaddr_t *)event_get_param2(e);
+            d_assert(addr, break,);
+            amf_ran_t *ran = NULL;
+
+            d_trace(1, "RAN-NG accepted[%s] in master_sm module\n", 
+                CORE_ADDR(addr, buf));
+                    
+            ran = amf_ran_find_by_addr(addr);
+            if (!ran)
+            {
+#if USE_USRSCTP != 1
+                status_t rv;
+
+                rv = sock_register(sock, ngap_recv_handler, NULL);
+                d_assert(rv == CORE_OK, break, "register ngap_recv_cb failed");
+#endif
+                ran = amf_ran_add(sock, addr);
+                d_assert(ran, break, "Null param");
+            }
+            else
+            {
+                d_warn("RAN context duplicated with IP-address [%s]!!!", 
+                        CORE_ADDR(addr, buf));
+                sock_delete(sock);
+                d_warn("NG Socket Closed");
+            }
+
+            break;
+        }
+        case AMF_EVT_NGAP_LO_SCTP_COMM_UP:
+        {
+            amf_ran_t *ran = NULL;
+            sock_id sock = 0;
+            c_sockaddr_t *addr = NULL;
+            c_uint16_t outbound_streams = 0;
+
+            sock = (sock_id)event_get_param1(e);
+            d_assert(sock, break, "Null param");
+            addr = (c_sockaddr_t *)event_get_param2(e);
+            d_assert(addr, break, "Null param");
+
+            outbound_streams = (c_uint16_t)event_get_param4(e);
+
+            ran = amf_ran_find_by_addr(addr);
+            if (!ran)
+            {
+#if USE_USRSCTP != 1
+                status_t rv;
+
+                rv = sock_register(sock, ngap_recv_handler, NULL);
+                d_assert(rv == CORE_OK, break, "register ngap_recv_cb failed");
+#endif
+                ran = amf_ran_add(sock, addr);
+                d_assert(ran, break, "Null param");
+            }
+            else
+            {
+                CORE_FREE(addr);
+            }
+
+            ran->outbound_streams =
+                    c_min(outbound_streams, ran->outbound_streams);
+
+            d_trace(3, "RAN-NG SCTP_COMM_UP[%s] Outbound Streams[%d]\n", 
+                CORE_ADDR(addr, buf), ran->outbound_streams);
+
+            break;
+        }
+        case AMF_EVT_NGAP_LO_CONNREFUSED:
+        {
+            amf_ran_t *ran = NULL;
+            sock_id sock = 0;
+            c_sockaddr_t *addr = NULL;
+
+            sock = (sock_id)event_get_param1(e);
+            d_assert(sock, break, "Null param");
+            addr = (c_sockaddr_t *)event_get_param2(e);
+            d_assert(addr, break, "Null param");
+
+            ran = amf_ran_find_by_addr(addr);
+            CORE_FREE(addr);
+
+            if (ran)
+            {
+                d_trace(1, "RAN-NG[%x] connection refused!!!\n", ran->ran_id);
+                amf_ran_remove(ran);
+            }
+            else
+            {
+                d_warn("Socket connection refused, Already Removed!");
+            }
+
+            break;
+        }
+        case AMF_EVT_NGAP_MESSAGE:
+        {
+            ngap_message_t message;
+            amf_ran_t *ran = NULL;
+            sock_id sock = 0;
+            c_sockaddr_t *addr = NULL;
+            pkbuf_t *pkbuf = NULL;
+
+            sock = (sock_id)event_get_param1(e);
+            d_assert(sock, break, "Null param");
+
+            addr = (c_sockaddr_t *)event_get_param2(e);
+            d_assert(addr, break, "Null param");
+            
+            pkbuf = (pkbuf_t *)event_get_param3(e);
+            d_assert(pkbuf, break, "Null param");
+
+            ran = amf_ran_find_by_addr(addr);
+            CORE_FREE(addr);
+
+            d_assert(ran, pkbuf_free(pkbuf); break, "No RAN context");
+            d_assert(FSM_STATE(&ran->sm), pkbuf_free(pkbuf); break,
+                    "No NGAP State Machine");
+
+            rv = ngap_decode_pdu(&message, pkbuf);
+            if (rv != CORE_OK)
+            {
+                d_print_hex(pkbuf->payload, pkbuf->len);
+                d_assert(0, ngap_free_pdu(&message); pkbuf_free(pkbuf); break,
+                        "Can't decode NGAP_PDU");
+            }
+
+            event_set_param1(e, (c_uintptr_t)ran->index);
+            event_set_param4(e, (c_uintptr_t)&message);
+            fsm_dispatch(&ran->sm, (fsm_event_t*)e);
+
+            ngap_free_pdu(&message);
+            pkbuf_free(pkbuf);
+            break;
+        }
         case AMF_EVT_NGAP_DELAYED_SEND:
         {
             ran_ue_t *ran_ue = NULL;

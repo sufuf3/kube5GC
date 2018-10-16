@@ -33,7 +33,7 @@ static fd_config_t g_fd_conf;
 /*******************add by HU************************/
 index_declare(amf_ran_pool, amf_ran_t, MAX_NUM_OF_RAN);
 index_declare(amf_ue_pool, amf_ue_t, MAX_POOL_OF_5G_UE);
-index_declare(ran_ue_pool, ran_ue_t, MAX_NUM_OF_5G_UE);
+index_declare(ran_ue_pool, ran_ue_t, MAX_POOL_OF_5G_UE);
 /****************************************************/
 
 index_declare(mme_enb_pool, mme_enb_t, MAX_NUM_OF_ENB);
@@ -59,6 +59,11 @@ status_t mme_context_init()
     list_init(&self.s1ap_list);
     list_init(&self.s1ap_list6);
 
+    /****************add by HU***************/
+    list_init(&self.ngap_list);
+    list_init(&self.ngap_list6);
+    /****************************************/
+
     list_init(&self.gtpc_list);
     list_init(&self.gtpc_list6);
 
@@ -66,6 +71,13 @@ status_t mme_context_init()
     list_init(&self.sgw_list);
     list_init(&self.pgw_list);
 
+
+    /****************add by HU***************/
+    index_init(&amf_ran_pool, MAX_NUM_OF_RAN);
+
+    index_init(&amf_ue_pool, MAX_POOL_OF_5G_UE);
+    index_init(&ran_ue_pool, MAX_POOL_OF_5G_UE);
+    /****************************************/
 
     index_init(&mme_enb_pool, MAX_NUM_OF_ENB);
 
@@ -75,6 +87,12 @@ status_t mme_context_init()
     index_init(&mme_bearer_pool, MAX_POOL_OF_BEARER);
     pool_init(&self.m_tmsi, MAX_POOL_OF_UE);
 
+    /****************add by HU***************/
+    self.ran_sock_hash = hash_make();
+    self.ran_addr_hash = hash_make();
+    self.ran_id_hash = hash_make();
+    self.amf_ue_ngap_id_hash = hash_make();
+    /****************************************/
     self.enb_sock_hash = hash_make();
     self.enb_addr_hash = hash_make();
     self.enb_id_hash = hash_make();
@@ -85,6 +103,10 @@ status_t mme_context_init()
     /* Timer value */
     self.t3413_value = 2;               /* Paging retry timer: 2 secs */
     self.s1_holding_timer_value = 30;   /* S1 holding timer: 30 secs */
+
+    /****************add by HU***************/
+    self.ng_holding_timer_value = 30;   /* NG holding timer: 30 secs */
+    /****************************************/
 
     /******************** Added by Chi ********************/
     /* Status */
@@ -101,6 +123,7 @@ status_t mme_context_final()
     d_assert(context_initialized == 1, return CORE_ERROR,
             "MME context already has been finalized");
 
+    amf_ran_remove_all();
     mme_enb_remove_all();
     mme_ue_remove_all();
 
@@ -111,6 +134,18 @@ status_t mme_context_final()
     }
     d_trace(9, "%d not freed in M-TMSI pool[%d] in MME-Context\n",
             pool_used(&self.m_tmsi), pool_size(&self.m_tmsi));
+
+    /****************add by HU***************/
+    d_assert(self.ran_sock_hash, , "Null param");
+    hash_destroy(self.ran_sock_hash);
+    d_assert(self.ran_addr_hash, , "Null param");
+    hash_destroy(self.ran_addr_hash);
+    d_assert(self.ran_id_hash, , "Null param");
+    hash_destroy(self.ran_id_hash);
+
+    d_assert(self.amf_ue_ngap_id_hash, , "Null param");
+    hash_destroy(self.amf_ue_ngap_id_hash);
+    /****************************************/
 
     d_assert(self.enb_sock_hash, , "Null param");
     hash_destroy(self.enb_sock_hash);
@@ -134,12 +169,23 @@ status_t mme_context_final()
 
     index_final(&mme_enb_pool);
 
+    /****************add by HU***************/
+    index_final(&amf_ue_pool);
+    index_final(&ran_ue_pool);
+
+    index_final(&amf_ran_pool);
+    /****************************************/
+
     gtp_remove_all_nodes(&self.sgw_list);
     gtp_remove_all_nodes(&self.pgw_list);
     gtp_node_final();
 
     sock_remove_all_nodes(&self.s1ap_list);
     sock_remove_all_nodes(&self.s1ap_list6);
+    /****************add by HU***************/
+    sock_remove_all_nodes(&self.ngap_list);
+    sock_remove_all_nodes(&self.ngap_list6);
+    /****************************************/
     sock_remove_all_nodes(&self.gtpc_list);
     sock_remove_all_nodes(&self.gtpc_list6);
 
@@ -162,6 +208,9 @@ static status_t mme_context_prepare()
     self.relative_capacity = 0xff;
 
     self.s1ap_port = S1AP_SCTP_PORT;
+    /*****************add by HU********************/
+    self.ngap_port = NGAP_SCTP_PORT;
+    /**********************************************/
     self.gtpc_port = GTPV2_C_UDP_PORT;
     self.fd_config->cnf_port = DIAMETER_PORT;
     self.fd_config->cnf_port_tls = DIAMETER_SECURE_PORT;
@@ -1761,7 +1810,212 @@ int mme_enb_sock_type(sock_id sock)
 }
 
 /*************************add by HU***************************/
-/** ran_ue_context handlinf function **/
+/** amf_ran handling function **/
+
+amf_ran_t* amf_ran_add(sock_id sock, c_sockaddr_t *addr)
+{
+    amf_ran_t *ran = NULL;
+    event_t e;
+
+    d_assert(sock, return NULL,);
+    d_assert(addr, return NULL,);
+
+    index_alloc(&amf_ran_pool, &ran);
+    d_assert(ran, return NULL, "Null param");
+
+    ran->sock = sock;
+    ran->addr = addr;
+    ran->sock_type = amf_ran_sock_type(ran->sock);
+
+    ran->outbound_streams = context_self()->parameter.sctp_streams;
+
+    list_init(&ran->ran_ue_list);
+
+    hash_set(self.ran_sock_hash, &ran->sock, sizeof(ran->sock), ran);
+    hash_set(self.ran_addr_hash, ran->addr, sizeof(c_sockaddr_t), ran);
+    
+    event_set_param1(&e, (c_uintptr_t)ran->index);
+    fsm_create(&ran->sm, ngap_state_initial, ngap_state_final);
+    fsm_init(&ran->sm, &e);
+
+    return ran;
+}
+
+status_t amf_ran_remove(amf_ran_t *ran)
+{
+    event_t e;
+
+    d_assert(ran, return CORE_ERROR, "Null param");
+    d_assert(ran->sock, return CORE_ERROR, "Null param");
+
+    event_set_param1(&e, (c_uintptr_t)ran->index);
+    fsm_final(&ran->sm, &e);
+    fsm_clear(&ran->sm);
+
+    hash_set(self.ran_sock_hash, &ran->sock, sizeof(ran->sock), NULL);
+    hash_set(self.ran_addr_hash, ran->addr, sizeof(c_sockaddr_t), NULL);
+    if(ran->ran_id.ran_present)
+        hash_set(self.ran_id_hash, &ran->ran_id, sizeof(ran->ran_id), NULL);
+
+        
+    ran_ue_remove_in_ran(ran);
+
+    CORE_FREE(ran->addr);
+
+    index_free(&amf_ran_pool, ran);
+
+    return CORE_OK;
+}
+
+status_t amf_ran_remove_all()
+{
+    hash_index_t *hi = NULL;
+    amf_ran_t *ran = NULL;
+
+    for (hi = amf_ran_first(); hi; hi = amf_ran_next(hi))
+    {
+        ran = amf_ran_this(hi);
+
+        if (ran->sock_type == SOCK_STREAM)
+            s1ap_delete(ran->sock);
+
+        amf_ran_remove(ran);
+    }
+
+    return CORE_OK;
+}
+
+amf_ran_t* amf_ran_find(index_t index)
+{
+    d_assert(index, return NULL, "Invalid Index");
+    return index_find(&amf_ran_pool, index);
+}
+
+amf_ran_t* amf_ran_find_by_sock(sock_id sock)
+{
+    d_assert(sock, return NULL,"Invalid param");
+    return (amf_ran_t *)hash_get(self.ran_sock_hash, &sock, sizeof(sock));
+
+    return NULL;
+}
+
+amf_ran_t* amf_ran_find_by_addr(c_sockaddr_t *addr)
+{
+    d_assert(addr, return NULL,"Invalid param");
+    return (amf_ran_t *)hash_get(self.ran_addr_hash,
+            addr, sizeof(c_sockaddr_t));
+
+    return NULL;
+}
+
+amf_ran_t* amf_ran_find_by_ran_id(c_uint32_t gnb_id, c_uint32_t ngenb_id, c_uint16_t n3iwf_id, int ran_present)
+{
+    ran_id_t ran_id;
+    switch(ran_present)
+    {
+        case RAN_PR_GNB_ID:
+        {
+            d_assert(gnb_id, return NULL, "Invalid param");
+            ran_id.gnb_id = gnb_id;
+            break;
+        }
+        case RAN_PR_NgENB_ID:
+        {
+            d_assert(ngenb_id, return NULL, "Invalid param");
+            ran_id.ngenb_id = ngenb_id;
+            break;
+        }
+        case RAN_PR_N3IWF_ID:
+        {
+            d_assert(n3iwf_id, return NULL, "Invalid param");
+            ran_id.n3iwf_id = n3iwf_id;
+            break;
+        }
+        default:
+        {
+            d_assert(0, return NULL, "Invalid param");
+            break;
+        }
+
+    }
+    return (amf_ran_t *)hash_get(self.ran_id_hash, &ran_id, sizeof(ran_id));
+}
+
+status_t amf_ran_set_ran_id(amf_ran_t *ran, c_uint32_t gnb_id, c_uint32_t ngenb_id, c_uint16_t n3iwf_id, int ran_present)
+{
+    d_assert(ran, return CORE_ERROR, "Invalid param");
+    
+    ran->ran_id.ran_present = ran_present;
+    switch(ran_present)
+    {
+        case RAN_PR_GNB_ID:
+        {
+            d_assert(gnb_id, return CORE_ERROR, "Invalid param");
+            ran->ran_id.gnb_id = gnb_id;
+            break;
+        }
+        case RAN_PR_NgENB_ID:
+        {
+            d_assert(ngenb_id, return CORE_ERROR, "Invalid param");
+            ran->ran_id.ngenb_id = ngenb_id;
+            break;
+        }
+        case RAN_PR_N3IWF_ID:
+        {
+            d_assert(n3iwf_id, return CORE_ERROR, "Invalid param");
+            ran->ran_id.n3iwf_id = n3iwf_id;
+            break;
+        }
+        default:
+        {
+            d_assert(0, return CORE_ERROR, "Invalid param");
+            break;
+        }
+
+    }
+    hash_set(self.ran_id_hash, &ran->ran_id, sizeof(ran->ran_id), ran);
+    
+    return CORE_OK;
+}
+
+hash_index_t* amf_ran_first()
+{
+    d_assert(self.ran_sock_hash, return NULL, "Null param");
+    return hash_first(self.ran_sock_hash);
+}
+
+hash_index_t* amf_ran_next(hash_index_t *hi)
+{
+    return hash_next(hi);
+}
+
+amf_ran_t *amf_ran_this(hash_index_t *hi)
+{
+    d_assert(hi, return NULL, "Null param");
+    return hash_this_val(hi);
+}
+
+int amf_ran_sock_type(sock_id sock)
+{
+    sock_node_t *snode = NULL;
+
+    d_assert(sock, return SOCK_STREAM,);
+
+    for (snode = list_first(&mme_self()->ngap_list);
+            snode; snode = list_next(snode))
+    {
+        if (snode->sock == sock) return SOCK_SEQPACKET;
+    }
+    for (snode = list_first(&mme_self()->ngap_list6);
+            snode; snode = list_next(snode))
+    {
+        if (snode->sock == sock) return SOCK_SEQPACKET;
+    }
+
+    return SOCK_STREAM;
+}
+
+/** ran_ue_context handling function **/
 
 ran_ue_t* ran_ue_add(amf_ran_t *ran)
 {

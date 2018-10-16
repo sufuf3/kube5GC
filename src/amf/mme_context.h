@@ -75,6 +75,15 @@ typedef struct _fd_config_t fd_config_t;
 typedef c_uint32_t mme_m_tmsi_t;
 typedef c_uint32_t amf_5g_tmsi_t;
 
+typedef struct _ran_id_t{
+    int ran_present;
+    union{
+        c_uint32_t      gnb_id;      /* gNB_ID received from gNB */
+        c_uint32_t      ngenb_id;    /* Ng-ENB_ID received from  Ng-ENB */
+        c_uint16_t      n3iwf_id;    /* N3IEF_ID received from  N3IWF */
+    };
+} ran_id_t;
+
 typedef struct _served_gummei {
     c_uint32_t      num_of_plmn_id;
     plmn_id_t       plmn_id[MAX_PLMN_ID];
@@ -329,6 +338,9 @@ typedef struct _amf_context_t {
     hash_t          *mme_ue_s1ap_id_hash;   /* hash table for MME-UE-S1AP-ID */
 
     /***********************add by Hu********************************/
+    hash_t          *ran_sock_hash;         /* hash table for RAN Socket */
+    hash_t          *ran_addr_hash;         /* hash table for RAN Address */
+    hash_t          *ran_id_hash;           /* hash table for RAN-ID */
     hash_t          *amf_ue_ngap_id_hash;   /* hash table for AMF-UE-NGAP-ID */
     /****************************************************************/
 
@@ -354,12 +366,12 @@ typedef struct _amf_ran_t {
     index_t         index;  /* An index of this node */
     fsm_t           sm;     /* A state machine */
 
-   
-    union{
-        c_uint32_t      gnb_id;      /* gNB_ID received from gNB */
-        c_uint32_t      ngenb_id;    /* Ng-ENB_ID received from  Ng-ENB */
-        c_uint16_t      n3iwf_id;    /* N3IEF_ID received from  N3IWF */
-    };
+#define RAN_PR_NOTHING 0
+#define RAN_PR_GNB_ID   1
+#define RAN_PR_NgENB_ID 2
+#define RAN_PR_N3IWF_ID 3
+	
+    ran_id_t ran_id;
 
     int             sock_type;  /* SOCK_STREAM or SOCK_SEQPACKET */
     sock_id         sock;       /* gNB NGAP Socket */
@@ -444,6 +456,7 @@ struct _amf_ue_t {
     c_uint16_t      ostream_id;     /* SCTP output stream identification */
 
     /* UE Info */
+    int ran_present;
     tai_t           tai;
     union {
         nr_cgi_t    nr_cgi;
@@ -903,6 +916,24 @@ CORE_DECLARE(enb_ue_t*)     enb_ue_first_in_enb(mme_enb_t *enb);
 CORE_DECLARE(enb_ue_t*)     enb_ue_next_in_enb(enb_ue_t *enb_ue);
 
 /*************************add by HU***************************/
+CORE_DECLARE(amf_ran_t*)    amf_ran_add(sock_id sock, c_sockaddr_t *addr);
+CORE_DECLARE(status_t)      amf_ran_remove(amf_ran_t *ran);
+CORE_DECLARE(status_t)      amf_ran_remove_all(void);
+CORE_DECLARE(amf_ran_t*)    amf_ran_find(index_t index);
+CORE_DECLARE(amf_ran_t*)    amf_ran_find_by_sock(sock_id sock);
+CORE_DECLARE(amf_ran_t*)    amf_ran_find_by_addr(c_sockaddr_t *addr);
+CORE_DECLARE(amf_ran_t*)    amf_ran_find_by_ran_id(
+        c_uint32_t gnb_id, c_uint32_t ngran_id, c_uint16_t n3iwf_id, int ran_present);
+CORE_DECLARE(status_t)      amf_ran_set_ran_id(
+        amf_ran_t *ran, c_uint32_t gnb_id, c_uint32_t ngran_id, c_uint16_t n3iwf_id, int ran_present);
+CORE_DECLARE(hash_index_t *) amf_ran_first();
+CORE_DECLARE(hash_index_t *) amf_ran_next(hash_index_t *hi);
+CORE_DECLARE(amf_ran_t *)    amf_ran_this(hash_index_t *hi);
+CORE_DECLARE(int)           amf_ran_sock_type(sock_id sock);
+
+
+
+
 CORE_DECLARE(ran_ue_t*)     ran_ue_add(amf_ran_t *ran);
 CORE_DECLARE(unsigned int)  ran_ue_count();
 CORE_DECLARE(status_t)      ran_ue_remove(ran_ue_t *ran_ue);
