@@ -8,8 +8,11 @@ libsmf_la_SOURCES = \
 	smf_event.h smf_event.c \
 	smf_gtp_path.h smf_gtp_path.c \
 	smf_pfcp_path.h smf_pfcp_path.c \
+	smf_fd_path.h smf_fd_path.c \
 	smf_n4_build.h smf_n4_build.c \
 	smf_n4_handler.h smf_n4_handler.c \
+	smf_gx_handler.h smf_gx_handler.c \
+	smf_ipfw.h smf_ipfw.c \
 	smf_init.c \
 	$(NULL)
 

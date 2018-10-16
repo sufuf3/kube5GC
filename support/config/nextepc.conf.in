@@ -344,6 +344,8 @@ pcrf:
     freeDiameter: pcrf.conf
 
 smf:
+    freeDiameter: pgw.conf
+
     gtpc:
       - addr: 127.0.0.10
       - addr: ::1

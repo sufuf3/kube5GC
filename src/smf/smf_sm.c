@@ -8,10 +8,12 @@
 #include "smf_gtp_path.h"
 #include "smf_pfcp_path.h"
 #include "smf_n4_handler.h"
+#include "smf_gx_handler.h"
 #include "smf_sm.h"
 
 #include "gtp/gtp_message.h"
 #include "pfcp/pfcp_message.h"
+
 
 void smf_state_initial(fsm_t *s, event_t *e)
 {
@@ -89,7 +91,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
             pkbuf_free(recvbuf);
             break;
         }
-                case SMF_EVT_N4_MESSAGE:
+        case SMF_EVT_N4_MESSAGE:
         {
             status_t rv;
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
@@ -207,6 +209,85 @@ void smf_state_operational(fsm_t *s, event_t *e)
             {
                 d_error("Heartbeat fail, should delete association");
             }
+            break;
+        }
+        case SMF_EVT_GX_MESSAGE:
+        {
+            index_t sess_index = event_get_param1(e);
+            smf_sess_t *sess = NULL;
+            pkbuf_t *gxbuf = (pkbuf_t *)event_get_param2(e);
+            gx_message_t *gx_message = NULL;
+
+            d_assert(sess_index, return, "Null param");
+            sess = smf_sess_find(sess_index);
+            d_assert(sess, return, "Null param");
+
+            d_assert(gxbuf, return, "Null param");
+            gx_message = gxbuf->payload;
+            d_assert(gx_message, return, "Null param");
+
+            switch(gx_message->cmd_code)
+            {
+                case GX_CMD_CODE_CREDIT_CONTROL:
+                {
+                    index_t xact_index = event_get_param3(e);
+                    gtp_xact_t *xact = NULL;
+
+                    pkbuf_t *gtpbuf = (pkbuf_t *)event_get_param4(e);
+                    gtp_message_t *message = NULL;
+
+                    d_assert(xact_index, return, "Null param");
+                    xact = gtp_xact_find(xact_index);
+                    d_assert(xact, return, "Null param");
+
+                    d_assert(gtpbuf, return, "Null param");
+                    message = gtpbuf->payload;
+
+                    if (gx_message->result_code != ER_DIAMETER_SUCCESS)
+                    {
+                        d_error("Diameter Error(%d)", gx_message->result_code);
+                        break;
+                    }
+                    switch(gx_message->cc_request_type)
+                    {
+                        case GX_CC_REQUEST_TYPE_INITIAL_REQUEST:
+                        {
+                            smf_gx_handle_cca_initial_request(
+                                    sess, gx_message, xact, 
+                                    &message->create_session_request);
+                            break;
+                        }
+                        case GX_CC_REQUEST_TYPE_TERMINATION_REQUEST:
+                        {
+                            smf_gx_handle_cca_termination_request(
+                                    sess, gx_message, xact,
+                                    &message->delete_session_request);
+                            break;
+                        }
+                        default:
+                        {
+                            d_error("Not implemented(%d)", event_get_param4(e));
+                            break;
+                        }
+                    }
+
+                    pkbuf_free(gtpbuf);
+                    break;
+                }
+                case GX_CMD_RE_AUTH:
+                {
+                    smf_gx_handle_re_auth_request(sess, gx_message);
+                    break;
+                }
+                default:
+                {
+                    d_error("Invalid type(%d)", event_get_param3(e));
+                    break;
+                }
+            }
+
+            gx_message_free(gx_message);
+            pkbuf_free(gxbuf);
             break;
         }
         default:

@@ -25,6 +25,7 @@ index_declare(smf_sess_pool, smf_sess_t, MAX_POOL_OF_SESS);
 index_declare(smf_bearer_pool, smf_bearer_t, MAX_POOL_OF_BEARER);
 
 pool_declare(smf_subnet_pool, smf_subnet_t, MAX_NUM_OF_SUBNET);
+pool_declare(smf_pf_pool, smf_pf_t, MAX_POOL_OF_PF);
 
 index_declare(smf_pdr_pool, smf_pdr_t, MAX_POOL_OF_SESS * 2);
 index_declare(smf_far_pool, smf_far_t, MAX_POOL_OF_SESS);
@@ -59,6 +60,8 @@ status_t smf_context_init()
     list_init(&self.subnet_list);
     pool_init(&smf_subnet_pool, MAX_NUM_OF_SUBNET);
     
+    pool_init(&smf_pf_pool, MAX_POOL_OF_PF);
+    
     self.start_time = time((time_t*)NULL);
     self.cp_function_features = 0;
     
@@ -92,6 +95,8 @@ status_t smf_context_final()
 
     pool_final(&smf_subnet_pool);
     smf_subnet_remove_all();
+    
+    pool_final(&smf_pf_pool);
     
     hash_destroy(self.sess_hash);
     
@@ -138,6 +143,15 @@ static status_t smf_context_validation()
     if (list_first(&self.upf_n4_list) == NULL)
     {
         d_error("No smf.upf in '%s'",
+                context_self()->config.path);
+        return CORE_ERROR;
+    }
+    if (self.fd_conf_path == NULL &&
+        (self.fd_config->cnf_diamid == NULL ||
+        self.fd_config->cnf_diamrlm == NULL ||
+        self.fd_config->cnf_addr == NULL))
+    {
+        d_error("No smf.freeDiameter in '%s'",
                 context_self()->config.path);
         return CORE_ERROR;
     }
@@ -591,6 +605,192 @@ status_t smf_context_parse_config()
 
                     } while(yaml_iter_type(&upf_array) == YAML_SEQUENCE_NODE);
                 }
+                else if (!strcmp(smf_key, "freeDiameter"))
+                {
+                    yaml_node_t *node = 
+                        yaml_document_get_node(document,smf_iter.pair->value);
+                    d_assert(node, return CORE_ERROR,);
+                    if (node->type == YAML_SCALAR_NODE)
+                    {
+                        self.fd_conf_path = yaml_iter_value(&smf_iter);
+                    }
+                    else if (node->type == YAML_MAPPING_NODE)
+                    {
+                        yaml_iter_t fd_iter;
+                        yaml_iter_recurse(&smf_iter, &fd_iter);
+
+                        while(yaml_iter_next(&fd_iter))
+                        {
+                            const char *fd_key = yaml_iter_key(&fd_iter);
+                            d_assert(fd_key, return CORE_ERROR,);
+                            if (!strcmp(fd_key, "identity"))
+                            {
+                                self.fd_config->cnf_diamid = 
+                                    yaml_iter_value(&fd_iter);
+                            }
+                            else if (!strcmp(fd_key, "realm"))
+                            {
+                                self.fd_config->cnf_diamrlm = 
+                                    yaml_iter_value(&fd_iter);
+                            }
+                            else if (!strcmp(fd_key, "port"))
+                            {
+                                const char *v = yaml_iter_value(&fd_iter);
+                                if (v) self.fd_config->cnf_port = atoi(v);
+                            }
+                            else if (!strcmp(fd_key, "sec_port"))
+                            {
+                                const char *v = yaml_iter_value(&fd_iter);
+                                if (v) self.fd_config->cnf_port_tls = atoi(v);
+                            }
+                            else if (!strcmp(fd_key, "no_sctp"))
+                            {
+                                self.fd_config->cnf_flags.no_sctp =
+                                    yaml_iter_bool(&fd_iter);
+                            }
+                            else if (!strcmp(fd_key, "listen_on"))
+                            {
+                                self.fd_config->cnf_addr = 
+                                    yaml_iter_value(&fd_iter);
+                            }
+                            else if (!strcmp(fd_key, "load_extension"))
+                            {
+                                yaml_iter_t ext_array, ext_iter;
+                                yaml_iter_recurse(&fd_iter, &ext_array);
+                                do
+                                {
+                                    const char *module = NULL;
+                                    const char *conf = NULL;
+
+                                    if (yaml_iter_type(&ext_array) ==
+                                        YAML_MAPPING_NODE)
+                                    {
+                                        memcpy(&ext_iter, &ext_array,
+                                                sizeof(yaml_iter_t));
+                                    }
+                                    else if (yaml_iter_type(&ext_array) ==
+                                        YAML_SEQUENCE_NODE)
+                                    {
+                                        if (!yaml_iter_next(&ext_array))
+                                            break;
+                                        yaml_iter_recurse(
+                                                &ext_array, &ext_iter);
+                                    }
+                                    else if (yaml_iter_type(&ext_array) ==
+                                        YAML_SCALAR_NODE)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                        d_assert(0, return CORE_ERROR,);
+
+                                    while(yaml_iter_next(&ext_iter))
+                                    {
+                                        const char *ext_key =
+                                            yaml_iter_key(&ext_iter);
+                                        d_assert(ext_key,
+                                                return CORE_ERROR,);
+                                        if (!strcmp(ext_key, "module"))
+                                        {
+                                            module = yaml_iter_value(&ext_iter);
+                                        }
+                                        else if (!strcmp(ext_key, "conf"))
+                                        {
+                                            conf = yaml_iter_value(&ext_iter);
+                                        }
+                                        else
+                                            d_warn("unknown key `%s`", ext_key);
+                                    }
+
+                                    if (module)
+                                    {
+                                        self.fd_config->
+                                            ext[self.fd_config->num_of_ext].
+                                                module = module;
+                                        self.fd_config->
+                                            ext[self.fd_config->num_of_ext].
+                                                conf = conf;
+                                        self.fd_config->num_of_ext++;
+                                    }
+                                } while(yaml_iter_type(&ext_array) ==
+                                        YAML_SEQUENCE_NODE);
+                            }
+                            else if (!strcmp(fd_key, "connect"))
+                            {
+                                yaml_iter_t conn_array, conn_iter;
+                                yaml_iter_recurse(&fd_iter, &conn_array);
+                                do
+                                {
+                                    const char *identity = NULL;
+                                    const char *addr = NULL;
+                                    c_uint16_t port = 0;
+
+                                    if (yaml_iter_type(&conn_array) ==
+                                        YAML_MAPPING_NODE)
+                                    {
+                                        memcpy(&conn_iter, &conn_array,
+                                                sizeof(yaml_iter_t));
+                                    }
+                                    else if (yaml_iter_type(&conn_array) ==
+                                        YAML_SEQUENCE_NODE)
+                                    {
+                                        if (!yaml_iter_next(&conn_array))
+                                            break;
+                                        yaml_iter_recurse(&conn_array, &conn_iter);
+                                    }
+                                    else if (yaml_iter_type(&conn_array) ==
+                                        YAML_SCALAR_NODE)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                        d_assert(0, return CORE_ERROR,);
+
+                                    while(yaml_iter_next(&conn_iter))
+                                    {
+                                        const char *conn_key =
+                                            yaml_iter_key(&conn_iter);
+                                        d_assert(conn_key,
+                                                return CORE_ERROR,);
+                                        if (!strcmp(conn_key, "identity"))
+                                        {
+                                            identity = yaml_iter_value(&conn_iter);
+                                        }
+                                        else if (!strcmp(conn_key, "addr"))
+                                        {
+                                            addr = yaml_iter_value(&conn_iter);
+                                        }
+                                        else if (!strcmp(conn_key, "port"))
+                                        {
+                                            const char *v =
+                                                yaml_iter_value(&conn_iter);
+                                            if (v) port = atoi(v);
+                                        }
+                                        else
+                                            d_warn("unknown key `%s`", conn_key);
+                                    }
+
+                                    if (identity && addr)
+                                    {
+                                        self.fd_config->
+                                            conn[self.fd_config->num_of_conn].
+                                                identity = identity;
+                                        self.fd_config->
+                                            conn[self.fd_config->num_of_conn].
+                                                addr = addr;
+                                        self.fd_config->
+                                            conn[self.fd_config->num_of_conn].
+                                                port = port;
+                                        self.fd_config->num_of_conn++;
+                                    }
+                                } while(yaml_iter_type(&conn_array) ==
+                                        YAML_SEQUENCE_NODE);
+                            }
+                            else
+                                d_warn("unknown key `%s`", fd_key);
+                        }
+                    }
+                }
             }
         }
     }
@@ -904,6 +1104,82 @@ smf_bearer_t* smf_bearer_add(smf_sess_t *sess)
     return bearer;
 }
 
+smf_bearer_t* smf_bearer_find_by_name(smf_sess_t *sess, c_int8_t *name)
+{
+    smf_bearer_t *bearer = NULL;
+    
+    d_assert(sess, return NULL, "Null param");
+    d_assert(name, return NULL, "Null param");
+
+    bearer = smf_bearer_first(sess);
+    while (bearer)
+    {
+        if (bearer->name && strcmp(bearer->name, name) == 0)
+            return bearer;
+
+        bearer = smf_bearer_next(bearer);
+    }
+
+    return NULL;
+}
+
+smf_bearer_t* smf_bearer_find_by_qci_arp(smf_sess_t *sess, 
+                                c_uint8_t qci,
+                                c_uint8_t priority_level,
+                                c_uint8_t pre_emption_capability,
+                                c_uint8_t pre_emption_vulnerability)
+{
+    smf_bearer_t *bearer = NULL;
+
+    d_assert(sess, return NULL, "Null param");
+
+    bearer = smf_default_bearer_in_sess(sess);
+    if (!bearer) return NULL;
+
+    if (sess->pdn.qos.qci == qci &&
+        sess->pdn.qos.arp.priority_level == priority_level &&
+        sess->pdn.qos.arp.pre_emption_capability == 
+            pre_emption_capability &&
+        sess->pdn.qos.arp.pre_emption_vulnerability == 
+            pre_emption_vulnerability)
+    {
+        return bearer;
+    }
+
+    bearer = smf_bearer_next(bearer);
+    while(bearer)
+    {
+        if (bearer->qos.qci == qci &&
+            bearer->qos.arp.priority_level == priority_level &&
+            bearer->qos.arp.pre_emption_capability == 
+                pre_emption_capability &&
+            bearer->qos.arp.pre_emption_vulnerability == 
+                pre_emption_vulnerability)
+        {
+            return bearer;
+        }
+        bearer = smf_bearer_next(bearer);
+    }
+
+    return NULL;
+}
+
+smf_bearer_t* smf_default_bearer_in_sess(smf_sess_t *sess)
+{
+    return smf_bearer_first(sess);
+}
+
+smf_bearer_t* smf_bearer_first(smf_sess_t *sess)
+{
+    d_assert(sess, return NULL, "Null param");
+    return list_first(&sess->bearer_list);
+}
+
+smf_bearer_t* smf_bearer_next(smf_bearer_t *bearer)
+{
+    return list_next(bearer);
+}
+
 smf_pdr_t* smf_pdr_add(smf_bearer_t *bearer)
 {
     smf_pdr_t *pdr = NULL;
@@ -973,6 +1249,78 @@ status_t smf_far_remove(smf_far_t *far)
     return CORE_OK;
 }
 
+smf_pf_t *smf_pf_add(smf_bearer_t *bearer, c_uint32_t precedence)
+{
+    smf_pf_t *pf = NULL;
+
+    d_assert(bearer, return NULL, "Null param");
+
+    pool_alloc_node(&smf_pf_pool, &pf);
+    d_assert(pf, return NULL, "Null param");
+
+    pf->identifier = NEXT_ID(bearer->pf_identifier, 1, 15);
+    pf->bearer = bearer;
+
+    list_append(&bearer->pf_list, pf);
+
+    return pf;
+}
+
+status_t smf_pf_remove(smf_pf_t *pf)
+{
+    d_assert(pf, return CORE_ERROR, "Null param");
+    d_assert(pf->bearer, return CORE_ERROR, "Null param");
+
+    list_remove(&pf->bearer->pf_list, pf);
+    pool_free_node(&smf_pf_pool, pf);
+
+    return CORE_OK;
+}
+
+status_t smf_pf_remove_all(smf_bearer_t *bearer)
+{
+    smf_pf_t *pf = NULL, *next_pf = NULL;
+
+    d_assert(bearer, return CORE_ERROR, "Null param");
+    
+    pf = smf_pf_first(bearer);
+    while (pf)
+    {
+        next_pf = smf_pf_next(pf);
+
+        smf_pf_remove(pf);
+
+        pf = next_pf;
+    }
+
+    return CORE_OK;
+}
+
+smf_pf_t* smf_pf_find_by_id(smf_bearer_t *bearer, c_uint8_t id)
+{
+    smf_pf_t *pf = NULL;
+    
+    pf = smf_pf_first(bearer);
+    while (pf)
+    {
+        if (pf->identifier == id)
+            return pf;
+
+        pf = smf_pf_next(pf);
+    }
+
+    return CORE_OK;
+}
+
+smf_pf_t* smf_pf_first(smf_bearer_t *bearer)
+{
+    return list_first(&bearer->pf_list);
+}
+
+smf_pf_t* smf_pf_next(smf_pf_t *pf)
+{
+    return list_next(pf);
+}
 
 status_t smf_ue_pool_generate()
 {

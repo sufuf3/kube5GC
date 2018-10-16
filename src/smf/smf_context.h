@@ -73,6 +73,8 @@ typedef struct _smf_sess_t {
     c_uint64_t      smf_n4_seid;    /* SMF SEID is derived from INDEX */
     c_uint64_t      upf_n4_seid;    /* UPF SEID is received from UPF */
     
+    c_int8_t        *gx_sid;        /* Gx Session ID */
+    
     /* User-Lication-Info */
     tai_t           tai;
     e_cgi_t         e_cgi;
@@ -184,6 +186,46 @@ typedef struct _smf_qer_t {
     c_uint16_t      qer_id;
 } smf_qer_t;
 
+typedef struct _smf_rule_t {
+    c_uint8_t proto;
+ED5(c_uint8_t ipv4_local:1;,
+    c_uint8_t ipv4_remote:1;,
+    c_uint8_t ipv6_local:1;,
+    c_uint8_t ipv6_remote:1;,
+    c_uint8_t reserved:4;)
+    struct {
+        struct {
+            c_uint32_t addr[4];
+            c_uint32_t mask[4];
+        } local;
+        struct {
+            c_uint32_t addr[4];
+            c_uint32_t mask[4];
+        } remote;
+    } ip;
+    struct {
+        struct {
+            c_uint16_t low;
+            c_uint16_t high;
+        } local;
+        struct {
+            c_uint16_t low;
+            c_uint16_t high;
+        } remote;
+    } port;
+} smf_rule_t;
+
+typedef struct _smf_pf_t {
+    lnode_t         node;
+
+ED3(c_uint8_t spare:2;,
+    c_uint8_t direction:2;,
+    c_uint8_t identifier:4;)
+    smf_rule_t      rule;
+
+    smf_bearer_t    *bearer;
+} smf_pf_t;
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
@@ -216,6 +258,18 @@ CORE_DECLARE(hash_index_t*)     smf_sess_next(hash_index_t *hi);
 
 CORE_DECLARE(smf_bearer_t*)     smf_bearer_add(smf_sess_t *sess);
 CORE_DECLARE(status_t)          smf_bearer_remove(smf_bearer_t *bearer);
+CORE_DECLARE(smf_bearer_t*)     smf_bearer_find_by_ebi(
+                                    smf_sess_t *sess, c_uint8_t ebi);
+CORE_DECLARE(smf_bearer_t*)     smf_bearer_find_by_name(
+                                    smf_sess_t *sess, c_int8_t *name);
+CORE_DECLARE(smf_bearer_t*)     smf_bearer_find_by_qci_arp(smf_sess_t *sess, 
+                                    c_uint8_t qci,
+                                    c_uint8_t priority_level,
+                                    c_uint8_t pre_emption_capability,
+                                    c_uint8_t pre_emption_vulnerability);
+CORE_DECLARE(smf_bearer_t*)     smf_default_bearer_in_sess(smf_sess_t *sess);
+CORE_DECLARE(smf_bearer_t*)     smf_bearer_first(smf_sess_t *sess);
+CORE_DECLARE(smf_bearer_t*)     smf_bearer_next(smf_bearer_t *bearer);
 
 CORE_DECLARE(smf_pdr_t*)        smf_pdr_add(smf_bearer_t *bearer);
 CORE_DECLARE(status_t)          smf_pdr_remove(smf_pdr_t *pdr);
@@ -223,6 +277,15 @@ CORE_DECLARE(smf_pdr_t*)        smf_pdr_find(index_t index);
 CORE_DECLARE(smf_pdr_t*)        smf_pdr_find_by_pdr_id(c_uint16_t pdr_id);
 CORE_DECLARE(smf_far_t*)        smf_far_add(smf_bearer_t *bearer);
 CORE_DECLARE(status_t)          smf_far_remove(smf_far_t *far);
+
+CORE_DECLARE(smf_pf_t*)         smf_pf_add(
+                                    smf_bearer_t *bearer, c_uint32_t precedence);
+CORE_DECLARE(status_t )         smf_pf_remove(smf_pf_t *pf);
+CORE_DECLARE(status_t )         smf_pf_remove_all(smf_bearer_t *bearer);
+CORE_DECLARE(smf_pf_t*)         smf_pf_find_by_id(
+                                    smf_bearer_t *smf_bearer, c_uint8_t id);
+CORE_DECLARE(smf_pf_t*)         smf_pf_first(smf_bearer_t *bearer);
+CORE_DECLARE(smf_pf_t*)         smf_pf_next(smf_pf_t *pf);
 
 CORE_DECLARE(status_t )         smf_ue_pool_generate(void);
 CORE_DECLARE(smf_ue_ip_t*)      smf_ue_ip_alloc(int family, const char *apn);
