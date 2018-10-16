@@ -137,3 +137,19 @@ status_t ngap_delayed_send_to_ran_ue(
         return ngap_send_to_ran_ue(ran_ue, pkbuf);
     }
 }
+
+status_t ngap_send_initial_context_setup_request(amf_ue_t *amf_ue)
+{
+    status_t rv;
+    pkbuf_t *ngapbuf = NULL;
+
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+
+    rv = ngap_build_initial_context_setup_request(&ngapbuf, amf_ue, NULL);
+    d_assert(rv == CORE_OK && ngapbuf, return CORE_ERROR, "ngapbuf build error");
+
+    // rv = nas_send_to_enb(amf_ue, ngapbuf);
+    // d_assert(rv == CORE_OK, return CORE_ERROR, "ngap send error");
+
+    return CORE_OK;
+}

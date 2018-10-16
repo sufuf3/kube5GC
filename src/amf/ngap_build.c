@@ -129,3 +129,26 @@ status_t ngap_build_setup_failure(pkbuf_t **pkbuf, NGAP_Cause_PR group, long cau
 {
     return CORE_OK;
 }
+
+/** 
+ *  Direction AMF -> NG-RAN Node
+ **/
+status_t ngap_build_initial_context_setup_request(
+            pkbuf_t **ngapbuf, amf_ue_t *amf_ue, pkbuf_t *naspdubuf)
+{
+    status_t rv;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_InitialContextSetupRequest_t *InitialContextSetupRequest = NULL;
+
+    NGAP_InitialContextSetupRequestIEs_t *ie = NULL;
+
+    NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+	NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+    NGAP_GUAMI_t *GUAMI = NULL;
+    NGAP_AllowedNSSAI_t	*AllowedNSSAI = NULL;
+    NGAP_UESecurityCapabilities_t *UESecurityCapabilities = NULL;
+	NGAP_SecurityKey_t *SecurityKey = NULL;
+
+    return rv;
+}
