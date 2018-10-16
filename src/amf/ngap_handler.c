@@ -170,3 +170,20 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
     d_assert(ngap_send_to_ran(ran, ngapbuf, NGAP_NON_UE_SIGNALLING) == CORE_OK,,
              "ngap_send_to_ran() failed");
 }
+
+
+void ngap_handle_initial_context_setup_response(amf_ran_t *ran, ngap_message_t *message)
+{                              
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_InitialContextSetupResponse_t *InitialContextSetupResponse = NULL;
+
+    d_assert(ran, return,);
+    d_assert(message, return,);
+
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    InitialContextSetupResponse =
+        &successfulOutcome->value.choice.InitialContextSetupResponse;
+    d_assert(InitialContextSetupResponse, return,);
+
+}
