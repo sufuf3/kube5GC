@@ -408,3 +408,137 @@ void ngap_handle_pdu_session_resource_setup_response(amf_ran_t *ran, ngap_messag
        
     }
 }
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_ue_context_modification_response(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];
+                              
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_UEContextModificationResponse_t *UEContextModificationResponse = NULL;
+
+    NGAP_UEContextModificationResponseIEs_t *ie = NULL;
+		NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+		// NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+    d_assert(message, return,);
+    
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    UEContextModificationResponse =
+        &successfulOutcome->value.choice.UEContextModificationResponse;
+    d_assert(UEContextModificationResponse, return,);
+
+    ran_ue_t *ran_ue = NULL;
+
+    for (i = 0; i < UEContextModificationResponse->protocolIEs.list.count; i++)
+    {
+        ie = UEContextModificationResponse->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID =
+                    &ie->value.choice.RAN_UE_NGAP_ID;
+                break;
+            // case NGAP_ProtocolIE_ID_id_CriticalityDiagnostics:
+            //     NGAP_CriticalityDiagnostics =
+            //         &ie->value.choice.CriticalityDiagnostics;
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    IP[%s] gnb_ID[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+
+    d_assert(AMF_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
+    
+    ran_ue = ran_ue_find_by_amf_ue_ngap_id(*AMF_UE_NGAP_ID);
+    d_trace(5, "    AMF_UE_NGAP_ID[%d] RAN_UE_NGAP_ID[%d]\n",
+            ran_ue->amf_ue_ngap_id, ran_ue->ran_ue_ngap_id);
+    if(!ran_ue)
+    {
+        //TODO: send ngap error indication
+        return;
+    }
+    d_trace(3, "UE Context modification. AMF_UE_NGAP_ID[%lu], RAN_UE_NGAP_ID[%lu]\n", *AMF_UE_NGAP_ID, *RAN_UE_NGAP_ID);
+}
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_ue_context_modification_failure(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];
+
+    NGAP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
+    NGAP_UEContextModificationFailure_t *UEContextModificationFailure = NULL;
+
+    NGAP_UEContextModificationFailureIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_Cause_t *Cause = NULL;
+			// NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+
+    d_assert(ran, return,);
+    d_assert(message, return,);
+
+    // amf_ue_t *amf_ue = NULL;
+    ran_ue_t *ran_ue = NULL;
+
+    unsuccessfulOutcome = message->choice.unsuccessfulOutcome;
+    d_assert(unsuccessfulOutcome, return,);
+    UEContextModificationFailure =
+        &unsuccessfulOutcome->value.choice.UEContextModificationFailure;
+    d_assert(UEContextModificationFailure, return,);
+
+    for (i = 0; i < UEContextModificationFailure->protocolIEs.list.count; i++)
+    {
+        ie = UEContextModificationFailure->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_Cause:
+                Cause = &ie->value.choice.Cause;
+            default:
+                break;
+        }
+    }
+    d_trace(5, "    IP[%s] gnb_ID[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+
+    d_assert(AMF_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
+    
+    ran_ue = ran_ue_find_by_amf_ue_ngap_id(*AMF_UE_NGAP_ID);
+    d_trace(5, "    AMF_UE_NGAP_ID[%d] RAN_UE_NGAP_ID[%d]\n",
+            ran_ue->amf_ue_ngap_id, ran_ue->ran_ue_ngap_id);
+    
+    d_trace(5, "    Cause[Group:%d Cause:%d]\n",
+            Cause->present, Cause->choice.radioNetwork);
+
+    if(!ran_ue)
+    {
+        //TODO: send ngap error indication
+        return;
+    }
+    d_trace(3, "UE Context modification. AMF_UE_NGAP_ID[%lu], RAN_UE_NGAP_ID[%lu]\n", *AMF_UE_NGAP_ID, *RAN_UE_NGAP_ID);
+}

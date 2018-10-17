@@ -338,3 +338,72 @@ status_t ngap_build_pdu_session_resource_setup_request(pkbuf_t **ngapbuf)
 
     return CORE_OK;
 }
+
+/**
+ * AMF -> NG-RAN node
+ **/
+status_t ngap_build_ue_context_modification_request(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
+{
+    status_t rv = 0;
+
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UEContextModificationRequest_t *UEContextModificationRequest = NULL;
+
+    NGAP_UEContextModificationRequestIEs_t *ie = NULL;
+			NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+			NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+			// NGAP_RANPagingPriority_t	 RANPagingPriority;
+			// NGAP_SecurityKey_t	 SecurityKey;
+			// NGAP_IndexToRFSP_t	 IndexToRFSP;
+			// NGAP_UEAggregateMaximumBitRate_t	 UEAggregateMaximumBitRate;
+			// NGAP_UESecurityCapabilities_t	 UESecurityCapabilities;
+			// NGAP_RRCInactiveAssistanceInformation_t	 RRCInactiveAssistanceInformation;
+			// NGAP_EmergencyFallbackIndicator_t	 EmergencyFallbackIndicator;
+    
+    d_assert(ran_ue, return CORE_ERROR, "Null param");
+    if (ran_ue->amf_ue_ngap_id == 0)
+    {
+        d_error("invalid amf ue ngap id (idx: %d)", ran_ue->index);
+        return CORE_ERROR;
+    }
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode =
+        NGAP_ProcedureCode_id_UEContextModification;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present =
+        NGAP_InitiatingMessage__value_PR_UEContextModificationRequest;
+    
+    UEContextModificationRequest = 
+        &initiatingMessage->value.choice.UEContextModificationRequest;
+ 
+    ie = core_calloc(1, sizeof(NGAP_UEContextModificationRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextModificationRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = ran_ue->amf_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_UEContextModificationRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UEContextModificationRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = ran_ue->ran_ue_ngap_id;
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}

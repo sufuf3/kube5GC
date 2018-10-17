@@ -17,6 +17,8 @@ CORE_DECLARE(void) ngap_handle_initial_context_setup_failure(amf_ran_t *ran, nga
 
 CORE_DECLARE(void) ngap_handle_pdu_session_resource_setup_response(amf_ran_t *ran, ngap_message_t *message);
 
+CORE_DECLARE(void) ngap_handle_ue_context_modification_response(amf_ran_t *ran, ngap_message_t *message);
+CORE_DECLARE(void) ngap_handle_ue_context_modification_failure(amf_ran_t *ran, ngap_message_t *message);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
