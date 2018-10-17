@@ -482,3 +482,103 @@ status_t ngap_build_ng_reset(
 
     return CORE_OK;
 }
+
+/**
+ * Direction: NG-RAN node -> AMF and AMF -> NG-RAN node
+ */ 
+status_t ngap_build_ng_reset_acknowledge(
+    pkbuf_t **ngapbuf,
+    NGAP_Cause_PR group, long cause,
+    NGAP_UE_associatedLogicalNG_ConnectionListRes_t *partOfNG_Interface)
+{
+    status_t rv;
+    int i = 0 ;
+
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_NGResetAcknowledge_t *NGResetAcknowledge = NULL;
+
+    NGAP_NGResetAcknowledgeIEs_t *ie = NULL;
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = 
+        core_calloc(1, sizeof(NGAP_SuccessfulOutcome_t));
+
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = NGAP_ProcedureCode_id_NGReset;
+    successfulOutcome->criticality = NGAP_Criticality_reject;
+    successfulOutcome->value.present =
+        NGAP_SuccessfulOutcome__value_PR_NGResetAcknowledge;
+    NGResetAcknowledge = &successfulOutcome->value.choice.NGResetAcknowledge;
+
+    if (partOfNG_Interface && partOfNG_Interface->list.count)
+    {
+        i = 0;
+        NGAP_UE_associatedLogicalNG_ConnectionListResAck_t *list = NULL;
+        ie = core_calloc(1, sizeof(NGAP_NGResetAcknowledgeIEs_t));
+        ASN_SEQUENCE_ADD(&NGResetAcknowledge->protocolIEs, ie);
+        
+        ie->id = NGAP_ProtocolIE_ID_id_UE_associatedLogicalNG_ConnectionListResAck;
+        ie->criticality = NGAP_Criticality_ignore;
+        ie->value.present = NGAP_NGResetAcknowledgeIEs__value_PR_UE_associatedLogicalNG_ConnectionListResAck;
+        list = &ie->value.choice.UE_associatedLogicalNG_ConnectionListResAck;
+
+        for(i = 0 ; i < partOfNG_Interface->list.count ; i++)
+        {
+            NGAP_UE_associatedLogicalNG_ConnectionItemResIEs_t *ie1 = NULL;
+            NGAP_UE_associatedLogicalNG_ConnectionItem_t *item1 = NULL;
+
+            NGAP_UE_associatedLogicalNG_ConnectionItemResAck_t *ie2 = NULL;
+            NGAP_UE_associatedLogicalNG_ConnectionItem_t *item2 = NULL;
+            
+            ie1 = (NGAP_UE_associatedLogicalNG_ConnectionItemResIEs_t *) 
+                partOfNG_Interface->list.array[i];
+            d_assert(ie1, return CORE_ERROR, );
+            item1 = &ie1->value.choice.UE_associatedLogicalNG_ConnectionItem;
+            d_assert(item1, return CORE_ERROR, );
+
+            if (item1->aMF_UE_NGAP_ID == NULL && item1->rAN_UE_NGAP_ID == NULL)
+            {
+                d_warn("No AMF_UE_NGAP_ID & RAN_UE_NGAP_ID");
+                continue;
+            }
+
+            ie2 = core_calloc(1, sizeof(NGAP_UE_associatedLogicalNG_ConnectionItemResAck_t));
+            d_assert(ie2, return CORE_ERROR, );
+            ASN_SEQUENCE_ADD(&list->list, ie2);
+
+            ie2->id = NGAP_ProtocolIE_ID_id_UE_associatedLogicalNG_ConnectionItem;
+            ie2->criticality = NGAP_Criticality_ignore;
+            ie2->value.present = NGAP_UE_associatedLogicalNG_ConnectionItemResAck__value_PR_UE_associatedLogicalNG_ConnectionItem;
+            item2 = &ie2->value.choice.UE_associatedLogicalNG_ConnectionItem;
+            d_assert(item2, return CORE_ERROR, );
+
+            if (item1->aMF_UE_NGAP_ID)
+            {
+                item2->aMF_UE_NGAP_ID = core_calloc(1, sizeof(NGAP_AMF_UE_NGAP_ID_t));
+                d_assert(item2->aMF_UE_NGAP_ID, return CORE_ERROR, );
+                *item2->aMF_UE_NGAP_ID = *item1->aMF_UE_NGAP_ID;
+            }
+            if (item1->rAN_UE_NGAP_ID)
+            {
+                item2->rAN_UE_NGAP_ID = core_calloc(1, sizeof(NGAP_RAN_UE_NGAP_ID_t));
+                d_assert(item2->rAN_UE_NGAP_ID, return CORE_ERROR, );
+                *item2->rAN_UE_NGAP_ID = *item1->rAN_UE_NGAP_ID;
+            }
+            d_trace(5, "    AMF_UE_NGAP_ID[%d] RAN_UE_NGAP_ID[%d]\n",
+                item2->aMF_UE_NGAP_ID ? *item2->aMF_UE_NGAP_ID : -1,
+                item2->rAN_UE_NGAP_ID ? *item2->rAN_UE_NGAP_ID : -1);
+        }
+    }
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
