@@ -17,7 +17,7 @@ CORE_DECLARE(status_t) ngap_build_initial_context_setup_request(
 CORE_DECLARE(status_t) ngap_build_pdu_session_resource_setup_request(pkbuf_t **ngapbuf);
 
 CORE_DECLARE(status_t) ngap_build_ue_context_modification_request(pkbuf_t **ngapbuf, ran_ue_t *ran_ue);
-
+CORE_DECLARE(status_t) ngap_build_ng_reset(pkbuf_t **ngapbuf, NGAP_Cause_PR group, long cause, NGAP_UE_associatedLogicalNG_ConnectionListRes_t *partOfNG_Interface);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

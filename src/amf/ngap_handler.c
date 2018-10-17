@@ -542,3 +542,132 @@ void ngap_handle_ue_context_modification_failure(amf_ran_t *ran, ngap_message_t 
     }
     d_trace(3, "UE Context modification. AMF_UE_NGAP_ID[%lu], RAN_UE_NGAP_ID[%lu]\n", *AMF_UE_NGAP_ID, *RAN_UE_NGAP_ID);
 }
+
+/**
+ * Direction: NG-RAN node -> AMF and AMF -> NG-RAN node
+ */ 
+void ngap_handle_ng_reset(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    status_t rv = 0;
+    char buf[CORE_ADDRSTRLEN];
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_NGReset_t *NGReset = NULL;
+
+    NGAP_NGResetIEs_t *ie = NULL;
+        NGAP_Cause_t *Cause = NULL;
+		NGAP_ResetType_t *ResetType = NULL;
+           NGAP_UE_associatedLogicalNG_ConnectionListRes_t *partOfNG_Interface = NULL;
+    
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    NGReset = &initiatingMessage->value.choice.NGReset;
+    d_assert(NGReset, return,);
+
+    d_trace(3, "[NG] Reset\n");
+
+    for(i = 0; i < NGReset->protocolIEs.list.count; i++)
+    {
+        ie = NGReset->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_Cause:
+                Cause = &ie->value.choice.Cause;
+                break;
+            case S1AP_ProtocolIE_ID_id_ResetType:
+                ResetType = &ie->value.choice.ResetType;
+                break;
+            default:
+                break;
+        }
+    }
+    d_trace(5, "    IP[%s] gnb_ID[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+
+    d_assert(Cause, return, );
+    d_trace(5, "    Cause[Group:%d Cause:%d]\n",
+        Cause->present, Cause->choice.radioNetwork);
+
+    switch(Cause->present)
+    {
+        case NGAP_Cause_PR_radioNetwork:
+        case NGAP_Cause_PR_transport:
+        case NGAP_Cause_PR_protocol:
+        case NGAP_Cause_PR_misc:
+            break;
+        case NGAP_Cause_PR_nas:
+            d_warn("NAS-Cause[%d]", Cause->choice.nas);
+        default:
+            d_warn("Invalid cause group[%d]", Cause->present);
+            break;
+    }
+    d_assert(ResetType, return,);
+    switch(ResetType->present)
+    {
+        case NGAP_ResetType_PR_nG_Interface:
+        {
+            d_trace(5, "    NGAP_ResetType_PR_nG_Interface\n");
+                 
+            rv = ran_ue_remove_in_ran(ran);
+            d_assert(rv == CORE_OK,,);
+            break;
+        }
+        case NGAP_ResetType_PR_partOfNG_Interface:
+        {
+            d_trace(5, "    S1AP_ResetType_PR_partOfS1_Interface\n");
+
+            partOfNG_Interface = ResetType->choice.partOfNG_Interface;
+            d_assert(partOfNG_Interface, return,);
+            for (i = 0; i < partOfNG_Interface->list.count; i++)
+            {
+                
+                NGAP_UE_associatedLogicalNG_ConnectionItemResIEs_t *ie2 = NULL;
+                NGAP_UE_associatedLogicalNG_ConnectionItem_t *item = NULL;
+
+                ran_ue_t *ran_ue = NULL;
+
+                ie2 = (NGAP_UE_associatedLogicalNG_ConnectionItemResIEs_t *)
+                    partOfNG_Interface->list.array[i];
+                d_assert(ie2, return,);
+
+                item = &ie2->value.choice.UE_associatedLogicalNG_ConnectionItem;
+                d_assert(item, return,);
+                
+                d_trace(5, "    AMF_UE_NGAP_ID[%d] RAN_UE_NGAP_ID[%d]\n",
+                        item->aMF_UE_NGAP_ID ? *item->aMF_UE_NGAP_ID : -1,
+                        item->rAN_UE_NGAP_ID ? *item->rAN_UE_NGAP_ID : -1);
+
+                if (item->aMF_UE_NGAP_ID)
+                    ran_ue = ran_ue_find_by_amf_ue_ngap_id(
+                            *item->aMF_UE_NGAP_ID);
+                else if (item->rAN_UE_NGAP_ID)
+                    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran,
+                            *item->rAN_UE_NGAP_ID);
+
+                if (ran_ue == NULL)
+                {
+                    d_warn("Cannot find S1 Context "
+                            "(AMF_UE_NGAP_ID[%d] RAN_UE_NGAP_ID[%d])\n",
+                            item->aMF_UE_NGAP_ID ? *item->aMF_UE_NGAP_ID : -1,
+                            item->rAN_UE_NGAP_ID ? *item->rAN_UE_NGAP_ID : -1);
+                    continue;
+                }
+
+                rv = ran_ue_remove(ran_ue);
+                d_assert(rv == CORE_OK,,);
+            }
+            break;
+        }
+        default:
+            d_warn("Invalid ResetType[%d]", ResetType->present);
+            break;
+    }
+    // TODO: add ngap send ng reset ack api
+    // rv = ngap_send_ng_reset_ack(ran, partOfNG_Interface);
+    d_assert(rv == CORE_OK,,);
+
+}

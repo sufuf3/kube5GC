@@ -407,3 +407,78 @@ status_t ngap_build_ue_context_modification_request(pkbuf_t **ngapbuf, ran_ue_t 
 
     return CORE_OK;
 }
+
+/**
+ * Direction: NG-RAN node -> AMF and AMF -> NG-RAN node
+ */ 
+status_t ngap_build_ng_reset(
+    pkbuf_t **ngapbuf,
+    NGAP_Cause_PR group, long cause,
+    NGAP_UE_associatedLogicalNG_ConnectionListRes_t *partOfNG_Interface)
+{
+    status_t rv = 0;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_NGReset_t *NGReset = NULL;
+
+    NGAP_NGResetIEs_t *ie = NULL;
+        NGAP_Cause_t *Cause = NULL;
+		NGAP_ResetType_t *ResetType = NULL;
+        //    NGAP_UE_associatedLogicalNG_ConnectionListRes_t *partOfNG_Interface = NULL;
+    
+    d_trace(3, "[AMF] Reset\n");
+    
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode =
+        NGAP_ProcedureCode_id_NGReset;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present =
+        NGAP_InitiatingMessage__value_PR_NGReset;
+    
+    NGReset = &initiatingMessage->value.choice.NGReset;
+
+    ie = core_calloc(1, sizeof(NGAP_NGResetIEs_t));
+    ASN_SEQUENCE_ADD(&NGReset->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_Cause;
+    ie->criticality = NGAP_Criticality_ignore;
+    Cause = &ie->value.choice.Cause;
+    
+    ie = core_calloc(1, sizeof(NGAP_NGResetIEs_t));
+    ASN_SEQUENCE_ADD(&NGReset->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_ResetType;
+    ie->criticality = NGAP_Criticality_reject;
+    ResetType = &ie->value.choice.ResetType;
+
+    Cause->present = group;
+    Cause->choice.radioNetwork = cause;
+
+    d_trace(5, "    Group[%d] Cause[%d] partOfNG_Interface[%p]\n",
+        Cause->present, Cause->choice.radioNetwork, partOfNG_Interface);
+
+    if (partOfNG_Interface)
+    {
+        ResetType->present = NGAP_ResetType_PR_partOfNG_Interface;
+        ResetType->choice.partOfNG_Interface = partOfNG_Interface;
+    }
+    else
+    {
+        ResetType->present = NGAP_ResetType_PR_nG_Interface;
+        ResetType->choice.nG_Interface = NGAP_ResetAll_reset_all;
+    }
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("s1ap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
