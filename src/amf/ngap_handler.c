@@ -331,3 +331,80 @@ void ngap_handle_initial_context_setup_failure(amf_ran_t *ran, ngap_message_t *m
         //        "mme_send_delete_session_or_ue_context_release() failed");
     }
 }
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_pdu_session_resource_setup_response(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+
+    char buf[CORE_ADDRSTRLEN];
+                              
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_PDUSessionResourceSetupResponse_t *PDUSessionResourceSetupResponse = NULL;
+
+    NGAP_PDUSessionResourceSetupResponseIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_PDUSessionResourceSetupListSURes_t	*PDUSessionResourceSetupListSURes = NULL;
+    d_assert(ran, return,);
+    d_assert(message, return,);
+
+    amf_ue_t *amf_ue = NULL;
+    ran_ue_t *ran_ue = NULL;
+
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    PDUSessionResourceSetupResponse =
+        &successfulOutcome->value.choice.PDUSessionResourceSetupResponse;
+    d_assert(PDUSessionResourceSetupResponse, return,);
+
+    for (i = 0; i < PDUSessionResourceSetupResponse->protocolIEs.list.count; i++)
+    {
+        ie = PDUSessionResourceSetupResponse->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID =
+                    &ie->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_PDUSessionResourceSetupListSURes:
+                PDUSessionResourceSetupListSURes =
+                    &ie->value.choice.PDUSessionResourceSetupListSURes;
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    IP[%s] gnb_ID[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+
+    d_assert(AMF_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
+    amf_ue = ran_ue->amf_ue;
+    d_assert(amf_ue, return, );
+
+    ran_ue = ran_ue_find_by_amf_ue_ngap_id(*AMF_UE_NGAP_ID);
+    d_trace(5, "    AMF_UE_NGAP_ID[%d] RAN_UE_NGAP_ID[%d]\n",
+            ran_ue->amf_ue_ngap_id, ran_ue->ran_ue_ngap_id);
+
+    
+    d_assert(PDUSessionResourceSetupListSURes, return, );
+    for (i = 0 ; i < PDUSessionResourceSetupListSURes->list.count; i++)
+    {   
+        NGAP_PDUSessionResourceSetupItemCxtReq_t *ie2 = NULL;
+        // NGAP_PDUSessionResourceSetupResponseTransfer_t *PDUSessionResourceSetupResponseTransfer = NULL;
+        ie2 = (NGAP_PDUSessionResourceSetupItemCxtReq_t *) 
+            PDUSessionResourceSetupListSURes->list.array[i];
+        d_assert(ie2, return,);
+
+        amf_ue->psi = ie2->pDUSessionID;
+        //ie2->pDUSessionResourceSetupRequestTransfer;
+       
+    }
+}
