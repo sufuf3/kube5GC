@@ -9,6 +9,7 @@
 #include "ngap_build.h"
 #include "ngap_handler.h"
 
+
 void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 {
     int i = 0, j = 0, k = 0;
@@ -218,8 +219,9 @@ void ngap_handle_initial_context_setup_response(amf_ran_t *ran, ngap_message_t *
                 break;
         }
     }
-    d_trace(5, "    IP[%s] gnb_ID[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+
+    d_trace(5, "    IP[%s] ran_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id);
 
     d_assert(AMF_UE_NGAP_ID, return, );
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
@@ -290,8 +292,8 @@ void ngap_handle_initial_context_setup_failure(amf_ran_t *ran, ngap_message_t *m
         }
     }
 
-    d_trace(5, "    IP[%s] gnb_id[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+    d_trace(5, "    IP[%s] ran_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id);
 
     d_assert(AMF_UE_NGAP_ID, return,);
     d_assert(RAN_UE_NGAP_ID, return,);
@@ -380,8 +382,8 @@ void ngap_handle_pdu_session_resource_setup_response(amf_ran_t *ran, ngap_messag
         }
     }
 
-    d_trace(5, "    IP[%s] gnb_ID[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+    d_trace(5, "    IP[%s] ran_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id);
 
     d_assert(AMF_UE_NGAP_ID, return, );
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
@@ -457,8 +459,8 @@ void ngap_handle_ue_context_modification_response(amf_ran_t *ran, ngap_message_t
         }
     }
 
-    d_trace(5, "    IP[%s] gnb_ID[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+    d_trace(5, "    IP[%s] ran_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id);
 
     d_assert(AMF_UE_NGAP_ID, return, );
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
@@ -521,8 +523,8 @@ void ngap_handle_ue_context_modification_failure(amf_ran_t *ran, ngap_message_t 
                 break;
         }
     }
-    d_trace(5, "    IP[%s] gnb_ID[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+    d_trace(5, "    IP[%s] ran_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id);
 
     d_assert(AMF_UE_NGAP_ID, return, );
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
@@ -585,8 +587,8 @@ void ngap_handle_ng_reset(amf_ran_t *ran, ngap_message_t *message)
                 break;
         }
     }
-    d_trace(5, "    IP[%s] gnb_ID[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->gnb_id);
+    d_trace(5, "    IP[%s] ran_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id);
 
     d_assert(Cause, return, );
     d_trace(5, "    Cause[Group:%d Cause:%d]\n",
