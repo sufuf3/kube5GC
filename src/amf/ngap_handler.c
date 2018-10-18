@@ -220,9 +220,22 @@ void ngap_handle_initial_context_setup_response(amf_ran_t *ran, ngap_message_t *
         }
     }
 
-    d_trace(5, "    IP[%s] ran_id[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->ran_id);
-
+     switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    
     d_assert(AMF_UE_NGAP_ID, return, );
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
     d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
@@ -292,8 +305,21 @@ void ngap_handle_initial_context_setup_failure(amf_ran_t *ran, ngap_message_t *m
         }
     }
 
-    d_trace(5, "    IP[%s] ran_id[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->ran_id);
+     switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
 
     d_assert(AMF_UE_NGAP_ID, return,);
     d_assert(RAN_UE_NGAP_ID, return,);
@@ -381,10 +407,23 @@ void ngap_handle_pdu_session_resource_setup_response(amf_ran_t *ran, ngap_messag
                 break;
         }
     }
-
-    d_trace(5, "    IP[%s] ran_id[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->ran_id);
-
+    
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    
     d_assert(AMF_UE_NGAP_ID, return, );
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
     d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
@@ -459,9 +498,22 @@ void ngap_handle_ue_context_modification_response(amf_ran_t *ran, ngap_message_t
         }
     }
 
-    d_trace(5, "    IP[%s] ran_id[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->ran_id);
-
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    
     d_assert(AMF_UE_NGAP_ID, return, );
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
     d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
@@ -523,9 +575,23 @@ void ngap_handle_ue_context_modification_failure(amf_ran_t *ran, ngap_message_t 
                 break;
         }
     }
-    d_trace(5, "    IP[%s] ran_id[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->ran_id);
-
+    
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    
     d_assert(AMF_UE_NGAP_ID, return, );
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
     d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
@@ -587,8 +653,22 @@ void ngap_handle_ng_reset(amf_ran_t *ran, ngap_message_t *message)
                 break;
         }
     }
-    d_trace(5, "    IP[%s] ran_id[%d]\n",
-            CORE_ADDR(ran->addr, buf), ran->ran_id);
+
+     switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
 
     d_assert(Cause, return, );
     d_trace(5, "    Cause[Group:%d Cause:%d]\n",
