@@ -446,12 +446,14 @@ status_t ngap_build_ng_reset(
     ASN_SEQUENCE_ADD(&NGReset->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_Cause;
     ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_NGResetIEs__value_PR_Cause;
     Cause = &ie->value.choice.Cause;
     
     ie = core_calloc(1, sizeof(NGAP_NGResetIEs_t));
     ASN_SEQUENCE_ADD(&NGReset->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_ResetType;
     ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_NGResetIEs__value_PR_ResetType;
     ResetType = &ie->value.choice.ResetType;
 
     Cause->present = group;
@@ -571,6 +573,130 @@ status_t ngap_build_ng_reset_acknowledge(
                 item2->rAN_UE_NGAP_ID ? *item2->rAN_UE_NGAP_ID : -1);
         }
     }
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
+status_t ngap_build_handover_cancel_acknowledge(pkbuf_t **ngapbuf, ran_ue_t *sourece_ue)
+{
+    status_t rv = 0;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_HandoverCancelAcknowledge_t *HandoverCancel = NULL;
+
+    NGAP_HandoverCancelIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        // NGAP_Cause_t	 Cause;
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = 
+        core_calloc(1, sizeof(NGAP_SuccessfulOutcome_t));
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = NGAP_ProcedureCode_id_HandoverCancel;
+    successfulOutcome->criticality = NGAP_Criticality_reject;
+    successfulOutcome->value.present =
+        NGAP_SuccessfulOutcome__value_PR_HandoverCancelAcknowledge;
+    HandoverCancel = &successfulOutcome->value.choice.HandoverCancelAcknowledge;
+
+    ie = core_calloc(1, sizeof(NGAP_UEContextModificationRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverCancel->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverCancelAcknowledgeIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = sourece_ue->amf_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_UEContextModificationRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverCancel->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverCancelAcknowledgeIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = sourece_ue->ran_ue_ngap_id;
+    
+    d_trace(5, "    Source : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+            sourece_ue->ran_ue_ngap_id, sourece_ue->amf_ue_ngap_id);
+  
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
+/**
+ * Direction: AMF -> NG-RAN node
+ **/
+
+status_t ngap_build_ue_context_release_command(pkbuf_t **ngapbuf, ran_ue_t *ran_ue, NGAP_Cause_PR group, long cause)
+{
+    status_t rv = 0;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UEContextReleaseCommand_t *UEContextReleaseCommand = NULL;
+
+    NGAP_UEContextReleaseCommand_IEs_t *ie = NULL;
+        NGAP_UE_NGAP_IDs_t *UE_NGAP_IDs = NULL;
+        // NGAP_RANPagingPriority_t	 RANPagingPriority;
+        NGAP_Cause_t *Cause = NULL;
+    
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_UEContextRelease;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_UEContextReleaseCommand;
+    UEContextReleaseCommand = &initiatingMessage->value.choice.UEContextReleaseCommand;
+    
+    ie = core_calloc(1, sizeof(NGAP_UEContextReleaseCommand_IEs_t));
+    ASN_SEQUENCE_ADD(&UEContextReleaseCommand->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_UE_NGAP_IDs;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_UEContextReleaseCommand_IEs__value_PR_UE_NGAP_IDs;
+    UE_NGAP_IDs = &ie->value.choice.UE_NGAP_IDs;
+
+    if (ran_ue->ran_ue_ngap_id == INVALID_UE_NGAP_ID)
+    {
+        UE_NGAP_IDs->present = NGAP_UE_NGAP_IDs_PR_aMF_UE_NGAP_ID;
+        UE_NGAP_IDs->choice.aMF_UE_NGAP_ID = ran_ue->amf_ue_ngap_id;
+    }
+    else
+    {
+        UE_NGAP_IDs->present = NGAP_UE_NGAP_IDs_PR_uE_NGAP_ID_pair;
+        UE_NGAP_IDs->choice.uE_NGAP_ID_pair = core_calloc(1, sizeof(NGAP_UE_NGAP_ID_pair_t));
+        UE_NGAP_IDs->choice.uE_NGAP_ID_pair->aMF_UE_NGAP_ID = ran_ue->amf_ue_ngap_id;
+        UE_NGAP_IDs->choice.uE_NGAP_ID_pair->rAN_UE_NGAP_ID = ran_ue->ran_ue_ngap_id;
+        UE_NGAP_IDs->choice.aMF_UE_NGAP_ID =ran_ue->amf_ue_ngap_id;
+    }
+
+    ie = core_calloc(1, sizeof(NGAP_UEContextReleaseCommand_IEs_t));
+    ASN_SEQUENCE_ADD(&UEContextReleaseCommand->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_Cause;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_UEContextReleaseCommand_IEs__value_PR_Cause;
+    Cause = &ie->value.choice.Cause;
+
+    Cause->present = group;
+    Cause->choice.radioNetwork = cause;
+
     rv = ngap_encode_pdu(ngapbuf, &pdu);
     ngap_free_pdu(&pdu);
 

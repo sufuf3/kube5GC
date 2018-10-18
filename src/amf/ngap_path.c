@@ -153,3 +153,51 @@ status_t ngap_send_initial_context_setup_request(amf_ue_t *amf_ue)
 
     return CORE_OK;
 }
+
+status_t ngap_send_handover_cancel_acknowledge(ran_ue_t *source_ue)
+{
+    status_t rv;
+    pkbuf_t *ngapbuf = NULL;
+
+    d_assert(source_ue, return CORE_ERROR,);
+
+    rv = ngap_build_handover_cancel_acknowledge(&ngapbuf, source_ue);
+    d_assert(rv == CORE_OK && ngapbuf, return CORE_ERROR, "ngap build error");
+
+    rv = ngap_send_to_ran_ue(source_ue, ngapbuf);
+    d_assert(rv == CORE_OK,, "ngap send error");
+
+    return rv;
+}
+
+status_t ngap_send_ue_context_release_command(
+    ran_ue_t *ran_ue, NGAP_Cause_PR group, long cause,
+    c_uint8_t action, c_uint32_t delay)
+{
+    status_t rv;
+    pkbuf_t *ngapbuf = NULL;
+
+    //d_assert(action != S1AP_UE_CTX_REL_INVALID_ACTION, return CORE_ERROR,
+    //        "Should give valid action for UE Context Release Command");
+
+    d_assert(action != 0, return CORE_ERROR,
+           "Should give valid action for UE Context Release Command");
+
+    d_assert(ran_ue, return CORE_ERROR, "Null param");
+    //TODO: add ue ctx rel action 
+    // ran_ue->ue_ctx_rel_action = action;
+
+    d_trace(3, "[AMF] UE Context release command\n");
+    d_trace(5, "    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+            ran_ue->ran_ue_ngap_id, ran_ue->amf_ue_ngap_id);
+    d_trace(5, "    Group[%d] Cause[%d] Action[%d] Delay[%d]\n",
+            group, cause, action, delay);
+
+    rv = ngap_build_ue_context_release_command(&ngapbuf, ran_ue, group, cause);
+    d_assert(rv == CORE_OK && ngapbuf, return CORE_ERROR, "ngapbuf build error");
+
+    rv = ngap_delayed_send_to_ran_ue(ran_ue, ngapbuf, delay);
+    d_assert(rv == CORE_OK,, "ngapbuf send error");
+    
+    return CORE_OK;
+}

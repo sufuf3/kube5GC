@@ -646,7 +646,7 @@ void ngap_handle_ng_reset(amf_ran_t *ran, ngap_message_t *message)
             case NGAP_ProtocolIE_ID_id_Cause:
                 Cause = &ie->value.choice.Cause;
                 break;
-            case S1AP_ProtocolIE_ID_id_ResetType:
+            case NGAP_ProtocolIE_ID_id_ResetType:
                 ResetType = &ie->value.choice.ResetType;
                 break;
             default:
@@ -752,4 +752,135 @@ void ngap_handle_ng_reset(amf_ran_t *ran, ngap_message_t *message)
     // rv = ngap_send_ng_reset_ack(ran, partOfNG_Interface);
     d_assert(rv == CORE_OK,,);
 
+}
+
+
+/**
+ * Direction: NG-RAN node -> AMF 
+ */ 
+void ngap_handle_handover_cancel(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    status_t rv = 0;
+    char buf[CORE_ADDRSTRLEN];
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_HandoverCancel_t *HandoverCancel = NULL;
+
+    NGAP_HandoverCancelIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_Cause_t *Cause = NULL;
+    
+    ran_ue_t *source_ue = NULL;
+    ran_ue_t *target_ue = NULL;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+    d_assert(message, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    HandoverCancel = &initiatingMessage->value.choice.HandoverCancel;
+    d_assert(HandoverCancel, return,);
+
+    d_trace(3, "[NG] HandoverCancel\n");
+
+    for(i = 0; i < HandoverCancel->protocolIEs.list.count; i++)
+    {
+        ie = HandoverCancel->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_Cause:
+                Cause = &ie->value.choice.Cause;
+                break;
+            default:
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+
+    d_assert(AMF_UE_NGAP_ID, return,);
+    d_assert(RAN_UE_NGAP_ID, return,);
+    d_assert(Cause, return,);
+
+    source_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(source_ue, return, "Cannot find UE for RAN_UE_NGAP_ID%d]", *RAN_UE_NGAP_ID);
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+
+    d_assert(source_ue->amf_ue_ngap_id == *AMF_UE_NGAP_ID, return,
+            "Conflict MME-UE-S1AP-ID : %d != %d\n",
+            source_ue->amf_ue_ngap_id, *AMF_UE_NGAP_ID);
+    
+    target_ue = source_ue->target_ue;
+    d_assert(target_ue, return,);
+
+    d_trace(5, "    Source : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+            source_ue->ran_ue_ngap_id, source_ue->amf_ue_ngap_id);
+    d_trace(5, "    Target : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+            target_ue->ran_ue_ngap_id, target_ue->amf_ue_ngap_id);
+
+    rv = ngap_send_handover_cancel_acknowledge(source_ue);
+    d_assert(rv == CORE_OK,, "ngap send error");
+
+    rv = ngap_send_ue_context_release_command(
+        target_ue, NGAP_Cause_PR_radioNetwork,
+        NGAP_CauseRadioNetwork_handover_cancelled,
+        4, 3000);
+    
+    d_assert(rv == CORE_OK, return, "ngap send error");
+
+    d_trace(3, "[AMF] Handover Cancel : "
+            "UE[RAN-UE-NGAP-ID(%d)] --> ", source_ue->ran_ue_ngap_id);
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
 }

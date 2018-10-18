@@ -33,6 +33,10 @@ CORE_DECLARE(status_t) ngap_send_to_ran_ue(ran_ue_t *ran_ue, pkbuf_t *pkbuf);
 CORE_DECLARE(status_t) ngap_delayed_send_to_ran_ue(ran_ue_t *ran_ue,
         pkbuf_t *pkbuf, c_uint32_t duration);
 
+CORE_DECLARE(status_t) ngap_send_handover_cancel_acknowledge(ran_ue_t *source_ue);
+
+CORE_DECLARE(status_t) ngap_send_ue_context_release_command(ran_ue_t *ran_ue, NGAP_Cause_PR group, long cause, c_uint8_t action, c_uint32_t delay);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
