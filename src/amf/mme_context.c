@@ -2733,14 +2733,6 @@ status_t mme_ue_deassociate(mme_ue_t *mme_ue)
     return CORE_OK;
 }
 
-//status_t amf_ue_deassociate(amf_ue_t *amf_ue)
-//{
-//    d_assert(amf_ue, return CORE_ERROR, "Null param");
-//    amf_ue->ran_ue = NULL;
-    
-//    return CORE_OK;
-//}
-
 status_t source_ue_associate_target_ue(
         enb_ue_t *source_ue, enb_ue_t *target_ue)
 {
@@ -3414,3 +3406,98 @@ status_t mme_overload_checking_init()
 }
 /******************************************************/
 
+status_t amf_ue_deassociate(amf_ue_t *amf_ue)
+{
+   d_assert(amf_ue, return CORE_ERROR, "Null param");
+   amf_ue->ran_ue = NULL;
+    
+   return CORE_OK;
+}
+
+status_t amf_ue_remove(amf_ue_t *amf_ue)
+{
+    // status_t rv;
+    event_t e;
+
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+
+    event_set_param1(&e, (c_uintptr_t)amf_ue->index);
+    fsm_final(&amf_ue->sm, &e);
+    fsm_clear(&amf_ue->sm);
+#if 0 //TODO: clean function.
+    /* Clear hash table */
+    if (mme_ue->m_tmsi)
+    {
+        hash_set(self.guti_ue_hash, &mme_ue->guti, sizeof(guti_t), NULL);
+        d_assert(mme_m_tmsi_free(mme_ue->m_tmsi) == CORE_OK,,);
+    }
+    if (mme_ue->imsi_len != 0)
+        hash_set(self.imsi_ue_hash, mme_ue->imsi, mme_ue->imsi_len, NULL);
+    
+    /* Clear the saved PDN Connectivity Request */
+    NAS_CLEAR_DATA(&mme_ue->pdn_connectivity_request);
+
+    /* Clear Paging info : stop t3413, last_paing_msg */
+    CLEAR_PAGING_INFO(mme_ue);
+
+    /* Free UeRadioCapability */
+#if 0
+    if (mme_ue->radio_capa)
+    {
+        S1AP_UERadioCapability_t *radio_capa = 
+            (S1AP_UERadioCapability_t *)mme_ue->radio_capa;
+
+        if (radio_capa->buf)
+            CORE_FREE(radio_capa->buf);
+        CORE_FREE(mme_ue->radio_capa);
+    }
+#else
+    S1AP_CLEAR_DATA(&mme_ue->ueRadioCapability);
+#endif
+
+    /* Clear Transparent Container */
+    S1AP_CLEAR_DATA(&mme_ue->container);
+
+    /* Delete All Timers */
+    tm_delete(mme_ue->t3413);
+
+    rv = mme_ue_deassociate(mme_ue);
+    d_assert(rv == CORE_OK,,);
+
+    mme_sess_remove_all(mme_ue);
+    mme_pdn_remove_all(mme_ue);
+
+    index_free(&mme_ue_pool, mme_ue);
+#endif
+    return CORE_OK;
+}
+
+status_t source_ue_deassociate_target_ue_5g(ran_ue_t *ran_ue)
+{
+    ran_ue_t *source_ue = NULL;
+    ran_ue_t *target_ue = NULL;
+    d_assert(ran_ue, return CORE_ERROR,);
+
+    if (ran_ue->target_ue)
+    {
+        source_ue = ran_ue;
+        target_ue = ran_ue->target_ue;
+
+        d_assert(source_ue->target_ue, return CORE_ERROR,);
+        d_assert(target_ue->source_ue, return CORE_ERROR,);
+        source_ue->target_ue = NULL;
+        target_ue->source_ue = NULL;
+    }
+    else if (ran_ue->source_ue)
+    {
+        target_ue = ran_ue;
+        source_ue = ran_ue->source_ue;
+
+        d_assert(source_ue->target_ue, return CORE_ERROR,);
+        d_assert(target_ue->source_ue, return CORE_ERROR,);
+        source_ue->target_ue = NULL;
+        target_ue->source_ue = NULL;
+    }
+
+    return CORE_OK;
+}

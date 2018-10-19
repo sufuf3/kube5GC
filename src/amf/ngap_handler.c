@@ -990,7 +990,7 @@ void ngap_handle_ue_context_release_complete(amf_ran_t *ran, ngap_message_t *mes
             d_assert(rv == CORE_OK,, "ran_ue_remove() failed");
 
             d_assert(amf_ue,,);
-            // rv = amf_ue_deassociate(amf_ue);
+            rv = amf_ue_deassociate(amf_ue);
             d_assert(rv == CORE_OK,, "amf_ue_deassociate() failed");
             break;
         }
@@ -1001,7 +1001,7 @@ void ngap_handle_ue_context_release_complete(amf_ran_t *ran, ngap_message_t *mes
             d_assert(rv == CORE_OK,, "ran_ue_remove() failed");
 
             d_assert(amf_ue,,);
-            // rv = amf_ue_remove(amf_ue);
+            rv = amf_ue_remove(amf_ue);
             d_assert(rv == CORE_OK,, "amf_ue_remove() failed");
             break;
         }
@@ -1009,30 +1009,33 @@ void ngap_handle_ue_context_release_complete(amf_ran_t *ran, ngap_message_t *mes
         {
             d_trace(5, "    Action: Delete indirect tunnel\n");
 
-            //rv = source_ue_deassociate_target_ue(ran_ue);
+            rv = source_ue_deassociate_target_ue_5g(ran_ue);
             d_assert(rv == CORE_OK,,
-                    "source_ue_deassociate_target_ue() failed");
+                    "source_ue_deassociate_target_ue_5g() failed");
 
             rv = ran_ue_remove(ran_ue);
             d_assert(rv == CORE_OK,, "ran_ue_remove() failed");
 
-            //d_assert(amf,,);
-            // if (amf_ue_have_indirect_tunnel(amf_ue))
-            // {
-            //     //TODO:
-            //     // rv = mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(mme_ue);
-            //     // d_assert(rv == CORE_OK,, "mme_gtp_send_delete_indirect_data_"
-            //     //     "forwarding_tunnel_request() failed");
-            // }
-            // else
-            // {
-            //     d_warn("Check your eNodeB");
-            //     d_warn("  There is no INDIRECT TUNNEL");
-            //     d_warn("  Packet could be dropped during S1-Handover");
-            //     // rv = amf_ue_clear_indirect_tunnel(amf_ue);
-            //     d_assert(rv == CORE_OK,,
-            //             "amf_ue_clear_indirect_tunnel() failed");
-            // }
+            //TODO: fix it.
+#if 0
+            d_assert(amf,,);
+            if (amf_ue_have_indirect_tunnel(amf_ue))
+            {
+                //TODO:
+                // rv = mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(mme_ue);
+                // d_assert(rv == CORE_OK,, "mme_gtp_send_delete_indirect_data_"
+                //     "forwarding_tunnel_request() failed");
+            }
+            else
+            {
+                d_warn("Check your eNodeB");
+                d_warn("  There is no INDIRECT TUNNEL");
+                d_warn("  Packet could be dropped during S1-Handover");
+                // rv = amf_ue_clear_indirect_tunnel(amf_ue);
+                d_assert(rv == CORE_OK,,
+                        "amf_ue_clear_indirect_tunnel() failed");
+            }
+#endif
             break;
         }
         default:

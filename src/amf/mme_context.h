@@ -1028,7 +1028,6 @@ CORE_DECLARE(status_t)      mme_ue_associate_enb_ue(
 /*************************add by HU***************************/
 CORE_DECLARE(status_t)      ran_ue_deassociate(ran_ue_t *ran_ue);
 /*************************************************************/
-CORE_DECLARE(status_t)      amf_ue_deassociate(amf_ue_t *amf_ue);
 
 CORE_DECLARE(status_t)      enb_ue_deassociate(enb_ue_t *enb_ue);
 CORE_DECLARE(status_t)      mme_ue_deassociate(mme_ue_t *mme_ue);
@@ -1087,6 +1086,12 @@ CORE_DECLARE(status_t)      mme_m_tmsi_free(mme_m_tmsi_t *tmsi);
 
 /******************** Added by Chi ********************/
 CORE_DECLARE(status_t)      mme_overload_checking_init(void);
+/******************************************************/
+
+/******************** Added by Dobie ********************/
+CORE_DECLARE(status_t)      amf_ue_deassociate(amf_ue_t *amf_ue);
+CORE_DECLARE(status_t)      amf_ue_remove(amf_ue_t *amf_ue);
+CORE_DECLARE(status_t)      source_ue_deassociate_target_ue_5g(ran_ue_t *ran_ue);
 /******************************************************/
 
 #ifdef __cplusplus
