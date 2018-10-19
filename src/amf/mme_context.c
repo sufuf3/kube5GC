@@ -2733,6 +2733,14 @@ status_t mme_ue_deassociate(mme_ue_t *mme_ue)
     return CORE_OK;
 }
 
+//status_t amf_ue_deassociate(amf_ue_t *amf_ue)
+//{
+//    d_assert(amf_ue, return CORE_ERROR, "Null param");
+//    amf_ue->ran_ue = NULL;
+    
+//    return CORE_OK;
+//}
+
 status_t source_ue_associate_target_ue(
         enb_ue_t *source_ue, enb_ue_t *target_ue)
 {

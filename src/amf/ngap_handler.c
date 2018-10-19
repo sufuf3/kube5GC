@@ -884,3 +884,161 @@ void ngap_handle_handover_cancel(amf_ran_t *ran, ngap_message_t *message)
             break;
     }
 }
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_ue_context_release_complete(amf_ran_t *ran, ngap_message_t *message)
+{
+    status_t rv = 0;
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];
+                              
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_UEContextReleaseComplete_t *UEContextReleaseComplete = NULL;
+
+    NGAP_UEContextReleaseComplete_IEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        // NGAP_UserLocationInformation_t	 UserLocationInformation;
+        // NGAP_InfoOnRecommendedCellsAndRANNodesForPaging_t	 InfoOnRecommendedCellsAndRANNodesForPaging;
+        // NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+    
+    amf_ue_t *amf_ue = NULL;
+    ran_ue_t *ran_ue = NULL;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+    d_assert(message, return,);
+    
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    UEContextReleaseComplete =
+        &successfulOutcome->value.choice.UEContextReleaseComplete;
+    d_assert(UEContextReleaseComplete, return,);
+    d_trace(3, "[AMF] UE Context release complete\n");
+
+    for (i = 0; i < UEContextReleaseComplete->protocolIEs.list.count; i++)
+    {
+        ie = UEContextReleaseComplete->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID =
+                    &ie->value.choice.RAN_UE_NGAP_ID;
+                break;
+            // case NGAP_ProtocolIE_ID_id_CriticalityDiagnostics:
+            //     NGAP_CriticalityDiagnostics =
+            //         &ie->value.choice.CriticalityDiagnostics;
+            default:
+                break;
+        }
+    }
+    
+    d_trace(5, "    ran[%s] \n",
+            CORE_ADDR(ran->addr, buf));
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    
+    d_assert(AMF_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
+    
+    ran_ue = ran_ue_find_by_amf_ue_ngap_id(*AMF_UE_NGAP_ID);
+    d_trace(5, "    AMF_UE_NGAP_ID[%d] RAN_UE_NGAP_ID[%d]\n",
+            ran_ue->amf_ue_ngap_id, ran_ue->ran_ue_ngap_id);
+    
+    if(!ran_ue) 
+    {
+        //TODO: send ngap error indication
+        return;
+    }
+    
+    amf_ue = ran_ue->amf_ue;
+    d_trace(5, "    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]",
+        ran_ue->ran_ue_ngap_id, ran_ue->amf_ue_ngap_id);
+
+    switch (ran_ue->ue_ctx_rel_action)
+    {
+        case NGAP_UE_CTX_REL_NO_ACTION:
+        {
+            d_trace(5, "    No Action\n");
+            rv = ran_ue_remove(ran_ue);
+            d_assert(rv == CORE_OK,, "ran_ue_remove() failed");
+            break;
+        }
+        case NGAP_UE_CTX_REL_S1_NORMAL_RELEASE:
+        {
+            d_trace(5, "    Action: NG normal release\n");
+            rv = ran_ue_remove(ran_ue);
+            d_assert(rv == CORE_OK,, "ran_ue_remove() failed");
+
+            d_assert(amf_ue,,);
+            // rv = amf_ue_deassociate(amf_ue);
+            d_assert(rv == CORE_OK,, "amf_ue_deassociate() failed");
+            break;
+        }
+        case NGAP_UE_CTX_REL_UE_CONTEXT_REMOVE:
+        {
+            d_trace(5, "    Action: UE context remove()\n");
+            rv = ran_ue_remove(ran_ue);
+            d_assert(rv == CORE_OK,, "ran_ue_remove() failed");
+
+            d_assert(amf_ue,,);
+            // rv = amf_ue_remove(amf_ue);
+            d_assert(rv == CORE_OK,, "amf_ue_remove() failed");
+            break;
+        }
+        case NGAP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL:
+        {
+            d_trace(5, "    Action: Delete indirect tunnel\n");
+
+            //rv = source_ue_deassociate_target_ue(ran_ue);
+            d_assert(rv == CORE_OK,,
+                    "source_ue_deassociate_target_ue() failed");
+
+            rv = ran_ue_remove(ran_ue);
+            d_assert(rv == CORE_OK,, "ran_ue_remove() failed");
+
+            //d_assert(amf,,);
+            // if (amf_ue_have_indirect_tunnel(amf_ue))
+            // {
+            //     //TODO:
+            //     // rv = mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(mme_ue);
+            //     // d_assert(rv == CORE_OK,, "mme_gtp_send_delete_indirect_data_"
+            //     //     "forwarding_tunnel_request() failed");
+            // }
+            // else
+            // {
+            //     d_warn("Check your eNodeB");
+            //     d_warn("  There is no INDIRECT TUNNEL");
+            //     d_warn("  Packet could be dropped during S1-Handover");
+            //     // rv = amf_ue_clear_indirect_tunnel(amf_ue);
+            //     d_assert(rv == CORE_OK,,
+            //             "amf_ue_clear_indirect_tunnel() failed");
+            // }
+            break;
+        }
+        default:
+        {
+            d_assert(0,, "Invalid Action[%d]", ran_ue->ue_ctx_rel_action);
+            break;
+        }
+    }
+}

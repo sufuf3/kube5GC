@@ -415,6 +415,15 @@ struct _ran_ue_t {
         };
     } nas;
 
+    /* Store by UE Context Release Command
+     * Retrieve by UE Context Release Complete */
+#define NGAP_UE_CTX_REL_INVALID_ACTION                      0
+#define NGAP_UE_CTX_REL_NO_ACTION                           1
+#define NGAP_UE_CTX_REL_S1_NORMAL_RELEASE                   2
+#define NGAP_UE_CTX_REL_UE_CONTEXT_REMOVE                   3
+#define NGAP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL              4
+    c_uint8_t      ue_ctx_rel_action;
+
     /* 
      * NG holding timer
      *
@@ -1019,6 +1028,7 @@ CORE_DECLARE(status_t)      mme_ue_associate_enb_ue(
 /*************************add by HU***************************/
 CORE_DECLARE(status_t)      ran_ue_deassociate(ran_ue_t *ran_ue);
 /*************************************************************/
+CORE_DECLARE(status_t)      amf_ue_deassociate(amf_ue_t *amf_ue);
 
 CORE_DECLARE(status_t)      enb_ue_deassociate(enb_ue_t *enb_ue);
 CORE_DECLARE(status_t)      mme_ue_deassociate(mme_ue_t *mme_ue);
