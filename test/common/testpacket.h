@@ -123,7 +123,10 @@ CORE_DECLARE(status_t) tests1ap_build_enb_cp_relocation_indication(pkbuf_t **pkb
 
 CORE_DECLARE(status_t) testngap_build_setup_req(
         pkbuf_t **pkbuf, NGAP_NgENB_ID_PR present, c_uint32_t enb_id);
-
+CORE_DECLARE(status_t)  ngap_build_initial_context_setup_failure(
+        pkbuf_t **pkbuf, c_uint32_t amf_ue_ngap_id, c_uint32_t ran_ue_nagp_id);
+CORE_DECLARE(status_t)  testngap_build_initial_context_setup_response(
+        pkbuf_t **pkbuf, c_uint32_t amf_ue_ngap_id, c_uint32_t ran_ue_ngap_id);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

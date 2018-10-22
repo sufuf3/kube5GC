@@ -3511,12 +3511,11 @@ status_t testngap_build_setup_req(
     
     NGAP_NGSetupRequestIEs_t *ie = NULL;
         NGAP_GlobalRANNodeID_t *Global_RAN_Node_ID = NULL;
-        NGAP_SupportedTAList_t *SupportedTAList = NULL;
         NGAP_PagingDRX_t *PagingDRX = NULL;
-        
-    NGAP_SupportedTAItem_t *SupportedTAItem = NULL;
-    NGAP_BroadcastPLMNItem_t *BroadcastPLMNItem = NULL;
-    NGAP_SliceSupportItem_t *SliceSupportItem = NULL;
+        NGAP_SupportedTAList_t *SupportedTAList = NULL;            
+            NGAP_SupportedTAItem_t *SupportedTAItem = NULL;
+            NGAP_BroadcastPLMNItem_t *BroadcastPLMNItem = NULL;
+            NGAP_SliceSupportItem_t *SliceSupportItem = NULL;
 
 printf("\n  %d \n", __LINE__);
     memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
@@ -3529,7 +3528,7 @@ printf("\n  %d \n", __LINE__);
     initiatingMessage->criticality = NGAP_Criticality_ignore;
     initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_NGSetupRequest;
 
-    NGSetupRequest = &initiatingMessage->value.choice.NGSetupRequest;
+    NGSetupRequest = &initiatingMessage->value.choice.NGSetupRequest;    
 #if 1
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
@@ -3541,7 +3540,7 @@ printf("\n  %d add GlobalRANNodeID \n", __LINE__);
     Global_RAN_Node_ID = &ie->value.choice.GlobalRANNodeID;
     Global_RAN_Node_ID->present = NGAP_GlobalRANNodeID_PR_globalGNB_ID;
 #endif
-#if 0
+#if 1
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
     printf("\n  %d SupportedTAList\n", __LINE__);
@@ -3553,7 +3552,6 @@ printf("\n  %d add GlobalRANNodeID \n", __LINE__);
 #if 1
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
-
     ie->id = NGAP_ProtocolIE_ID_id_DefaultPagingDRX;
     ie->criticality = NGAP_Criticality_ignore;
     ie->value.present = NGAP_NGSetupRequestIEs__value_PR_PagingDRX;
@@ -3565,7 +3563,7 @@ printf("\n  %d add GlobalRANNodeID \n", __LINE__);
     plmn_id_build(&plmn_id, 1, 1, 2);
 printf("\n  %d \n", __LINE__);
     Global_RAN_Node_ID->choice.globalGNB_ID = core_calloc(1, sizeof(struct NGAP_GlobalGNB_ID));
-    ngap_buffer_to_OCTET_STRING(
+        ngap_buffer_to_OCTET_STRING(
            &plmn_id, PLMN_ID_LEN, &Global_RAN_Node_ID->choice.globalGNB_ID->pLMNIdentity);
 
 printf("\n  %d \n", __LINE__);
@@ -3586,19 +3584,17 @@ printf("\n  %d \n", __LINE__);
 
 #endif
 
-#if 0
-    SupportedTAItem = (NGAP_SupportedTAItem_t *) core_calloc(1, sizeof(NGAP_SupportedTAItem_t));
-    ASN_SEQUENCE_ADD(&SupportedTAList->list, SupportedTAItem);
-        ngap_uint16_to_OCTET_STRING(tac, &SupportedTAItem->tAC);
 #if 1
-        BroadcastPLMNItem = (NGAP_BroadcastPLMNItem_t *) core_calloc(1, sizeof(NGAP_BroadcastPLMNItem_t)); 
-        ASN_SEQUENCE_ADD(&SupportedTAItem->broadcastPLMNList.list, BroadcastPLMNItem);
+        SupportedTAItem = (NGAP_SupportedTAItem_t *) core_calloc(1, sizeof(NGAP_SupportedTAItem_t));
+        ngap_uint16_to_OCTET_STRING(tac, &SupportedTAItem->tAC);
+            BroadcastPLMNItem = (NGAP_BroadcastPLMNItem_t *) core_calloc(1, sizeof(NGAP_BroadcastPLMNItem_t));
             ngap_buffer_to_OCTET_STRING(&plmn_id, PLMN_ID_LEN, &BroadcastPLMNItem->pLMNIdentity);
                 SliceSupportItem = (NGAP_SliceSupportItem_t *) core_calloc(1, sizeof(NGAP_SliceSupportItem_t));
-                ASN_SEQUENCE_ADD(&BroadcastPLMNItem->tAISliceSupportList.list, SliceSupportItem); 
                     ngap_buffer_to_OCTET_STRING(&plmn_id, 1, &SliceSupportItem->s_NSSAI.sST);
-#endif    
-
+                    ngap_buffer_to_OCTET_STRING(&plmn_id, 1, &SliceSupportItem->s_NSSAI.sD);
+            ASN_SEQUENCE_ADD(&BroadcastPLMNItem->tAISliceSupportList.list, SliceSupportItem);
+        ASN_SEQUENCE_ADD(&SupportedTAItem->broadcastPLMNList.list, BroadcastPLMNItem);
+    ASN_SEQUENCE_ADD(&SupportedTAList->list, SupportedTAItem);
 #endif
 printf("\n  %d \n", __LINE__);
 
@@ -3611,10 +3607,161 @@ printf("\n  %d \n", __LINE__);
 
     if (rv != CORE_OK)
     {
-        d_error("s1ap_encode_pdu() failed");
+        d_error("ngap_encode_pdu() failed");
         return CORE_ERROR;
     }
 printf("\n  %d %d \n", rv, __LINE__);
 
     return CORE_OK;
 }
+
+#if 1
+status_t testngap_build_initial_context_setup_response(
+        pkbuf_t **pkbuf, 
+        c_uint32_t amf_ue_ngap_id, c_uint32_t ran_ue_ngap_id)
+{
+    status_t rv;
+    plmn_id_t test;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_InitialContextSetupResponse_t *InitialContextSetupResponse = NULL;
+
+    NGAP_InitialContextSetupResponseIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_PDUSessionResourceSetupListCxtRes_t *PDUSessionResourceSetupListCxtRes = NULL;
+            NGAP_PDUSessionResourceSetupItemCxtResIEs_t *PDUSessionResourceSetupItemCxtResIEs = NULL;
+                NGAP_PDUSessionResourceSetupItemCxtRes_t *PDUSessionResourceSetupItemCxtRes = NULL;
+ 
+    printf("%d testngap_build_initial_context_setup_response\n", __LINE__);
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = 
+        core_calloc(1, sizeof(NGAP_SuccessfulOutcome_t));
+
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode =
+        NGAP_ProcedureCode_id_InitialContextSetup;
+    successfulOutcome->criticality = NGAP_Criticality_reject;
+    successfulOutcome->value.present =
+        NGAP_SuccessfulOutcome__value_PR_InitialContextSetupResponse;
+
+    InitialContextSetupResponse = 
+        &successfulOutcome->value.choice.InitialContextSetupResponse;
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupResponseIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupResponse->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupResponseIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupResponseIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupResponse->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupResponseIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupResponseIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupResponse->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceSetupListCxtRes;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupResponseIEs__value_PR_PDUSessionResourceSetupListCxtRes;
+    PDUSessionResourceSetupListCxtRes = &ie->value.choice.PDUSessionResourceSetupListCxtRes;
+
+    *AMF_UE_NGAP_ID = amf_ue_ngap_id;
+    *RAN_UE_NGAP_ID = ran_ue_ngap_id;
+
+    PDUSessionResourceSetupItemCxtResIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupItemCxtResIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceSetupListCxtRes->list, PDUSessionResourceSetupItemCxtResIEs);
+    PDUSessionResourceSetupItemCxtResIEs->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceSetupItemCxtRes;
+    PDUSessionResourceSetupItemCxtResIEs->criticality = NGAP_Criticality_ignore;
+    PDUSessionResourceSetupItemCxtResIEs->value.present = NGAP_PDUSessionResourceSetupItemCxtResIEs__value_PR_PDUSessionResourceSetupItemCxtRes;
+    PDUSessionResourceSetupItemCxtRes = &PDUSessionResourceSetupItemCxtResIEs->value.choice.PDUSessionResourceSetupItemCxtRes;
+
+    PDUSessionResourceSetupItemCxtRes->pDUSessionID = 168;
+    //TODO: fix the real OCTET buffer
+    plmn_id_build(&test, 1, 1, 2);
+        ngap_buffer_to_OCTET_STRING(
+            &test, 3, &PDUSessionResourceSetupItemCxtRes->pDUSessionResourceSetupResponseTransfer);   
+
+    rv = ngap_encode_pdu(pkbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+#endif
+
+status_t ngap_build_initial_context_setup_failure(pkbuf_t **pkbuf, c_uint32_t amf_ue_ngap_id, c_uint32_t ran_ue_nagp_id)
+{
+    status_t rv = 0;
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];
+
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
+    NGAP_InitialContextSetupFailure_t *InitialContextSetupFailure = NULL;
+
+    NGAP_InitialContextSetupFailureIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_Cause_t *Cause = NULL;
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_unsuccessfulOutcome;
+    pdu.choice.unsuccessfulOutcome = 
+        core_calloc(1, sizeof(NGAP_UnsuccessfulOutcome_t));
+
+    unsuccessfulOutcome = pdu.choice.unsuccessfulOutcome;
+    unsuccessfulOutcome->procedureCode =
+        NGAP_ProcedureCode_id_InitialContextSetup;
+    unsuccessfulOutcome->criticality = NGAP_Criticality_reject;
+    unsuccessfulOutcome->value.present =
+        NGAP_UnsuccessfulOutcome__value_PR_InitialContextSetupFailure;
+    InitialContextSetupFailure = &unsuccessfulOutcome->value.choice.InitialContextSetupFailure;
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupFailureIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupFailure->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupFailureIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = amf_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupFailureIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupFailure->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupFailureIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = ran_ue_nagp_id;
+
+    ie = core_calloc(1, sizeof(NGAP_InitialContextSetupFailureIEs_t));
+    ASN_SEQUENCE_ADD(&InitialContextSetupFailure->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_Cause;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_InitialContextSetupFailureIEs__value_PR_Cause;
+    Cause = &ie->value.choice.Cause;
+    Cause->present = NGAP_Cause_PR_radioNetwork;
+    Cause->choice.radioNetwork = NGAP_CauseRadioNetwork_txnrelocoverall_expiry;
+
+    rv = ngap_encode_pdu(pkbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_build_initial_context_setup_failure ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+
+}
+

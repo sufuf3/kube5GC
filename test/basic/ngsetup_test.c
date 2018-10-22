@@ -65,11 +65,31 @@ static void ngsetup_test1(abts_case *tc, void *data)
     core_sleep(time_from_msec(300));
 }
 
+
+static void ngsetup_test2(abts_case *tc, void *data)
+{
+    pkbuf_t *sendbuf;
+    status_t rv;
+    rv = ngap_build_initial_context_setup_failure(&sendbuf, 0x1234, 0x5678);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+}
+
+static void ngsetup_test3(abts_case *tc, void *data)
+{
+    pkbuf_t *sendbuf;
+    status_t rv;
+
+    rv = testngap_build_initial_context_setup_response(&sendbuf, 0x1234, 0x5678);
+    ABTS_INT_EQUAL(tc, CORE_OK, rv);
+}
+
 abts_suite *test_ngsetup(abts_suite *suite)
 {
     suite = ADD_SUITE(suite)
     printf("\n test ngsetup \n");
-    abts_run_test(suite, ngsetup_test1, NULL);
+    //abts_run_test(suite, ngsetup_test1, NULL);
+    abts_run_test(suite, ngsetup_test2, NULL);
+    abts_run_test(suite, ngsetup_test3, NULL);
 
     return suite;
 
