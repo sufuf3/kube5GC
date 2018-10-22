@@ -8,6 +8,7 @@
 #include "smf_gtp_path.h"
 #include "smf_pfcp_path.h"
 #include "smf_n4_handler.h"
+#include "smf_s11_handler.h"
 #include "smf_gx_handler.h"
 #include "smf_sm.h"
 
@@ -77,15 +78,34 @@ void smf_state_operational(fsm_t *s, event_t *e)
             status_t rv;
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
             gtp_message_t s11_message;
+            gtp_xact_t *s11_xact = NULL;
             smf_sess_t *sess = NULL;
+
 
             rv = gtp_parse_msg(&s11_message, recvbuf);
             d_assert(rv == CORE_OK, goto release_s11_pkbuf;,);
             
             sess = smf_sess_add_or_find_by_message(&s11_message);
             d_assert(sess, goto release_s11_pkbuf;,);
-            
+
+            rv = gtp_xact_receive(sess->mme_node, &s11_message.h, &s11_xact);
+            d_assert(rv == CORE_OK, goto release_s11_pkbuf;,);
+
             d_info("%lu", sess->ipv4->addr[0]);
+
+            switch (s11_message.h.type)
+            {
+                case GTP_CREATE_SESSION_REQUEST_TYPE:
+                {
+                    smf_s11_handle_create_session_request(s11_xact, sess, &s11_message.create_session_request);
+                    break;
+                }
+                default:
+                {
+                    d_error("No handler for event %s", smf_event_get_name(e));
+                    break;
+                }
+            }
 
         release_s11_pkbuf:
             pkbuf_free(recvbuf);

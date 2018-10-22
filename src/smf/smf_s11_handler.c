@@ -22,6 +22,6 @@ void smf_s11_handle_create_session_request(gtp_xact_t *s11_xact,
         d_error("No EPS Bearer ID");
         return;
     }
-    rv = smf_pfcp_send_session_modification_request(sess);
+    rv = smf_pfcp_send_session_establishment_request(sess);
     d_assert(rv == CORE_OK, , "session modifiaction fail");
 }
