@@ -1068,8 +1068,9 @@ void ngap_handle_handover_required(amf_ran_t *ran, ngap_message_t *message)
 		 NGAP_DirectForwardingPathAvailability_t	 DirectForwardingPathAvailability;
 
         NGAP_PDUSessionResourceListHORqd_t *PDUSessionResourceListHORqd = NULL;
-        NGAP_SourceToTarget_TransparentContainer_t *SourceToTarget_TransparentContainer = NULL;
 #endif 
+        NGAP_SourceToTarget_TransparentContainer_t *SourceToTarget_TransparentContainer = NULL;
+
     d_assert(ran, return,);
     d_assert(ran->sock, return,);
 
@@ -1109,9 +1110,7 @@ void ngap_handle_handover_required(amf_ran_t *ran, ngap_message_t *message)
 #endif
                 break;
             case NGAP_ProtocolIE_ID_id_SourceToTarget_TransparentContainer:
-#if 0 // not implement yet
                 SourceToTarget_TransparentContainer = &ie->value.choice.SourceToTarget_TransparentContainer;
-#endif
                 break;
             default:
                 break;
@@ -1202,11 +1201,9 @@ void ngap_handle_handover_required(amf_ran_t *ran, ngap_message_t *message)
     }
     d_assert(HandoverType, return, );
     source_ue->handover_type = *HandoverType;
-#if 0 // not implement yet
-    rv = ngap_send_handover_request(mme_ue, target_enb,
-            ENB_UE_S1AP_ID, MME_UE_S1AP_ID,
+    rv = ngap_send_handover_request(amf_ue, target_ran,
+            AMF_UE_NGAP_ID, RAN_UE_NGAP_ID,
             HandoverType, Cause,
-            Source_ToTarget_TransparentContainer);
-#endif
-    d_assert(rv == CORE_OK,, "s1ap send error");    
+            SourceToTarget_TransparentContainer);
+    d_assert(rv == CORE_OK,, "ngap send error");    
 }

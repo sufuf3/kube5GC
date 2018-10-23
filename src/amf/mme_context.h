@@ -1092,6 +1092,7 @@ CORE_DECLARE(status_t)      mme_overload_checking_init(void);
 CORE_DECLARE(status_t)      amf_ue_deassociate(amf_ue_t *amf_ue);
 CORE_DECLARE(status_t)      amf_ue_remove(amf_ue_t *amf_ue);
 CORE_DECLARE(status_t)      source_ue_deassociate_target_ue_5g(ran_ue_t *ran_ue);
+CORE_DECLARE(status_t)      source_ue_associate_target_5g(ran_ue_t *source_ue, ran_ue_t *target_ue);
 /******************************************************/
 
 #ifdef __cplusplus

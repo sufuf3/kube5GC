@@ -3501,3 +3501,20 @@ status_t source_ue_deassociate_target_ue_5g(ran_ue_t *ran_ue)
 
     return CORE_OK;
 }
+
+status_t source_ue_associate_target_5g(
+        ran_ue_t *source_ue, ran_ue_t *target_ue)
+{
+    amf_ue_t *amf_ue = NULL;
+
+    d_assert(source_ue, return CORE_ERROR, "Null param");
+    d_assert(target_ue, return CORE_ERROR, "Null param");
+    amf_ue = source_ue->amf_ue;
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+
+    target_ue->amf_ue = amf_ue;
+    target_ue->source_ue = source_ue;
+    source_ue->target_ue = target_ue;
+
+    return CORE_OK;
+}

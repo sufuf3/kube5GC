@@ -779,3 +779,178 @@ status_t ngap_build_handover_preparation_failure(pkbuf_t **ngapbuf, ran_ue_t *so
 
     return CORE_OK;  
 }
+
+/**
+ * Direction: AMF -> NG-RAN node
+ **/
+CORE_DECLARE(status_t) ngap_build_handover_request(
+            pkbuf_t **ngapbuf, amf_ue_t *amf_ue, ran_ue_t *target_ue,
+            NGAP_RAN_UE_NGAP_ID_t *ran_ue_ngap_id, NGAP_AMF_UE_NGAP_ID_t *amf_ue_ngap_id,
+            NGAP_HandoverType_t *handovertype, NGAP_Cause_t *cause,
+            NGAP_SourceToTarget_TransparentContainer_t *sourceToTarget_TransparentContainer)
+{
+    status_t rv = 0;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_HandoverRequest_t *HandoverRequest = NULL;
+
+    NGAP_HandoverRequestIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_HandoverType_t *HandoverType = NULL;
+		NGAP_Cause_t *Cause = NULL;
+		NGAP_UEAggregateMaximumBitRate_t *UEAggregateMaximumBitRate = NULL;
+		NGAP_UESecurityCapabilities_t *UESecurityCapabilities = NULL;
+		NGAP_SecurityContext_t *SecurityContext = NULL;
+        NGAP_PDUSessionResourceSetupListHOReq_t *PDUSessionResourceSetupListHOReq = NULL;
+		NGAP_SourceToTarget_TransparentContainer_t *SourceToTarget_TransparentContainer = NULL;
+#if 0 
+        NGAP_RRCInactiveAssistanceInformation_t	 RRCInactiveAssistanceInformation;
+        NGAP_KamfChangeInd_t	 KamfChangeInd;
+        NGAP_NAS_PDU_t	 NAS_PDU;
+        NGAP_TraceActivation_t	 TraceActivation;
+        NGAP_MaskedIMEISV_t	 MaskedIMEISV;
+        NGAP_MobilityRestrictionList_t	 MobilityRestrictionList;
+        NGAP_LocationReportingRequestType_t	 LocationReportingRequestType;
+#endif
+    d_assert(handovertype, return CORE_ERROR,);
+    d_assert(cause, return CORE_ERROR,);
+    d_assert(sourceToTarget_TransparentContainer, return CORE_ERROR,);
+    d_assert(target_ue, return CORE_ERROR, "Null param");
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_HandoverResourceAllocation;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_HandoverRequest;
+    HandoverRequest = &initiatingMessage->value.choice.HandoverRequest;
+        
+    ie = core_calloc(1, sizeof(NGAP_HandoverRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverRequestIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = target_ue->amf_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_HandoverRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_HandoverType;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverRequestIEs__value_PR_HandoverType;
+    HandoverType = &ie->value.choice.HandoverType;
+    *HandoverType = *handovertype;
+
+    ie = core_calloc(1, sizeof(NGAP_HandoverRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_Cause;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_HandoverRequestIEs__value_PR_Cause;
+    Cause = &ie->value.choice.Cause;
+    Cause->present = cause->present;
+    Cause->choice.radioNetwork = cause->choice.radioNetwork;
+
+    ie = core_calloc(1, sizeof(NGAP_HandoverRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_UEAggregateMaximumBitRate;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverRequestIEs__value_PR_UEAggregateMaximumBitRate;
+    UEAggregateMaximumBitRate = &ie->value.choice.UEAggregateMaximumBitRate;
+    //TODO: fix it    
+    asn_uint642INTEGER(&UEAggregateMaximumBitRate->uEAggregateMaximumBitRateUL, 0x1234);
+    asn_uint642INTEGER(&UEAggregateMaximumBitRate->uEAggregateMaximumBitRateDL, 0x1234);
+
+    ie = core_calloc(1, sizeof(NGAP_HandoverRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_UESecurityCapabilities;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverRequestIEs__value_PR_UESecurityCapabilities;
+    UESecurityCapabilities = &ie->value.choice.UESecurityCapabilities;
+        //TODO: fix it    
+        UESecurityCapabilities->eUTRAencryptionAlgorithms.size = 2;
+        UESecurityCapabilities->eUTRAencryptionAlgorithms.bits_unused = 0;
+        UESecurityCapabilities->eUTRAencryptionAlgorithms.buf = 
+            core_calloc(UESecurityCapabilities->eUTRAencryptionAlgorithms.size, sizeof(c_uint8_t));
+        UESecurityCapabilities->eUTRAencryptionAlgorithms.buf[0] = 0;
+            //(amf->ue_network_capability.eea << 1);
+        UESecurityCapabilities->eUTRAintegrityProtectionAlgorithms.size = 2;
+        UESecurityCapabilities->eUTRAintegrityProtectionAlgorithms.bits_unused = 0;
+        UESecurityCapabilities->eUTRAintegrityProtectionAlgorithms.buf = 
+            core_calloc(UESecurityCapabilities->eUTRAintegrityProtectionAlgorithms.size, sizeof(c_uint8_t));
+        UESecurityCapabilities->eUTRAintegrityProtectionAlgorithms.buf[0] = 0;
+
+        UESecurityCapabilities->nRencryptionAlgorithms.size = 2;
+        UESecurityCapabilities->nRencryptionAlgorithms.bits_unused = 0;
+        UESecurityCapabilities->nRencryptionAlgorithms.buf = 
+            core_calloc(UESecurityCapabilities->nRencryptionAlgorithms.size, sizeof(c_uint8_t));
+        UESecurityCapabilities->nRencryptionAlgorithms.buf[0] = 0;
+
+        UESecurityCapabilities->nRintegrityProtectionAlgorithms.size = 2;
+        UESecurityCapabilities->nRintegrityProtectionAlgorithms.bits_unused = 0;
+        UESecurityCapabilities->nRintegrityProtectionAlgorithms.buf = 
+            core_calloc(UESecurityCapabilities->nRintegrityProtectionAlgorithms.size, sizeof(c_uint8_t));
+        UESecurityCapabilities->nRintegrityProtectionAlgorithms.buf[0] = 0;
+
+    ie = core_calloc(1, sizeof(NGAP_HandoverRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_SecurityContext;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverRequestIEs__value_PR_SecurityContext;
+    SecurityContext = &ie->value.choice.SecurityContext;
+        //TODO: fix it  
+        SecurityContext->nextHopChainingCount = 1;//amf_ue->nhcc;
+        SecurityContext->nextHopNH.size = SHA256_DIGEST_SIZE;
+        SecurityContext->nextHopNH.buf = 
+            core_calloc(SecurityContext->nextHopNH.size,
+            sizeof(c_uint8_t));
+        SecurityContext->nextHopNH.bits_unused = 0;
+        memcpy(SecurityContext->nextHopNH.buf,
+             "\x00", SecurityContext->nextHopNH.size);
+
+    ie = core_calloc(1, sizeof(NGAP_HandoverRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceSetupListHOReq;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverRequestIEs__value_PR_PDUSessionResourceSetupListHOReq;
+    PDUSessionResourceSetupListHOReq = &ie->value.choice.PDUSessionResourceSetupListHOReq;
+        NGAP_PDUSessionResourceSetupItemHOReqIEs_t *PDUSessionResourceSetupItemHOReqIEs = NULL;
+        PDUSessionResourceSetupItemHOReqIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupItemHOReqIEs_t));
+        ASN_SEQUENCE_ADD(&PDUSessionResourceSetupListHOReq->list, PDUSessionResourceSetupItemHOReqIEs);
+        PDUSessionResourceSetupItemHOReqIEs->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceSetupItemHOReq;
+        PDUSessionResourceSetupItemHOReqIEs->criticality = NGAP_Criticality_reject;
+        PDUSessionResourceSetupItemHOReqIEs->value.present = NGAP_PDUSessionResourceSetupItemHOReqIEs__value_PR_PDUSessionResourceSetupItemHOReq;
+        PDUSessionResourceSetupItemHOReqIEs->value.choice.PDUSessionResourceSetupItemHOReq.pDUSessionID = amf_ue->psi;
+#if 0 // need to fix
+        PDUSessionResourceSetupItemHOReqIEs->value.choice.PDUSessionResourceSetupItemHOReq.s_NSSAI.sD = amf_ue->ran_ue->ran->supported_ta_list->s_nssai->sd;
+        PDUSessionResourceSetupItemHOReqIEs->value.choice.PDUSessionResourceSetupItemHOReq.s_NSSAI.sST = amf_ue->ran_ue->ran->supported_ta_list->s_nssai->sst;
+        PDUSessionResourceSetupItemHOReqIEs->value.choice.PDUSessionResourceSetupItemHOReq.handoverRequestTransfer;
+#endif      
+        
+
+    ie = core_calloc(1, sizeof(NGAP_HandoverRequestIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_SourceToTarget_TransparentContainer;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverRequestIEs__value_PR_SourceToTarget_TransparentContainer;
+    SourceToTarget_TransparentContainer = &ie->value.choice.SourceToTarget_TransparentContainer;
+    ngap_buffer_to_OCTET_STRING(
+            sourceToTarget_TransparentContainer->buf, 
+            sourceToTarget_TransparentContainer->size, 
+            SourceToTarget_TransparentContainer);
+    
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+
+}
