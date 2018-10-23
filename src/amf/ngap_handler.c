@@ -1195,9 +1195,7 @@ void ngap_handle_handover_required(amf_ran_t *ran, ngap_message_t *message)
     else
     {
         d_assert(Cause, return,);
-#if 0 // not implement yet
-        rv = s1ap_send_handover_preparation_failure(source_ue, Cause);
-#endif 
+        rv = ngap_send_handover_preparation_failure(source_ue, Cause);
         d_assert(rv == CORE_OK, return, "s1ap send error");
 
         return;

@@ -22,8 +22,8 @@ CORE_DECLARE(status_t) ngap_build_ue_context_release_command(pkbuf_t **ngapbuf, 
 
 CORE_DECLARE(status_t) ngap_build_ng_reset(pkbuf_t **ngapbuf, NGAP_Cause_PR group, long cause, NGAP_UE_associatedLogicalNG_ConnectionListRes_t *partOfNG_Interface);
 
-CORE_DECLARE(status_t) ngap_build_handover_cancel_acknowledge(pkbuf_t **ngapbuf, ran_ue_t *sourece_ue);
-
+CORE_DECLARE(status_t) ngap_build_handover_cancel_acknowledge(pkbuf_t **ngapbuf, ran_ue_t *source_ue);
+CORE_DECLARE(status_t) ngap_build_handover_preparation_failure(pkbuf_t **ngapbuf, ran_ue_t *source_ue, NGAP_Cause_t *cause);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

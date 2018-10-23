@@ -201,3 +201,20 @@ status_t ngap_send_ue_context_release_command(
     
     return CORE_OK;
 }
+
+status_t ngap_send_handover_preparation_failure(ran_ue_t *source_ue, NGAP_Cause_t *cause)
+{
+    status_t rv;
+    pkbuf_t *ngapbuf = NULL;
+
+    d_assert(source_ue, return CORE_ERROR,);
+    d_assert(cause, return CORE_ERROR,);
+
+    rv = ngap_build_handover_preparation_failure(&ngapbuf, source_ue, cause);
+    d_assert(rv == CORE_OK && ngapbuf, return CORE_ERROR, "ngapbuf build error");
+
+    rv = ngap_send_to_ran_ue(source_ue, ngapbuf);
+    d_assert(rv == CORE_OK,, "ngapbuf send error");
+
+    return rv;
+}
