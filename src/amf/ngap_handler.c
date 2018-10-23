@@ -1045,3 +1045,170 @@ void ngap_handle_ue_context_release_complete(amf_ran_t *ran, ngap_message_t *mes
         }
     }
 }
+
+/**
+ * Direction NG-RAN -> AMF 
+ **/
+void ngap_handle_handover_required(amf_ran_t *ran, ngap_message_t *message)
+{
+    status_t rv = 0;
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_HandoverRequired_t *HandoverRequired = NULL;
+
+    NGAP_HandoverRequiredIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_HandoverType_t *HandoverType = NULL;
+        NGAP_Cause_t *Cause = NULL;
+        NGAP_TargetID_t *TargetID = NULL;
+#if 0 // not implement yet
+		 NGAP_DirectForwardingPathAvailability_t	 DirectForwardingPathAvailability;
+
+        NGAP_PDUSessionResourceListHORqd_t *PDUSessionResourceListHORqd = NULL;
+        NGAP_SourceToTarget_TransparentContainer_t *SourceToTarget_TransparentContainer = NULL;
+#endif 
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+
+    HandoverRequired = &initiatingMessage->value.choice.HandoverRequired;
+    d_assert(HandoverRequired, return,);
+
+    d_trace(3, "[AMF] handover required \n");
+
+    for (i = 0; i < HandoverRequired->protocolIEs.list.count; i++)
+    {
+        ie = HandoverRequired->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                d_assert(AMF_UE_NGAP_ID, return,);
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_HandoverType:
+                HandoverType = &ie->value.choice.HandoverType;
+                break;
+            case NGAP_ProtocolIE_ID_id_Cause:
+                Cause = &ie->value.choice.Cause;
+                break;
+            case NGAP_ProtocolIE_ID_id_TargetID:
+                TargetID = &ie->value.choice.TargetID;
+                break;
+            case NGAP_ProtocolIE_ID_id_PDUSessionResourceListHORqd:
+#if 0 // not implement yet
+                PDUSessionResourceListHORqd = &ie->value.choice.PDUSessionResourceListHORqd;
+#endif
+                break;
+            case NGAP_ProtocolIE_ID_id_SourceToTarget_TransparentContainer:
+#if 0 // not implement yet
+                SourceToTarget_TransparentContainer = &ie->value.choice.SourceToTarget_TransparentContainer;
+#endif
+                break;
+            default:
+                break;
+        }
+    }
+    
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+
+    d_assert(TargetID, return,);
+    c_uint32_t target_ran_id = 0;
+    switch(TargetID->present)
+    {
+        case NGAP_TargetID_PR_targetRANNodeID:
+        {
+           ngap_GNB_ID_to_uint32(&TargetID->choice.targetRANNodeID->globalRANNodeID.choice.globalGNB_ID->gNB_ID, &target_ran_id);
+            break;
+        }
+        
+#if 0 // not implement yet
+        case NGAP_TargetID_PR_targeteNB_ID:
+        ngap_GNB_ID_to_uint32(&TargetID->choice.targeteNB_ID->globalENB_ID.ngENB_ID, c_uint32_t *uint32)
+            break;
+#endif     
+        default:
+        {
+            d_error("Not implemented(%d)", TargetID->present);
+            return;
+        }
+    }
+    
+    amf_ran_t *target_ran = NULL;
+
+    target_ran = amf_ran_find_by_ran_id(target_ran_id,0 ,0 ,ran->ran_id.ran_present);
+    if (target_ran == NULL)
+    {
+        d_warn("Handover required : cannot find target gNB_ID[%d]",
+                target_ran_id);
+        return;
+    }
+
+    d_assert(RAN_UE_NGAP_ID, return,);
+    d_assert(AMF_UE_NGAP_ID, return,);
+    ran_ue_t *source_ue = NULL;
+    source_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(source_ue, return,
+            "Cannot find UE for RAN_UE_NGAP_ID[%d] ", *RAN_UE_NGAP_ID);
+    d_assert(source_ue->amf_ue_ngap_id == *AMF_UE_NGAP_ID, return,
+            "Conflict AMF_UE_NGAP_ID: %d != %d\n",
+            source_ue->amf_ue_ngap_id, *AMF_UE_NGAP_ID);
+    d_trace(5, "    Source : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+            source_ue->ran_ue_ngap_id, source_ue->amf_ue_ngap_id);
+    
+    amf_ue_t *amf_ue = NULL;
+    amf_ue = source_ue->amf_ue;
+    d_assert(amf_ue, return,);
+#if 0 // TODO: fix it   
+    if (SECURITY_CONTEXT_IS_VALID(mme_ue))
+#else 
+    if (0)
+#endif
+    {
+#if 0 // TODO: fix it
+        mme_ue->nhcc++;
+        mme_kdf_nh(mme_ue->kasme, mme_ue->nh, mme_ue->nh);
+#endif 
+    }
+    else
+    {
+        d_assert(Cause, return,);
+#if 0 // not implement yet
+        rv = s1ap_send_handover_preparation_failure(source_ue, Cause);
+#endif 
+        d_assert(rv == CORE_OK, return, "s1ap send error");
+
+        return;
+    }
+    d_assert(HandoverType, return, );
+    source_ue->handover_type = *HandoverType;
+#if 0 // not implement yet
+    rv = ngap_send_handover_request(mme_ue, target_enb,
+            ENB_UE_S1AP_ID, MME_UE_S1AP_ID,
+            HandoverType, Cause,
+            Source_ToTarget_TransparentContainer);
+#endif
+    d_assert(rv == CORE_OK,, "s1ap send error");    
+}
