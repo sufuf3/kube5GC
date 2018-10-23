@@ -41,18 +41,21 @@ status_t ngap_build_setup_rsp(pkbuf_t **pkbuf)
     ie->value.present = NGAP_NGSetupResponseIEs__value_PR_AMFName;
     //AMFName = &ie->value.choice.AMFName;
 
+    ie = core_calloc(1, sizeof(NGAP_NGSetupResponseIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupResponse->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_ServedGUAMIList;
     ie->criticality = NGAP_Criticality_reject;
     ie->value.present = NGAP_NGSetupResponseIEs__value_PR_ServedGUAMIList;
     ServedGUAMIList = &ie->value.choice.ServedGUAMIList;
 
+    ie = core_calloc(1, sizeof(NGAP_NGSetupResponseIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupResponse->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_RelativeAMFCapacity;
     ie->criticality = NGAP_Criticality_ignore;
     ie->value.present = NGAP_NGSetupResponseIEs__value_PR_RelativeAMFCapacity;
     //RelativeAMFCapacity = &ie->value.choice.RelativeAMFCapacity;
 
+    ie = core_calloc(1, sizeof(NGAP_NGSetupResponseIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupResponse->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_PLMNSupportList;
     ie->criticality = NGAP_Criticality_ignore;
@@ -166,18 +169,24 @@ status_t ngap_build_initial_context_setup_request(
     ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupRequestIEs__value_PR_AMF_UE_NGAP_ID;
     AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
     *AMF_UE_NGAP_ID = ran_ue->amf_ue_ngap_id;
 
     ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupRequestIEs__value_PR_RAN_UE_NGAP_ID;
     RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
     *RAN_UE_NGAP_ID = ran_ue->ran_ue_ngap_id;
 
     ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_GUAMI;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupRequestIEs__value_PR_GUAMI;
     GUAMI = &ie->value.choice.GUAMI;
     /* which guami plmn/rid/ should be selete ?*/
     served_guami_t *served_guami = &mme_self()->served_guami[0];
@@ -189,6 +198,8 @@ status_t ngap_build_initial_context_setup_request(
     ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceSetupListCxtReq;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupRequestIEs__value_PR_PDUSessionResourceSetupListCxtReq;
     PDUSessionResourceSetupListCxtReq = &ie->value.choice.PDUSessionResourceSetupListCxtReq;
     /* TODO: max number of PDU Sesssions*/
     for (i = 0; i <  1 ; i++)
@@ -216,6 +227,7 @@ status_t ngap_build_initial_context_setup_request(
     ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_AllowedNSSAI;
     ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_InitialContextSetupRequestIEs__value_PR_AllowedNSSAI;
     AllowedNSSAI = &ie->value.choice.AllowedNSSAI;
     NGAP_AllowedNSSAI_Item_t *AllowedNSSAI_Item = NULL;
     for (i = 0 ; i < mme_self()->plmn_support->num_of_s_nssai; i++)
@@ -229,6 +241,8 @@ status_t ngap_build_initial_context_setup_request(
     ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_UESecurityCapabilities;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupRequestIEs__value_PR_UESecurityCapabilities;
     UESecurityCapabilities = &ie->value.choice.UESecurityCapabilities;
 	
     //nas_ue_network_capability_t ue_network_capability
@@ -240,6 +254,8 @@ status_t ngap_build_initial_context_setup_request(
     ie = core_calloc(1, sizeof(NGAP_InitialContextSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&InitialContextSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_SecurityKey;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_InitialContextSetupRequestIEs__value_PR_SecurityKey;
     SecurityKey = &ie->value.choice.SecurityKey;
   
     SecurityKey->size = SHA256_DIGEST_SIZE;
@@ -297,16 +313,22 @@ status_t ngap_build_pdu_session_resource_setup_request(pkbuf_t **ngapbuf)
     // ie = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupRequestIEs_t));
     // ASN_SEQUENCE_ADD(&PDUSessionResourceSetupRequest->protocolIEs, ie);
     // ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    // ie->criticality 
+    //ie->value.present
     // AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
     
     // ie = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupRequestIEs_t));
     // ASN_SEQUENCE_ADD(&PDUSessionResourceSetupRequest->protocolIEs, ie);
     // ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    // ie->criticality
+    //ie->value.present
     // RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
     
     ie = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&PDUSessionResourceSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_PDUSessionResourceSetupRequestIEs__value_PR_PDUSessionResourceSetupListSUReq;
     PDUSessionResourceSetupListSUReq = &ie->value.choice.PDUSessionResourceSetupListSUReq;
 
     for (i = 0 ; i < 1 ; i++)
@@ -387,12 +409,15 @@ status_t ngap_build_ue_context_modification_request(pkbuf_t **ngapbuf, ran_ue_t 
     ASN_SEQUENCE_ADD(&UEContextModificationRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
     ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_UEContextModificationRequestIEs__value_PR_AMF_UE_NGAP_ID;
     AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
     *AMF_UE_NGAP_ID = ran_ue->amf_ue_ngap_id;
 
     ie = core_calloc(1, sizeof(NGAP_UEContextModificationRequestIEs_t));
     ASN_SEQUENCE_ADD(&UEContextModificationRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_UEContextModificationRequestIEs__value_PR_RAN_UE_NGAP_ID;
     RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
     *RAN_UE_NGAP_ID = ran_ue->ran_ue_ngap_id;
 
@@ -608,7 +633,7 @@ status_t ngap_build_handover_cancel_acknowledge(pkbuf_t **ngapbuf, ran_ue_t *sou
         NGAP_SuccessfulOutcome__value_PR_HandoverCancelAcknowledge;
     HandoverCancel = &successfulOutcome->value.choice.HandoverCancelAcknowledge;
 
-    ie = core_calloc(1, sizeof(NGAP_UEContextModificationRequestIEs_t));
+    ie = core_calloc(1, sizeof(NGAP_HandoverCancelIEs_t));
     ASN_SEQUENCE_ADD(&HandoverCancel->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
     ie->criticality = NGAP_Criticality_reject;
@@ -616,7 +641,7 @@ status_t ngap_build_handover_cancel_acknowledge(pkbuf_t **ngapbuf, ran_ue_t *sou
     AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
     *AMF_UE_NGAP_ID = source_ue->amf_ue_ngap_id;
 
-    ie = core_calloc(1, sizeof(NGAP_UEContextModificationRequestIEs_t));
+    ie = core_calloc(1, sizeof(NGAP_HandoverCancelIEs_t));
     ASN_SEQUENCE_ADD(&HandoverCancel->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
     ie->criticality = NGAP_Criticality_reject;
@@ -953,4 +978,94 @@ CORE_DECLARE(status_t) ngap_build_handover_request(
 
     return CORE_OK;
 
+}
+
+status_t ngap_build_handover_command(pkbuf_t **ngapbuf, ran_ue_t *source_ue)
+{
+    status_t rv = 0;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_HandoverCommand_t *HandoverCommand = NULL;
+
+    NGAP_HandoverCommandIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_HandoverType_t	*HandoverType = NULL;
+		NGAP_PDUSessionResourceSubjectToForwardingList_t *PDUSessionResourceSubjectToForwardingList = NULL;	
+		NGAP_TargetToSource_TransparentContainer_t	*TargetToSource_TransparentContainer = NULL;
+#if 0
+    NGAP_PDUSessionList_t	 PDUSessionList;
+    NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+#endif
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = 
+        core_calloc(1, sizeof(NGAP_SuccessfulOutcome_t));
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = NGAP_ProcedureCode_id_HandoverPreparation;
+    successfulOutcome->criticality = NGAP_Criticality_reject;
+    successfulOutcome->value.present =
+        NGAP_SuccessfulOutcome__value_PR_HandoverCommand;
+    HandoverCommand = &successfulOutcome->value.choice.HandoverCommand;
+
+    ie = core_calloc(1, sizeof(NGAP_HandoverCommandIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverCommand->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverCommandIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = source_ue->amf_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_HandoverCommandIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverCommand->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverCommandIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = source_ue->ran_ue_ngap_id;
+    
+	ie = core_calloc(1, sizeof(NGAP_HandoverCommandIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverCommand->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_HandoverType;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverCommandIEs__value_PR_HandoverType;
+    HandoverType = &ie->value.choice.HandoverType;
+    *HandoverType = source_ue->handover_type;
+
+	ie = core_calloc(1, sizeof(NGAP_HandoverCommandIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverCommand->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceSubjectToForwardingList;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverCommandIEs__value_PR_PDUSessionResourceSubjectToForwardingList;
+    PDUSessionResourceSubjectToForwardingList = &ie->value.choice.PDUSessionResourceSubjectToForwardingList;
+        NGAP_PDUSessionResourceSubjectToForwardingItemIEs_t *PDUSessionResourceSubjectToForwardingItemIEs = NULL;
+        PDUSessionResourceSubjectToForwardingItemIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceSubjectToForwardingItemIEs_t));
+        ASN_SEQUENCE_ADD(&PDUSessionResourceSubjectToForwardingList->list, PDUSessionResourceSubjectToForwardingItemIEs);
+        PDUSessionResourceSubjectToForwardingItemIEs->criticality = NGAP_Criticality_ignore;
+        PDUSessionResourceSubjectToForwardingItemIEs->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceSubjectToForwardingItem;
+        PDUSessionResourceSubjectToForwardingItemIEs->value.present 
+            = NGAP_PDUSessionResourceSubjectToForwardingItemIEs__value_PR_PDUSessionResourceSubjectToForwardingItem;
+        //PDUSessionResourceSubjectToForwardingItemIEs->value.choice.PDUSessionResourceSubjectToForwardingItem.handoverCommandTransfer'
+        PDUSessionResourceSubjectToForwardingItemIEs->value.choice.PDUSessionResourceSubjectToForwardingItem.pDUSessionID 
+            = source_ue->amf_ue->psi;
+        
+	ie = core_calloc(1, sizeof(NGAP_HandoverCommandIEs_t));
+    ASN_SEQUENCE_ADD(&HandoverCommand->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_TargetToSource_TransparentContainer;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_HandoverCommandIEs__value_PR_TargetToSource_TransparentContainer;
+    TargetToSource_TransparentContainer = &ie->value.choice.TargetToSource_TransparentContainer;
+    ngap_buffer_to_OCTET_STRING(source_ue->amf_ue->container.buf, source_ue->amf_ue->container.size, TargetToSource_TransparentContainer);
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
 }
