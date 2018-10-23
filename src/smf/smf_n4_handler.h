@@ -27,11 +27,11 @@ CORE_DECLARE(void) smf_n4_handle_node_report_request(
         pfcp_xact_t* xact, pfcp_node_report_request_t *req);
 
 CORE_DECLARE(void) smf_n4_handle_session_establishment_response(
-        pfcp_xact_t *xact, pfcp_session_establishment_response_t *rsp);
+        pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_establishment_response_t *rsp);
 CORE_DECLARE(void) smf_n4_handle_session_modification_response(
-        pfcp_xact_t *xact, pfcp_session_modification_response_t *rsp);
+        pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_modification_response_t *rsp);
 CORE_DECLARE(void) smf_n4_handle_session_deletion_response(
-        pfcp_xact_t *xact, pfcp_session_deletion_response_t *rsp);
+        pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_deletion_response_t *rsp);
 
 #ifdef __cplusplus
 }

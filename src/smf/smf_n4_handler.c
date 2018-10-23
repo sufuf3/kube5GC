@@ -8,11 +8,14 @@
 #include "pfcp/pfcp_node.h"
 #include "pfcp/pfcp_path.h"
 
+#include "gtp/gtp_xact.h"
+
 #include "smf_event.h"
 #include "smf_context.h"
 #include "smf_n4_handler.h"
 #include "smf_n4_build.h"
 #include "smf_pfcp_path.h"
+#include "smf_s11_build.h"
 
 void test_session()
 {
@@ -101,7 +104,6 @@ void smf_n4_handle_association_setup_response(
     {
         d_info("association_setup_response cause: %d", pfcp_cause_get_name(cause));
     }
-    test_session();
 }
 
 void smf_n4_handle_association_update_request(
@@ -200,13 +202,42 @@ void smf_n4_handle_association_release_response(
 }
 
 void smf_n4_handle_session_establishment_response(
-        pfcp_xact_t *xact, pfcp_session_establishment_response_t *rsp)
+        pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_establishment_response_t *rsp)
 {
     d_trace(3, "[SMF] Session Establishment Response\n");
+ 
+    status_t rv;
+    pkbuf_t *pkbuf = NULL;
+    gtp_header_t h;
+    c_uint8_t cause;
+    
+    if (!rsp->cause.presence)
+    {
+        d_error("session_establishment_response error: no Cause");
+        return;
+    }
+    
+    cause = *((c_uint8_t*)rsp->cause.data);
+    
+    if (cause != PFCP_CAUSE_SUCCESS)
+    {
+        d_info("association_setup_response cause: %d", pfcp_cause_get_name(cause));
+    } else
+    {
+        rv = smf_s11_build_create_session_response(
+            &pkbuf, sess);
+        d_assert(rv == CORE_OK, return, "gtp build error");
+
+        rv = gtp_xact_update_tx(sess->s11_xact, &h, pkbuf);
+        d_assert(rv == CORE_OK, return, "gtp_xact_update_tx error");
+    
+        rv = gtp_xact_commit(sess->s11_xact);
+        d_assert(rv == CORE_OK, return, "xact_commit error");
+    }
 }
 
 void smf_n4_handle_session_modification_response(
-        pfcp_xact_t *xact, pfcp_session_modification_response_t *rsp)
+        pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_modification_response_t *rsp)
 {
     d_trace(3, "[SMF] Session Modification Response\n");
     
@@ -218,7 +249,7 @@ void smf_n4_handle_session_modification_response(
 }
 
 void smf_n4_handle_session_deletion_response(
-        pfcp_xact_t *xact, pfcp_session_deletion_response_t *rsp)
+        pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_deletion_response_t *rsp)
 {
     d_trace(3, "[SMF] Session Deletion Response\n");
     

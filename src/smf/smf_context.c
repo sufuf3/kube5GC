@@ -922,6 +922,8 @@ smf_sess_t* smf_sess_add(
 
     index_alloc(&smf_sess_pool, &sess);
 
+    sess->s11_xact = NULL;
+    
     /* Set IMSI */
     sess->imsi_len = imsi_len;
     memcpy(sess->imsi, imsi, sess->imsi_len);

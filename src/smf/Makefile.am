@@ -13,6 +13,7 @@ libsmf_la_SOURCES = \
 	smf_n4_handler.h smf_n4_handler.c \
 	smf_gx_handler.h smf_gx_handler.c \
 	smf_s11_handler.h smf_s11_handler.c \
+	smf_s11_build.h smf_s11_build.c \
 	smf_ipfw.h smf_ipfw.c \
 	smf_init.c \
 	$(NULL)

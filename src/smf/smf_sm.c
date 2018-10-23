@@ -100,6 +100,11 @@ void smf_state_operational(fsm_t *s, event_t *e)
                     smf_s11_handle_create_session_request(s11_xact, sess, &s11_message.create_session_request);
                     break;
                 }
+                case GTP_DELETE_SESSION_REQUEST_TYPE:
+                {
+                    smf_s11_handle_delete_session_request(s11_xact, sess, &s11_message.delete_session_request);
+                    break;
+                }
                 default:
                 {
                     d_error("No handler for event %s", smf_event_get_name(e));
@@ -201,15 +206,15 @@ void smf_state_operational(fsm_t *s, event_t *e)
             {
                 case PFCP_SESSION_ESTABLISHMENT_RESPONSE_TYPE:
                     smf_n4_handle_session_establishment_response(
-                        xact, &message->pfcp_session_establishment_response);
+                        xact, sess, &message->pfcp_session_establishment_response);
                     break;
                 case PFCP_SESSION_MODIFICATION_RESPONSE_TYPE:
                     smf_n4_handle_session_modification_response(
-                        xact, &message->pfcp_session_modification_response);
+                        xact, sess,&message->pfcp_session_modification_response);
                     break;
                 case PFCP_SESSION_DELETION_RESPONSE_TYPE:
                     smf_n4_handle_session_deletion_response(
-                        xact, &message->pfcp_session_deletion_response);
+                        xact, sess,&message->pfcp_session_deletion_response);
                     break;
                 default:
                     break;

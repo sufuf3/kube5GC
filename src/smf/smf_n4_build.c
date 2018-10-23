@@ -462,7 +462,10 @@ status_t smf_n4_build_create_far(
     create_far->apply_action.data = &far->apply_action;
     if (far->apply_action & PFCP_FAR_APPLY_ACTION_FORW)
     {
-//        create_far->forwarding_parameters.presence = 1;
+        create_far->forwarding_parameters.presence = 1;
+        create_far->forwarding_parameters.destination_interface.presence = 1;
+        create_far->forwarding_parameters.destination_interface.len = 1;
+        create_far->forwarding_parameters.destination_interface.data = &far->destination_interface;
     }
     
     return CORE_OK;

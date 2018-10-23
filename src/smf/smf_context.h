@@ -11,6 +11,7 @@
 
 #include "3gpp_types.h"
 #include "gtp/gtp_node.h"
+#include "gtp/gtp_xact.h"
 #include "gtp/gtp_message.h"
 #include "pfcp/pfcp_types.h"
 #include "pfcp/pfcp_node.h"
@@ -73,6 +74,9 @@ typedef struct _smf_sess_t {
     c_uint64_t      smf_n4_seid;    /* SMF SEID is derived from INDEX */
     c_uint64_t      upf_n4_seid;    /* UPF SEID is received from UPF */
     
+    c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is derived from INDEX */
+    c_uint32_t      mme_s11_teid;   /* MME-S11-TEID is received from MME */
+    
     c_int8_t        *gx_sid;        /* Gx Session ID */
     
     /* User-Lication-Info */
@@ -102,6 +106,7 @@ typedef struct _smf_sess_t {
     /* Related Context */
     gtp_node_t      *mme_node;
     pfcp_node_t     *upf_node;
+    gtp_xact_t      *s11_xact;
 } smf_sess_t;
 
 typedef struct _smf_bearer_t {

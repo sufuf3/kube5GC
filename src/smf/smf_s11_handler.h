@@ -12,6 +12,8 @@ extern "C" {
 
 CORE_DECLARE(void) smf_s11_handle_create_session_request(gtp_xact_t *s11_xact,
         smf_sess_t *sess, gtp_create_session_request_t *req);
+CORE_DECLARE(void) smf_s11_handle_delete_session_request(gtp_xact_t *s11_xact,
+        smf_sess_t *sess, gtp_delete_session_request_t *req);
 
 
 #ifdef __cplusplus
