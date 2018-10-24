@@ -1753,3 +1753,139 @@ void ngap_handle_initial_ue_message(amf_ran_t *ran, ngap_message_t *message)
     }
     
 }
+
+void ngap_handle_ue_context_release_request(amf_ran_t *ran, ngap_message_t *message)
+{
+    status_t rv;
+    int i;
+    char buf[CORE_ADDRSTRLEN];
+
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UEContextReleaseRequest_t	*UEContextReleaseRequest = NULL;
+    
+    NGAP_UEContextReleaseRequest_IEs_t	*ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_Cause_t *Cause = NULL;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+
+    UEContextReleaseRequest = &initiatingMessage->value.choice.UEContextReleaseRequest;
+    d_assert(UEContextReleaseRequest, return,);
+
+    ran_ue_t *ran_ue = NULL;
+    amf_ue_t *amf_ue = NULL;
+
+    d_trace(3, "[AMF] UE Context release request \n");
+
+    for (i = 0; i < UEContextReleaseRequest->protocolIEs.list.count; i++)
+    {
+        ie = UEContextReleaseRequest->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                d_assert(AMF_UE_NGAP_ID, return,);
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+                d_assert(RAN_UE_NGAP_ID, return,);
+                break;
+            case NGAP_ProtocolIE_ID_id_Cause:
+                Cause = &ie->value.choice.Cause;
+                d_assert(Cause, return,);
+                break;
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    ran[%s] \n",
+            CORE_ADDR(ran->addr, buf));
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    
+    d_assert(AMF_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_amf_ue_ngap_id(*AMF_UE_NGAP_ID);
+    if(!ran_ue) 
+    {
+        d_warn("No UE Context : AMF_UE_NGAP_ID[%d]", *AMF_UE_NGAP_ID);
+#if 0   //TODO: add error indication
+        rv = s1ap_send_error_indication(enb, 
+                AMF_UE_NGAP_ID, ENB_UE_S1AP_ID,
+                S1AP_Cause_PR_radioNetwork,
+                S1AP_CauseRadioNetwork_unknown_mme_ue_s1ap_id);
+        d_assert(rv == CORE_OK, return, "s1ap send error");
+#endif
+        return;
+    }
+    
+    d_trace(5, "    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+            ran_ue->ran_ue_ngap_id, ran_ue->amf_ue_ngap_id);
+
+    d_assert(Cause, return,);
+    d_trace(5, "    Cause[Group:%d Cause:%d]\n",
+            Cause->present, Cause->choice.radioNetwork);
+
+    switch(Cause->present)
+    {
+        case NGAP_Cause_PR_radioNetwork:
+        case NGAP_Cause_PR_transport:
+        case NGAP_Cause_PR_protocol:
+        case NGAP_Cause_PR_misc:
+            break;
+        case NGAP_Cause_PR_nas:
+            d_warn("NAS-Cause[%d]", Cause->choice.nas);
+        default:
+            d_warn("Invalid cause group[%d]", Cause->present);
+            break;
+    }
+
+    amf_ue = ran_ue->amf_ue;
+    if (amf_ue)
+    {
+#if 0
+        if (FSM_CHECK(&amf_ue->sm, emm_state_registered))
+        {
+            d_trace(5, "    EMM-Registered\n");
+            rv = mme_send_release_access_bearer_or_ue_context_release(
+                    mme_ue, enb_ue);
+            d_assert(rv == CORE_OK,, "mme_send_release_access_bearer_or_"
+                    "ue_context_release() failed");
+        }
+        else
+
+        {
+            d_trace(5, "    NOT EMM-Registered\n");
+            rv = mme_send_delete_session_or_ue_context_release(mme_ue, enb_ue);
+            d_assert(rv == CORE_OK,,
+                    "mme_send_delete_session_or_ue_context_release() failed");
+        }
+#endif
+    }
+    else
+    {
+        d_trace(5, "    NG Context Not Associated\n");
+        rv = ngap_send_ue_context_release_command(ran_ue,
+            NGAP_Cause_PR_nas, NGAP_CauseNas_normal_release ,
+            NGAP_UE_CTX_REL_NO_ACTION, 0);
+        d_assert(rv == CORE_OK,, "ngap send error");
+    }
+}
