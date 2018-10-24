@@ -1207,3 +1207,129 @@ void ngap_handle_handover_required(amf_ran_t *ran, ngap_message_t *message)
             SourceToTarget_TransparentContainer);
     d_assert(rv == CORE_OK,, "ngap send error");    
 }
+
+void ngap_handle_handover_request_acknowledge(amf_ran_t *ran, ngap_message_t *message)
+{
+    status_t rv = 0;
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];
+                              
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_HandoverRequestAcknowledge_t *HandoverRequestAcknowledge = NULL;
+
+    NGAP_HandoverRequestAcknowledgeIEs_t *ie = NULL;
+		NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+		NGAP_PDUSessionResourceAdmittedList_t *PDUSessionResourceAdmittedList = NULL;
+		NGAP_TargetToSource_TransparentContainer_t *TargetToSource_TransparentContainer = NULL;
+#if 0
+        NGAP_PDUSessionList_t	 PDUSessionList;
+	    NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+#endif
+
+    ran_ue_t *source_ue = NULL;
+    ran_ue_t *target_ue = NULL;
+    amf_ue_t *amf_ue = NULL;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+    d_assert(message, return,);
+
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    HandoverRequestAcknowledge = &successfulOutcome->value.choice.HandoverRequestAcknowledge;
+    d_assert(HandoverRequestAcknowledge, return,);
+    d_trace(3, "[AMF] Handover request acknowledge\n");
+
+    for (i = 0; i < HandoverRequestAcknowledge->protocolIEs.list.count; i++)
+    {
+        ie = HandoverRequestAcknowledge->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID =
+                    &ie->value.choice.RAN_UE_NGAP_ID;
+                break;
+             case NGAP_ProtocolIE_ID_id_PDUSessionResourceAdmittedList:
+                PDUSessionResourceAdmittedList = &ie->value.choice.PDUSessionResourceAdmittedList;
+                break;
+            case NGAP_ProtocolIE_ID_id_TargetToSource_TransparentContainer:
+                TargetToSource_TransparentContainer =  &ie->value.choice.TargetToSource_TransparentContainer;
+            default:
+                break;
+        }
+    }
+
+    d_trace(5, "    ran[%s] \n",
+            CORE_ADDR(ran->addr, buf));
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+
+    d_assert(AMF_UE_NGAP_ID, return,);
+    d_assert(RAN_UE_NGAP_ID, return,);
+    d_assert(PDUSessionResourceAdmittedList, return,);
+    d_assert(TargetToSource_TransparentContainer, return,);
+
+    target_ue = ran_ue_find_by_amf_ue_ngap_id(*AMF_UE_NGAP_ID);
+    d_assert(target_ue, return, "Cannot find UE for AMF_UE_NGAP_ID[%d] ", *AMF_UE_NGAP_ID);
+
+    target_ue->ran_ue_ngap_id = *RAN_UE_NGAP_ID;
+    source_ue = target_ue->source_ue;
+    d_assert(source_ue, return,);
+    amf_ue = source_ue->amf_ue;
+    d_assert(amf_ue, return,);
+
+    d_trace(5, "    Source : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+            source_ue->ran_ue_ngap_id, source_ue->amf_ue_ngap_id);
+    d_trace(5, "    Target : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+            target_ue->ran_ue_ngap_id, target_ue->amf_ue_ngap_id);
+
+    for (i = 0 ; i < PDUSessionResourceAdmittedList->list.count ; i ++)
+    {
+#if 0   
+        //TODO : 
+        NGAP_PDUSessionResourceAdmittedItemIEs_t *ie2 = NULL;
+        NGAP_PDUSessionResourceAdmittedItem_t *PDUSession = NULL;
+
+        ie2 = (NGAP_PDUSessionResourceAdmittedItemIEs_t *)PDUSessionResourceAdmittedList->list.array[i];
+        d_assert(ie2, return, );
+        PDUSession = &ie2->value.choice.PDUSessionResourceAdmittedItem;
+        PDUSession->pDUSessionID;
+#endif  
+    }
+
+
+    NGAP_STORE_DATA(&amf_ue->container, TargetToSource_TransparentContainer);
+
+#if 0
+    if (mme_ue_have_indirect_tunnel(mme_ue) == 1)
+    {
+        rv = mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
+                mme_ue);
+        d_assert(rv == CORE_OK, return, "gtp send failed");
+    }
+    else
+#endif
+    {
+        rv = ngap_send_handover_command(source_ue);
+        d_assert(rv == CORE_OK, return, "gtp send failed");
+    }
+
+
+}

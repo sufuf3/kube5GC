@@ -24,6 +24,8 @@ CORE_DECLARE(void) ngap_handle_ng_reset(amf_ran_t *ran, ngap_message_t *message)
 
 CORE_DECLARE(void) ngap_handle_handover_cancel(amf_ran_t *ran, ngap_message_t *message);
 CORE_DECLARE(void) ngap_handle_handover_required(amf_ran_t *ran, ngap_message_t *message);
+CORE_DECLARE(void) ngap_handle_handover_request_acknowledge(amf_ran_t *ran, ngap_message_t *message);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

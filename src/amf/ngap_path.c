@@ -219,7 +219,7 @@ status_t ngap_send_handover_preparation_failure(ran_ue_t *source_ue, NGAP_Cause_
     return rv;
 }
 
-CORE_DECLARE(status_t) ngap_send_handover_request(
+status_t ngap_send_handover_request(
         amf_ue_t *amf_ue,
         amf_ran_t *target_ran,
         NGAP_RAN_UE_NGAP_ID_t *ran_ue_ngap_id,
@@ -262,6 +262,22 @@ CORE_DECLARE(status_t) ngap_send_handover_request(
     d_assert(rv == CORE_OK && ngapbuf, return CORE_ERROR, "ngap build error");
 
     rv = ngap_send_to_ran_ue(target_ue, ngapbuf);
+    d_assert(rv == CORE_OK,, "ngap send error");
+
+    return rv;
+}
+
+status_t ngap_send_handover_command(ran_ue_t *source_ue)
+{
+    status_t rv;
+    pkbuf_t *ngapbuf = NULL;
+
+    d_assert(source_ue, return CORE_ERROR,);
+
+    rv = ngap_build_handover_command(&ngapbuf, source_ue);
+    d_assert(rv == CORE_OK && ngapbuf, return CORE_ERROR, "ngap build error");
+
+    rv = ngap_send_to_ran_ue(source_ue, ngapbuf);
     d_assert(rv == CORE_OK,, "ngap send error");
 
     return rv;

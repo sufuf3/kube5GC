@@ -35,6 +35,7 @@ CORE_DECLARE(status_t) ngap_delayed_send_to_ran_ue(ran_ue_t *ran_ue,
 
 CORE_DECLARE(status_t) ngap_send_handover_cancel_acknowledge(ran_ue_t *source_ue);
 CORE_DECLARE(status_t) ngap_send_handover_preparation_failure(ran_ue_t *source_ue, NGAP_Cause_t *cause);
+CORE_DECLARE(status_t)  ngap_send_handover_command(ran_ue_t *source_ue);
 CORE_DECLARE(status_t) ngap_send_handover_request(
         amf_ue_t *amf_ue,
         amf_ran_t *target_ran,
