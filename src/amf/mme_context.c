@@ -3518,3 +3518,16 @@ status_t source_ue_associate_target_5g(
 
     return CORE_OK;
 }
+
+
+status_t amf_ue_associate_ran_ue(amf_ue_t *amf_ue, ran_ue_t *ran_ue)
+{
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+    d_assert(ran_ue, return CORE_ERROR, "Null param");
+
+    amf_ue->ran_ue = ran_ue;
+    ran_ue->amf_ue = amf_ue;
+
+
+    return CORE_OK;
+}

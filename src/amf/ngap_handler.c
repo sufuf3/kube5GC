@@ -1417,3 +1417,176 @@ void ngap_handle_handover_failure(amf_ran_t *ran, ngap_message_t *message)
         NGAP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL, 0);
     d_assert(rv == CORE_OK, return, "npap send error");
 }
+
+void ngap_handle_handover_notification(amf_ran_t *ran, ngap_message_t *message)
+{
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+    
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_HandoverNotify_t *HandoverNotify = NULL;
+
+    NGAP_HandoverNotifyIEs_t *ie = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_UserLocationInformation_t *UserLocationInformation = NULL;
+            NGAP_TAC_t *tAC = NULL;
+            NGAP_PLMNIdentity_t *PLMNIdentity = NULL;
+            NGAP_EUTRACellIdentity_t *eUTRACellIdentity = NULL;
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+
+    HandoverNotify = &initiatingMessage->value.choice.HandoverNotify;
+    d_assert(HandoverNotify, return,);
+
+    d_trace(3, "[AMF] Handover notification \n");
+    
+    ran_ue_t *source_ue = NULL;
+    ran_ue_t *target_ue = NULL;
+    amf_ue_t *amf_ue = NULL;
+
+    for (i = 0; i < HandoverNotify->protocolIEs.list.count; i++)
+    {
+        ie = HandoverNotify->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                d_assert(AMF_UE_NGAP_ID, return,);
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+                d_assert(RAN_UE_NGAP_ID, return,);
+                break;
+            case NGAP_ProtocolIE_ID_id_UserLocationInformation:
+                UserLocationInformation = &ie->value.choice.UserLocationInformation;
+                d_assert(UserLocationInformation, return,);
+                break;
+            default:
+                break;
+        }
+    }
+    
+    d_trace(5, "    ran[%s] \n",
+            CORE_ADDR(ran->addr, buf));
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+
+    switch(UserLocationInformation->present)
+    {
+        case NGAP_UserLocationInformation_PR_userLocationInformationEUTRA:
+        {
+            NGAP_UserLocationInformationEUTRA_t *userLocationInformationEUTRA = NULL;
+            userLocationInformationEUTRA = UserLocationInformation->choice.userLocationInformationEUTRA;
+            d_assert(userLocationInformationEUTRA , return, );
+            PLMNIdentity = &userLocationInformationEUTRA->tAI.pLMNIdentity;
+            d_assert(PLMNIdentity, return,);
+            tAC = &userLocationInformationEUTRA->tAI.tAC;
+            d_assert(tAC, return,);
+            PLMNIdentity = &userLocationInformationEUTRA->eUTRA_CGI.pLMNIdentity;
+            d_assert(PLMNIdentity, return,);
+            eUTRACellIdentity = &userLocationInformationEUTRA->eUTRA_CGI.eUTRACellIdentity;
+            d_assert(eUTRACellIdentity, return,);
+
+            d_assert(AMF_UE_NGAP_ID, return, );
+            d_assert(RAN_UE_NGAP_ID, return, );
+            target_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+            d_assert(target_ue, return, "Cannot find UE for RAN_UE_NGAP_ID[%d] ", *RAN_UE_NGAP_ID);
+            d_assert(target_ue->amf_ue_ngap_id == *AMF_UE_NGAP_ID, return,
+                     "Conflict RAN_UE_NGAP_ID[%d] : != %d \n",
+                     target_ue->amf_ue_ngap_id, *AMF_UE_NGAP_ID);
+
+            source_ue = target_ue-> source_ue;
+            d_assert(source_ue, return, );
+            amf_ue = source_ue->amf_ue;
+            d_assert(amf_ue, return, );
+            d_trace(5, "    Source : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+                    source_ue->ran_ue_ngap_id, source_ue->amf_ue_ngap_id);
+            d_trace(5, "    Target : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+                    target_ue->ran_ue_ngap_id, target_ue->amf_ue_ngap_id);
+            amf_ue_associate_ran_ue(amf_ue, target_ue);
+#if 0
+    memcpy(&target_ue->nas.tai.plmn_id, pLMNidentity->buf, 
+            sizeof(target_ue->nas.tai.plmn_id));
+    memcpy(&target_ue->nas.tai.tac, tAC->buf, sizeof(target_ue->nas.tai.tac));
+    target_ue->nas.tai.tac = ntohs(target_ue->nas.tai.tac);
+
+    memcpy(&target_ue->nas.e_cgi.plmn_id, pLMNidentity->buf, 
+            sizeof(target_ue->nas.e_cgi.plmn_id));
+    memcpy(&target_ue->nas.e_cgi.cell_id, cell_ID->buf,
+            sizeof(target_ue->nas.e_cgi.cell_id));
+    target_ue->nas.e_cgi.cell_id = (ntohl(target_ue->nas.e_cgi.cell_id) >> 4);
+
+    d_trace(5, "    OLD TAI[PLMN_ID:0x%x,TAC:%d]\n",
+            mme_ue->tai.plmn_id, mme_ue->tai.tac);
+    d_trace(5, "    OLD E_CGI[PLMN_ID:0x%x,CELL_ID:%d]\n",
+            mme_ue->e_cgi.plmn_id, mme_ue->e_cgi.cell_id);
+    d_trace(5, "    TAI[PLMN_ID:0x%x,TAC:%d]\n",
+            target_ue->nas.tai.plmn_id, target_ue->nas.tai.tac);
+    d_trace(5, "    E_CGI[PLMN_ID:0x%x,CELL_ID:%d]\n",
+            target_ue->nas.e_cgi.plmn_id, target_ue->nas.e_cgi.cell_id);
+
+    /* Copy TAI and ECGI from enb_ue */
+    memcpy(&mme_ue->tai, &target_ue->nas.tai, sizeof(tai_t));
+    memcpy(&mme_ue->e_cgi, &target_ue->nas.e_cgi, sizeof(e_cgi_t));
+
+    sess = mme_sess_first(mme_ue);
+    while(sess)
+    {
+        bearer = mme_bearer_first(sess);
+        while(bearer)
+        {
+            bearer->enb_s1u_teid = bearer->target_s1u_teid;
+            memcpy(&bearer->enb_s1u_ip, &bearer->target_s1u_ip, sizeof(ip_t));
+
+            GTP_COUNTER_INCREMENT(
+                    mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY);
+
+            rv = mme_gtp_send_modify_bearer_request(bearer, 1);
+            d_assert(rv == CORE_OK, return, "gtp send failed");
+
+            bearer = mme_bearer_next(bearer);
+        }
+        sess = mme_sess_next(sess);
+    }
+#endif
+            break;
+        }
+        case NGAP_UserLocationInformation_PR_userLocationInformationNR:
+        {
+            NGAP_UserLocationInformationNR_t *userLocationInformationNR = NULL;
+            userLocationInformationNR = UserLocationInformation->choice.userLocationInformationNR;
+            d_assert(userLocationInformationNR , return, );
+            break;
+        }
+        case NGAP_UserLocationInformation_PR_userLocationInformationN3IWF:
+        {
+            NGAP_UserLocationInformationN3IWF_t *userLocationInformationN3IWF = NULL;
+            userLocationInformationN3IWF = UserLocationInformation->choice.userLocationInformationN3IWF;
+            d_assert(userLocationInformationN3IWF , return, );
+            break;
+        }
+        case NGAP_UserLocationInformation_PR_NOTHING:
+        default:
+        {
+            break;
+        }
+
+    }	
+}
