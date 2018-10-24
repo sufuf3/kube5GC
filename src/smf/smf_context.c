@@ -14,6 +14,7 @@
 #include "app/yaml_helper.h"
 
 #include "gtp/gtp_node.h"
+#include "gtp/gtp_path.h"
 #include "pfcp/pfcp_node.h"
 
 #include "smf_context.h"
@@ -50,6 +51,7 @@ status_t smf_context_init()
     
     list_init(&self.gtpc_list);
     list_init(&self.gtpc_list6);
+    list_init(&self.mme_s11_list);
     gtp_node_init();
     
     list_init(&self.pfcp_list);
@@ -87,6 +89,7 @@ status_t smf_context_final()
     
     sock_remove_all_nodes(&self.gtpc_list);
     sock_remove_all_nodes(&self.gtpc_list6);
+    gtp_remove_all_nodes(&self.mme_s11_list);
     gtp_node_final();
     
     sock_remove_all_nodes(&self.pfcp_list);
@@ -849,6 +852,38 @@ status_t smf_context_setup_trace_module()
         d_trace_level(&_smf_n4_build, pfcp);
     }
     return CORE_OK;
+}
+
+gtp_node_t *smf_mme_add_by_message(gtp_message_t *message)
+{
+    status_t rv;
+    gtp_node_t *mme = NULL;
+    gtp_f_teid_t *mme_s11_teid = NULL;
+    gtp_create_session_request_t *req = &message->create_session_request;
+
+    if (req->sender_f_teid_for_control_plane.presence == 0)
+    {
+        d_error("No Sender F-TEID");
+        return NULL;
+    }
+
+    mme_s11_teid = req->sender_f_teid_for_control_plane.data;
+    d_assert(mme_s11_teid, return NULL,);
+    mme = gtp_find_node(&smf_self()->mme_s11_list, mme_s11_teid);
+    if (!mme)
+    {
+        mme = gtp_add_node_with_teid(&smf_self()->mme_s11_list, mme_s11_teid,
+            smf_self()->gtpc_port,
+            context_self()->parameter.no_ipv4,
+            context_self()->parameter.no_ipv6,
+            context_self()->parameter.prefer_ipv4);
+        d_assert(mme, return NULL,);
+
+        rv = gtp_client(mme);
+        d_assert(rv == CORE_OK, return NULL,);
+    }
+
+    return mme;
 }
 
 static void *sess_hash_keygen(c_uint8_t *out, int *out_len,

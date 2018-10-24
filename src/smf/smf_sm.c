@@ -87,6 +87,13 @@ void smf_state_operational(fsm_t *s, event_t *e)
             
             sess = smf_sess_add_or_find_by_message(&s11_message);
             d_assert(sess, goto release_s11_pkbuf;,);
+            
+            if (s11_message.h.teid == 0)
+            {
+                gtp_node_t *mme = smf_mme_add_by_message(&s11_message);
+                d_assert(mme, goto release_s11_pkbuf;,);
+                sess->mme_node = mme;
+            }
 
             rv = gtp_xact_receive(sess->mme_node, &s11_message.h, &s11_xact);
             d_assert(rv == CORE_OK, goto release_s11_pkbuf;,);

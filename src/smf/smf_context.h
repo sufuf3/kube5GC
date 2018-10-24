@@ -55,6 +55,7 @@ typedef struct _smf_context_t {
     list_t              subnet_list;    /* SMF UE Subnet List */
     
     list_t              upf_n4_list;    /* UPF PFCP client List */
+    list_t              mme_s11_list;
     
     hash_t              *sess_hash;     /* Session Hash Table (IMSI + APN) */
     
@@ -260,6 +261,8 @@ CORE_DECLARE(smf_sess_t*)       smf_sess_find_by_imsi_apn(
 CORE_DECLARE(smf_sess_t*)       smf_sess_this(hash_index_t *hi);
 CORE_DECLARE(hash_index_t*)     smf_sess_first();
 CORE_DECLARE(hash_index_t*)     smf_sess_next(hash_index_t *hi);
+
+CORE_DECLARE(gtp_node_t *)      smf_mme_add_by_message(gtp_message_t *message);
 
 CORE_DECLARE(smf_bearer_t*)     smf_bearer_add(smf_sess_t *sess);
 CORE_DECLARE(status_t)          smf_bearer_remove(smf_bearer_t *bearer);
