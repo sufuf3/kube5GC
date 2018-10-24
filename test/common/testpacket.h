@@ -121,6 +121,11 @@ CORE_DECLARE(status_t) tests1ap_build_enb_cp_relocation_indication(pkbuf_t **pkb
         c_uint32_t enb_ue_s1ap_id);
 /******************************************************/
 
+CORE_DECLARE(status_t) testngap_ran_connect(sock_id *new);
+CORE_DECLARE(status_t) testngap_ran_close(sock_id id);
+CORE_DECLARE(status_t) testngap_ran_send(sock_id id, pkbuf_t *sendbuf);
+CORE_DECLARE(status_t) testngap_ran_read(sock_id id, pkbuf_t *recvbuf);
+
 CORE_DECLARE(status_t) testngap_build_setup_req(
         pkbuf_t **pkbuf, NGAP_NgENB_ID_PR present, c_uint32_t enb_id);
 CORE_DECLARE(status_t)  ngap_build_initial_context_setup_failure(

@@ -3496,8 +3496,39 @@ status_t tests1ap_build_enb_direct_information_transfer(
 }
 /******************************************************/
 
+status_t testngap_ran_connect(sock_id *new)
+{
+    status_t rv;
+    sock_node_t *snode = NULL;
+    
+    snode = list_first(&ngap_list);
+    if (!snode) snode = list_first(&ngap_list6);
+    
+    d_assert(snode, return CORE_ERROR,);
+
+    rv = sctp_client(new, SOCK_STREAM, snode->list);
+    d_assert(rv == CORE_OK, return CORE_ERROR,);
+
+    return CORE_OK;
+}
+
+status_t testngap_ran_close(sock_id id)
+{
+    return ngap_delete(id);
+}
+
+status_t testngap_ran_read(sock_id id, pkbuf_t *recvbuf)
+{
+    return ngap_recv(id, recvbuf);
+}
+
+status_t testngap_ran_send(sock_id id, pkbuf_t *sendbuf)
+{
+    return ngap_send(id, sendbuf, NULL, 0);
+}
+
 status_t testngap_build_setup_req(
-        pkbuf_t **pkbuf, NGAP_NgENB_ID_PR present, c_uint32_t enb_id)
+        pkbuf_t **pkbuf, NGAP_GNB_ID_PR present, c_uint32_t gnb_id)
 
 {
     status_t rv;
@@ -3528,8 +3559,8 @@ printf("\n  %d \n", __LINE__);
     initiatingMessage->criticality = NGAP_Criticality_ignore;
     initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_NGSetupRequest;
 
-    NGSetupRequest = &initiatingMessage->value.choice.NGSetupRequest;    
-#if 1
+    //NGSetupRequest = &initiatingMessage->value.choice.NGSetupRequest;    
+#if 0
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
 printf("\n  %d add GlobalRANNodeID \n", __LINE__);
@@ -3540,7 +3571,7 @@ printf("\n  %d add GlobalRANNodeID \n", __LINE__);
     Global_RAN_Node_ID = &ie->value.choice.GlobalRANNodeID;
     Global_RAN_Node_ID->present = NGAP_GlobalRANNodeID_PR_globalGNB_ID;
 #endif
-#if 1
+#if 0
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
     printf("\n  %d SupportedTAList\n", __LINE__);
@@ -3549,7 +3580,7 @@ printf("\n  %d add GlobalRANNodeID \n", __LINE__);
     ie->value.present = NGAP_NGSetupRequestIEs__value_PR_SupportedTAList;
     SupportedTAList = &ie->value.choice.SupportedTAList;
 #endif
-#if 1
+#if 0
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_DefaultPagingDRX;
@@ -3559,7 +3590,7 @@ printf("\n  %d add GlobalRANNodeID \n", __LINE__);
 #endif
 
 
-#if 1
+#if 0
     plmn_id_build(&plmn_id, 1, 1, 2);
 printf("\n  %d \n", __LINE__);
     Global_RAN_Node_ID->choice.globalGNB_ID = core_calloc(1, sizeof(struct NGAP_GlobalGNB_ID));
@@ -3567,7 +3598,7 @@ printf("\n  %d \n", __LINE__);
            &plmn_id, PLMN_ID_LEN, &Global_RAN_Node_ID->choice.globalGNB_ID->pLMNIdentity);
 
 printf("\n  %d \n", __LINE__);
-    ngap_uint32_to_GNB_ID(present, enb_id, &Global_RAN_Node_ID->choice.globalGNB_ID->gNB_ID);
+    ngap_uint32_to_GNB_ID(present, gnb_id, &Global_RAN_Node_ID->choice.globalGNB_ID->gNB_ID);
 #endif
 #if 0    
     Global_RAN_Node_ID->choice.globalNgENB_ID = core_calloc(1, sizeof(struct NGAP_GlobalNgENB_ID));
@@ -3584,7 +3615,7 @@ printf("\n  %d \n", __LINE__);
 
 #endif
 
-#if 1
+#if 0
         SupportedTAItem = (NGAP_SupportedTAItem_t *) core_calloc(1, sizeof(NGAP_SupportedTAItem_t));
         ngap_uint16_to_OCTET_STRING(tac, &SupportedTAItem->tAC);
             BroadcastPLMNItem = (NGAP_BroadcastPLMNItem_t *) core_calloc(1, sizeof(NGAP_BroadcastPLMNItem_t));
@@ -3598,7 +3629,7 @@ printf("\n  %d \n", __LINE__);
 #endif
 printf("\n  %d \n", __LINE__);
 
-    *PagingDRX = 1;
+    //*PagingDRX = 1;
 
 printf("\n  %d \n", __LINE__);
     rv = ngap_encode_pdu(pkbuf, &pdu);
