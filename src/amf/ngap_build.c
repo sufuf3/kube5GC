@@ -1069,3 +1069,219 @@ status_t ngap_build_handover_command(pkbuf_t **ngapbuf, ran_ue_t *source_ue)
 
     return CORE_OK;
 }
+
+status_t ngap_build_path_switch_ack(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
+{
+    status_t rv = 0;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_PathSwitchRequestAcknowledge_t *PathSwitchRequestAcknowledge = NULL;
+
+    NGAP_PathSwitchRequestAcknowledgeIEs_t *ie = NULL;
+		NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;	
+		//NGAP_SecurityContext_t *SecurityContext = NULL;	
+		NGAP_PDUSessionResourceToBeSwitchedULList_t *PDUSessionResourceToBeSwitchedULList = NULL;
+			
+#if 0
+    NGAP_UESecurityCapabilities_t	 UESecurityCapabilities;
+    NGAP_KamfChangeInd_t	 KamfChangeInd;
+    NGAP_PDUSessionList_t	 PDUSessionList;
+	NGAP_RRCInactiveAssistanceInformation_t	 RRCInactiveAssistanceInformation;
+	NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+#endif
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = 
+        core_calloc(1, sizeof(NGAP_SuccessfulOutcome_t));
+
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = NGAP_ProcedureCode_id_PathSwitchRequest;
+    successfulOutcome->criticality = NGAP_Criticality_reject;
+    successfulOutcome->value.present =
+        NGAP_SuccessfulOutcome__value_PR_PathSwitchRequestAcknowledge;
+    PathSwitchRequestAcknowledge = &successfulOutcome->value.choice.PathSwitchRequestAcknowledge;
+
+    ie = core_calloc(1, sizeof(NGAP_PathSwitchRequestAcknowledgeIEs_t));
+    ASN_SEQUENCE_ADD(&PathSwitchRequestAcknowledge->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_PathSwitchRequestAcknowledgeIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = amf_ue->ran_ue->amf_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_PathSwitchRequestAcknowledgeIEs_t));
+    ASN_SEQUENCE_ADD(&PathSwitchRequestAcknowledge->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_PathSwitchRequestAcknowledgeIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = amf_ue->ran_ue->ran_ue_ngap_id;
+#if 0 
+    ie = core_calloc(1, sizeof(NGAP_PathSwitchRequestAcknowledgeIEs_t));
+    ASN_SEQUENCE_ADD(&PathSwitchRequestAcknowledge->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_SecurityContext;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_PathSwitchRequestAcknowledgeIEs__value_PR_SecurityContext;
+    SecurityContext = &ie->value.choice.SecurityContext;
+   
+    SecurityContext->nextHopChainingCount = mme_ue->nhcc;
+    SecurityContext->nextHopParameter.size = SHA256_DIGEST_SIZE;
+    SecurityContext->nextHopParameter.buf = 
+        core_calloc(SecurityContext->nextHopParameter.size,
+        sizeof(c_uint8_t));
+    SecurityContext->nextHopParameter.bits_unused = 0;
+    memcpy(SecurityContext->nextHopParameter.buf,
+            mme_ue->nh, SecurityContext->nextHopParameter.size);
+#endif
+
+    ie = core_calloc(1, sizeof(NGAP_PathSwitchRequestAcknowledgeIEs_t));
+    ASN_SEQUENCE_ADD(&PathSwitchRequestAcknowledge->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceToBeSwitchedULList;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_PathSwitchRequestAcknowledgeIEs__value_PR_PDUSessionResourceToBeSwitchedULList;
+    PDUSessionResourceToBeSwitchedULList = &ie->value.choice.PDUSessionResourceToBeSwitchedULList;
+
+    NGAP_PDUSessionResourceToBeSwitchedULItemIEs_t *PDUSessionResourceToBeSwitchedULItemIEs = NULL;
+    PDUSessionResourceToBeSwitchedULItemIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceToBeSwitchedULItemIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceToBeSwitchedULList->list, PDUSessionResourceToBeSwitchedULItemIEs);
+            NGAP_PDUSessionResourceToBeSwitchedULItem_t	*PDUSessionResourceToBeSwitchedULItem = NULL;
+            PDUSessionResourceToBeSwitchedULItemIEs->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceToBeSwitchedDLItem;
+            PDUSessionResourceToBeSwitchedULItemIEs->criticality = NGAP_Criticality_ignore;
+            PDUSessionResourceToBeSwitchedULItemIEs->value.present = NGAP_PDUSessionResourceToBeSwitchedULItemIEs__value_PR_PDUSessionResourceToBeSwitchedULItem;
+            PDUSessionResourceToBeSwitchedULItem = &PDUSessionResourceToBeSwitchedULItemIEs->value.choice.PDUSessionResourceToBeSwitchedULItem;
+            //TODO: fix it
+            //PDUSessionResourceToBeSwitchedULItem->pathSwitchRequestTransfer
+            PDUSessionResourceToBeSwitchedULItem->pDUSessionID = amf_ue->psi;
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
+
+status_t ngap_build_path_switch_failure(pkbuf_t **ngapbuf,
+    c_uint32_t ran_ue_ngap_id, c_uint32_t amf_ue_ngap_id,
+    NGAP_Cause_PR group, long cause)
+{
+    status_t rv = 0;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_UnsuccessfulOutcome_t *unsuccessfulOutcome = NULL;
+    NGAP_PathSwitchRequestFailure_t *PathSwitchRequestFailure = NULL;
+
+    NGAP_PathSwitchRequestFailureIEs_t *ie = NULL;
+    	NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+		NGAP_Cause_t *Cause = NULL;
+#if 0
+		NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+#endif
+    d_assert(ngapbuf, return CORE_ERROR,);
+    
+    d_trace(3, "[AMF] Path Switch failure\n");
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_unsuccessfulOutcome;
+    pdu.choice.unsuccessfulOutcome = 
+        core_calloc(1, sizeof(NGAP_UnsuccessfulOutcome_t));
+    unsuccessfulOutcome = pdu.choice.unsuccessfulOutcome;
+    unsuccessfulOutcome->procedureCode = NGAP_ProcedureCode_id_PathSwitchRequest;
+    unsuccessfulOutcome->criticality = NGAP_Criticality_reject;
+    unsuccessfulOutcome->value.present = NGAP_UnsuccessfulOutcome__value_PR_HandoverFailure;
+    PathSwitchRequestFailure = &unsuccessfulOutcome->value.choice.PathSwitchRequestFailure;
+
+    ie = core_calloc(1, sizeof(NGAP_PathSwitchRequestFailureIEs_t));
+    ASN_SEQUENCE_ADD(&PathSwitchRequestFailure->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_PathSwitchRequestFailureIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = amf_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_PathSwitchRequestFailureIEs_t));
+    ASN_SEQUENCE_ADD(&PathSwitchRequestFailure->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_PathSwitchRequestFailureIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = ran_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_PathSwitchRequestFailureIEs_t));
+    ASN_SEQUENCE_ADD(&PathSwitchRequestFailure->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_Cause;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_PathSwitchRequestFailureIEs__value_PR_Cause;;
+    Cause = &ie->value.choice.Cause;
+
+    Cause->present = group;
+    Cause->choice.radioNetwork = cause;
+
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
+
+CORE_DECLARE(status_t) ngap_build_amf_status_indication(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
+{
+    status_t rv = 0;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_AMFStatusIndication_t *AMFStatusIndication = NULL;
+
+    NGAP_AMFStatusIndicationIEs_t *ie = NULL;
+    	NGAP_UnavailableGUAMIList_t	 *UnavailableGUAMIList = NULL;
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_AMFStatusIndication;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_HandoverRequest;
+    AMFStatusIndication = &initiatingMessage->value.choice.AMFStatusIndication;
+        
+    ie = core_calloc(1, sizeof(NGAP_AMFStatusIndicationIEs_t));
+    ASN_SEQUENCE_ADD(&AMFStatusIndication->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_AMFStatusIndicationIEs__value_PR_UnavailableGUAMIList;
+    UnavailableGUAMIList = &ie->value.choice.UnavailableGUAMIList;
+        NGAP_UnavailableGUAMIItem_t *NGAP_UnavailableGUAMIItem = NULL;
+        NGAP_UnavailableGUAMIItem = core_calloc(1, sizeof(NGAP_AMFStatusIndicationIEs_t));
+         ASN_SEQUENCE_ADD(&UnavailableGUAMIList->list, NGAP_UnavailableGUAMIItem);
+
+   ngap_buffer_to_OCTET_STRING(&ran_ue->amf_ue->guti_5g.plmn_id, 3, &NGAP_UnavailableGUAMIItem->gUAMI.pLMNIdentity);
+#if 0 // Fix it, use bit string.
+   ngap_buffer_to_OCTET_STRING(&ran_ue->amf_ue->guti_5g.amf_ptr, 4, &NGAP_UnavailableGUAMIItem->gUAMI.aMFPointer);
+   ngap_buffer_to_OCTET_STRING(&ran_ue->amf_ue->guti_5g.amf_rid, 4, &NGAP_UnavailableGUAMIItem->gUAMI.aMFRegionID);
+   ngap_buffer_to_OCTET_STRING(&ran_ue->amf_ue->guti_5g.amf_sid, 2, &NGAP_UnavailableGUAMIItem->gUAMI.aMFSetID);
+#endif
+       
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}

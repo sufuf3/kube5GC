@@ -24,12 +24,20 @@ CORE_DECLARE(status_t) ngap_build_ng_reset(pkbuf_t **ngapbuf, NGAP_Cause_PR grou
 
 CORE_DECLARE(status_t) ngap_build_handover_cancel_acknowledge(pkbuf_t **ngapbuf, ran_ue_t *source_ue);
 CORE_DECLARE(status_t) ngap_build_handover_preparation_failure(pkbuf_t **ngapbuf, ran_ue_t *source_ue, NGAP_Cause_t *cause);
-CORE_DECLARE(status_t)  ngap_build_handover_command(pkbuf_t **ngapbuf, ran_ue_t *source_ue);
+CORE_DECLARE(status_t) ngap_build_handover_command(pkbuf_t **ngapbuf, ran_ue_t *source_ue);
 CORE_DECLARE(status_t) ngap_build_handover_request(
             pkbuf_t **ngapbuf, amf_ue_t *amf_ue, ran_ue_t *target_ue,
             NGAP_RAN_UE_NGAP_ID_t *ran_ue_ngap_id, NGAP_AMF_UE_NGAP_ID_t *amf_ue_ngap_id,
             NGAP_HandoverType_t *handovertype, NGAP_Cause_t *cause,
             NGAP_SourceToTarget_TransparentContainer_t *sourceToTarget_TransparentContainer);
+
+CORE_DECLARE(status_t) ngap_build_path_switch_ack(pkbuf_t **ngapbuf, amf_ue_t *amf_ue);
+CORE_DECLARE(status_t) ngap_build_path_switch_failure(pkbuf_t **ngapbuf,
+    c_uint32_t ran_ue_ngap_id, c_uint32_t amf_ue_ngap_id,
+    NGAP_Cause_PR group, long cause);
+
+CORE_DECLARE(status_t) ngap_build_amf_status_indication(pkbuf_t **ngapbuf, ran_ue_t *ran_ue);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

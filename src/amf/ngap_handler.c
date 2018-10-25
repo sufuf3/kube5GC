@@ -1691,7 +1691,7 @@ void ngap_handle_initial_ue_message(amf_ran_t *ran, ngap_message_t *message)
 
                 d_assert(RAN_UE_NGAP_ID, return, );
                 
-    #if 0
+#if 0
            d_assert(TAI, return,);
     pLMNidentity = &TAI->pLMNidentity;
     d_assert(pLMNidentity && pLMNidentity->size == sizeof(plmn_id_t), return,);
@@ -1888,4 +1888,219 @@ void ngap_handle_ue_context_release_request(amf_ran_t *ran, ngap_message_t *mess
             NGAP_UE_CTX_REL_NO_ACTION, 0);
         d_assert(rv == CORE_OK,, "ngap send error");
     }
+}
+
+void ngap_handle_path_switch_request(amf_ran_t *ran, ngap_message_t *message)
+{
+    char buf[CORE_ADDRSTRLEN];
+    int i;
+
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_PathSwitchRequest_t *PathSwitchRequest = NULL;
+
+    NGAP_PathSwitchRequestIEs_t *ie = NULL;
+    	NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;;
+		NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;;
+		NGAP_UserLocationInformation_t *UserLocationInformation = NULL;;
+            NGAP_TAC_t *tAC = NULL;
+            NGAP_PLMNIdentity_t *PLMNIdentity = NULL;
+            NGAP_EUTRACellIdentity_t *eUTRACellIdentity = NULL;
+		NGAP_UESecurityCapabilities_t *UESecurityCapabilities = NULL;;
+		//NGAP_PDUSessionResourceToBeSwitchedDLList_t	*PDUSessionResourceToBeSwitchedDLList = NULL;;
+#if 0	    
+        NGAP_PDUSessionList_t	 PDUSessionList;
+#endif
+    ran_ue_t *ran_ue = NULL;
+    amf_ue_t *amf_ue = NULL;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+
+    PathSwitchRequest = &initiatingMessage->value.choice.PathSwitchRequest;
+    d_assert(PathSwitchRequest, return,);
+
+    d_trace(3, "[AMF] Path switch request \n");
+
+    for (i = 0; i < PathSwitchRequest->protocolIEs.list.count; i++)
+    {
+        ie = PathSwitchRequest->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+                d_assert(AMF_UE_NGAP_ID, return,);
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_UserLocationInformation:
+                UserLocationInformation = &ie->value.choice.UserLocationInformation;
+                break;
+            case NGAP_ProtocolIE_ID_id_UESecurityCapabilities:
+                UESecurityCapabilities = &ie->value.choice.UESecurityCapabilities;
+                break;
+            // case NGAP_ProtocolIE_ID_id_PDUSessionResourceToBeSwitchedDLList:
+            //     PDUSessionResourceToBeSwitchedDLList = &ie->value.choice.PDUSessionResourceToBeSwitchedDLList;
+            //     break;
+            default:
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+
+    switch(UserLocationInformation->present)
+    {
+        case NGAP_UserLocationInformation_PR_userLocationInformationEUTRA:
+        {
+            NGAP_UserLocationInformationEUTRA_t *userLocationInformationEUTRA = NULL;
+            userLocationInformationEUTRA = UserLocationInformation->choice.userLocationInformationEUTRA;
+            d_assert(userLocationInformationEUTRA , return, );
+            PLMNIdentity = &userLocationInformationEUTRA->tAI.pLMNIdentity;
+            d_assert(PLMNIdentity, return,);
+            tAC = &userLocationInformationEUTRA->tAI.tAC;
+            d_assert(tAC, return,);
+            PLMNIdentity = &userLocationInformationEUTRA->eUTRA_CGI.pLMNIdentity;
+            d_assert(PLMNIdentity, return,);
+            eUTRACellIdentity = &userLocationInformationEUTRA->eUTRA_CGI.eUTRACellIdentity;
+            d_assert(eUTRACellIdentity, return,);
+            d_assert(RAN_UE_NGAP_ID, return, );
+            
+            break;
+        }
+        case NGAP_UserLocationInformation_PR_userLocationInformationNR:
+        {
+            NGAP_UserLocationInformationNR_t *userLocationInformationNR = NULL;
+            userLocationInformationNR = UserLocationInformation->choice.userLocationInformationNR;
+            d_assert(userLocationInformationNR , return, );
+            break;
+        }
+        case NGAP_UserLocationInformation_PR_userLocationInformationN3IWF:
+        {
+            NGAP_UserLocationInformationN3IWF_t *userLocationInformationN3IWF = NULL;
+            userLocationInformationN3IWF = UserLocationInformation->choice.userLocationInformationN3IWF;
+            d_assert(userLocationInformationN3IWF , return, );
+            break;
+        }
+        case NGAP_UserLocationInformation_PR_NOTHING:
+        default:
+        {
+            break;
+        }
+
+    }
+    NGAP_NrencryptionAlgorithms_t *nRencryptionAlgorithms = NULL; 
+	NGAP_NrintegrityProtectionAlgorithms_t *nRintegrityProtectionAlgorithms = NULL;
+	NGAP_EUTRAencryptionAlgorithms_t *eUTRAencryptionAlgorithms = NULL;
+	NGAP_EUTRAintegrityProtectionAlgorithms_t *eUTRAintegrityProtectionAlgorithms = NULL;
+    d_assert(UESecurityCapabilities, return,);
+    nRencryptionAlgorithms = &UESecurityCapabilities->nRencryptionAlgorithms;
+    d_assert(nRencryptionAlgorithms, return,);
+    nRintegrityProtectionAlgorithms = &UESecurityCapabilities->nRintegrityProtectionAlgorithms;
+    d_assert(nRintegrityProtectionAlgorithms, return,);
+    eUTRAencryptionAlgorithms = &UESecurityCapabilities->eUTRAencryptionAlgorithms;
+    d_assert(eUTRAencryptionAlgorithms, return,);
+    eUTRAintegrityProtectionAlgorithms = &UESecurityCapabilities->eUTRAintegrityProtectionAlgorithms;
+    d_assert(eUTRAintegrityProtectionAlgorithms, return,);
+
+    d_assert(AMF_UE_NGAP_ID, return,);
+    d_assert(RAN_UE_NGAP_ID, return,);
+    ran_ue = ran_ue_find_by_amf_ue_ngap_id(*AMF_UE_NGAP_ID);
+
+    if (!ran_ue)
+    {
+#if 0
+        d_error("Cannot find UE from sourceMME-UE-S1AP-ID[%d] and eNB[%s:%d]",
+                *MME_UE_S1AP_ID, CORE_ADDR(enb->addr, buf), enb->enb_id);
+        // TODO : add path switch failure message
+        rv = s1ap_build_path_switch_failure(&s1apbuf,
+                *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID,
+                S1AP_Cause_PR_radioNetwork,
+                S1AP_CauseRadioNetwork_unknown_mme_ue_s1ap_id);
+        d_assert(rv == CORE_OK && s1apbuf, return, "s1ap build error");
+
+        rv = ngap_send_to_ran(ran, ngapbuf, NGAP_NON_UE_SIGNALLING);
+        d_assert(rv == CORE_OK,, "ngap send error");
+        return;
+#endif
+    }
+
+    d_trace(5, "    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n",
+            ran_ue->ran_ue_ngap_id, ran_ue->amf_ue_ngap_id);
+
+    amf_ue = ran_ue->amf_ue;
+    d_assert(amf_ue, return, "NULL param");
+#if 0
+    if (SECURITY_CONTEXT_IS_VALID(mme_ue))
+    {
+        mme_ue->nhcc++;
+        mme_kdf_nh(mme_ue->kasme, mme_ue->nh, mme_ue->nh);
+    }
+    else
+    {
+        rv = s1ap_build_path_switch_failure(&s1apbuf,
+                *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID,
+                S1AP_Cause_PR_nas, S1AP_CauseNas_authentication_failure);
+        d_assert(rv == CORE_OK && s1apbuf, return, "s1ap build error");
+
+        rv = ngap_send_to_ran_ue(ran_ue, ngapbuf);
+        d_assert(rv == CORE_OK,, "s1ap send error");
+        return;
+    }
+#endif
+    
+    ran_ue->ran_ue_ngap_id = *RAN_UE_NGAP_ID;
+#if 0
+memcpy(&enb_ue->nas.tai.plmn_id, pLMNidentity->buf, 
+            sizeof(enb_ue->nas.tai.plmn_id));
+    memcpy(&enb_ue->nas.tai.tac, tAC->buf, sizeof(enb_ue->nas.tai.tac));
+    enb_ue->nas.tai.tac = ntohs(enb_ue->nas.tai.tac);
+
+    memcpy(&enb_ue->nas.e_cgi.plmn_id, pLMNidentity->buf, 
+            sizeof(enb_ue->nas.e_cgi.plmn_id));
+    memcpy(&enb_ue->nas.e_cgi.cell_id, cell_ID->buf,
+            sizeof(enb_ue->nas.e_cgi.cell_id));
+    enb_ue->nas.e_cgi.cell_id = (ntohl(enb_ue->nas.e_cgi.cell_id) >> 4);
+
+    d_trace(5, "    OLD TAI[PLMN_ID:0x%x,TAC:%d]\n",
+            mme_ue->tai.plmn_id, mme_ue->tai.tac);
+    d_trace(5, "    OLD E_CGI[PLMN_ID:0x%x,CELL_ID:%d]\n",
+            mme_ue->e_cgi.plmn_id, mme_ue->e_cgi.cell_id);
+    d_trace(5, "    TAI[PLMN_ID:0x%x,TAC:%d]\n",
+            enb_ue->nas.tai.plmn_id, enb_ue->nas.tai.tac);
+    d_trace(5, "    E_CGI[PLMN_ID:0x%x,CELL_ID:%d]\n",
+            enb_ue->nas.e_cgi.plmn_id, enb_ue->nas.e_cgi.cell_id);
+
+    /* Copy TAI and ECGI from enb_ue */
+    memcpy(&mme_ue->tai, &enb_ue->nas.tai, sizeof(tai_t));
+    memcpy(&mme_ue->e_cgi, &enb_ue->nas.e_cgi, sizeof(e_cgi_t));
+
+    memcpy(&eea, encryptionAlgorithms->buf, sizeof(eea));
+    eea = ntohs(eea);
+    mme_ue->ue_network_capability.eea = eea >> 9;
+    mme_ue->ue_network_capability.eea0 = 1;
+
+    memcpy(&eia, integrityProtectionAlgorithms->buf, sizeof(eia));
+    eia = ntohs(eia);
+    mme_ue->ue_network_capability.eia = eia >> 9;
+    mme_ue->ue_network_capability.eia0 = 0;
+#endif
 }
