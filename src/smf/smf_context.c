@@ -1017,6 +1017,9 @@ smf_sess_t* smf_sess_add(
     else
         d_assert(0, return NULL, "Unsupported PDN Type(%d)", pdn_type);
     
+    sess->smf_n4_seid = sess->index | ((c_uint64_t)sess->ipv4->addr[0] << 32);
+    sess->sgw_s11_teid = sess->index;
+    
     /* Generate Hash Key : IMSI + APN */
     sess_hash_keygen(sess->hash_keybuf, &sess->hash_keylen,
             imsi, imsi_len, apn);
@@ -1041,6 +1044,9 @@ smf_sess_t* smf_sess_add(
     dl_pdr->far = smf_far_add(bearer);
     dl_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
     dl_pdr->far->destination_interface = PFCP_FAR_DEST_INTF_ACCESS;
+    
+    d_trace(9, "smf_sess_add(): [SEID: %08x, TEID: %08x]\n",
+            sess->smf_n4_seid, sess->sgw_s11_teid);
     
     return sess;
 }
@@ -1547,10 +1553,10 @@ status_t smf_subnet_remove(smf_subnet_t *subnet)
 
     if (pool_used(&subnet->pool))
     {
-        d_warn("%d not freed in ue_ip_pool[%d] in PGW-Context",
+        d_warn("%d not freed in ue_ip_pool[%d] in SMF-Context",
                 pool_used(&subnet->pool), pool_size(&subnet->pool));
     }
-    d_trace(9, "%d not freed in ue_ip_pool[%d] in PGW-Context\n",
+    d_trace(9, "%d not freed in ue_ip_pool[%d] in SMF-Context\n",
             pool_used(&subnet->pool), pool_size(&subnet->pool));
     pool_final(&subnet->pool);
 

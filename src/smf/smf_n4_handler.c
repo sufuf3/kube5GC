@@ -224,13 +224,17 @@ void smf_n4_handle_session_establishment_response(
         d_info("association_setup_response cause: %d", pfcp_cause_get_name(cause));
     } else
     {
+        memset(&h, 0, sizeof(gtp_header_t));
+        h.type = GTP_CREATE_SESSION_RESPONSE_TYPE;
+        h.teid = sess->mme_s11_teid;
+
         rv = smf_s11_build_create_session_response(
             &pkbuf, sess);
         d_assert(rv == CORE_OK, return, "gtp build error");
 
         rv = gtp_xact_update_tx(sess->s11_xact, &h, pkbuf);
         d_assert(rv == CORE_OK, return, "gtp_xact_update_tx error");
-    
+
         rv = gtp_xact_commit(sess->s11_xact);
         d_assert(rv == CORE_OK, return, "xact_commit error");
     }

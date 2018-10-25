@@ -23,6 +23,14 @@ void smf_s11_handle_create_session_request(gtp_xact_t *s11_xact,
         d_error("No EPS Bearer ID");
         return;
     }
+
+    gtp_f_teid_t *mme_s11_teid = NULL;
+
+    /* Receive Control Plane(DL) : MME-S11 */
+    mme_s11_teid = req->sender_f_teid_for_control_plane.data;
+    d_assert(mme_s11_teid, return, "Null param");
+    sess->mme_s11_teid = ntohl(mme_s11_teid->teid);
+
     rv = smf_pfcp_send_session_establishment_request(sess);
     d_assert(rv == CORE_OK, , "pfcp session create fail");
     

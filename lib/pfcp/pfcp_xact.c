@@ -277,8 +277,9 @@ status_t pfcp_xact_update_tx(pfcp_xact_t *xact,
 
     memset(h, 0, hdr_len);
     h->version = PFCP_VERSION;    
-    h->type = hdesc->type;    
-    if (hdesc->type >=PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE)
+    h->type = hdesc->type;
+    /* Node related msessage & Session Establishment request NOT contain SEID*/
+    if (hdesc->type >= PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE)
     {
         h->seid_p = 1;
         h->seid = hdesc->seid;//htonl(hdesc->seid);

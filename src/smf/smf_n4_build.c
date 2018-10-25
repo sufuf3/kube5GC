@@ -85,6 +85,7 @@ status_t smf_n4_build_association_setup_request(
     req->cp_function_features.len = sizeof cp_function_features;
     
     pfcp_message.h.type = PFCP_ASSOCIATION_SETUP_REQUEST_TYPE;
+    pfcp_message.h.seid_p = 0;
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
     
@@ -112,6 +113,7 @@ status_t smf_n4_build_association_update_request(
     req->cp_function_features.len = sizeof smf_self()->cp_function_features;
 
     pfcp_message.h.type = PFCP_ASSOCIATION_UPDATE_REQUEST_TYPE;
+    pfcp_message.h.seid_p = 0;
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
 
@@ -220,7 +222,7 @@ status_t smf_n4_build_session_establishment_request(
     /* Set CP F-SEID, mandatory */
     req->cp_f_seid.presence = 1;
     req->cp_f_seid.data = &smf_f_seid;
-    smf_f_seid.seid = sess->smf_n4_seid;
+    smf_f_seid.seid = htonll(sess->smf_n4_seid);
     rv = pfcp_sockaddr_to_f_seid(smf_self()->pfcp_addr, smf_self()->pfcp_addr6,
             &smf_f_seid, (c_int32_t *)&req->cp_f_seid.len);
 
@@ -254,6 +256,7 @@ status_t smf_n4_build_session_establishment_request(
     req->user_plane_inactivity_timer.presence = 0;
     
     pfcp_message.h.type = PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE;
+    pfcp_message.h.seid_p = 0;
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
 
@@ -448,6 +451,8 @@ status_t smf_n4_free_create_pdr(tlv_create_pdr_t *create_pdr)
 status_t smf_n4_build_create_far(
         tlv_create_far_t *create_far, smf_far_t *far, smf_sess_t *sess)
 {
+    pfcp_outer_hdr_t* outer_hdr = NULL;
+    
     /* Set Create FAR, mandatory */
     create_far->presence = 1;
     
@@ -466,6 +471,22 @@ status_t smf_n4_build_create_far(
         create_far->forwarding_parameters.destination_interface.presence = 1;
         create_far->forwarding_parameters.destination_interface.len = 1;
         create_far->forwarding_parameters.destination_interface.data = &far->destination_interface;
+        
+        if (far->destination_interface==PFCP_FAR_DEST_INTF_ACCESS)
+        {
+            c_uint8_t len;
+            create_far->forwarding_parameters.outer_header_creation.presence = 1;            
+            len = 2 + 4;
+            outer_hdr = malloc(sizeof(pfcp_outer_hdr_t));
+            memset(outer_hdr, 0, sizeof(pfcp_outer_hdr_t)); 
+            outer_hdr->gtpu_ipv6 = 0;
+            outer_hdr->gtpu_ipv4 = 1;
+            outer_hdr->addr = sess->ipv4->addr[0];
+            outer_hdr->teid = sess->index;
+            len += IPV4_LEN;
+            create_far->forwarding_parameters.outer_header_creation.len = len;
+            create_far->forwarding_parameters.outer_header_creation.data = outer_hdr;
+        }
     }
     
     return CORE_OK;
@@ -473,5 +494,10 @@ status_t smf_n4_build_create_far(
 
 status_t smf_n4_free_create_far(tlv_create_far_t *create_far)
 {
+    if (create_far->forwarding_parameters.outer_header_creation.presence && 
+            create_far->forwarding_parameters.outer_header_creation.data)
+    {
+        free(create_far->forwarding_parameters.outer_header_creation.data);
+    }
     return CORE_OK;
 }

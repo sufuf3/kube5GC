@@ -85,20 +85,24 @@ void smf_state_operational(fsm_t *s, event_t *e)
             rv = gtp_parse_msg(&s11_message, recvbuf);
             d_assert(rv == CORE_OK, goto release_s11_pkbuf;,);
             
-            sess = smf_sess_add_or_find_by_message(&s11_message);
-            d_assert(sess, goto release_s11_pkbuf;,);
-            
-            if (s11_message.h.teid == 0)
-            {
+            d_trace(8, "S11 Message: [type: %d, TEID: %08x]\n", 
+                    s11_message.h.type, s11_message.h.teid);
+
+            if (s11_message.h.teid) {
+                sess = smf_sess_find_by_teid(s11_message.h.teid);
+                d_assert(sess, goto release_s11_pkbuf;, "Session Context Not Found");
+            }
+            else {
+                sess = smf_sess_add_or_find_by_message(&s11_message);
+                d_assert(sess, goto release_s11_pkbuf;, "Session Context Not Created");
+
                 gtp_node_t *mme = smf_mme_add_by_message(&s11_message);
-                d_assert(mme, goto release_s11_pkbuf;,);
+                d_assert(mme, goto release_s11_pkbuf;, "MME Not Found");
                 sess->mme_node = mme;
             }
 
             rv = gtp_xact_receive(sess->mme_node, &s11_message.h, &s11_xact);
-            d_assert(rv == CORE_OK, goto release_s11_pkbuf;,);
-
-            d_info("%lu", sess->ipv4->addr[0]);
+            d_assert(rv == CORE_OK, goto release_s11_pkbuf;, "GTP Transaction Recive Error");
 
             switch (s11_message.h.type)
             {
@@ -121,6 +125,12 @@ void smf_state_operational(fsm_t *s, event_t *e)
 
         release_s11_pkbuf:
             pkbuf_free(recvbuf);
+            break;
+        }
+        case SMF_EVT_S11_T3_RESPONSE:
+        case SMF_EVT_S11_T3_HOLDING:
+        {
+            gtp_xact_timeout(event_get_param1(e), event_get(e));
             break;
         }
         case SMF_EVT_N4_MESSAGE:
@@ -147,7 +157,9 @@ void smf_state_operational(fsm_t *s, event_t *e)
             d_assert(rv == CORE_OK,
                     pkbuf_free(recvbuf); pkbuf_free(copybuf); break,
                     "parse error");
-            d_trace(3, "message type: %d", message->h.type);
+            d_trace(9, "N4 Message: [Type: %d, SEID: %08x]\n", 
+                    message->h.type,
+                    message->h.seid_p ? message->h.seid : 0);
             if (!message->h.seid_p)
             {
                 rv = pfcp_xact_receive(upf, &message->h, &xact);
@@ -189,7 +201,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
                     default:
                         d_error("Not implemented PFCP message type (%d)", message->h.type);
                         break;
-                }            
+                }
                 pkbuf_free(recvbuf);
                 pkbuf_free(copybuf);
                 break;

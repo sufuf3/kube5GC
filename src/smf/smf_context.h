@@ -113,6 +113,8 @@ typedef struct _smf_sess_t {
 typedef struct _smf_bearer_t {
     lnode_t         node;           /**< A node of list_t */
     index_t         index;
+
+    c_uint32_t      sgw_s1u_teid;   /* S1U GTP-TEID */
     
     c_uint8_t       ebi;
 

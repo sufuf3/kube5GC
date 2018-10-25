@@ -9,8 +9,9 @@ status_t smf_s11_build_create_session_response(
     gtp_create_session_response_t *rsp = NULL;
     gtp_cause_t cause;
     gtp_f_teid_t sgw_s11_teid;
+    gtp_f_teid_t s1_u_enodeb_f_teid;
+    c_sockaddr_t *s1_u_enodeb_addr = NULL;
     smf_bearer_t *bearer = NULL;
-    int len;
     
     rsp = &gtp_message.create_session_response;
     memset(&gtp_message, 0, sizeof(gtp_message_t));
@@ -22,20 +23,18 @@ status_t smf_s11_build_create_session_response(
     rsp->cause.len = sizeof(cause);
     rsp->cause.data = &cause;
     
-    /* Send Control Plane(UL) : SGW-S11 */
+    // Send Control Plane(UL) : SGW-S11
     memset(&sgw_s11_teid, 0, sizeof(gtp_f_teid_t));
     sgw_s11_teid.interface_type = GTP_F_TEID_S11_S4_SGW_GTP_C;
     sgw_s11_teid.teid = htonl(sess->sgw_s11_teid);
     rv = gtp_sockaddr_to_f_teid(
-            smf_self()->gtpc_addr, smf_self()->gtpc_addr6, &sgw_s11_teid, &len);
+            smf_self()->gtpc_addr, smf_self()->gtpc_addr6, 
+            &sgw_s11_teid, 
+            (int*)&rsp->sender_f_teid_for_control_plane.len);
     d_assert(rv == CORE_OK, return rv,);
     rsp->sender_f_teid_for_control_plane.presence = 1;
     rsp->sender_f_teid_for_control_plane.data = &sgw_s11_teid;
-    rsp->sender_f_teid_for_control_plane.len = len;
-    
-    bearer = smf_default_bearer_in_sess(sess);
-    
-    /* PDN Address Allocation */
+
     rsp->pdn_address_allocation.data = &sess->pdn.paa;
     if (sess->ipv4 && sess->ipv6)
         rsp->pdn_address_allocation.len = PAA_IPV4V6_LEN;
@@ -50,19 +49,24 @@ status_t smf_s11_build_create_session_response(
     /* APN Restriction */
     rsp->apn_restriction.presence = 1;
     rsp->apn_restriction.u8 = GTP_APN_NO_RESTRICTION;
-    
-    /* TODO : APN-AMBR
-     * if PCRF changes APN-AMBR, this should be included. */
 
     /* Bearer EBI */
+    bearer = smf_default_bearer_in_sess(sess);
     rsp->bearer_contexts_created.presence = 1;
     rsp->bearer_contexts_created.eps_bearer_id.presence = 1;
     rsp->bearer_contexts_created.eps_bearer_id.u8 = bearer->ebi;
 
-    /* TODO : Bearer QoS 
-     * if PCRF changes Bearer QoS, this should be included. */
+    memset(&s1_u_enodeb_f_teid, 0, sizeof(gtp_f_teid_t));
+    s1_u_enodeb_f_teid.interface_type = GTP_F_TEID_S1_U_SGW_GTP_U;
+    s1_u_enodeb_addr = sess->upf_node->sa_list;
+    rv = gtp_sockaddr_to_f_teid(
+            s1_u_enodeb_addr, NULL, &s1_u_enodeb_f_teid, 
+            (c_int32_t *)&rsp->bearer_contexts_created.s1_u_enodeb_f_teid.len);
 
-    gtp_message.h.type = GTP_CREATE_SESSION_REQUEST_TYPE;
+    rsp->bearer_contexts_created.s1_u_enodeb_f_teid.presence = 1;
+    rsp->bearer_contexts_created.s1_u_enodeb_f_teid.data = &s1_u_enodeb_f_teid;
+
+    gtp_message.h.type = GTP_CREATE_SESSION_RESPONSE_TYPE;
     rv = gtp_build_msg(pkbuf, &gtp_message);
     d_assert(rv == CORE_OK, return CORE_ERROR, "gtp build failed");
     
