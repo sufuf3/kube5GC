@@ -116,6 +116,11 @@ void smf_state_operational(fsm_t *s, event_t *e)
                     smf_s11_handle_delete_session_request(s11_xact, sess, &s11_message.delete_session_request);
                     break;
                 }
+                case GTP_MODIFY_BEARER_REQUEST_TYPE:
+                {
+                    smf_s11_handle_modify_bearer_request(s11_xact, sess, &s11_message.modify_bearer_request);
+                    break;
+                }
                 default:
                 {
                     d_error("No handler for event %s", smf_event_get_name(e));

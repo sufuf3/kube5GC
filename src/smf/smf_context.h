@@ -115,6 +115,7 @@ typedef struct _smf_bearer_t {
     index_t         index;
 
     c_uint32_t      sgw_s1u_teid;   /* S1U GTP-TEID */
+    c_uint32_t      enb_s1u_teid;
     
     c_uint8_t       ebi;
 

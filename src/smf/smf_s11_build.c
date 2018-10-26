@@ -72,3 +72,27 @@ status_t smf_s11_build_create_session_response(
     
     return CORE_OK;
 }
+
+status_t smf_s11_build_modify_bearer_response(
+        pkbuf_t **pkbuf, smf_sess_t *sess)
+{
+    status_t rv;
+    gtp_message_t gtp_message;
+    gtp_modify_bearer_response_t *rsp = NULL;
+    gtp_cause_t cause;
+
+    rsp = &gtp_message.modify_bearer_response;
+    memset(&gtp_message, 0, sizeof(gtp_message_t));
+    
+    /* Set Cause */
+    memset(&cause, 0, sizeof(cause));
+    cause.value = GTP_CAUSE_REQUEST_ACCEPTED;
+    rsp->cause.presence = 1;
+    rsp->cause.len = sizeof(cause);
+    rsp->cause.data = &cause;
+
+    gtp_message.h.type = GTP_MODIFY_BEARER_RESPONSE_TYPE;
+    rv = gtp_build_msg(pkbuf, &gtp_message);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "gtp build failed");
+    return CORE_OK;
+}

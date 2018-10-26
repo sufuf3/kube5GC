@@ -347,8 +347,9 @@ smf:
     freeDiameter: pgw.conf
 
     gtpc:
-      - addr: 127.0.0.10
-      - addr: ::1
+      addr: 
+        - 127.0.0.10
+        - ::1
 
     pfcp:
       - addr: 127.0.0.10

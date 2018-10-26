@@ -1223,6 +1223,24 @@ smf_bearer_t* smf_bearer_next(smf_bearer_t *bearer)
     return list_next(bearer);
 }
 
+smf_bearer_t* smf_bearer_find_by_ebi(smf_sess_t *sess, c_uint8_t ebi)
+{
+    smf_bearer_t *bearer = NULL;
+    
+    d_assert(sess, return NULL, "Null param");
+
+    bearer = smf_bearer_first(sess);
+    while (bearer)
+    {
+        if (bearer->ebi == ebi)
+            break;
+
+        bearer = smf_bearer_next(bearer);
+    }
+
+    return bearer;
+}
+
 smf_pdr_t* smf_pdr_add(smf_bearer_t *bearer)
 {
     smf_pdr_t *pdr = NULL;

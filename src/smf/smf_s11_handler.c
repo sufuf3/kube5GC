@@ -42,3 +42,58 @@ void smf_s11_handle_delete_session_request(gtp_xact_t *s11_xact,
 {
     d_trace(3, "[SMF] S11 Delete Session Reqeust\n");
 }
+
+void smf_s11_handle_modify_bearer_request(gtp_xact_t *s11_xact,
+        smf_sess_t *sess, gtp_modify_bearer_request_t *req)
+{
+    d_trace(3, "[SMF] S11 Modify Bearer Reqeust\n");
+
+    status_t rv;
+    pkbuf_t *pkbuf = NULL;
+    smf_bearer_t *bearer = NULL;
+    gtp_header_t h;
+    gtp_f_teid_t *enb_s1u_teid = NULL;
+
+    if (req->bearer_contexts_to_be_modified.presence == 0)
+    {
+        d_error("No Bearer Context");
+        return;
+    }
+    
+    if (req->bearer_contexts_to_be_modified.eps_bearer_id.presence == 0)
+    {
+        d_error("No EPS Bearer ID");
+        return;
+    }
+
+    if (req->bearer_contexts_to_be_modified.s1_u_enodeb_f_teid.presence == 0)
+    {
+        d_error("No eNB TEID");
+        return;
+    }
+
+    bearer = smf_bearer_find_by_ebi(sess, req->bearer_contexts_to_be_modified.eps_bearer_id.u8);
+    d_assert(bearer, return, "Bearer Context Not Found");
+
+    enb_s1u_teid = req->bearer_contexts_to_be_modified.s1_u_enodeb_f_teid.data;
+    bearer->enb_s1u_teid = ntohl(enb_s1u_teid->teid);
+
+    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+        sess->mme_s11_teid, sess->sgw_s11_teid);
+    d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
+        bearer->sgw_s1u_teid, bearer->enb_s1u_teid);
+
+    memset(&h, 0, sizeof(gtp_header_t));
+    h.type = GTP_MODIFY_BEARER_RESPONSE_TYPE;
+    h.teid = sess->mme_s11_teid;
+
+    rv = smf_s11_build_modify_bearer_response(
+        &pkbuf, sess);
+    d_assert(rv == CORE_OK, return, "gtp build error");
+
+    rv = gtp_xact_update_tx(s11_xact, &h, pkbuf);
+    d_assert(rv == CORE_OK, return, "gtp_xact_update_tx error");
+
+    rv = gtp_xact_commit(s11_xact);
+    d_assert(rv == CORE_OK, return, "xact_commit error");   
+}
