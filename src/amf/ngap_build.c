@@ -1285,3 +1285,167 @@ CORE_DECLARE(status_t) ngap_build_amf_status_indication(pkbuf_t **ngapbuf, ran_u
 
     return CORE_OK;
 }
+
+
+/**
+ * Direction: AMF -> NG-RAN node
+ **/
+status_t ngap_build_amf_configuration_update(pkbuf_t **pkbuf)
+{
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    status_t rv;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_AMFConfigurationUpdate_t *AMFConfigurationUpdate = NULL;
+
+    NGAP_AMFConfigurationUpdateIEs_t *ie = NULL;
+        NGAP_ServedGUAMIList_t *ServedGUAMIList = NULL;
+        NGAP_PLMNSupportList_t *PLMNSupportList = NULL;      
+        NGAP_AMF_TNLAssociationToAddList_t *AMF_TNLAssociationToAddList = NULL;
+        NGAP_AMF_TNLAssociationToRemoveList_t *AMF_TNLAssociationToRemoveList = NULL;
+        NGAP_AMF_TNLAssociationToUpdateList_t *AMF_TNLAssociationToUpdateList = NULL;
+#if 0
+    NGAP_AMFName_t	 AMFName;
+    NGAP_RelativeAMFCapacity_t	 RelativeAMFCapacity;
+#endif
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = 
+        core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+    
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode =
+        NGAP_ProcedureCode_id_AMFConfigurationUpdate;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present =
+        NGAP_InitiatingMessage__value_PR_AMFConfigurationUpdate;
+    AMFConfigurationUpdate = 
+        &initiatingMessage->value.choice.AMFConfigurationUpdate;
+    
+    ie = core_calloc(1, sizeof(NGAP_AMFConfigurationUpdateIEs_t));
+    ASN_SEQUENCE_ADD(&AMFConfigurationUpdate->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_ServedGUAMIList;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_AMFConfigurationUpdateIEs__value_PR_ServedGUAMIList;
+    ServedGUAMIList = &ie->value.choice.ServedGUAMIList;
+    
+        for (int i = 0 ; i < mme_self()->max_num_of_served_guami ; i ++)
+        {
+            //TODO: fix it, use NGAP_ServedGUAMIItem_IEs instead 
+            NGAP_ServedGUAMIItem_t *ServedGUAMIItem = NULL;
+            ServedGUAMIItem =(NGAP_ServedGUAMIItem_t *) core_calloc(1, sizeof(NGAP_ServedGUAMIItem_t));
+            
+            served_guami_t *served_guami =&mme_self()->served_guami[i];
+            for (j = 0; j < 1/*served_guami->num_of_plmn_id*/; j++)
+            {
+                ngap_buffer_to_OCTET_STRING(&served_guami->plmn_id[j], PLMN_ID_LEN, &ServedGUAMIItem->gUAMI.pLMNIdentity);
+                d_trace(5, "    PLMN_ID[MCC:%d MNC:%d]\n",
+                    plmn_id_mcc(&served_guami->plmn_id[j]),
+                    plmn_id_mnc(&served_guami->plmn_id[j]));
+            }
+            ASN_SEQUENCE_ADD(&ServedGUAMIList->list, ServedGUAMIItem);
+        }
+
+    ie = core_calloc(1, sizeof(NGAP_AMFConfigurationUpdateIEs_t));
+    ASN_SEQUENCE_ADD(&AMFConfigurationUpdate->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_PLMNSupportList;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_AMFConfigurationUpdateIEs__value_PR_PLMNSupportList;
+    PLMNSupportList = &ie->value.choice.PLMNSupportList;
+        for (i = 0 ; i < mme_self()->max_num_of_plmn_support ; i ++)
+        {
+            //TODO: fix it, NGAP_PLMNSupportItem_IEs_t instead
+            NGAP_PLMNSupportItem_t *PLMNSupportItem = NULL;
+            PLMNSupportItem =(NGAP_PLMNSupportItem_t *) core_calloc(1, sizeof(NGAP_PLMNSupportItem_t));
+            
+            served_guami_t *served_guami =&mme_self()->served_guami[i];
+            for (j = 0; j < 1/*served_guami->num_of_plmn_id*/; j++)
+            {
+                ngap_buffer_to_OCTET_STRING(&served_guami->plmn_id[j], PLMN_ID_LEN, &PLMNSupportItem->pLMNIdentity);
+                d_trace(5, "    PLMN_ID[MCC:%d MNC:%d]\n",
+                    plmn_id_mcc(&served_guami->plmn_id[j]),
+                    plmn_id_mnc(&served_guami->plmn_id[j]));
+            }
+                NGAP_SliceSupportItem_t *NGAP_SliceSupportItem = NULL;
+                NGAP_SliceSupportItem =(NGAP_SliceSupportItem_t *) core_calloc(1, sizeof(NGAP_SliceSupportItem_t));
+                ASN_SEQUENCE_ADD(&PLMNSupportItem->sliceSupportList.list, NGAP_SliceSupportItem);
+                for (j = 0; j < mme_self()->max_num_of_plmn_support ; j++)
+                {
+                    for (k = 0; k < mme_self()->plmn_support[j].num_of_s_nssai; k++)
+                    {
+                        memcpy(&NGAP_SliceSupportItem->s_NSSAI, &mme_self()->plmn_support[j].s_nssai[k],  sizeof(NGAP_S_NSSAI_t));
+                    }
+                }
+            ASN_SEQUENCE_ADD(&PLMNSupportList->list, PLMNSupportItem);
+        }
+
+    ie = core_calloc(1, sizeof(NGAP_AMFConfigurationUpdateIEs_t));
+    ASN_SEQUENCE_ADD(&AMFConfigurationUpdate->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_TNLAssociationToAddList;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_AMFConfigurationUpdateIEs__value_PR_AMF_TNLAssociationToAddList;
+    AMF_TNLAssociationToAddList = &ie->value.choice.AMF_TNLAssociationToAddList;
+        NGAP_AMF_TNLAssociationToAddItemIEs_t *AMF_TNLAssociationToAddItemIEs = NULL;
+        AMF_TNLAssociationToAddItemIEs = (NGAP_AMF_TNLAssociationToAddItemIEs_t *) core_calloc(1, sizeof(NGAP_AMF_TNLAssociationToAddItemIEs_t));
+        AMF_TNLAssociationToAddItemIEs->id = NGAP_ProtocolIE_ID_id_AMF_TNLAssociationToAddItem;
+        AMF_TNLAssociationToAddItemIEs->criticality = NGAP_Criticality_ignore;
+        AMF_TNLAssociationToAddItemIEs->value.present = NGAP_AMF_TNLAssociationToAddItemIEs__value_PR_AMF_TNLAssociationToAddItem;
+            NGAP_AMF_TNLAssociationToAddItem_t *AMF_TNLAssociationToAddItem = NULL;
+            AMF_TNLAssociationToAddItem = &AMF_TNLAssociationToAddItemIEs->value.choice.AMF_TNLAssociationToAddItem;
+                AMF_TNLAssociationToAddItem->aMF_TNLAssociationAddress.present = NGAP_CPTransportLayerInformation_PR_endpointIPAddress;
+                //TODO: put bit string
+                //AMF_TNLAssociationToAddItem->aMF_TNLAssociationAddress.choice.endpointIPAddress;
+                AMF_TNLAssociationToAddItem->tNLAssociationWeightFactor = 0x1234;                     
+        ASN_SEQUENCE_ADD(&AMF_TNLAssociationToAddList->list, AMF_TNLAssociationToAddItemIEs);
+
+    ie = core_calloc(1, sizeof(NGAP_AMFConfigurationUpdateIEs_t));
+    ASN_SEQUENCE_ADD(&AMFConfigurationUpdate->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_TNLAssociationToRemoveList;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_AMFConfigurationUpdateIEs__value_PR_AMF_TNLAssociationToRemoveList;
+    AMF_TNLAssociationToRemoveList = &ie->value.choice.AMF_TNLAssociationToRemoveList;
+        NGAP_AMF_TNLAssociationToRemoveItemIEs_t *AMF_TNLAssociationToRemoveItemIEs = NULL;
+        AMF_TNLAssociationToRemoveItemIEs = (NGAP_AMF_TNLAssociationToRemoveItemIEs_t *) core_calloc(1, sizeof(NGAP_AMF_TNLAssociationToRemoveItemIEs_t));
+        AMF_TNLAssociationToRemoveItemIEs->id = NGAP_ProtocolIE_ID_id_AMF_TNLAssociationToRemoveItem;
+        AMF_TNLAssociationToRemoveItemIEs->criticality = NGAP_Criticality_ignore;
+        AMF_TNLAssociationToRemoveItemIEs->value.present = NGAP_AMF_TNLAssociationToRemoveItemIEs__value_PR_AMF_TNLAssociationToRemoveItem;
+            NGAP_AMF_TNLAssociationToRemoveItem_t *AMF_TNLAssociationToRemoveItem = NULL;
+            AMF_TNLAssociationToRemoveItem = &AMF_TNLAssociationToRemoveItemIEs->value.choice.AMF_TNLAssociationToRemoveItem;
+                AMF_TNLAssociationToRemoveItem->aMF_TNLAssociationAddress.present = NGAP_CPTransportLayerInformation_PR_endpointIPAddress;
+                //TODO: put bit string
+                //AMF_TNLAssociationToRemoveItem->aMF_TNLAssociationAddress.choice.endpointIPAddress;
+    d_assert(AMF_TNLAssociationToRemoveList, return CORE_ERROR, );
+
+    ie = core_calloc(1, sizeof(NGAP_AMFConfigurationUpdateIEs_t));
+    ASN_SEQUENCE_ADD(&AMFConfigurationUpdate->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_TNLAssociationToUpdateList;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_AMFConfigurationUpdateIEs__value_PR_AMF_TNLAssociationToUpdateList;
+    AMF_TNLAssociationToUpdateList = &ie->value.choice.AMF_TNLAssociationToUpdateList;
+        NGAP_AMF_TNLAssociationToUpdateItemIEs_t *AMF_TNLAssociationToUpdateItemIEs = NULL;
+        AMF_TNLAssociationToUpdateItemIEs = (NGAP_AMF_TNLAssociationToUpdateItemIEs_t *) core_calloc(1, sizeof(NGAP_AMF_TNLAssociationToUpdateItemIEs_t));
+        AMF_TNLAssociationToUpdateItemIEs->id = NGAP_AMF_TNLAssociationToUpdateItemIEs__value_PR_AMF_TNLAssociationToUpdateItem;
+        AMF_TNLAssociationToUpdateItemIEs->criticality = NGAP_Criticality_ignore;
+        AMF_TNLAssociationToUpdateItemIEs->value.present = NGAP_AMF_TNLAssociationToUpdateItemIEs__value_PR_AMF_TNLAssociationToUpdateItem;
+            NGAP_AMF_TNLAssociationToUpdateItem_t *AMF_TNLAssociationToUpdateItem = NULL;
+            AMF_TNLAssociationToUpdateItem = &AMF_TNLAssociationToUpdateItemIEs->value.choice.AMF_TNLAssociationToUpdateItem;
+                AMF_TNLAssociationToUpdateItem->aMF_TNLAssociationAddress.present = NGAP_CPTransportLayerInformation_PR_endpointIPAddress;
+                //TODO: put bit string
+                //AMF_TNLAssociationToRemoveItem->aMF_TNLAssociationAddress.choice.endpointIPAddress;
+    d_assert(AMF_TNLAssociationToUpdateList, return CORE_ERROR, );
+
+    
+    rv = ngap_encode_pdu(pkbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
