@@ -2291,3 +2291,94 @@ void ngap_handle_ran_configuration_update(amf_ran_t *ran, ngap_message_t *messag
             "ngap_send_to_ran() failed");
 
 }
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_pdu_session_resource_modify_response(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];
+
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_PDUSessionResourceModifyResponse_t *PDUSessionResourceModifyResponse = NULL;
+
+    NGAP_PDUSessionResourceModifyResponseIEs_t *PDUSessionResourceModifyResponseIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_PDUSessionResourceModifyListModRes_t *PDUSessionResourceModifyListModRes = NULL;
+#if 0        
+        NGAP_PDUSessionList_t	 PDUSessionList;
+        NGAP_UserLocationInformation_t	 UserLocationInformation;
+        NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+#endif
+    d_assert(ran, return,);
+    d_assert(message, return,);
+    
+    amf_ue_t *amf_ue = NULL;
+    ran_ue_t *ran_ue = NULL;
+
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    PDUSessionResourceModifyResponse =
+        &successfulOutcome->value.choice.PDUSessionResourceModifyResponse;
+    d_assert(PDUSessionResourceModifyResponse, return,);
+
+    for (i = 0; i < PDUSessionResourceModifyResponse->protocolIEs.list.count; i++)
+    {
+        PDUSessionResourceModifyResponseIEs = PDUSessionResourceModifyResponse->protocolIEs.list.array[i];
+        switch(PDUSessionResourceModifyResponseIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &PDUSessionResourceModifyResponseIEs->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID =
+                    &PDUSessionResourceModifyResponseIEs->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_PDUSessionResourceModifyListModRes:
+                PDUSessionResourceModifyListModRes =
+                    &PDUSessionResourceModifyResponseIEs->value.choice.PDUSessionResourceModifyListModRes;
+            default:
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+
+    d_assert(AMF_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
+    amf_ue = ran_ue->amf_ue;
+    d_assert(amf_ue, return, );
+
+    d_assert(PDUSessionResourceModifyListModRes, return, );
+    for (i = 0 ; i < PDUSessionResourceModifyListModRes->list.count; i++)
+    {   
+        NGAP_PDUSessionResourceModifyItemModResIEs_t *PDUSessionResourceModifyItemModResIEs = NULL;
+        // NGAP_PDUSessionResourceSetupResponseTransfer_t *PDUSessionResourceSetupResponseTransfer = NULL;
+        PDUSessionResourceModifyItemModResIEs = (NGAP_PDUSessionResourceModifyItemModResIEs_t *) 
+            PDUSessionResourceModifyListModRes->list.array[i];
+            d_assert(PDUSessionResourceModifyItemModResIEs, return,);
+            NGAP_PDUSessionResourceModifyItemModRes_t *PDUSessionResourceModifyItemModRes = NULL;
+            PDUSessionResourceModifyItemModRes = &PDUSessionResourceModifyItemModResIEs->value.choice.PDUSessionResourceModifyItemModRes;
+    
+        amf_ue->psi = PDUSessionResourceModifyItemModRes->pDUSessionID;
+        //PDUSessionResourceModifyItemModRes->pDUSessionResourceSetupRequestTransfer;
+       
+    }
+}
