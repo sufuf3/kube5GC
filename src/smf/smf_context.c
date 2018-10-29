@@ -158,6 +158,12 @@ static status_t smf_context_validation()
                 context_self()->config.path);
         return CORE_ERROR;
     }
+    if (self.dns[0] == NULL && self.dns6[0] == NULL)
+    {
+        d_error("No smf.dns in '%s'",
+                context_self()->config.path);
+        return CORE_ERROR;
+    }
     return CORE_OK;
 }
 
@@ -793,6 +799,53 @@ status_t smf_context_parse_config()
                                 d_warn("unknown key `%s`", fd_key);
                         }
                     }
+                }
+                else if (!strcmp(smf_key, "dns"))
+                {
+                    yaml_iter_t dns_iter;
+                    yaml_iter_recurse(&smf_iter, &dns_iter);
+                    d_assert(yaml_iter_type(&dns_iter) !=
+                        YAML_MAPPING_NODE, return CORE_ERROR,);
+
+                    do
+                    {
+                        const char *v = NULL;
+
+                        if (yaml_iter_type(&dns_iter) ==
+                                YAML_SEQUENCE_NODE)
+                        {
+                            if (!yaml_iter_next(&dns_iter))
+                                break;
+                        }
+
+                        v = yaml_iter_value(&dns_iter);
+                        if (v)
+                        {
+                            ipsubnet_t ipsub;
+                            rv = core_ipsubnet(&ipsub, v, NULL);
+                            d_assert(rv == CORE_OK, return CORE_ERROR,);
+
+                            if (ipsub.family == AF_INET)
+                            {
+                                if (self.dns[0] && self.dns[1])
+                                    d_warn("Ignore DNS : %s", v);
+                                else if (self.dns[0]) self.dns[1] = v;
+                                else self.dns[0] = v;
+                            }
+                            else if (ipsub.family == AF_INET6)
+                            {
+                                if (self.dns6[0] && self.dns6[1])
+                                    d_warn("Ignore DNS : %s", v);
+                                else if (self.dns6[0]) self.dns6[1] = v;
+                                else self.dns6[0] = v;
+                            }
+                            else
+                                d_warn("Ignore DNS : %s", v);
+                        }
+
+                    } while(
+                        yaml_iter_type(&dns_iter) ==
+                            YAML_SEQUENCE_NODE);
                 }
             }
         }

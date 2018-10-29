@@ -1,6 +1,156 @@
 #include "gtp/gtp_conv.h"
 #include "smf_s11_build.h"
 
+static c_int16_t smf_pco_build(c_uint8_t *pco_buf, tlv_pco_t *tlv_pco)
+{
+    status_t rv;
+    pco_t ue, smf;
+    pco_ipcp_t pco_ipcp;
+    ipsubnet_t dns_primary, dns_secondary, dns6_primary, dns6_secondary;
+    c_int8_t size = 0;
+    int i = 0;
+
+    d_assert(pco_buf, return -1, "Null param");
+    d_assert(tlv_pco, return -1, "Null param");
+
+    size = pco_parse(&ue, tlv_pco->data, tlv_pco->len);
+    d_assert(size, return -1, "pco parse failed");
+
+    memset(&smf, 0, sizeof(pco_t));
+    smf.ext = ue.ext;
+    smf.configuration_protocol = ue.configuration_protocol;
+
+    for(i = 0; i < ue.num_of_id; i++)
+    {
+        c_uint8_t *data = ue.ids[i].data;
+        switch(ue.ids[i].id)
+        {
+            case PCO_ID_CHALLENGE_HANDSHAKE_AUTHENTICATION_PROTOCOL:
+            {
+                if (data[0] == 2) /* Code : Response */
+                {
+                    smf.ids[smf.num_of_id].id = ue.ids[i].id;
+                    smf.ids[smf.num_of_id].len = 4;
+                    smf.ids[smf.num_of_id].data =
+                        (c_uint8_t *)"\x03\x00\x00\x04"; /* Code : Success */
+                    smf.num_of_id++;
+                }
+                break;
+            }
+            case PCO_ID_INTERNET_PROTOCOL_CONTROL_PROTOCOL:
+            {
+                if (data[0] == 1) /* Code : Configuration Request */
+                {
+                    c_uint16_t len = 16;
+
+                    memset(&pco_ipcp, 0, sizeof(pco_ipcp_t));
+                    pco_ipcp.code = 2; /* Code : Configuration Ack */
+                    pco_ipcp.len = htons(len);
+
+                    /* Primary DNS Server IP Address */
+                    if (smf_self()->dns[0])
+                    {
+                        rv = core_ipsubnet(
+                                &dns_primary, smf_self()->dns[0], NULL);
+                        d_assert(rv == CORE_OK, return CORE_ERROR,);
+                        pco_ipcp.options[0].type = 129; 
+                        pco_ipcp.options[0].len = 6; 
+                        pco_ipcp.options[0].addr = dns_primary.sub[0];
+                    }
+
+                    /* Secondary DNS Server IP Address */
+                    if (smf_self()->dns[1])
+                    {
+                        rv = core_ipsubnet(
+                                &dns_secondary, smf_self()->dns[1], NULL);
+                        d_assert(rv == CORE_OK, return CORE_ERROR,);
+                        pco_ipcp.options[1].type = 131; 
+                        pco_ipcp.options[1].len = 6; 
+                        pco_ipcp.options[1].addr = dns_secondary.sub[0];
+                    }
+
+                    smf.ids[smf.num_of_id].id = ue.ids[i].id;
+                    smf.ids[smf.num_of_id].len = len;
+                    smf.ids[smf.num_of_id].data = (c_uint8_t *)&pco_ipcp;
+
+                    smf.num_of_id++;
+                }
+                break;
+            }
+            case PCO_ID_DNS_SERVER_IPV4_ADDRESS_REQUEST:
+            {
+                if (smf_self()->dns[0])
+                {
+                    rv = core_ipsubnet(
+                            &dns_primary, smf_self()->dns[0], NULL);
+                    d_assert(rv == CORE_OK, return CORE_ERROR,);
+                    smf.ids[smf.num_of_id].id = ue.ids[i].id;
+                    smf.ids[smf.num_of_id].len = IPV4_LEN;
+                    smf.ids[smf.num_of_id].data = dns_primary.sub;
+                    smf.num_of_id++;
+                }
+
+                if (smf_self()->dns[1])
+                {
+                    rv = core_ipsubnet(
+                            &dns_secondary, smf_self()->dns[1], NULL);
+                    d_assert(rv == CORE_OK, return CORE_ERROR,);
+                    smf.ids[smf.num_of_id].id = ue.ids[i].id;
+                    smf.ids[smf.num_of_id].len = IPV4_LEN;
+                    smf.ids[smf.num_of_id].data = dns_secondary.sub;
+                    smf.num_of_id++;
+                }
+                break;
+            }
+            case PCO_ID_DNS_SERVER_IPV6_ADDRESS_REQUEST:
+            {
+                if (smf_self()->dns6[0])
+                {
+                    rv = core_ipsubnet(
+                            &dns6_primary, smf_self()->dns6[0], NULL);
+                    d_assert(rv == CORE_OK, return CORE_ERROR,);
+                    smf.ids[smf.num_of_id].id = ue.ids[i].id;
+                    smf.ids[smf.num_of_id].len = IPV6_LEN;
+                    smf.ids[smf.num_of_id].data = dns6_primary.sub;
+                    smf.num_of_id++;
+                }
+
+                if (smf_self()->dns6[1])
+                {
+                    rv = core_ipsubnet(
+                            &dns6_secondary, smf_self()->dns6[1], NULL);
+                    d_assert(rv == CORE_OK, return CORE_ERROR,);
+                    smf.ids[smf.num_of_id].id = ue.ids[i].id;
+                    smf.ids[smf.num_of_id].len = IPV6_LEN;
+                    smf.ids[smf.num_of_id].data = dns6_secondary.sub;
+                    smf.num_of_id++;
+                }
+                break;
+            }
+            case PCO_ID_P_CSCF_IPV4_ADDRESS_REQUEST:
+            {
+                /* TODO */
+            }
+            case PCO_ID_P_CSCF_IPV6_ADDRESS_REQUEST:
+            {
+                /* TODO */
+                break;
+            }
+            case PCO_ID_IP_ADDRESS_ALLOCATION_VIA_NAS_SIGNALLING:
+                /* TODO */
+                break;
+            case PCO_ID_IPV4_LINK_MTU_REQUEST:
+                /* TODO */
+                break;
+            default:
+                d_warn("Unknown PCO ID:(0x%x)", ue.ids[i].id);
+        }
+    }
+
+    size = pco_build(pco_buf, MAX_PCO_LEN, &smf);
+    return size;
+}
+
 status_t smf_s11_build_create_session_response(
     pkbuf_t **pkbuf, smf_sess_t *sess)
 {
@@ -12,6 +162,11 @@ status_t smf_s11_build_create_session_response(
     gtp_f_teid_t s1_u_enodeb_f_teid;
     c_sockaddr_t *s1_u_enodeb_addr = NULL;
     smf_bearer_t *bearer = NULL;
+    gtp_message_t *message = smf_default_bearer_in_sess(sess)->gtp_pkbuf->payload;
+    gtp_create_session_request_t *req = &message->create_session_request;
+
+    c_uint8_t pco_buf[MAX_PCO_LEN];
+    c_int16_t pco_len;
     
     rsp = &gtp_message.create_session_response;
     memset(&gtp_message, 0, sizeof(gtp_message_t));
@@ -46,6 +201,12 @@ status_t smf_s11_build_create_session_response(
         d_assert(0, return CORE_ERROR, "No IP Pool");
     rsp->pdn_address_allocation.presence = 1;
 
+    pco_len = smf_pco_build(pco_buf, &req->protocol_configuration_options);
+    d_assert(pco_len > 0, return CORE_ERROR, "pco build failed");
+    rsp->protocol_configuration_options.presence = 1;
+    rsp->protocol_configuration_options.data = pco_buf;
+    rsp->protocol_configuration_options.len = pco_len;
+
     /* APN Restriction */
     rsp->apn_restriction.presence = 1;
     rsp->apn_restriction.u8 = GTP_APN_NO_RESTRICTION;
@@ -58,6 +219,7 @@ status_t smf_s11_build_create_session_response(
 
     memset(&s1_u_enodeb_f_teid, 0, sizeof(gtp_f_teid_t));
     s1_u_enodeb_f_teid.interface_type = GTP_F_TEID_S1_U_SGW_GTP_U;
+    s1_u_enodeb_f_teid.teid = htonl(bearer->sgw_s1u_teid);
     s1_u_enodeb_addr = sess->upf_node->sa_list;
     rv = gtp_sockaddr_to_f_teid(
             s1_u_enodeb_addr, NULL, &s1_u_enodeb_f_teid, 

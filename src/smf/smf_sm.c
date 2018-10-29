@@ -77,48 +77,57 @@ void smf_state_operational(fsm_t *s, event_t *e)
         {
             status_t rv;
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
-            gtp_message_t s11_message;
+            pkbuf_t *copybuf = NULL;
+            gtp_message_t *s11_message = NULL;
+            c_uint16_t copybuf_len = 0;
             gtp_xact_t *s11_xact = NULL;
             smf_sess_t *sess = NULL;
 
+            copybuf_len = sizeof(gtp_message_t);
+            copybuf = pkbuf_alloc(0, copybuf_len);
+            d_assert(copybuf, break, "Null param");
+            s11_message = copybuf->payload;
+            d_assert(s11_message, break, "Null param");
 
-            rv = gtp_parse_msg(&s11_message, recvbuf);
+            rv = gtp_parse_msg(s11_message, recvbuf);
             d_assert(rv == CORE_OK, goto release_s11_pkbuf;,);
             
             d_trace(8, "S11 Message: [type: %d, TEID: %08x]\n", 
-                    s11_message.h.type, s11_message.h.teid);
+                    s11_message->h.type, s11_message->h.teid);
 
-            if (s11_message.h.teid) {
-                sess = smf_sess_find_by_teid(s11_message.h.teid);
+            if (s11_message->h.teid) {
+                sess = smf_sess_find_by_teid(s11_message->h.teid);
                 d_assert(sess, goto release_s11_pkbuf;, "Session Context Not Found");
             }
             else {
-                sess = smf_sess_add_or_find_by_message(&s11_message);
+                sess = smf_sess_add_or_find_by_message(s11_message);
                 d_assert(sess, goto release_s11_pkbuf;, "Session Context Not Created");
 
-                gtp_node_t *mme = smf_mme_add_by_message(&s11_message);
+                gtp_node_t *mme = smf_mme_add_by_message(s11_message);
                 d_assert(mme, goto release_s11_pkbuf;, "MME Not Found");
                 sess->mme_node = mme;
             }
 
-            rv = gtp_xact_receive(sess->mme_node, &s11_message.h, &s11_xact);
+            smf_default_bearer_in_sess(sess)->gtp_pkbuf = copybuf;
+
+            rv = gtp_xact_receive(sess->mme_node, &s11_message->h, &s11_xact);
             d_assert(rv == CORE_OK, goto release_s11_pkbuf;, "GTP Transaction Recive Error");
 
-            switch (s11_message.h.type)
+            switch (s11_message->h.type)
             {
                 case GTP_CREATE_SESSION_REQUEST_TYPE:
                 {
-                    smf_s11_handle_create_session_request(s11_xact, sess, &s11_message.create_session_request);
+                    smf_s11_handle_create_session_request(s11_xact, sess, &s11_message->create_session_request);
                     break;
                 }
                 case GTP_DELETE_SESSION_REQUEST_TYPE:
                 {
-                    smf_s11_handle_delete_session_request(s11_xact, sess, &s11_message.delete_session_request);
+                    smf_s11_handle_delete_session_request(s11_xact, sess, &s11_message->delete_session_request);
                     break;
                 }
                 case GTP_MODIFY_BEARER_REQUEST_TYPE:
                 {
-                    smf_s11_handle_modify_bearer_request(s11_xact, sess, &s11_message.modify_bearer_request);
+                    smf_s11_handle_modify_bearer_request(s11_xact, sess, &s11_message->modify_bearer_request);
                     break;
                 }
                 default:
@@ -130,6 +139,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
 
         release_s11_pkbuf:
             pkbuf_free(recvbuf);
+            pkbuf_free(copybuf);
             break;
         }
         case SMF_EVT_S11_T3_RESPONSE:

@@ -58,6 +58,10 @@ typedef struct _smf_context_t {
     list_t              mme_s11_list;
     
     hash_t              *sess_hash;     /* Session Hash Table (IMSI + APN) */
+
+    #define MAX_NUM_OF_DNS              2
+    const char          *dns[MAX_NUM_OF_DNS];
+    const char          *dns6[MAX_NUM_OF_DNS];
     
     c_uint32_t          start_time;     /* Timestamp of SMF start up time */
     msgq_id             queue_id;       /* Qsesssess for processing SMF control plane */
@@ -130,6 +134,8 @@ typedef struct _smf_bearer_t {
     smf_sess_t      *sess;
     
     gtp_node_t      *gnode;
+
+    pkbuf_t         *gtp_pkbuf;
 } smf_bearer_t;
 
 typedef struct _smf_ue_ip_t {
