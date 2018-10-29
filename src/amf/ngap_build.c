@@ -1437,7 +1437,96 @@ status_t ngap_build_amf_configuration_update(pkbuf_t **pkbuf)
                 //AMF_TNLAssociationToRemoveItem->aMF_TNLAssociationAddress.choice.endpointIPAddress;
     d_assert(AMF_TNLAssociationToUpdateList, return CORE_ERROR, );
 
+
+    rv = ngap_encode_pdu(pkbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
+status_t ngap_build_ran_configuration_update_acknowledge(pkbuf_t **pkbuf)
+{
+    status_t rv;
+
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = core_calloc(1, sizeof(NGAP_SuccessfulOutcome_t));
+
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = NGAP_ProcedureCode_id_RANConfigurationUpdate;
+    successfulOutcome->criticality = NGAP_Criticality_reject;
+    successfulOutcome->value.present = NGAP_SuccessfulOutcome__value_PR_RANConfigurationUpdateAcknowledge;
+
+    rv = ngap_encode_pdu(pkbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK;
+}
+
+status_t ngap_build_ran_configuration_update_failure(pkbuf_t **pkbuf, NGAP_Cause_PR group, long cause, long time_to_wait)
+{
+    status_t rv;
+
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_UnsuccessfulOutcome_t *UnsuccessfulOutcome = NULL;
+    NGAP_RANConfigurationUpdateFailure_t *RANConfigurationUpdateFailure = NULL;
+
+    NGAP_RANConfigurationUpdateFailureIEs_t *ie = NULL;
+        NGAP_Cause_t *Cause = NULL;
+        NGAP_TimeToWait_t *TimeToWait = NULL;
+#if 0
+        NGAP_CriticalityDiagnostics_t *CriticalityDiagnostics = NULL;
+#endif
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_unsuccessfulOutcome;
+    pdu.choice.unsuccessfulOutcome = core_calloc(1, sizeof(NGAP_UnsuccessfulOutcome_t));
+    UnsuccessfulOutcome = pdu.choice.unsuccessfulOutcome;
+    UnsuccessfulOutcome->procedureCode = NGAP_ProcedureCode_id_AMFConfigurationUpdate;
+    UnsuccessfulOutcome->criticality = NGAP_Criticality_reject;
+    UnsuccessfulOutcome->value.present = NGAP_UnsuccessfulOutcome__value_PR_RANConfigurationUpdateFailure;
+    RANConfigurationUpdateFailure = &UnsuccessfulOutcome->value.choice.RANConfigurationUpdateFailure;
+
+    ie = core_calloc(1, sizeof(NGAP_AMFConfigurationUpdateFailureIEs_t));
+    ASN_SEQUENCE_ADD(&RANConfigurationUpdateFailure->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_Cause;
+    ie->criticality = NGAP_Criticality_ignore;
+    ie->value.present = NGAP_RANConfigurationUpdateFailureIEs__value_PR_Cause;
+    Cause = &ie->value.choice.Cause;
     
+    Cause->present = group;
+    Cause->choice.radioNetwork = cause;
+
+    if (time_to_wait > -1)
+    {
+        ie = core_calloc(1, sizeof(NGAP_RANConfigurationUpdateFailureIEs_t));
+        ASN_SEQUENCE_ADD(&RANConfigurationUpdateFailure->protocolIEs, ie);
+
+        ie->id = S1AP_ProtocolIE_ID_id_TimeToWait;
+        ie->criticality = NGAP_Criticality_ignore;
+        ie->value.present =  NGAP_RANConfigurationUpdateFailureIEs__value_PR_TimeToWait;
+
+        TimeToWait = &ie->value.choice.TimeToWait;
+    }
+
+    if (TimeToWait)
+        *TimeToWait = time_to_wait;
+
     rv = ngap_encode_pdu(pkbuf, &pdu);
     ngap_free_pdu(&pdu);
 

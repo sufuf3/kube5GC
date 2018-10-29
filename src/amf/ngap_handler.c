@@ -2104,3 +2104,57 @@ memcpy(&enb_ue->nas.tai.plmn_id, pLMNidentity->buf,
     mme_ue->ue_network_capability.eia0 = 0;
 #endif
 }
+
+/**
+ * Direction: NG-RAN node -> AMF
+ **/
+void ngap_handle_amf_configuration_update_acknowledge(amf_ran_t *ran, ngap_message_t *message)
+{
+    NGAP_SuccessfulOutcome_t *SuccessfulOutcome = NULL;
+    NGAP_AMFConfigurationUpdateAcknowledge_t *AMFConfigurationUpdateAcknowledge = NULL;
+
+    // NGAP_AMFConfigurationUpdateIEs_t *AMFConfigurationUpdateIEs = NULL;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+    d_assert(message, return,);
+    SuccessfulOutcome = message->choice.successfulOutcome;
+    AMFConfigurationUpdateAcknowledge = &SuccessfulOutcome->value.choice.AMFConfigurationUpdateAcknowledge;
+
+    d_assert(AMFConfigurationUpdateAcknowledge, return, );
+    d_trace(3, "[AMF] AMF configuration update acknowledge\n");
+}
+
+/**
+ * Direction: NG-RAN node -> AMF
+ **/
+void ngap_handle_amf_configuration_update_failure(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    NGAP_UnsuccessfulOutcome_t *UnsuccessfulOutcome = NULL;
+    NGAP_AMFConfigurationUpdateFailure_t *AMFConfigurationUpdateFailure = NULL;
+
+    NGAP_AMFConfigurationUpdateFailureIEs_t *ie = NULL;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+    d_assert(message, return,);
+    UnsuccessfulOutcome = message->choice.unsuccessfulOutcome;
+    d_assert(UnsuccessfulOutcome, return,);
+    AMFConfigurationUpdateFailure = &UnsuccessfulOutcome->value.choice.AMFConfigurationUpdateFailure;
+
+    d_assert(AMFConfigurationUpdateFailure, return, );
+    d_trace(3, "[AMF] AMF configuration update failure\n");
+
+    for(i = 0; i < AMFConfigurationUpdateFailure->protocolIEs.list.count; i++)
+    {
+        ie = AMFConfigurationUpdateFailure->protocolIEs.list.array[i];
+        switch(ie->id)
+        {
+            case NGAP_ProtocolIE_ID_id_Cause:
+                break;
+            default:
+                break;
+        }
+    }
+}

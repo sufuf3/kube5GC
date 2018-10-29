@@ -38,7 +38,8 @@ CORE_DECLARE(status_t) ngap_build_path_switch_failure(pkbuf_t **ngapbuf,
 
 CORE_DECLARE(status_t) ngap_build_amf_status_indication(pkbuf_t **ngapbuf, ran_ue_t *ran_ue);
 CORE_DECLARE(status_t) ngap_build_amf_configuration_update(pkbuf_t **pkbuf);
-
+CORE_DECLARE(status_t) ngap_build_ran_configuration_update_acknowledge(pkbuf_t **pkbuf);
+CORE_DECLARE(status_t) ngap_build_ran_configuration_update_failure(pkbuf_t **pkbuf, NGAP_Cause_PR group, long cause, long time_to_wait);
 
 #ifdef __cplusplus
 }
