@@ -2158,3 +2158,136 @@ void ngap_handle_amf_configuration_update_failure(amf_ran_t *ran, ngap_message_t
         }
     }
 }
+
+void ngap_handle_ran_configuration_update(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_RANConfigurationUpdate_t *RANConfigurationUpdate = NULL;
+
+    NGAP_RANConfigurationUpdateIEs_t *RANConfigurationUpdateIEs = NULL;
+        NGAP_SupportedTAList_t *SupportedTAList = NULL;
+        NGAP_PagingDRX_t *PagingDRX = NULL;
+#if 0
+        NGAP_RANNodeName_t *RANNodeName = NULL;
+#endif
+
+    pkbuf_t *ngapbuf = NULL;
+    NGAP_Cause_PR group = NGAP_Cause_PR_NOTHING;
+    long cause = 0;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+
+    RANConfigurationUpdate = &initiatingMessage->value.choice.RANConfigurationUpdate;
+    d_assert(RANConfigurationUpdate, return,);
+
+    d_trace(3, "[AMF] RAN Configuration Update \n");
+    
+    for (i = 0; i < RANConfigurationUpdate->protocolIEs.list.count; i++)
+    {
+        RANConfigurationUpdateIEs = RANConfigurationUpdate->protocolIEs.list.array[i];
+        switch(RANConfigurationUpdateIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_SupportedTAList:
+                SupportedTAList = &RANConfigurationUpdateIEs->value.choice.SupportedTAList;
+                break;
+            case NGAP_ProtocolIE_ID_id_DefaultPagingDRX:
+                PagingDRX = &RANConfigurationUpdateIEs->value.choice.PagingDRX;
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (PagingDRX)
+    {
+        d_trace(5, "    PagingDRX[%ld]\n", *PagingDRX);
+    }
+        
+    ran->num_of_supported_ta_list = 0;
+    for (i = 0; SupportedTAList->list.count; i ++)
+    {
+        NGAP_SupportedTAItem_t *NGAP_SupportedTAItem = NULL;
+        NGAP_SupportedTAItem = SupportedTAList->list.array[i];
+        d_assert(NGAP_SupportedTAItem, return,);
+
+        for (j = 0; NGAP_SupportedTAItem->broadcastPLMNList.list.count;j++)
+        {
+            NGAP_BroadcastPLMNItem_t *BroadcastPLMNItem = NULL;
+            BroadcastPLMNItem = NGAP_SupportedTAItem->broadcastPLMNList.list.array[j];
+            memcpy(&ran->supported_ta_list[ran->num_of_supported_ta_list].tai.tac, 
+                &NGAP_SupportedTAItem->tAC.buf, sizeof(c_uint16_t));
+                ran->supported_ta_list[ran->num_of_supported_ta_list].tai.tac =
+                    ntohs(ran->supported_ta_list[ran->num_of_supported_ta_list].tai.tac);
+            memcpy(&ran->supported_ta_list[ran->num_of_supported_ta_list].tai.plmn_id,
+                &BroadcastPLMNItem->pLMNIdentity.buf, sizeof(plmn_id_t));
+                c_uint16_t tmp_num_of_s_nssai = ran->supported_ta_list[ran->num_of_supported_ta_list].num_of_s_nssai;
+                for(k = 0; BroadcastPLMNItem->tAISliceSupportList.list.count; k++)
+                {
+                    NGAP_SliceSupportItem_t *SliceSupportItem = NULL;
+                    SliceSupportItem = BroadcastPLMNItem->tAISliceSupportList.list.array[k];
+                    memcpy(&ran->supported_ta_list[ran->num_of_supported_ta_list].s_nssai[tmp_num_of_s_nssai].sst,
+                    &SliceSupportItem->s_NSSAI.sST, sizeof(NGAP_SST_t));
+                    tmp_num_of_s_nssai++;
+                }
+                ran->supported_ta_list[ran->num_of_supported_ta_list].num_of_s_nssai = tmp_num_of_s_nssai;
+        }
+        ran->num_of_supported_ta_list++;
+    }
+
+    if (ran->num_of_supported_ta_list == 0)
+    {
+        d_warn("RAN Configuration update failure:");
+        d_warn("    No supported TA exist in RAN Configuration update");
+        group = NGAP_Cause_PR_misc;
+        cause = NGAP_CauseMisc_unspecified;
+    }
+    else
+    {
+        int served_tai_index = -1;
+        for (i = 0; i < ran->num_of_supported_ta_list; i++)
+        {
+            served_tai_index = 
+                amf_find_served_tai(&ran->supported_ta_list[i].tai);
+            if (served_tai_index >= 0 &&
+                served_tai_index < MAX_NUM_OF_SERVED_TAI)
+            {
+                d_trace(5, "    SERVED_TAI_INDEX[%d]\n", served_tai_index);
+                break;
+            }
+        }
+
+        if (served_tai_index < 0)
+        {
+            d_warn("eNB Configuration update failure:");
+            d_warn("    Cannot find Served TAI. Check 'mme.tai' configuration");
+            group = NGAP_Cause_PR_misc;
+            cause = NGAP_CauseMisc_unknown_PLMN;
+        }
+    }
+
+        if (group == NGAP_Cause_PR_NOTHING)
+    {
+        d_trace(3, "[AMF]ran Configuration update ACKNOWLEDGE\n");
+        d_assert(ngap_build_ran_configuration_update_acknowledge(&ngapbuf) == CORE_OK, 
+                return, "ngap_build_ran_configuration_update_acknowledge() failed");
+    }
+    else
+    {
+        d_trace(3, "[AMF] ran Configuration update failure\n");
+        d_assert(ngap_build_ran_configuration_update_failure(
+                &ngapbuf, group, cause, NGAP_TimeToWait_v10s) == CORE_OK, 
+                return, "ngap_build_ran_configuration_update_failure() failed");
+    }
+
+    d_assert(ngap_send_to_ran(ran, ngapbuf, NGAP_NON_UE_SIGNALLING) == CORE_OK,,
+            "ngap_send_to_ran() failed");
+
+}
