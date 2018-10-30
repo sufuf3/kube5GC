@@ -2382,3 +2382,91 @@ void ngap_handle_pdu_session_resource_modify_response(amf_ran_t *ran, ngap_messa
        
     }
 }
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_pdu_session_resource_modify_indication(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];
+
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_PDUSessionResourceModifyIndication_t *PDUSessionResourceModifyIndication = NULL;
+
+
+    NGAP_PDUSessionResourceModifyIndicationIEs_t *PDUSessionResourceModifyIndicationIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_PDUSessionResourceModifyListModInd_t *PDUSessionResourceModifyListModInd = NULL;
+
+    d_assert(ran, return,);
+    d_assert(message, return,);
+    
+    amf_ue_t *amf_ue = NULL;
+    ran_ue_t *ran_ue = NULL;
+
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    PDUSessionResourceModifyIndication =
+        &initiatingMessage->value.choice.PDUSessionResourceModifyIndication;
+    d_assert(PDUSessionResourceModifyIndication, return,);
+
+    for (i = 0; i < PDUSessionResourceModifyIndication->protocolIEs.list.count; i++)
+    {
+        PDUSessionResourceModifyIndicationIEs = PDUSessionResourceModifyIndication->protocolIEs.list.array[i];
+        switch(PDUSessionResourceModifyIndicationIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &PDUSessionResourceModifyIndicationIEs->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID =
+                    &PDUSessionResourceModifyIndicationIEs->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_PDUSessionResourceModifyListModInd:
+                PDUSessionResourceModifyListModInd =
+                    &PDUSessionResourceModifyIndicationIEs->value.choice.PDUSessionResourceModifyListModInd;
+            default:
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+
+    d_assert(AMF_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
+    amf_ue = ran_ue->amf_ue;
+    d_assert(amf_ue, return, );
+
+    d_assert(PDUSessionResourceModifyListModInd, return, );
+    for (i = 0 ; i < PDUSessionResourceModifyListModInd->list.count; i++)
+    {   
+        NGAP_PDUSessionResourceModifyItemModIndIEs_t *PDUSessionResourceModifyItemModIndIEs = NULL;
+        // NGAP_PDUSessionResourceSetupResponseTransfer_t *PDUSessionResourceSetupResponseTransfer = NULL;
+        PDUSessionResourceModifyItemModIndIEs = (NGAP_PDUSessionResourceModifyItemModIndIEs_t *) 
+            PDUSessionResourceModifyListModInd->list.array[i];
+            d_assert(PDUSessionResourceModifyItemModIndIEs, return,);
+            NGAP_PDUSessionResourceModifyItemModInd_t *PDUSessionResourceModifyItemModInd = NULL;
+            PDUSessionResourceModifyItemModInd = &PDUSessionResourceModifyItemModIndIEs->value.choice.PDUSessionResourceModifyItemModInd;
+    
+        amf_ue->psi = PDUSessionResourceModifyItemModInd->pDUSessionID;
+        //PDUSessionResourceModifyItemModRes->pDUSessionResourceSetupRequestTransfer;
+       
+    }
+}

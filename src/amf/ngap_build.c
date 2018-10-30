@@ -1602,12 +1602,12 @@ status_t ngap_build_pdu_session_resource_modify_request(pkbuf_t **ngapbuf, amf_u
         PDUSessionResourceModifyItemModReqIEs->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceModifyItemModReq;
         PDUSessionResourceModifyItemModReqIEs->criticality = NGAP_Criticality_reject;
         PDUSessionResourceModifyItemModReqIEs->value.present = NGAP_PDUSessionResourceModifyItemModReqIEs__value_PR_PDUSessionResourceModifyItemModReq;
-        NGAP_PDUSessionResourceModifyItemModReq_t *PDUSessionResourceModifyItemModReq = NULL;
-        PDUSessionResourceModifyItemModReq = &PDUSessionResourceModifyItemModReqIEs->value.choice.PDUSessionResourceModifyItemModReq;
+            NGAP_PDUSessionResourceModifyItemModReq_t *PDUSessionResourceModifyItemModReq = NULL;
+            PDUSessionResourceModifyItemModReq = (NGAP_PDUSessionResourceModifyItemModReq_t *)core_calloc(1, sizeof(NGAP_PDUSessionResourceModifyItemModReq_t));
             PDUSessionResourceModifyItemModReq->pDUSessionID = amf_ue->psi;
             //TODO: need to add IE:PDU Session Resource Modify Request Transfer
             //PDUSessionResourceModifyItemModReq->pDUSessionResourceModifyRequestTransfer
-    ASN_SEQUENCE_ADD(&PDUSessionResourceModifyListModReq->list, PDUSessionResourceModifyItemModReqIEs);
+    ASN_SEQUENCE_ADD(&PDUSessionResourceModifyListModReq->list, PDUSessionResourceModifyItemModReq);
 
     rv = ngap_encode_pdu(ngapbuf, &pdu);
     ngap_free_pdu(&pdu);
@@ -1623,3 +1623,73 @@ status_t ngap_build_pdu_session_resource_modify_request(pkbuf_t **ngapbuf, amf_u
 
 }
 
+/**
+ * Direction: AMF -> NG-RAN node
+ **/
+status_t ngap_build_pdu_session_resource_modify_confirm(pkbuf_t **ngapbuf, ran_ue_t *source_ue)
+{
+    status_t rv;
+    
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_PDUSessionResourceModifyConfirm_t *PDUSessionResourceModifyConfirm = NULL;
+
+    NGAP_PDUSessionResourceModifyConfirmIEs_t *PDUSessionResourceModifyConfirmIEs = NULL;
+		NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+		NGAP_PDUSessionResourceModifyListModCfm_t *PDUSessionResourceModifyListModCfm = NULL;
+#if 0		
+        NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+#endif
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = core_calloc(1, sizeof(NGAP_SuccessfulOutcome_t));
+
+    successfulOutcome = pdu.choice.successfulOutcome;
+    successfulOutcome->procedureCode = NGAP_ProcedureCode_id_PDUSessionResourceModifyIndication;
+    successfulOutcome->criticality = NGAP_Criticality_reject;
+    successfulOutcome->value.present =
+        NGAP_SuccessfulOutcome__value_PR_PDUSessionResourceModifyConfirm;
+    PDUSessionResourceModifyConfirm = &successfulOutcome->value.choice.PDUSessionResourceModifyConfirm;
+
+    PDUSessionResourceModifyConfirmIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceModifyConfirmIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceModifyConfirm->protocolIEs, PDUSessionResourceModifyConfirmIEs);
+    PDUSessionResourceModifyConfirmIEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    PDUSessionResourceModifyConfirmIEs->criticality = NGAP_Criticality_ignore;
+    PDUSessionResourceModifyConfirmIEs->value.present = NGAP_PDUSessionResourceModifyConfirmIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &PDUSessionResourceModifyConfirmIEs->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = source_ue->amf_ue_ngap_id;
+
+    PDUSessionResourceModifyConfirmIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceModifyConfirmIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceModifyConfirm->protocolIEs, PDUSessionResourceModifyConfirmIEs);
+    PDUSessionResourceModifyConfirmIEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    PDUSessionResourceModifyConfirmIEs->criticality = NGAP_Criticality_ignore;
+    PDUSessionResourceModifyConfirmIEs->value.present = NGAP_PDUSessionResourceModifyConfirmIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &PDUSessionResourceModifyConfirmIEs->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = source_ue->ran_ue_ngap_id;
+
+    PDUSessionResourceModifyConfirmIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceModifyConfirmIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceModifyConfirm->protocolIEs, PDUSessionResourceModifyConfirmIEs);
+    PDUSessionResourceModifyConfirmIEs->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceModifyListModCfm;
+    PDUSessionResourceModifyConfirmIEs->criticality = NGAP_Criticality_reject;
+    PDUSessionResourceModifyConfirmIEs->value.present = NGAP_PDUSessionResourceModifyConfirmIEs__value_PR_PDUSessionResourceModifyListModCfm;
+    PDUSessionResourceModifyListModCfm = &PDUSessionResourceModifyConfirmIEs->value.choice.PDUSessionResourceModifyListModCfm;
+        NGAP_PDUSessionResourceModifyItemModCfm_t *PDUSessionResourceModifyItemModCfm = NULL;
+        PDUSessionResourceModifyItemModCfm = (NGAP_PDUSessionResourceModifyItemModCfm_t *)core_calloc(1, sizeof(NGAP_PDUSessionResourceModifyItemModCfm_t));
+                 PDUSessionResourceModifyItemModCfm->pDUSessionID = source_ue->amf_ue->psi;
+                //TODO: need to add IE:PDU Session Resource Modify Request Transfer
+                //PDUSessionResourceModifyItemModCfm->pDUSessionResourceModifyRequestTransfer
+    ASN_SEQUENCE_ADD(&PDUSessionResourceModifyListModCfm->list, PDUSessionResourceModifyItemModCfm);
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+
+    return rv;
+}
