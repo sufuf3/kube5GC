@@ -2693,3 +2693,87 @@ void ngap_handle_nas_non_delivery_indication(amf_ran_t *ran, ngap_message_t *mes
 #endif
    d_assert(NAS_PDU, return,);
 }
+
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_pdu_session_resource_notify(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];    
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_PDUSessionResourceNotify_t *PDUSessionResourceNotify = NULL;
+
+    NGAP_PDUSessionResourceNotifyIEs_t *PDUSessionResourceNotifyIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_PDUSessionResourceNotifyList_t	*PDUSessionResourceNotifyList = NULL;
+#if 0
+    NGAP_PDUSessionList_t	 PDUSessionList;
+    NGAP_UserLocationInformation_t	 UserLocationInformation;
+#endif
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    PDUSessionResourceNotify = &initiatingMessage->value.choice.PDUSessionResourceNotify;
+    d_assert(PDUSessionResourceNotify, return,);
+
+    d_trace(3, "[AMF] PDU Session Resource Notify \n");
+
+    ran_ue_t *ran_ue = NULL;
+
+    for(i = 0; i < PDUSessionResourceNotify->protocolIEs.list.count; i++)
+    {
+        PDUSessionResourceNotifyIEs = PDUSessionResourceNotify->protocolIEs.list.array[i];
+        switch(PDUSessionResourceNotifyIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &PDUSessionResourceNotifyIEs->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &PDUSessionResourceNotifyIEs->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_PDUSessionResourceNotifyList:
+                PDUSessionResourceNotifyList = &PDUSessionResourceNotifyIEs->value.choice.PDUSessionResourceNotifyList;
+                break;
+            default:
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    d_assert(AMF_UE_NGAP_ID, return, );
+    d_assert(RAN_UE_NGAP_ID, return, );
+
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+
+    NGAP_PDUSessionResourceNotifyItemIEs_t *PDUSessionResourceNotifyItemIEs = NULL;
+    for(i = 0; i < PDUSessionResourceNotifyList->list.count ; i++)
+    {
+        PDUSessionResourceNotifyItemIEs = (NGAP_PDUSessionResourceNotifyItemIEs_t *) PDUSessionResourceNotifyList->list.array[i];
+        NGAP_PDUSessionResourceNotifyItem_t	*PDUSessionResourceNotifyItem = &PDUSessionResourceNotifyItemIEs->value.choice.PDUSessionResourceNotifyItem;
+        ran_ue->amf_ue->psi = PDUSessionResourceNotifyItem->pDUSessionID;
+
+        //TODO: 
+        // ngap_send_amf_status_transfer(ran_ue,  PDUSessionResourceNotifyItem->pDUSessionResourceNotifyTransfer);
+    }
+
+}
