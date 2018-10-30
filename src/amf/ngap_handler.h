@@ -36,6 +36,8 @@ CORE_DECLARE(void) ngap_handle_path_switch_request(amf_ran_t *ran, ngap_message_
 
 CORE_DECLARE(void) ngap_handle_amf_configuration_update_acknowledge(amf_ran_t *ran, ngap_message_t *message);
 CORE_DECLARE(void) ngap_handle_amf_configuration_update_failure(amf_ran_t *ran, ngap_message_t *message);
+
+CORE_DECLARE(void) ngap_handle_ue_radio_capability_check_response(amf_ran_t *ran, ngap_message_t *message);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

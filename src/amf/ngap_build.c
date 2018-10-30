@@ -1767,3 +1767,55 @@ status_t ngap_build_pdu_session_resource_release_command(pkbuf_t **ngapbuf, ran_
 
     return CORE_OK; 
 }
+
+status_t ngap_build_ue_radio_capability_check_request(pkbuf_t **ngapbuf, ran_ue_t *source_ue)
+{
+    status_t rv;
+    
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UERadioCapabilityCheckRequest_t *UERadioCapabilityCheckRequest = NULL;
+
+    NGAP_UERadioCapabilityCheckRequestIEs_t *UERadioCapabilityCheckRequestIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+#if 0
+        NGAP_UERadioCapability_t	 UERadioCapability;
+#endif
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_UERadioCapabilityCheck;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_UERadioCapabilityCheckRequest;
+    UERadioCapabilityCheckRequest = &initiatingMessage->value.choice.UERadioCapabilityCheckRequest;
+
+    UERadioCapabilityCheckRequestIEs = core_calloc(1, sizeof(NGAP_UERadioCapabilityCheckRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UERadioCapabilityCheckRequest->protocolIEs, UERadioCapabilityCheckRequestIEs);
+    UERadioCapabilityCheckRequestIEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    UERadioCapabilityCheckRequestIEs->criticality = NGAP_Criticality_reject;
+    UERadioCapabilityCheckRequestIEs->value.present = NGAP_UERadioCapabilityCheckRequestIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &UERadioCapabilityCheckRequestIEs->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = source_ue->amf_ue_ngap_id;
+
+    UERadioCapabilityCheckRequestIEs = core_calloc(1, sizeof(NGAP_UERadioCapabilityCheckRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UERadioCapabilityCheckRequest->protocolIEs, UERadioCapabilityCheckRequestIEs);
+    UERadioCapabilityCheckRequestIEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    UERadioCapabilityCheckRequestIEs->criticality = NGAP_Criticality_reject;
+    UERadioCapabilityCheckRequestIEs->value.present = NGAP_UERadioCapabilityCheckRequestIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &UERadioCapabilityCheckRequestIEs->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = source_ue->amf_ue_ngap_id;
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK; 
+}

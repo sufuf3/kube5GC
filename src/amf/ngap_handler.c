@@ -2540,3 +2540,74 @@ void ngap_handle_pdu_session_resource_release_response(amf_ran_t *ran, ngap_mess
     d_assert(amf_ue, return, );
     
 }
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_ue_radio_capability_check_response(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];
+
+    NGAP_SuccessfulOutcome_t *successfulOutcome = NULL;
+    NGAP_UERadioCapabilityCheckResponse_t *NGAP_UERadioCapabilityCheckResponse = NULL;
+
+    NGAP_UERadioCapabilityCheckResponseIEs_t *NGAP_UERadioCapabilityCheckResponseIEs = NULL;
+		NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+		NGAP_IMSVoiceSupportIndicator_t	*IMSVoiceSupportIndicator = NULL;
+#if 0
+			NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+#endif
+    d_assert(ran, return,);
+    d_assert(message, return,);
+    
+    amf_ue_t *amf_ue = NULL;
+    ran_ue_t *ran_ue = NULL;
+
+    successfulOutcome = message->choice.successfulOutcome;
+    d_assert(successfulOutcome, return,);
+    NGAP_UERadioCapabilityCheckResponse = &successfulOutcome->value.choice.UERadioCapabilityCheckResponse;
+    d_assert(NGAP_UERadioCapabilityCheckResponse, return,);
+    
+    for (i = 0; i < NGAP_UERadioCapabilityCheckResponse->protocolIEs.list.count; i++)
+    {
+        NGAP_UERadioCapabilityCheckResponseIEs = NGAP_UERadioCapabilityCheckResponse->protocolIEs.list.array[i];
+        switch(NGAP_UERadioCapabilityCheckResponseIEs->id)
+        {
+            case NGAP_UERadioCapabilityCheckResponseIEs__value_PR_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &NGAP_UERadioCapabilityCheckResponseIEs->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_UERadioCapabilityCheckResponseIEs__value_PR_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &NGAP_UERadioCapabilityCheckResponseIEs->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_UERadioCapabilityCheckResponseIEs__value_PR_IMSVoiceSupportIndicator:
+                IMSVoiceSupportIndicator = &NGAP_UERadioCapabilityCheckResponseIEs->value.choice.IMSVoiceSupportIndicator;
+                d_assert(IMSVoiceSupportIndicator, return, );
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+
+    d_assert(AMF_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[%d]", *RAN_UE_NGAP_ID);
+    amf_ue = ran_ue->amf_ue;
+    d_assert(amf_ue, return, );
+
+}

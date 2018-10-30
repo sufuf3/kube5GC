@@ -44,6 +44,8 @@ CORE_DECLARE(status_t) ngap_build_amf_configuration_update(pkbuf_t **pkbuf);
 CORE_DECLARE(status_t) ngap_build_ran_configuration_update_acknowledge(pkbuf_t **pkbuf);
 CORE_DECLARE(status_t) ngap_build_ran_configuration_update_failure(pkbuf_t **pkbuf, NGAP_Cause_PR group, long cause, long time_to_wait);
 
+CORE_DECLARE(status_t) ngap_build_ue_radio_capability_check_request(pkbuf_t **ngapbuf, ran_ue_t *source_ue);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
