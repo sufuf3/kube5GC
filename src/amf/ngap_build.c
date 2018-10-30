@@ -1823,9 +1823,7 @@ status_t ngap_build_ue_radio_capability_check_request(pkbuf_t **ngapbuf, ran_ue_
 status_t ngap_build_downlink_nas_transport(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
 {
     status_t rv;
-
-    status_t rv;
-    
+  
     NGAP_NGAP_PDU_t pdu;
     NGAP_InitiatingMessage_t *initiatingMessage = NULL;
     NGAP_DownlinkNASTransport_t *DownlinkNASTransport = NULL;
@@ -1857,6 +1855,7 @@ status_t ngap_build_downlink_nas_transport(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
     DownlinkNASTransport_IEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
     DownlinkNASTransport_IEs->criticality = NGAP_Criticality_reject;
     DownlinkNASTransport_IEs->value.present = NGAP_DownlinkNASTransport_IEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &DownlinkNASTransport_IEs->value.choice.AMF_UE_NGAP_ID;
     *AMF_UE_NGAP_ID = ran_ue->amf_ue_ngap_id;
 
     DownlinkNASTransport_IEs = core_calloc(1, sizeof(NGAP_UERadioCapabilityCheckRequestIEs_t));
@@ -1864,6 +1863,7 @@ status_t ngap_build_downlink_nas_transport(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
     DownlinkNASTransport_IEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
     DownlinkNASTransport_IEs->criticality = NGAP_Criticality_reject;
     DownlinkNASTransport_IEs->value.present = NGAP_DownlinkNASTransport_IEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &DownlinkNASTransport_IEs->value.choice.RAN_UE_NGAP_ID;
     *RAN_UE_NGAP_ID = ran_ue->ran_ue_ngap_id;
 
     DownlinkNASTransport_IEs = core_calloc(1, sizeof(NGAP_UERadioCapabilityCheckRequestIEs_t));
@@ -1871,6 +1871,7 @@ status_t ngap_build_downlink_nas_transport(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
     DownlinkNASTransport_IEs->id = NGAP_ProtocolIE_ID_id_NAS_PDU;
     DownlinkNASTransport_IEs->criticality = NGAP_Criticality_reject;
     DownlinkNASTransport_IEs->value.present = NGAP_DownlinkNASTransport_IEs__value_PR_NAS_PDU;
+    NAS_PDU = &DownlinkNASTransport_IEs->value.choice.NAS_PDU;
 #if 0  
     NAS_PDU->size = emmbuf->len;
     NAS_PDU->buf = core_calloc(NAS_PDU->size, sizeof(c_uint8_t));
@@ -1889,4 +1890,78 @@ status_t ngap_build_downlink_nas_transport(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
     }
 
     return CORE_OK; 
+}
+
+status_t ngap_build_error_indication(pkbuf_t **ngapbuf, NGAP_AMF_UE_NGAP_ID_t *amf_ue_ngap_id, NGAP_RAN_UE_NGAP_ID_t *ran_ue_nagp_id, NGAP_Cause_PR group, long cause)
+{
+    status_t rv;
+    
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_ErrorIndication_t *ErrorIndication = NULL;
+
+    NGAP_ErrorIndicationIEs_t *ErrorIndicationIEs = NULL;
+		NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+		NGAP_Cause_t *Cause = NULL;
+#if 0
+	NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+#endif
+    d_trace(3, "[AMF] Error indication\n");
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_ErrorIndication;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_ErrorIndication;
+    ErrorIndication = &initiatingMessage->value.choice.ErrorIndication;
+
+    if (amf_ue_ngap_id) 
+    {
+        ErrorIndicationIEs = core_calloc(1, sizeof(NGAP_UERadioCapabilityCheckRequestIEs_t));
+        ASN_SEQUENCE_ADD(&ErrorIndication->protocolIEs, ErrorIndicationIEs);
+        ErrorIndicationIEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+        ErrorIndicationIEs->criticality = NGAP_Criticality_ignore;
+        ErrorIndicationIEs->value.present = NGAP_ErrorIndicationIEs__value_PR_AMF_UE_NGAP_ID;
+        AMF_UE_NGAP_ID = &ErrorIndicationIEs->value.choice.AMF_UE_NGAP_ID;
+        *AMF_UE_NGAP_ID = *amf_ue_ngap_id;
+         d_trace(5, "    AMF_UE_NGAP_ID[%d]\n", amf_ue_ngap_id);
+    }
+
+    if (ran_ue_nagp_id) 
+    {
+        ErrorIndicationIEs = core_calloc(1, sizeof(NGAP_UERadioCapabilityCheckRequestIEs_t));
+        ASN_SEQUENCE_ADD(&ErrorIndication->protocolIEs, ErrorIndicationIEs);
+        ErrorIndicationIEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+        ErrorIndicationIEs->criticality = NGAP_Criticality_ignore;
+        ErrorIndicationIEs->value.present = NGAP_ErrorIndicationIEs__value_PR_RAN_UE_NGAP_ID;
+        RAN_UE_NGAP_ID = &ErrorIndicationIEs->value.choice.RAN_UE_NGAP_ID;
+        *RAN_UE_NGAP_ID = *ran_ue_nagp_id;
+        d_trace(5, "    RAN_UE_NGAP_ID[%d]\n", ran_ue_nagp_id);
+    }
+
+    ErrorIndicationIEs = core_calloc(1, sizeof(NGAP_UERadioCapabilityCheckRequestIEs_t));
+    ASN_SEQUENCE_ADD(&ErrorIndication->protocolIEs, ErrorIndicationIEs);
+    ErrorIndicationIEs->id = NGAP_ProtocolIE_ID_id_Cause;
+    ErrorIndicationIEs->criticality = NGAP_Criticality_ignore;
+    ErrorIndicationIEs->value.present = NGAP_ErrorIndicationIEs__value_PR_Cause;
+    Cause = &ErrorIndicationIEs->value.choice.Cause;
+    Cause->present = group;
+    Cause->choice.radioNetwork = cause;
+
+    d_trace(5, "    Group[%d] Cause[%d]\n",
+            Cause->present, Cause->choice.radioNetwork);
+
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+    return CORE_OK;
 }
