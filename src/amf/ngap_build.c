@@ -2169,3 +2169,91 @@ status_t ngap_build_upwnlink_ran_status_transfer(pkbuf_t **ngapbuf, ran_ue_t *ra
     }
     return CORE_OK;
 }
+
+status_t ngap_build_paging(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
+{
+    status_t rv;
+  
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_Paging_t *Paging = NULL;
+
+    NGAP_PagingIEs_t *PagingIEs = NULL;
+        NGAP_UEIdentityIndexValue_t	*UEIdentityIndexValue = NULL;
+        NGAP_UEPagingIdentity_t	*UEPagingIdentity = NULL;
+        NGAP_TAIList_t *TAIList = NULL;
+#if 0
+NGAP_PagingDRX_t	 PagingDRX;
+NGAP_PagingPriority_t	 PagingPriority;
+NGAP_UERadioCapabilityForPaging_t	 UERadioCapabilityForPaging;
+NGAP_PagingOrigin_t	 PagingOrigin;
+NGAP_AssistanceDataForPaging_t	 AssistanceDataForPaging;    
+#endif
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+    d_trace(3, "[AMF] Paging\n");
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_Paging;
+    initiatingMessage->criticality = NGAP_Criticality_ignore;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_Paging;
+    Paging = &initiatingMessage->value.choice.Paging;
+    d_assert(Paging, return CORE_ERROR,);
+
+     //This IE may need to be refined. ref: 3841-9.2.4.1
+    PagingIEs = core_calloc(1, sizeof(NGAP_UplinkRANConfigurationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&Paging->protocolIEs, PagingIEs);
+    PagingIEs->id = NGAP_ProtocolIE_ID_id_UEIdentityIndexValue;
+    PagingIEs->criticality = NGAP_Criticality_ignore;
+    PagingIEs->value.present = NGAP_PagingIEs__value_PR_UEIdentityIndexValue;
+    UEIdentityIndexValue = &PagingIEs->value.choice.UEIdentityIndexValue;
+    d_assert(UEIdentityIndexValue, return CORE_ERROR, );
+
+    PagingIEs = core_calloc(1, sizeof(NGAP_UplinkRANConfigurationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&Paging->protocolIEs, PagingIEs);
+    PagingIEs->id = NGAP_ProtocolIE_ID_id_UEPagingIdentity;
+    PagingIEs->criticality = NGAP_Criticality_ignore;
+    PagingIEs->value.present = NGAP_PagingIEs__value_PR_UEPagingIdentity;
+    UEPagingIdentity = &PagingIEs->value.choice.UEPagingIdentity;
+        UEPagingIdentity->present = NGAP_UEPagingIdentity_PR_fiveG_S_TMSI;
+        NGAP_FiveG_S_TMSI_t *fiveG_S_TMSI = NULL;
+        fiveG_S_TMSI = (NGAP_FiveG_S_TMSI_t *)core_calloc(1, sizeof(NGAP_FiveG_S_TMSI_t));
+        fiveG_S_TMSI = UEPagingIdentity->choice.fiveG_S_TMSI;
+        d_assert(fiveG_S_TMSI, return CORE_ERROR, );
+        //  BIT String
+        // fiveG_S_TMSI->aMFPointer = amf_ue->guti_5g.amf_ptr;
+        //  BIT String
+        // fiveG_S_TMSI->aMFSetID = amf_ue->guti_5g.amf_sid;
+        // fiveG_S_TMSI->fiveG_TMSI = amf_ue->tmsi_5g;
+
+    PagingIEs = core_calloc(1, sizeof(NGAP_UplinkRANConfigurationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&Paging->protocolIEs, PagingIEs);
+    PagingIEs->id = NGAP_ProtocolIE_ID_id_TAIList;
+    PagingIEs->criticality = NGAP_Criticality_ignore;
+    PagingIEs->value.present = NGAP_PagingIEs__value_PR_TAIList;
+    TAIList = &PagingIEs->value.choice.TAIList;
+        NGAP_TAIItemIEs_t *TAIItemIEs = NULL;
+        TAIItemIEs = (NGAP_TAIItemIEs_t *)core_calloc(1, sizeof(NGAP_TAIItemIEs_t));
+        ASN_SEQUENCE_ADD(&TAIList->list, TAIItemIEs);
+        TAIItemIEs->id = NGAP_ProtocolIE_ID_id_TAIItem;
+        TAIItemIEs->criticality = NGAP_Criticality_ignore;
+        TAIItemIEs->value.present = NGAP_TAIItemIEs__value_PR_TAIItem;
+        NGAP_TAIItem_t *TAIItem = NULL;
+        TAIItem = &TAIItemIEs->value.choice.TAIItem;
+            ngap_buffer_to_OCTET_STRING(&amf_ue->tai.plmn_id, sizeof(plmn_id_t), &TAIItem->tAI.pLMNIdentity);
+            ngap_uint16_to_OCTET_STRING(amf_ue->tai.tac, &TAIItem->tAI.tAC);
+    
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+    return CORE_OK;        
+
+}
