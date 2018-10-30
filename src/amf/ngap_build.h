@@ -46,6 +46,7 @@ CORE_DECLARE(status_t) ngap_build_ran_configuration_update_failure(pkbuf_t **pkb
 
 CORE_DECLARE(status_t) ngap_build_ue_radio_capability_check_request(pkbuf_t **ngapbuf, ran_ue_t *source_ue);
 
+CORE_DECLARE(status_t) ngap_build_downlink_nas_transport(pkbuf_t **ngapbuf, ran_ue_t *ran_ue);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
