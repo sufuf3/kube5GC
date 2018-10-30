@@ -1846,7 +1846,7 @@ status_t ngap_build_downlink_nas_transport(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
 
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = NGAP_ProcedureCode_id_DownlinkNASTransport;
-    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->criticality = NGAP_Criticality_ignore;
     initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_DownlinkNASTransport;
     DownlinkNASTransport = &initiatingMessage->value.choice.DownlinkNASTransport;
 
@@ -1914,7 +1914,7 @@ status_t ngap_build_error_indication(pkbuf_t **ngapbuf, NGAP_AMF_UE_NGAP_ID_t *a
 
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = NGAP_ProcedureCode_id_ErrorIndication;
-    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->criticality = NGAP_Criticality_ignore;
     initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_ErrorIndication;
     ErrorIndication = &initiatingMessage->value.choice.ErrorIndication;
 
@@ -1977,14 +1977,14 @@ status_t ngap_build_downlink_ran_configuration_transfer(pkbuf_t **ngapbuf, ran_u
     NGAP_DownlinkRANConfigurationTransferIEs_t *DownlinkRANConfigurationTransferIEs = NULL;
 	    NGAP_SONConfigurationTransfer_t	*SONConfigurationTransfer = NULL;
 #endif
-    d_trace(3, "[AMF] RAN CONFIGURATION TRANSFER\n");
+    d_trace(3, "[AMF] Downlink Ran Configuration Transfer\n");
     memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
     pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
 
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = NGAP_ProcedureCode_id_DownlinkRANConfigurationTransfer;
-    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->criticality = NGAP_Criticality_ignore;
     initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_DownlinkRANConfigurationTransfer;
     DownlinkRANConfigurationTransfer = &initiatingMessage->value.choice.DownlinkRANConfigurationTransfer;
     d_assert(DownlinkRANConfigurationTransfer, return CORE_ERROR,);
@@ -2021,7 +2021,7 @@ status_t ngap_build_downlink_ran_status_transfer(pkbuf_t **ngapbuf, ran_ue_t *ra
 	    NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
 		NGAP_RANStatusTransfer_TransparentContainer_t *RANStatusTransfer_TransparentContainer = NULL;
 
-    d_trace(3, "[AMF] RAN Status TRANSFER\n");
+    d_trace(3, "[AMF] Downlink Ran Status Transfer\n");
     memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
     pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
@@ -2036,7 +2036,7 @@ status_t ngap_build_downlink_ran_status_transfer(pkbuf_t **ngapbuf, ran_ue_t *ra
     DownlinkRANStatusTransferIEs = core_calloc(1, sizeof(NGAP_DownlinkRANConfigurationTransferIEs_t));
     ASN_SEQUENCE_ADD(&DownlinkRANStatusTransfer->protocolIEs, DownlinkRANStatusTransferIEs);
     DownlinkRANStatusTransferIEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
-    DownlinkRANStatusTransferIEs->criticality = NGAP_Criticality_ignore;
+    DownlinkRANStatusTransferIEs->criticality = NGAP_Criticality_reject;
     DownlinkRANStatusTransferIEs->value.present = NGAP_DownlinkRANStatusTransferIEs__value_PR_AMF_UE_NGAP_ID;
     AMF_UE_NGAP_ID = &DownlinkRANStatusTransferIEs->value.choice.AMF_UE_NGAP_ID;
     *AMF_UE_NGAP_ID = ran_ue->amf_ue_ngap_id;
@@ -2044,7 +2044,7 @@ status_t ngap_build_downlink_ran_status_transfer(pkbuf_t **ngapbuf, ran_ue_t *ra
     DownlinkRANStatusTransferIEs = core_calloc(1, sizeof(NGAP_DownlinkRANConfigurationTransferIEs_t));
     ASN_SEQUENCE_ADD(&DownlinkRANStatusTransfer->protocolIEs, DownlinkRANStatusTransferIEs);
     DownlinkRANStatusTransferIEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
-    DownlinkRANStatusTransferIEs->criticality = NGAP_Criticality_ignore;
+    DownlinkRANStatusTransferIEs->criticality = NGAP_Criticality_reject;
     DownlinkRANStatusTransferIEs->value.present = NGAP_DownlinkRANStatusTransferIEs__value_PR_RAN_UE_NGAP_ID;
     RAN_UE_NGAP_ID = &DownlinkRANStatusTransferIEs->value.choice.RAN_UE_NGAP_ID;
     *RAN_UE_NGAP_ID = ran_ue->ran_ue_ngap_id;
@@ -2052,9 +2052,111 @@ status_t ngap_build_downlink_ran_status_transfer(pkbuf_t **ngapbuf, ran_ue_t *ra
     DownlinkRANStatusTransferIEs = core_calloc(1, sizeof(NGAP_DownlinkRANConfigurationTransferIEs_t));
     ASN_SEQUENCE_ADD(&DownlinkRANStatusTransfer->protocolIEs, DownlinkRANStatusTransferIEs);
     DownlinkRANStatusTransferIEs->id = NGAP_ProtocolIE_ID_id_RANStatusTransfer_TransparentContainer;
-    DownlinkRANStatusTransferIEs->criticality = NGAP_Criticality_ignore;
+    DownlinkRANStatusTransferIEs->criticality = NGAP_Criticality_reject;
     DownlinkRANStatusTransferIEs->value.present = NGAP_DownlinkRANStatusTransferIEs__value_PR_RANStatusTransfer_TransparentContainer;
     RANStatusTransfer_TransparentContainer = &DownlinkRANStatusTransferIEs->value.choice.RANStatusTransfer_TransparentContainer;
+    d_assert(RANStatusTransfer_TransparentContainer, return CORE_ERROR,);
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+    return CORE_OK;
+}
+
+status_t ngap_build_uplink_ran_configuration_transfer(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
+{
+    status_t rv;
+  
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UplinkRANConfigurationTransfer_t *UplinkRANConfigurationTransfer = NULL;
+#if 0
+    NGAP_UplinkRANConfigurationTransferIEs_t *UplinkRANConfigurationTransferIEs = NULL;
+	    NGAP_SONConfigurationTransfer_t	*SONConfigurationTransfer = NULL;
+#endif
+    d_trace(3, "[AMF] Uplink Ran Configuration Transfer\n");
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_DownlinkRANConfigurationTransfer;
+    initiatingMessage->criticality = NGAP_Criticality_ignore;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_UplinkRANConfigurationTransfer;
+    UplinkRANConfigurationTransfer = &initiatingMessage->value.choice.UplinkRANConfigurationTransfer;
+    d_assert(UplinkRANConfigurationTransfer, return CORE_ERROR,);
+#if 0
+    UplinkRANConfigurationTransferIEs = core_calloc(1, sizeof(NGAP_UplinkRANConfigurationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&UplinkRANConfigurationTransfer->protocolIEs, UplinkRANConfigurationTransferIEs);
+    UplinkRANConfigurationTransferIEs->id = NGAP_ProtocolIE_ID_id_SONConfigurationTransferDL;
+    UplinkRANConfigurationTransferIEs->criticality = NGAP_Criticality_ignore;
+    UplinkRANConfigurationTransferIEs->value.present = NGAP_UplinkRANConfigurationTransferIEs__value_PR_SONConfigurationTransfer;
+    SONConfigurationTransfer = &UplinkRANConfigurationTransferIEs->value.choice.SONConfigurationTransfer;
+#endif
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+    return CORE_OK;
+}
+
+status_t ngap_build_upwnlink_ran_status_transfer(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
+{
+    status_t rv;
+  
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UplinkRANStatusTransfer_t *UplinkRANStatusTransfer = NULL;
+
+    NGAP_UplinkRANStatusTransferIEs_t *UplinkRANStatusTransferIEs = NULL;
+	  	NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+	    NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+		NGAP_RANStatusTransfer_TransparentContainer_t *RANStatusTransfer_TransparentContainer = NULL;
+
+    d_trace(3, "[AMF] Uplink Ran Status Transfer\n");
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_UplinkRANStatusTransfer;
+    initiatingMessage->criticality = NGAP_Criticality_ignore;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_UplinkRANStatusTransfer;
+    UplinkRANStatusTransfer = &initiatingMessage->value.choice.UplinkRANStatusTransfer;
+    d_assert(UplinkRANStatusTransfer, return CORE_ERROR,);
+
+    UplinkRANStatusTransferIEs = core_calloc(1, sizeof(NGAP_UplinkRANConfigurationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&UplinkRANStatusTransfer->protocolIEs, UplinkRANStatusTransferIEs);
+    UplinkRANStatusTransferIEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    UplinkRANStatusTransferIEs->criticality = NGAP_Criticality_reject;
+    UplinkRANStatusTransferIEs->value.present = NGAP_UplinkRANStatusTransferIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &UplinkRANStatusTransferIEs->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = ran_ue->amf_ue_ngap_id;
+
+    UplinkRANStatusTransferIEs = core_calloc(1, sizeof(NGAP_UplinkRANConfigurationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&UplinkRANStatusTransfer->protocolIEs, UplinkRANStatusTransferIEs);
+    UplinkRANStatusTransferIEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    UplinkRANStatusTransferIEs->criticality = NGAP_Criticality_reject;
+    UplinkRANStatusTransferIEs->value.present = NGAP_UplinkRANStatusTransferIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &UplinkRANStatusTransferIEs->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = ran_ue->ran_ue_ngap_id;
+    //This IE may need to be refined. ref: 3841-9.2.3.14
+    UplinkRANStatusTransferIEs = core_calloc(1, sizeof(NGAP_UplinkRANConfigurationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&UplinkRANStatusTransfer->protocolIEs, UplinkRANStatusTransferIEs);
+    UplinkRANStatusTransferIEs->id = NGAP_ProtocolIE_ID_id_RANStatusTransfer_TransparentContainer;
+    UplinkRANStatusTransferIEs->criticality = NGAP_Criticality_reject;
+    UplinkRANStatusTransferIEs->value.present = NGAP_UplinkRANStatusTransferIEs__value_PR_RANStatusTransfer_TransparentContainer;
+    RANStatusTransfer_TransparentContainer = &UplinkRANStatusTransferIEs->value.choice.RANStatusTransfer_TransparentContainer;
     d_assert(RANStatusTransfer_TransparentContainer, return CORE_ERROR,);
 
     rv = ngap_encode_pdu(ngapbuf, &pdu);
