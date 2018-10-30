@@ -1965,3 +1965,45 @@ status_t ngap_build_error_indication(pkbuf_t **ngapbuf, NGAP_AMF_UE_NGAP_ID_t *a
     }
     return CORE_OK;
 }
+
+status_t ngap_build_downlink_ran_configuration_transfer(pkbuf_t **ngapbuf, ran_ue_t *ran_ue)
+{
+    status_t rv;
+  
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_DownlinkRANConfigurationTransfer_t *DownlinkRANConfigurationTransfer = NULL;
+#if 0
+    NGAP_DownlinkRANConfigurationTransferIEs_t *DownlinkRANConfigurationTransferIEs = NULL;
+	    NGAP_SONConfigurationTransfer_t	*SONConfigurationTransfer = NULL;
+#endif
+    d_trace(3, "[AMF] RAN CONFIGURATION TRANSFER\n");
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_DownlinkRANConfigurationTransfer;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_DownlinkRANConfigurationTransfer;
+    DownlinkRANConfigurationTransfer = &initiatingMessage->value.choice.DownlinkRANConfigurationTransfer;
+    d_assert(DownlinkRANConfigurationTransfer, return CORE_ERROR,);
+#if 0
+    DownlinkRANConfigurationTransferIEs = core_calloc(1, sizeof(NGAP_DownlinkRANConfigurationTransferIEs_t));
+    ASN_SEQUENCE_ADD(&DownlinkRANConfigurationTransfer->protocolIEs, DownlinkRANConfigurationTransferIEs);
+    DownlinkRANConfigurationTransferIEs->id = NGAP_ProtocolIE_ID_id_SONConfigurationTransferDL;
+    DownlinkRANConfigurationTransferIEs->criticality = NGAP_Criticality_ignore;
+    DownlinkRANConfigurationTransferIEs->value.present = NGAP_DownlinkRANConfigurationTransferIEs__value_PR_SONConfigurationTransfer;
+    SONConfigurationTransfer = &DownlinkRANConfigurationTransferIEs->value.choice.SONConfigurationTransfer;
+#endif
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+    return CORE_OK;
+}
