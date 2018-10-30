@@ -503,7 +503,7 @@ status_t ngap_build_ng_reset(
     
     if (rv != CORE_OK)
     {
-        d_error("s1ap_encode_pdu() failed");
+        d_error("ngap_encode_pdu() failed");
         return CORE_ERROR;
     }
 
@@ -1517,7 +1517,7 @@ status_t ngap_build_ran_configuration_update_failure(pkbuf_t **pkbuf, NGAP_Cause
         ie = core_calloc(1, sizeof(NGAP_RANConfigurationUpdateFailureIEs_t));
         ASN_SEQUENCE_ADD(&RANConfigurationUpdateFailure->protocolIEs, ie);
 
-        ie->id = S1AP_ProtocolIE_ID_id_TimeToWait;
+        ie->id = NGAP_ProtocolIE_ID_id_TimeToWait;
         ie->criticality = NGAP_Criticality_ignore;
         ie->value.present =  NGAP_RANConfigurationUpdateFailureIEs__value_PR_TimeToWait;
 
@@ -1671,7 +1671,7 @@ status_t ngap_build_pdu_session_resource_modify_confirm(pkbuf_t **ngapbuf, ran_u
     PDUSessionResourceModifyConfirmIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceModifyConfirmIEs_t));
     ASN_SEQUENCE_ADD(&PDUSessionResourceModifyConfirm->protocolIEs, PDUSessionResourceModifyConfirmIEs);
     PDUSessionResourceModifyConfirmIEs->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceModifyListModCfm;
-    PDUSessionResourceModifyConfirmIEs->criticality = NGAP_Criticality_reject;
+    PDUSessionResourceModifyConfirmIEs->criticality = NGAP_Criticality_ignore;
     PDUSessionResourceModifyConfirmIEs->value.present = NGAP_PDUSessionResourceModifyConfirmIEs__value_PR_PDUSessionResourceModifyListModCfm;
     PDUSessionResourceModifyListModCfm = &PDUSessionResourceModifyConfirmIEs->value.choice.PDUSessionResourceModifyListModCfm;
         NGAP_PDUSessionResourceModifyItemModCfm_t *PDUSessionResourceModifyItemModCfm = NULL;
@@ -1692,4 +1692,78 @@ status_t ngap_build_pdu_session_resource_modify_confirm(pkbuf_t **ngapbuf, ran_u
 
 
     return rv;
+}
+
+/**
+ * Direction: AMF -> NG-RAN node
+ **/
+status_t ngap_build_pdu_session_resource_release_command(pkbuf_t **ngapbuf, ran_ue_t *source_ue, NGAP_Cause_PR group, long cause)
+{
+    status_t rv;
+    int i = 0;
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_PDUSessionResourceReleaseCommand_t *PDUSessionResourceReleaseCommand = NULL;
+
+    NGAP_PDUSessionResourceReleaseCommandIEs_t *PDUSessionResourceReleaseCommandIEs = NULL;
+		NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;		
+		NGAP_PDUSessionList_t *PDUSessionList = NULL;
+#if 0		
+		NGAP_RANPagingPriority_t	 RANPagingPriority;
+		NGAP_NAS_PDU_t	 NAS_PDU;
+        NGAP_CriticalityDiagnostics_t	 CriticalityDiagnostics;
+#endif
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_successfulOutcome;
+    pdu.choice.successfulOutcome = core_calloc(1, sizeof(NGAP_SuccessfulOutcome_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_PDUSessionResourceRelease;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_PDUSessionResourceReleaseCommand;
+    PDUSessionResourceReleaseCommand = &initiatingMessage->value.choice.PDUSessionResourceReleaseCommand;
+
+    PDUSessionResourceReleaseCommandIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceReleaseCommandIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceReleaseCommand->protocolIEs, PDUSessionResourceReleaseCommandIEs);
+    PDUSessionResourceReleaseCommandIEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    PDUSessionResourceReleaseCommandIEs->criticality = NGAP_Criticality_reject;
+    PDUSessionResourceReleaseCommandIEs->value.present = NGAP_PDUSessionResourceReleaseCommandIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &PDUSessionResourceReleaseCommandIEs->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = source_ue->amf_ue_ngap_id;
+
+    PDUSessionResourceReleaseCommandIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceReleaseCommandIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceReleaseCommand->protocolIEs, PDUSessionResourceReleaseCommandIEs);
+    PDUSessionResourceReleaseCommandIEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    PDUSessionResourceReleaseCommandIEs->criticality = NGAP_Criticality_reject;
+    PDUSessionResourceReleaseCommandIEs->value.present = NGAP_PDUSessionResourceReleaseCommandIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &PDUSessionResourceReleaseCommandIEs->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = source_ue->amf_ue_ngap_id;
+
+    PDUSessionResourceReleaseCommandIEs = core_calloc(1, sizeof(NGAP_PDUSessionResourceReleaseCommandIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceReleaseCommand->protocolIEs, PDUSessionResourceReleaseCommandIEs);
+    PDUSessionResourceReleaseCommandIEs->id = NGAP_ProtocolIE_ID_id_PDUSessionResourceReleasedList;
+    PDUSessionResourceReleaseCommandIEs->criticality = NGAP_Criticality_ignore;
+    PDUSessionResourceReleaseCommandIEs->value.present = NGAP_PDUSessionResourceReleaseCommandIEs__value_PR_PDUSessionList;
+    PDUSessionList = &PDUSessionResourceReleaseCommandIEs->value.choice.PDUSessionList;
+        NGAP_PDUSessionItem_t *PDUSessionItem = NULL;
+        for(i = 0 ; i < PDUSessionList->list.count ; i++) 
+        {
+            PDUSessionItem = (NGAP_PDUSessionItem_t *) core_calloc(1, sizeof(NGAP_PDUSessionItem_t));
+            PDUSessionItem->pDUSessionID = source_ue->amf_ue->psi;
+            PDUSessionItem->cause.present = group;
+            PDUSessionItem->cause.choice.radioNetwork =cause;
+            ASN_SEQUENCE_ADD(&PDUSessionList->list, PDUSessionItem);
+        }
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+
+    return CORE_OK; 
 }
