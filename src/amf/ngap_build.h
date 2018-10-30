@@ -49,6 +49,7 @@ CORE_DECLARE(status_t) ngap_build_ue_radio_capability_check_request(pkbuf_t **ng
 CORE_DECLARE(status_t) ngap_build_downlink_nas_transport(pkbuf_t **ngapbuf, ran_ue_t *ran_ue);
 CORE_DECLARE(status_t) ngap_build_error_indication(pkbuf_t **ngapbuf, NGAP_AMF_UE_NGAP_ID_t *amf_ue_ngap_id, NGAP_RAN_UE_NGAP_ID_t *ran_ue_nagp_id, NGAP_Cause_PR group, long cause);
 CORE_DECLARE(status_t) ngap_build_downlink_ran_configuration_transfer(pkbuf_t **ngapbuf, ran_ue_t *ran_ue);
+CORE_DECLARE(status_t) ngap_build_downlink_ran_status_transfer(pkbuf_t **ngapbuf, ran_ue_t *ran_ue);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
