@@ -57,6 +57,7 @@ CORE_DECLARE(status_t) ngap_build_paging(pkbuf_t **ngapbuf, amf_ue_t *amf_ue);
 CORE_DECLARE(status_t) ngap_build_reroute_nas_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue);
 CORE_DECLARE(status_t) ngap_build_downlink_ue_associated_nrppa_transport(pkbuf_t **ngapbuf, amf_ue_t *amf_ue);
 CORE_DECLARE(status_t) ngap_build_downlink_non_ue_associated_nrppa_transport(pkbuf_t **ngapbuf, amf_ue_t *amf_ue);
+CORE_DECLARE(status_t) ngap_build_location_reporting_control(pkbuf_t **ngapbuf, amf_ue_t *amf_ue, NGAP_EventType_t enentType, NGAP_ReportArea_t reportArea);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

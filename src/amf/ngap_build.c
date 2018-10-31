@@ -2421,7 +2421,7 @@ status_t ngap_build_downlink_non_ue_associated_nrppa_transport(pkbuf_t **ngapbuf
     initiatingMessage->criticality = NGAP_Criticality_ignore;
     initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_DownlinkNonUEAssociatedNRPPaTransport;
     DownlinkNonUEAssociatedNRPPaTransport = &initiatingMessage->value.choice.DownlinkNonUEAssociatedNRPPaTransport;
-    d_assert(DownlinkNonUEAssociatedNRPPaTransportIEs, return CORE_ERROR,);
+    d_assert(DownlinkNonUEAssociatedNRPPaTransport, return CORE_ERROR,);
 
     DownlinkNonUEAssociatedNRPPaTransportIEs = core_calloc(1, sizeof(NGAP_DownlinkNonUEAssociatedNRPPaTransportIEs_t));
     ASN_SEQUENCE_ADD(&DownlinkNonUEAssociatedNRPPaTransport->protocolIEs, DownlinkNonUEAssociatedNRPPaTransportIEs);
@@ -2439,6 +2439,78 @@ status_t ngap_build_downlink_non_ue_associated_nrppa_transport(pkbuf_t **ngapbuf
     NRPPa_PDU = &DownlinkNonUEAssociatedNRPPaTransportIEs->value.choice.NRPPa_PDU;
     d_assert(NRPPa_PDU, return CORE_ERROR, );
 
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+    return CORE_OK;
+}
+
+status_t ngap_build_location_reporting_control(pkbuf_t **ngapbuf, amf_ue_t *amf_ue, NGAP_EventType_t enentType, NGAP_ReportArea_t reportArea)
+{
+    status_t rv;
+  
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_LocationReportingControl_t *LocationReportingControl = NULL;
+
+    NGAP_LocationReportingControlIEs_t *LocationReportingControlIEs = NULL;
+		NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+		NGAP_LocationReportingRequestType_t	*LocationReportingRequestType = NULL;
+
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+    d_trace(3, "[AMF] Downlink Non Ue Associated NRPPa Transport\n");
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_LocationReportingControl;
+    initiatingMessage->criticality = NGAP_Criticality_ignore;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_LocationReportingControl;
+    LocationReportingControl = &initiatingMessage->value.choice.LocationReportingControl;
+    d_assert(LocationReportingControl, return CORE_ERROR,);
+
+    LocationReportingControlIEs = core_calloc(1, sizeof(NGAP_LocationReportingControl_t));
+    ASN_SEQUENCE_ADD(&LocationReportingControl->protocolIEs, LocationReportingControlIEs);
+    LocationReportingControlIEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    LocationReportingControlIEs->criticality = NGAP_Criticality_reject;
+    LocationReportingControlIEs->value.present = NGAP_LocationReportingControlIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &LocationReportingControlIEs->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = amf_ue->ran_ue->amf_ue_ngap_id;
+
+    LocationReportingControlIEs = core_calloc(1, sizeof(NGAP_LocationReportingControl_t));
+    ASN_SEQUENCE_ADD(&LocationReportingControl->protocolIEs, LocationReportingControlIEs);
+    LocationReportingControlIEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    LocationReportingControlIEs->criticality = NGAP_Criticality_reject;
+    LocationReportingControlIEs->value.present = NGAP_LocationReportingControlIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &LocationReportingControlIEs->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = amf_ue->ran_ue->ran_ue_ngap_id;
+
+    LocationReportingControlIEs = core_calloc(1, sizeof(NGAP_LocationReportingControl_t));
+    ASN_SEQUENCE_ADD(&LocationReportingControl->protocolIEs, LocationReportingControlIEs);
+    LocationReportingControlIEs->id = NGAP_ProtocolIE_ID_id_LocationReportingRequestType;
+    LocationReportingControlIEs->criticality = NGAP_Criticality_ignore;
+    LocationReportingControlIEs->value.present = NGAP_LocationReportingControlIEs__value_PR_LocationReportingRequestType;
+    LocationReportingRequestType = &LocationReportingControlIEs->value.choice.LocationReportingRequestType;
+    
+    LocationReportingRequestType->eventType = enentType;
+    LocationReportingRequestType->reportArea = reportArea;
+    NGAP_AreaOfInterest_t *AreaOfInterest = NULL;
+    AreaOfInterest = (NGAP_AreaOfInterest_t *) core_calloc(1, sizeof(NGAP_AreaOfInterest_t));
+    ASN_SEQUENCE_ADD(&LocationReportingRequestType->areaOfInterestList->list, AreaOfInterest);
+        NGAP_AreaOfInterestTAIItem_t *AreaOfInterestTAIItem = NULL;
+        AreaOfInterestTAIItem = (NGAP_AreaOfInterestTAIItem_t *) core_calloc(1, sizeof(NGAP_AreaOfInterestTAIItem_t));
+        ASN_SEQUENCE_ADD(&AreaOfInterest->areaOfInterestTAIList.list, AreaOfInterestTAIItem);
+        ngap_buffer_to_OCTET_STRING(&amf_ue->tai.plmn_id, PLMN_ID_LEN, &AreaOfInterestTAIItem->tAI.pLMNIdentity);
+        ngap_buffer_to_OCTET_STRING(&amf_ue->tai.tac, 2, &AreaOfInterestTAIItem->tAI.tAC);
+    
     rv = ngap_encode_pdu(ngapbuf, &pdu);
     ngap_free_pdu(&pdu);
     
