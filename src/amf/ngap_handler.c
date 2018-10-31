@@ -2881,7 +2881,7 @@ void ngap_handle_uplink_nas_transport(amf_ran_t *ran, ngap_message_t *message)
         case NGAP_UserLocationInformation_PR_NOTHING:
             break;
     }
-     d_assert(UserLocationInformation, return,);
+    d_assert(UserLocationInformation, return,);
    
 }
 
@@ -3083,4 +3083,122 @@ void ngap_handle_location_reporting_failure_indication(amf_ran_t *ran, ngap_mess
     d_assert(Cause, return,);
     d_trace(5, "    Cause[Group:%d Cause:%d]\n",
             Cause->present, Cause->choice.radioNetwork);
+}
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_location_report(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    int j = 0;
+    char buf[CORE_ADDRSTRLEN];    
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_LocationReport_t *LocationReport = NULL;
+
+    NGAP_LocationReportIEs_t *LocationReportIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_UserLocationInformation_t *UserLocationInformation = NULL;
+        NGAP_LocationReportingRequestType_t	*LocationReportingRequestType = NULL;
+#if 0 
+    NGAP_TimeStamp_t	 TimeStamp;
+    NGAP_UEPresenceInAreaOfInterestList_t	 UEPresenceInAreaOfInterestList;
+#endif
+    // ran_ue_t *ran_ue = NULL;
+    
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    LocationReport = &initiatingMessage->value.choice.LocationReport;
+    d_assert(LocationReport, return,);
+
+    d_trace(3, "[AMF] Upline UE Associated NRPPa Transport \n");
+
+    for(i = 0; i < LocationReport->protocolIEs.list.count; i++)
+    {
+        LocationReportIEs = LocationReport->protocolIEs.list.array[i];
+        switch(LocationReportIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &LocationReportIEs->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &LocationReportIEs->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_UserLocationInformation:
+                UserLocationInformation = &LocationReportIEs->value.choice.UserLocationInformation;
+                break;
+            case NGAP_ProtocolIE_ID_id_LocationReportingRequestType:
+                LocationReportingRequestType = &LocationReportIEs->value.choice.LocationReportingRequestType;
+                break;
+            default:
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    d_assert(AMF_UE_NGAP_ID, return, );
+    d_assert(RAN_UE_NGAP_ID, return, );
+
+
+    switch(UserLocationInformation->present)
+    {
+        case NGAP_UserLocationInformation_PR_userLocationInformationEUTRA:            
+            d_assert(UserLocationInformation->choice.userLocationInformationEUTRA, return,);
+            // UserLocationInformation->choice.userLocationInformationEUTRA;->tAI
+            // UserLocationInformation->choice.userLocationInformationEUTRA;->eUTRA_CGI.eUTRACellIdentity
+            // UserLocationInformation->choice.userLocationInformationEUTRA;->eUTRA_CGI.pLMNIdentity
+            break;
+	    case NGAP_UserLocationInformation_PR_userLocationInformationNR:            
+            d_assert(UserLocationInformation->choice.userLocationInformationNR, return,);
+            // UserLocationInformation->choice.userLocationInformationNR->tAI
+            // UserLocationInformation->choice.userLocationInformationNR->nR_CGI.pLMNIdentity
+            //  UserLocationInformation->choice.userLocationInformationNR->nR_CGI.nRCellIdentity.
+            break;
+        case NGAP_UserLocationInformation_PR_userLocationInformationN3IWF:
+            d_assert(UserLocationInformation->choice.userLocationInformationN3IWF, return,);
+            // userLocationInformationN3IWF = &UserLocationInformation->choice.userLocationInformationN3IWF->iPAddress.
+            // userLocationInformationN3IWF = &UserLocationInformation->choice.userLocationInformationN3IWF->portNumber
+            break;
+        case NGAP_UserLocationInformation_PR_NOTHING:
+            break;
+    }
+    d_assert(UserLocationInformation, return,);
+
+    // LocationReportingRequestType->eventType
+    //  LocationReportingRequestType->reportArea
+    for (i = 0; i < LocationReportingRequestType->areaOfInterestList->list.count; i++)
+    {
+        NGAP_AreaOfInterestItem_t *AreaOfInterestItem = NULL;
+        AreaOfInterestItem = LocationReportingRequestType->areaOfInterestList->list.array[i];
+        NGAP_AreaOfInterest_t *NGAP_AreaOfInterest = NULL;
+        NGAP_AreaOfInterest = &AreaOfInterestItem->areaOfInterest;
+        for ( j = 0 ; j < NGAP_AreaOfInterest->areaOfInterestTAIList.list.count; j++)
+        {
+            NGAP_AreaOfInterestTAIItem_t *AreaOfInterestTAIItem = NULL;
+            AreaOfInterestTAIItem = NGAP_AreaOfInterest->areaOfInterestTAIList.list.array[j];
+            //TODO: 
+            // AreaOfInterestTAIItem->tAI.pLMNIdentity
+            // AreaOfInterestTAIItem->tAI.tAC
+            d_assert(AreaOfInterestTAIItem, return, );
+        }
+    }
 }

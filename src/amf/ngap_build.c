@@ -2501,9 +2501,11 @@ status_t ngap_build_location_reporting_control(pkbuf_t **ngapbuf, amf_ue_t *amf_
     LocationReportingRequestType = &LocationReportingControlIEs->value.choice.LocationReportingRequestType;
     LocationReportingRequestType->eventType = enentType;
     LocationReportingRequestType->reportArea = reportArea;
+    NGAP_AreaOfInterestItem_t *AreaOfInterestItem = NULL;
+    AreaOfInterestItem = (NGAP_AreaOfInterestItem_t *) core_calloc(1, sizeof(NGAP_AreaOfInterestItem_t));
+    ASN_SEQUENCE_ADD(&LocationReportingRequestType->areaOfInterestList->list, AreaOfInterestItem);
     NGAP_AreaOfInterest_t *AreaOfInterest = NULL;
-    AreaOfInterest = (NGAP_AreaOfInterest_t *) core_calloc(1, sizeof(NGAP_AreaOfInterest_t));
-    ASN_SEQUENCE_ADD(&LocationReportingRequestType->areaOfInterestList->list, AreaOfInterest);
+    AreaOfInterest = &AreaOfInterestItem->areaOfInterest;
         NGAP_AreaOfInterestTAIItem_t *AreaOfInterestTAIItem = NULL;
         AreaOfInterestTAIItem = (NGAP_AreaOfInterestTAIItem_t *) core_calloc(1, sizeof(NGAP_AreaOfInterestTAIItem_t));
         ASN_SEQUENCE_ADD(&AreaOfInterest->areaOfInterestTAIList.list, AreaOfInterestTAIItem);
