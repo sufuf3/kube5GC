@@ -46,6 +46,7 @@ CORE_DECLARE(void) ngap_handle_uplink_ue_associated_nrppa_transport(amf_ran_t *r
 CORE_DECLARE(void) ngap_handle_uplink_non_ue_associated_nrppa_transport(amf_ran_t *ran, ngap_message_t *message);
 CORE_DECLARE(void) ngap_handle_location_reporting_failure_indication(amf_ran_t *ran, ngap_message_t *message);
 CORE_DECLARE(void) ngap_handle_location_report(amf_ran_t *ran, ngap_message_t *message);
+CORE_DECLARE(void) ngap_handle_uplink_ran_configuration_transfer(amf_ran_t *ran, ngap_message_t *message);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

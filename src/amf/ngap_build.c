@@ -280,8 +280,7 @@ status_t ngap_build_initial_context_setup_request(
 /**
  * AMF -> NG-RAN node
  **/
-//TODO: fix the api input
-status_t ngap_build_pdu_session_resource_setup_request(pkbuf_t **ngapbuf)
+status_t ngap_build_pdu_session_resource_setup_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
 {
     int i = 0;
     status_t rv = 0;
@@ -291,8 +290,8 @@ status_t ngap_build_pdu_session_resource_setup_request(pkbuf_t **ngapbuf)
     NGAP_PDUSessionResourceSetupRequest_t *PDUSessionResourceSetupRequest = NULL;
 
     NGAP_PDUSessionResourceSetupRequestIEs_t *ie = NULL;
-        // NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
-		// NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
         NGAP_PDUSessionResourceSetupListSUReq_t *PDUSessionResourceSetupListSUReq = NULL;
 
     memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
@@ -301,28 +300,26 @@ status_t ngap_build_pdu_session_resource_setup_request(pkbuf_t **ngapbuf)
         core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
 
     initiatingMessage = pdu.choice.initiatingMessage;
-    initiatingMessage->procedureCode =
-        NGAP_ProcedureCode_id_PDUSessionResourceSetup;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_PDUSessionResourceSetup;
     initiatingMessage->criticality = NGAP_Criticality_reject;
-    initiatingMessage->value.present =
-        NGAP_InitiatingMessage__value_PR_PDUSessionResourceSetupRequest;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_PDUSessionResourceSetupRequest;
+    PDUSessionResourceSetupRequest = &initiatingMessage->value.choice.PDUSessionResourceSetupRequest;
     
-    PDUSessionResourceSetupRequest = 
-        &initiatingMessage->value.choice.PDUSessionResourceSetupRequest;
-    
-    // ie = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupRequestIEs_t));
-    // ASN_SEQUENCE_ADD(&PDUSessionResourceSetupRequest->protocolIEs, ie);
-    // ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
-    // ie->criticality 
-    //ie->value.present
-    // AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
-    
-    // ie = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupRequestIEs_t));
-    // ASN_SEQUENCE_ADD(&PDUSessionResourceSetupRequest->protocolIEs, ie);
-    // ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
-    // ie->criticality
-    //ie->value.present
-    // RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+    ie = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceSetupRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_PDUSessionResourceSetupRequestIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &ie->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = amf_ue->ran_ue->amf_ue_ngap_id;
+
+    ie = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&PDUSessionResourceSetupRequest->protocolIEs, ie);
+    ie->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_PDUSessionResourceSetupRequestIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &ie->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = amf_ue->ran_ue->ran_ue_ngap_id;
     
     ie = core_calloc(1, sizeof(NGAP_PDUSessionResourceSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&PDUSessionResourceSetupRequest->protocolIEs, ie);
@@ -344,8 +341,6 @@ status_t ngap_build_pdu_session_resource_setup_request(pkbuf_t **ngapbuf)
 	    ngap_buffer_to_OCTET_STRING(&mme_self()->plmn_support->s_nssai[0].sst, SST_LEN, &PDUSessionResourceSetupItemCxtReq->s_NSSAI.sST);
 	        // OCTET_STRING_t	 pDUSessionResourceSetupRequestTransfer;
         
-        
-
         ASN_SEQUENCE_ADD(&PDUSessionResourceSetupListSUReq->list, PDUSessionResourceSetupItemCxtReq);
     }
 
@@ -2464,7 +2459,7 @@ status_t ngap_build_location_reporting_control(pkbuf_t **ngapbuf, amf_ue_t *amf_
 		NGAP_LocationReportingRequestType_t	*LocationReportingRequestType = NULL;
 
     d_assert(amf_ue, return CORE_ERROR, "Null param");
-    d_trace(3, "[AMF] Downlink Non Ue Associated NRPPa Transport\n");
+    d_trace(3, "[AMF] Location Reporting Control \n");
 
     memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
     pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
@@ -2523,6 +2518,9 @@ status_t ngap_build_location_reporting_control(pkbuf_t **ngapbuf, amf_ue_t *amf_
     return CORE_OK;
 }
 
+/**
+ * AMF -> NG-RAN node
+ **/
 status_t ngap_build_ue_tnla_binding_release_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
 {
     status_t rv;
@@ -2551,7 +2549,7 @@ status_t ngap_build_ue_tnla_binding_release_request(pkbuf_t **ngapbuf, amf_ue_t 
 
     UETNLABindingReleaseRequestIEs = core_calloc(1, sizeof(NGAP_UETNLABindingReleaseRequestIEs_t));
     ASN_SEQUENCE_ADD(&UETNLABindingReleaseRequest->protocolIEs, UETNLABindingReleaseRequestIEs);
-    UETNLABindingReleaseRequestIEs->id = NGAP_ProtocolIE_ID_id_RoutingID;
+    UETNLABindingReleaseRequestIEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
     UETNLABindingReleaseRequestIEs->criticality = NGAP_Criticality_reject;
     UETNLABindingReleaseRequestIEs->value.present = NGAP_UETNLABindingReleaseRequestIEs__value_PR_AMF_UE_NGAP_ID;
     AMF_UE_NGAP_ID = &UETNLABindingReleaseRequestIEs->value.choice.AMF_UE_NGAP_ID;
@@ -2559,7 +2557,7 @@ status_t ngap_build_ue_tnla_binding_release_request(pkbuf_t **ngapbuf, amf_ue_t 
 
     UETNLABindingReleaseRequestIEs = core_calloc(1, sizeof(NGAP_UETNLABindingReleaseRequestIEs_t));
     ASN_SEQUENCE_ADD(&UETNLABindingReleaseRequest->protocolIEs, UETNLABindingReleaseRequestIEs);
-    UETNLABindingReleaseRequestIEs->id = NGAP_ProtocolIE_ID_id_RoutingID;
+    UETNLABindingReleaseRequestIEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
     UETNLABindingReleaseRequestIEs->criticality = NGAP_Criticality_reject;
     UETNLABindingReleaseRequestIEs->value.present = NGAP_UETNLABindingReleaseRequestIEs__value_PR_RAN_UE_NGAP_ID;
     RAN_UE_NGAP_ID = &UETNLABindingReleaseRequestIEs->value.choice.RAN_UE_NGAP_ID;

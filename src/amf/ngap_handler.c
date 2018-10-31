@@ -2110,10 +2110,13 @@ memcpy(&enb_ue->nas.tai.plmn_id, pLMNidentity->buf,
  **/
 void ngap_handle_amf_configuration_update_acknowledge(amf_ran_t *ran, ngap_message_t *message)
 {
+    int i = 0;
+    int j = 0;
     NGAP_SuccessfulOutcome_t *SuccessfulOutcome = NULL;
     NGAP_AMFConfigurationUpdateAcknowledge_t *AMFConfigurationUpdateAcknowledge = NULL;
 
-    // NGAP_AMFConfigurationUpdateIEs_t *AMFConfigurationUpdateIEs = NULL;
+    NGAP_AMFConfigurationUpdateAcknowledgeIEs_t *AMFConfigurationUpdateAcknowledgeIEs = NULL;
+        NGAP_AMF_TNLAssociationSetupList_t *AMF_TNLAssociationSetupList = NULL;
 
     d_assert(ran, return,);
     d_assert(ran->sock, return,);
@@ -2121,8 +2124,33 @@ void ngap_handle_amf_configuration_update_acknowledge(amf_ran_t *ran, ngap_messa
     SuccessfulOutcome = message->choice.successfulOutcome;
     AMFConfigurationUpdateAcknowledge = &SuccessfulOutcome->value.choice.AMFConfigurationUpdateAcknowledge;
 
-    d_assert(AMFConfigurationUpdateAcknowledge, return, );
+    d_assert(AMFConfigurationUpdateAcknowledgeIEs, return, );
     d_trace(3, "[AMF] AMF configuration update acknowledge\n");
+
+
+    for (i = 0; i < AMFConfigurationUpdateAcknowledge->protocolIEs.list.count; i++)
+    {
+        AMFConfigurationUpdateAcknowledgeIEs = AMFConfigurationUpdateAcknowledge->protocolIEs.list.array[i];
+        switch(AMFConfigurationUpdateAcknowledgeIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_TNLAssociationSetupList = &AMFConfigurationUpdateAcknowledgeIEs->value.choice.AMF_TNLAssociationSetupList;
+                d_assert(AMF_TNLAssociationSetupList, return,);
+                break;
+
+            default:
+                break;
+        }
+    }
+    for(j = 0 ; j < AMF_TNLAssociationSetupList->list.count; j++)
+    {
+        NGAP_AMF_TNLAssociationSetupItem_t *AMF_TNLAssociationSetupItem =NULL;
+        AMF_TNLAssociationSetupItem = AMF_TNLAssociationSetupList->list.array[j];
+        // AMF_TNLAssociationSetupItem->aMF_TNLAssociationAddress.choice.endpointIPAddress;
+          //Previously received AMF Transport Layer information for the TNL association.
+        d_assert(AMF_TNLAssociationSetupItem, return, );
+    }
+ 
 }
 
 /**
@@ -2988,7 +3016,7 @@ void ngap_handle_uplink_non_ue_associated_nrppa_transport(amf_ran_t *ran, ngap_m
     UplinkNonUEAssociatedNRPPaTransport = &initiatingMessage->value.choice.UplinkNonUEAssociatedNRPPaTransport;
     d_assert(UplinkNonUEAssociatedNRPPaTransport, return,);
 
-    d_trace(3, "[AMF] Uplink UE Associated NRPPa Transport \n");
+    d_trace(3, "[AMF] Uplink Non UE Associated NRPPa Transport \n");
 
     for(i = 0; i < UplinkNonUEAssociatedNRPPaTransport->protocolIEs.list.count; i++)
     {
@@ -3116,7 +3144,7 @@ void ngap_handle_location_report(amf_ran_t *ran, ngap_message_t *message)
     LocationReport = &initiatingMessage->value.choice.LocationReport;
     d_assert(LocationReport, return,);
 
-    d_trace(3, "[AMF] Upline UE Associated NRPPa Transport \n");
+    d_trace(3, "[AMF] Location Report \n");
 
     for(i = 0; i < LocationReport->protocolIEs.list.count; i++)
     {
@@ -3201,4 +3229,114 @@ void ngap_handle_location_report(amf_ran_t *ran, ngap_message_t *message)
             d_assert(AreaOfInterestTAIItem, return, );
         }
     }
+}
+
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_ue_capability_info_indication(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+
+    char buf[CORE_ADDRSTRLEN];    
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UECapabilityInfoIndication_t *UECapabilityInfoIndication = NULL;
+
+    NGAP_UECapabilityInfoIndicationIEs_t *UECapabilityInfoIndicationIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+		NGAP_UERadioCapability_t *UERadioCapability = NULL;
+#if 0
+NGAP_UERadioCapabilityForPaging_t	 UERadioCapabilityForPaging;
+#endif
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    UECapabilityInfoIndication = &initiatingMessage->value.choice.UECapabilityInfoIndication;
+    d_assert(UECapabilityInfoIndication, return,);
+
+    d_trace(3, "[AMF] UE Capability Info Indication \n");
+
+    for(i = 0; i < UECapabilityInfoIndication->protocolIEs.list.count; i++)
+    {
+        UECapabilityInfoIndicationIEs = UECapabilityInfoIndication->protocolIEs.list.array[i];
+        switch(UECapabilityInfoIndicationIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &UECapabilityInfoIndicationIEs->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &UECapabilityInfoIndicationIEs->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_UERadioCapability:
+                UERadioCapability = &UECapabilityInfoIndicationIEs->value.choice.UERadioCapability;
+                break;
+            default:
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    d_assert(AMF_UE_NGAP_ID, return, );
+    d_assert(RAN_UE_NGAP_ID, return, );
+    d_assert(UERadioCapability, return, );
+    
+}
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_uplink_ran_configuration_transfer(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UplinkRANConfigurationTransfer_t *UplinkRANConfigurationTransfer =  NULL;
+
+    NGAP_UplinkRANConfigurationTransferIEs_t *UplinkRANConfigurationTransferIEs = NULL;
+        NGAP_SONConfigurationTransfer_t	 *SONConfigurationTransfer = NULL;
+
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    UplinkRANConfigurationTransfer = &initiatingMessage->value.choice.UplinkRANConfigurationTransfer;
+    d_assert(UplinkRANConfigurationTransfer, return,);
+
+    d_trace(3, "[AMF] Uplink RAN Configuration Transfer \n");
+
+    for(i = 0; i < UplinkRANConfigurationTransfer->protocolIEs.list.count; i++)
+    {
+        UplinkRANConfigurationTransferIEs = UplinkRANConfigurationTransfer->protocolIEs.list.array[i];
+        switch(UplinkRANConfigurationTransferIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_SONConfigurationTransferUL:
+                SONConfigurationTransfer = &UplinkRANConfigurationTransferIEs->value.choice.SONConfigurationTransfer;
+                break;
+            default:
+                break;
+        }
+    }
+     d_assert(SONConfigurationTransfer, return,);
 }
