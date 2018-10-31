@@ -2265,7 +2265,6 @@ status_t ngap_build_reroute_nas_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
     NGAP_InitiatingMessage_t *initiatingMessage = NULL;
     NGAP_RerouteNASRequest_t *RerouteNASRequest = NULL;
 
-
     NGAP_RerouteNASRequest_IEs_t *RerouteNASRequest_IEs = NULL;
 		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
         OCTET_STRING_t *OCTET_STRING = NULL;
@@ -2315,6 +2314,78 @@ status_t ngap_build_reroute_nas_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
     d_assert(AMFSetID, return CORE_ERROR,);
     // TODO: Bit String
     //*AMFSetID = amf_ue->guti_5g.amf_sid;
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+    return CORE_OK;
+}
+
+
+status_t ngap_build_downlink_ue_associated_nrppa_transport(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
+{
+    status_t rv;
+  
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_DownlinkUEAssociatedNRPPaTransport_t *DownlinkUEAssociatedNRPPaTransport = NULL;
+
+    NGAP_DownlinkUEAssociatedNRPPaTransportIEs_t *DownlinkUEAssociatedNRPPaTransportIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_RoutingID_t *RoutingID = NULL;
+        NGAP_NRPPa_PDU_t *NRPPa_PDU = NULL;
+
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+    d_trace(3, "[AMF] Reroute NAS Request\n");
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_DownlinkUEAssociatedNRPPaTransport;
+    initiatingMessage->criticality = NGAP_Criticality_ignore;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_DownlinkUEAssociatedNRPPaTransport;
+    DownlinkUEAssociatedNRPPaTransport = &initiatingMessage->value.choice.DownlinkUEAssociatedNRPPaTransport;
+    d_assert(DownlinkUEAssociatedNRPPaTransport, return CORE_ERROR,);
+
+    DownlinkUEAssociatedNRPPaTransportIEs = core_calloc(1, sizeof(NGAP_DownlinkUEAssociatedNRPPaTransportIEs_t));
+    ASN_SEQUENCE_ADD(&DownlinkUEAssociatedNRPPaTransport->protocolIEs, DownlinkUEAssociatedNRPPaTransportIEs);
+    DownlinkUEAssociatedNRPPaTransportIEs->id = NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID;
+    DownlinkUEAssociatedNRPPaTransportIEs->criticality = NGAP_Criticality_reject;
+    DownlinkUEAssociatedNRPPaTransportIEs->value.present = NGAP_DownlinkUEAssociatedNRPPaTransportIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &DownlinkUEAssociatedNRPPaTransportIEs->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = amf_ue->ran_ue->amf_ue_ngap_id;
+
+    DownlinkUEAssociatedNRPPaTransportIEs = core_calloc(1, sizeof(NGAP_DownlinkUEAssociatedNRPPaTransportIEs_t));
+    ASN_SEQUENCE_ADD(&DownlinkUEAssociatedNRPPaTransport->protocolIEs, DownlinkUEAssociatedNRPPaTransportIEs);
+    DownlinkUEAssociatedNRPPaTransportIEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    DownlinkUEAssociatedNRPPaTransportIEs->criticality = NGAP_Criticality_reject;
+    DownlinkUEAssociatedNRPPaTransportIEs->value.present = NGAP_DownlinkUEAssociatedNRPPaTransportIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &DownlinkUEAssociatedNRPPaTransportIEs->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = amf_ue->ran_ue->ran_ue_ngap_id;
+
+    DownlinkUEAssociatedNRPPaTransportIEs = core_calloc(1, sizeof(NGAP_DownlinkUEAssociatedNRPPaTransportIEs_t));
+    ASN_SEQUENCE_ADD(&DownlinkUEAssociatedNRPPaTransport->protocolIEs, DownlinkUEAssociatedNRPPaTransportIEs);
+    DownlinkUEAssociatedNRPPaTransportIEs->id = NGAP_ProtocolIE_ID_id_RoutingID;
+    DownlinkUEAssociatedNRPPaTransportIEs->criticality = NGAP_Criticality_reject;
+    DownlinkUEAssociatedNRPPaTransportIEs->value.present = NGAP_DownlinkUEAssociatedNRPPaTransportIEs__value_PR_RoutingID;
+    RoutingID = &DownlinkUEAssociatedNRPPaTransportIEs->value.choice.RoutingID;
+    ngap_buffer_to_OCTET_STRING(&amf_ue->guti_5g.amf_rid, 2, RoutingID);
+    
+    DownlinkUEAssociatedNRPPaTransportIEs = core_calloc(1, sizeof(NGAP_DownlinkUEAssociatedNRPPaTransportIEs_t));
+    ASN_SEQUENCE_ADD(&DownlinkUEAssociatedNRPPaTransport->protocolIEs, DownlinkUEAssociatedNRPPaTransportIEs);
+    DownlinkUEAssociatedNRPPaTransportIEs->id = NGAP_ProtocolIE_ID_id_NRPPa_PDU;
+    DownlinkUEAssociatedNRPPaTransportIEs->criticality = NGAP_Criticality_reject;
+    DownlinkUEAssociatedNRPPaTransportIEs->value.present = NGAP_DownlinkUEAssociatedNRPPaTransportIEs__value_PR_NRPPa_PDU;
+    NRPPa_PDU = &DownlinkUEAssociatedNRPPaTransportIEs->value.choice.NRPPa_PDU;
+    d_assert(NRPPa_PDU, return CORE_ERROR, );
 
     rv = ngap_encode_pdu(ngapbuf, &pdu);
     ngap_free_pdu(&pdu);

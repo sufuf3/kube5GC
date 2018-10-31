@@ -54,7 +54,8 @@ CORE_DECLARE(status_t) ngap_build_uplink_ran_configuration_transfer(pkbuf_t **ng
 CORE_DECLARE(status_t) ngap_build_upwnlink_ran_status_transfer(pkbuf_t **ngapbuf, ran_ue_t *ran_ue);
 
 CORE_DECLARE(status_t) ngap_build_paging(pkbuf_t **ngapbuf, amf_ue_t *amf_ue);
-CORE_DECLARE(status_t)  ngap_build_reroute_nas_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue);
+CORE_DECLARE(status_t) ngap_build_reroute_nas_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue);
+CORE_DECLARE(status_t) ngap_build_downlink_ue_associated_nrppa_transport(pkbuf_t **ngapbuf, amf_ue_t *amf_ue);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
