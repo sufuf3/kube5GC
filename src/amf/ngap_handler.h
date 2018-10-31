@@ -41,7 +41,7 @@ CORE_DECLARE(void) ngap_handle_amf_configuration_update_failure(amf_ran_t *ran, 
 CORE_DECLARE(void) ngap_handle_ue_radio_capability_check_response(amf_ran_t *ran, ngap_message_t *message);
 
 CORE_DECLARE(void) ngap_handle_nas_non_delivery_indication(amf_ran_t *ran, ngap_message_t *message);
-
+CORE_DECLARE(void) ngap_handle_uplink_nas_transport(amf_ran_t *ran, ngap_message_t *message);
 
 #ifdef __cplusplus
 }
