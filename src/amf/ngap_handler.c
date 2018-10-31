@@ -2806,7 +2806,7 @@ void ngap_handle_uplink_nas_transport(amf_ran_t *ran, ngap_message_t *message)
     UplinkNASTransport = &initiatingMessage->value.choice.UplinkNASTransport;
     d_assert(UplinkNASTransport, return,);
 
-    d_trace(3, "[AMF] NAS NON DELIVERY INDICATION\n");
+    d_trace(3, "[AMF] Uplink Nas Transport\n");
 
     for(i = 0; i < UplinkNASTransport->protocolIEs.list.count; i++)
     {
@@ -2912,7 +2912,7 @@ void ngap_handle_uplink_ue_associated_nrppa_transport(amf_ran_t *ran, ngap_messa
     UplinkUEAssociatedNRPPaTransport = &initiatingMessage->value.choice.UplinkUEAssociatedNRPPaTransport;
     d_assert(UplinkUEAssociatedNRPPaTransport, return,);
 
-    d_trace(3, "[AMF] NAS NON DELIVERY INDICATION\n");
+    d_trace(3, "[AMF] Upline UE Associated NRPPa Transport \n");
 
     for(i = 0; i < UplinkUEAssociatedNRPPaTransport->protocolIEs.list.count; i++)
     {
@@ -2962,4 +2962,51 @@ void ngap_handle_uplink_ue_associated_nrppa_transport(amf_ran_t *ran, ngap_messa
     memcpy(&ran_ue->amf_ue->guti_5g.amf_rid ,RoutingID->buf, RoutingID->size);
     d_assert(NRPPa_PDU, return, );
     
+}
+
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_uplink_non_ue_associated_nrppa_transport(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UplinkNonUEAssociatedNRPPaTransport_t *UplinkNonUEAssociatedNRPPaTransport = NULL;
+
+    NGAP_UplinkNonUEAssociatedNRPPaTransportIEs_t *UplinkNonUEAssociatedNRPPaTransportIEs = NULL;
+        NGAP_RoutingID_t *RoutingID = NULL;
+        NGAP_NRPPa_PDU_t *NRPPa_PDU = NULL;
+    
+    ran_ue_t *ran_ue = NULL;
+     d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    UplinkNonUEAssociatedNRPPaTransport = &initiatingMessage->value.choice.UplinkNonUEAssociatedNRPPaTransport;
+    d_assert(UplinkNonUEAssociatedNRPPaTransport, return,);
+
+    d_trace(3, "[AMF] Uplink UE Associated NRPPa Transport \n");
+
+    for(i = 0; i < UplinkNonUEAssociatedNRPPaTransport->protocolIEs.list.count; i++)
+    {
+        UplinkNonUEAssociatedNRPPaTransportIEs = UplinkNonUEAssociatedNRPPaTransport->protocolIEs.list.array[i];
+        switch(UplinkNonUEAssociatedNRPPaTransportIEs->id)
+        {            
+            case NGAP_ProtocolIE_ID_id_RoutingID:
+                RoutingID = &UplinkNonUEAssociatedNRPPaTransportIEs->value.choice.RoutingID;
+                break;
+            case NGAP_ProtocolIE_ID_id_NRPPa_PDU:
+                NRPPa_PDU = &UplinkNonUEAssociatedNRPPaTransportIEs->value.choice.NRPPa_PDU;
+                break;
+            default:
+                break;
+        }
+    }
+
+    d_assert(RoutingID, return, );
+    memcpy(&ran_ue->amf_ue->guti_5g.amf_rid ,RoutingID->buf, RoutingID->size);
+    d_assert(NRPPa_PDU, return, );
 }
