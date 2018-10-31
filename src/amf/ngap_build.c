@@ -2522,3 +2522,56 @@ status_t ngap_build_location_reporting_control(pkbuf_t **ngapbuf, amf_ue_t *amf_
     }
     return CORE_OK;
 }
+
+status_t ngap_build_ue_tnla_binding_release_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
+{
+    status_t rv;
+  
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UETNLABindingReleaseRequest_t *UETNLABindingReleaseRequest = NULL;
+    
+    NGAP_UETNLABindingReleaseRequestIEs_t *UETNLABindingReleaseRequestIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+    d_trace(3, "[AMF] Downlink Non Ue Associated NRPPa Transport\n");
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_UETNLABindingRelease;
+    initiatingMessage->criticality = NGAP_Criticality_ignore;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_UETNLABindingReleaseRequest;
+    UETNLABindingReleaseRequest = &initiatingMessage->value.choice.UETNLABindingReleaseRequest;
+    d_assert(UETNLABindingReleaseRequest, return CORE_ERROR,);
+
+    UETNLABindingReleaseRequestIEs = core_calloc(1, sizeof(NGAP_UETNLABindingReleaseRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UETNLABindingReleaseRequest->protocolIEs, UETNLABindingReleaseRequestIEs);
+    UETNLABindingReleaseRequestIEs->id = NGAP_ProtocolIE_ID_id_RoutingID;
+    UETNLABindingReleaseRequestIEs->criticality = NGAP_Criticality_reject;
+    UETNLABindingReleaseRequestIEs->value.present = NGAP_UETNLABindingReleaseRequestIEs__value_PR_AMF_UE_NGAP_ID;
+    AMF_UE_NGAP_ID = &UETNLABindingReleaseRequestIEs->value.choice.AMF_UE_NGAP_ID;
+    *AMF_UE_NGAP_ID = amf_ue->ran_ue->amf_ue_ngap_id;
+
+    UETNLABindingReleaseRequestIEs = core_calloc(1, sizeof(NGAP_UETNLABindingReleaseRequestIEs_t));
+    ASN_SEQUENCE_ADD(&UETNLABindingReleaseRequest->protocolIEs, UETNLABindingReleaseRequestIEs);
+    UETNLABindingReleaseRequestIEs->id = NGAP_ProtocolIE_ID_id_RoutingID;
+    UETNLABindingReleaseRequestIEs->criticality = NGAP_Criticality_reject;
+    UETNLABindingReleaseRequestIEs->value.present = NGAP_UETNLABindingReleaseRequestIEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &UETNLABindingReleaseRequestIEs->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = amf_ue->ran_ue->ran_ue_ngap_id;
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+    return CORE_OK;
+}
