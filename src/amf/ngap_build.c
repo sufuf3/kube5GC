@@ -2255,5 +2255,74 @@ NGAP_AssistanceDataForPaging_t	 AssistanceDataForPaging;
         return CORE_ERROR;
     }
     return CORE_OK;        
+}
 
+status_t ngap_build_reroute_nas_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
+{
+    status_t rv;
+  
+    NGAP_NGAP_PDU_t pdu;
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_RerouteNASRequest_t *RerouteNASRequest = NULL;
+
+
+    NGAP_RerouteNASRequest_IEs_t *RerouteNASRequest_IEs = NULL;
+		NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        OCTET_STRING_t *OCTET_STRING = NULL;
+        NGAP_AMFSetID_t	*AMFSetID = NULL;
+#if 0
+			NGAP_AMF_UE_NGAP_ID_t	 AMF_UE_NGAP_ID;
+            NGAP_AllowedNSSAI_t	 AllowedNSSAI;
+#endif		
+
+
+    d_assert(amf_ue, return CORE_ERROR, "Null param");
+    d_trace(3, "[AMF] Reroute NAS Request\n");
+
+    memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
+    pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
+    pdu.choice.initiatingMessage = core_calloc(1, sizeof(NGAP_InitiatingMessage_t));
+
+    initiatingMessage = pdu.choice.initiatingMessage;
+    initiatingMessage->procedureCode = NGAP_ProcedureCode_id_RerouteNASRequest;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
+    initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_RerouteNASRequest;
+    RerouteNASRequest = &initiatingMessage->value.choice.RerouteNASRequest;
+    d_assert(RerouteNASRequest, return CORE_ERROR,);
+
+    RerouteNASRequest_IEs = core_calloc(1, sizeof(NGAP_RerouteNASRequest_IEs_t));
+    ASN_SEQUENCE_ADD(&RerouteNASRequest->protocolIEs, RerouteNASRequest_IEs);
+    RerouteNASRequest_IEs->id = NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID;
+    RerouteNASRequest_IEs->criticality = NGAP_Criticality_reject;
+    RerouteNASRequest_IEs->value.present = NGAP_RerouteNASRequest_IEs__value_PR_RAN_UE_NGAP_ID;
+    RAN_UE_NGAP_ID = &RerouteNASRequest_IEs->value.choice.RAN_UE_NGAP_ID;
+    *RAN_UE_NGAP_ID = amf_ue->ran_ue->ran_ue_ngap_id;
+
+    RerouteNASRequest_IEs = core_calloc(1, sizeof(NGAP_RerouteNASRequest_IEs_t));
+    ASN_SEQUENCE_ADD(&RerouteNASRequest->protocolIEs, RerouteNASRequest_IEs);
+    RerouteNASRequest_IEs->id = NGAP_ProtocolIE_ID_id_NGAP_Message;
+    RerouteNASRequest_IEs->criticality = NGAP_Criticality_reject;
+    RerouteNASRequest_IEs->value.present = NGAP_RerouteNASRequest_IEs__value_PR_OCTET_STRING;
+    OCTET_STRING = &RerouteNASRequest_IEs->value.choice.OCTET_STRING;
+    d_assert(OCTET_STRING, return CORE_ERROR,);
+
+    RerouteNASRequest_IEs = core_calloc(1, sizeof(NGAP_RerouteNASRequest_IEs_t));
+    ASN_SEQUENCE_ADD(&RerouteNASRequest->protocolIEs, RerouteNASRequest_IEs);
+    RerouteNASRequest_IEs->id = NGAP_ProtocolIE_ID_id_AMFSetID;
+    RerouteNASRequest_IEs->criticality = NGAP_Criticality_reject;
+    RerouteNASRequest_IEs->value.present = NGAP_RerouteNASRequest_IEs__value_PR_AMFSetID;
+    AMFSetID = &RerouteNASRequest_IEs->value.choice.AMFSetID;
+    d_assert(AMFSetID, return CORE_ERROR,);
+    // TODO: Bit String
+    //*AMFSetID = amf_ue->guti_5g.amf_sid;
+
+    rv = ngap_encode_pdu(ngapbuf, &pdu);
+    ngap_free_pdu(&pdu);
+    
+    if (rv != CORE_OK)
+    {
+        d_error("ngap_encode_pdu() failed");
+        return CORE_ERROR;
+    }
+    return CORE_OK;
 }
