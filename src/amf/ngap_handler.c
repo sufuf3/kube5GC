@@ -2884,3 +2884,82 @@ void ngap_handle_uplink_nas_transport(amf_ran_t *ran, ngap_message_t *message)
      d_assert(UserLocationInformation, return,);
    
 }
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_uplink_ue_associated_nrppa_transport(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];    
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_UplinkUEAssociatedNRPPaTransport_t *UplinkUEAssociatedNRPPaTransport = NULL;
+
+    NGAP_UplinkUEAssociatedNRPPaTransportIEs_t *UplinkUEAssociatedNRPPaTransportIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_RoutingID_t *RoutingID = NULL;
+        NGAP_NRPPa_PDU_t *NRPPa_PDU = NULL;
+    
+    ran_ue_t *ran_ue = NULL;
+    
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    UplinkUEAssociatedNRPPaTransport = &initiatingMessage->value.choice.UplinkUEAssociatedNRPPaTransport;
+    d_assert(UplinkUEAssociatedNRPPaTransport, return,);
+
+    d_trace(3, "[AMF] NAS NON DELIVERY INDICATION\n");
+
+    for(i = 0; i < UplinkUEAssociatedNRPPaTransport->protocolIEs.list.count; i++)
+    {
+        UplinkUEAssociatedNRPPaTransportIEs = UplinkUEAssociatedNRPPaTransport->protocolIEs.list.array[i];
+        switch(UplinkUEAssociatedNRPPaTransportIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &UplinkUEAssociatedNRPPaTransportIEs->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &UplinkUEAssociatedNRPPaTransportIEs->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RoutingID:
+                RoutingID = &UplinkUEAssociatedNRPPaTransportIEs->value.choice.RoutingID;
+                break;
+            case NGAP_ProtocolIE_ID_id_NRPPa_PDU:
+                NRPPa_PDU = &UplinkUEAssociatedNRPPaTransportIEs->value.choice.NRPPa_PDU;
+                break;
+            default:
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    d_assert(AMF_UE_NGAP_ID, return, );
+    d_assert(RAN_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[RAN_UE_NGAP_ID:%d]", *RAN_UE_NGAP_ID);
+
+    d_trace(5, "    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n", ran_ue->ran_ue_ngap_id, ran_ue->amf_ue_ngap_id);
+    
+    d_assert(RoutingID, return, );
+    memcpy(&ran_ue->amf_ue->guti_5g.amf_rid ,RoutingID->buf, RoutingID->size);
+    d_assert(NRPPa_PDU, return, );
+    
+}

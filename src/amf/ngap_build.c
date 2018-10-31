@@ -2326,7 +2326,6 @@ status_t ngap_build_reroute_nas_request(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
     return CORE_OK;
 }
 
-
 status_t ngap_build_downlink_ue_associated_nrppa_transport(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
 {
     status_t rv;
