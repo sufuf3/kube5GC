@@ -2499,7 +2499,6 @@ status_t ngap_build_location_reporting_control(pkbuf_t **ngapbuf, amf_ue_t *amf_
     LocationReportingControlIEs->criticality = NGAP_Criticality_ignore;
     LocationReportingControlIEs->value.present = NGAP_LocationReportingControlIEs__value_PR_LocationReportingRequestType;
     LocationReportingRequestType = &LocationReportingControlIEs->value.choice.LocationReportingRequestType;
-    
     LocationReportingRequestType->eventType = enentType;
     LocationReportingRequestType->reportArea = reportArea;
     NGAP_AreaOfInterest_t *AreaOfInterest = NULL;

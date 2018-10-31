@@ -3010,3 +3010,77 @@ void ngap_handle_uplink_non_ue_associated_nrppa_transport(amf_ran_t *ran, ngap_m
     memcpy(&ran_ue->amf_ue->guti_5g.amf_rid ,RoutingID->buf, RoutingID->size);
     d_assert(NRPPa_PDU, return, );
 }
+
+/**
+ * NG-RAN node -> AMF
+ * */
+void ngap_handle_location_reporting_failure_indication(amf_ran_t *ran, ngap_message_t *message)
+{
+    int i = 0;
+    char buf[CORE_ADDRSTRLEN];    
+    NGAP_InitiatingMessage_t *initiatingMessage = NULL;
+    NGAP_LocationReportingFailureIndication_t *LocationReportingFailureIndication = NULL;
+
+    NGAP_LocationReportingFailureIndicationIEs_t *LocationReportingFailureIndicationIEs = NULL;
+        NGAP_AMF_UE_NGAP_ID_t *AMF_UE_NGAP_ID = NULL;
+        NGAP_RAN_UE_NGAP_ID_t *RAN_UE_NGAP_ID = NULL;
+        NGAP_Cause_t *Cause = NULL;
+
+    ran_ue_t *ran_ue = NULL;
+    
+    d_assert(ran, return,);
+    d_assert(ran->sock, return,);
+
+    d_assert(message, return,);
+    initiatingMessage = message->choice.initiatingMessage;
+    d_assert(initiatingMessage, return,);
+    LocationReportingFailureIndication = &initiatingMessage->value.choice.LocationReportingFailureIndication;
+    d_assert(LocationReportingFailureIndication, return,);
+
+    d_trace(3, "[AMF] Location Reporting Failure Indication \n");
+
+    for(i = 0; i < LocationReportingFailureIndication->protocolIEs.list.count; i++)
+    {
+        LocationReportingFailureIndicationIEs = LocationReportingFailureIndication->protocolIEs.list.array[i];
+        switch(LocationReportingFailureIndicationIEs->id)
+        {
+            case NGAP_ProtocolIE_ID_id_AMF_UE_NGAP_ID:
+                AMF_UE_NGAP_ID = &LocationReportingFailureIndicationIEs->value.choice.AMF_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_RAN_UE_NGAP_ID:
+                RAN_UE_NGAP_ID = &LocationReportingFailureIndicationIEs->value.choice.RAN_UE_NGAP_ID;
+                break;
+            case NGAP_ProtocolIE_ID_id_Cause:
+                Cause = &LocationReportingFailureIndicationIEs->value.choice.Cause;
+                break;
+            default:
+                break;
+        }
+    }
+
+    switch(ran->ran_id.ran_present) 
+    {
+        case RAN_PR_GNB_ID:
+        d_trace(5, "    IP[%s] gnb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.gnb_id);
+            break;
+        case RAN_PR_NgENB_ID:
+        d_trace(5, "    IP[%s] ngenb_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.ngenb_id);
+            break;
+        case RAN_PR_N3IWF_ID:
+        d_trace(5, "    IP[%s] n3iwf_id[%d]\n",
+            CORE_ADDR(ran->addr, buf), ran->ran_id.n3iwf_id);
+            break;
+    }
+    d_assert(AMF_UE_NGAP_ID, return, );
+    d_assert(RAN_UE_NGAP_ID, return, );
+    ran_ue = ran_ue_find_by_ran_ue_ngap_id(ran, *RAN_UE_NGAP_ID);
+    d_assert(ran_ue, return, "No UE Context[RAN_UE_NGAP_ID:%d]", *RAN_UE_NGAP_ID);
+
+    d_trace(5, "    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%d]\n", ran_ue->ran_ue_ngap_id, ran_ue->amf_ue_ngap_id);
+    
+    d_assert(Cause, return,);
+    d_trace(5, "    Cause[Group:%d Cause:%d]\n",
+            Cause->present, Cause->choice.radioNetwork);
+}
