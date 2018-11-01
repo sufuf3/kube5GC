@@ -209,6 +209,7 @@ void smf_n4_handle_session_establishment_response(
     status_t rv;
     pkbuf_t *pkbuf = NULL;
     gtp_header_t h;
+    pfcp_f_seid_t *up_f_seid = NULL;
     c_uint8_t cause;
     
     if (!rsp->cause.presence)
@@ -217,13 +218,21 @@ void smf_n4_handle_session_establishment_response(
         return;
     }
     
+    if (!rsp->up_f_seid.presence)
+    {
+        d_error("session_establishment_response error: no UP F-SEID");
+        return;
+    }
+    
     cause = *((c_uint8_t*)rsp->cause.data);
+    up_f_seid = rsp->up_f_seid.data;
     
     if (cause != PFCP_CAUSE_SUCCESS)
     {
         d_info("association_setup_response cause: %d", pfcp_cause_get_name(cause));
     } else
     {
+        sess->upf_n4_seid = up_f_seid->seid;
         memset(&h, 0, sizeof(gtp_header_t));
         h.type = GTP_CREATE_SESSION_RESPONSE_TYPE;
         h.teid = sess->mme_s11_teid;

@@ -77,6 +77,7 @@ void smf_s11_handle_modify_bearer_request(gtp_xact_t *s11_xact,
 
     enb_s1u_teid = req->bearer_contexts_to_be_modified.s1_u_enodeb_f_teid.data;
     bearer->enb_s1u_teid = ntohl(enb_s1u_teid->teid);
+    bearer->addr = enb_s1u_teid->addr;
 
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
         sess->mme_s11_teid, sess->sgw_s11_teid);
@@ -87,6 +88,9 @@ void smf_s11_handle_modify_bearer_request(gtp_xact_t *s11_xact,
     h.type = GTP_MODIFY_BEARER_RESPONSE_TYPE;
     h.teid = sess->mme_s11_teid;
 
+    rv = smf_pfcp_send_session_modification_request(sess);
+    d_assert(rv == CORE_OK, , "pfcp session modification fail");
+
     rv = smf_s11_build_modify_bearer_response(
         &pkbuf, sess);
     d_assert(rv == CORE_OK, return, "gtp build error");
@@ -95,5 +99,5 @@ void smf_s11_handle_modify_bearer_request(gtp_xact_t *s11_xact,
     d_assert(rv == CORE_OK, return, "gtp_xact_update_tx error");
 
     rv = gtp_xact_commit(s11_xact);
-    d_assert(rv == CORE_OK, return, "xact_commit error");   
+    d_assert(rv == CORE_OK, return, "xact_commit error");
 }

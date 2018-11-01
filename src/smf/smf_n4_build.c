@@ -258,6 +258,13 @@ status_t smf_n4_build_session_establishment_request(
     pfcp_message.h.type = PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE;
     pfcp_message.h.seid_p = 0;
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
+
+    smf_n4_free_create_pdr(&req->create_pdr);
+    smf_n4_free_create_pdr(&req->create_pdr1);
+
+    smf_n4_free_create_far(&req->create_far);
+    smf_n4_free_create_far(&req->create_far1);
+
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
 
     return CORE_OK;
@@ -270,6 +277,10 @@ status_t smf_n4_build_session_modification_request(
     pfcp_message_t pfcp_message;
     pfcp_session_modification_request_t *req = NULL;
     pfcp_f_seid_t smf_f_seid;
+    uint32_t *far_id = NULL;
+
+    far_id = malloc(sizeof(c_uint32_t));
+    *far_id = htonl(sess->dl_pdr->far->far_id);
 
     req = &pfcp_message.pfcp_session_modification_request;
     memset(&pfcp_message, 0, sizeof(pfcp_message_t));
@@ -277,18 +288,42 @@ status_t smf_n4_build_session_modification_request(
     /* Set CP F-SEID, mandatory */
     req->cp_f_seid.presence = 1;
     req->cp_f_seid.data = &smf_f_seid;
-    smf_f_seid.seid = sess->smf_n4_seid;
+    smf_f_seid.seid = htobe64(sess->smf_n4_seid);
     rv = pfcp_sockaddr_to_f_seid(smf_self()->pfcp_addr, smf_self()->pfcp_addr6,
             &smf_f_seid, (c_int32_t *)&req->cp_f_seid.len);
-    
-    req->update_pdr.presence = 1;
-    
-    req->update_pdr.pdr_id.presence = 1;
-    req->update_pdr.pdr_id.data = &sess->ul_pdr->pdr_id;
-    req->update_pdr.pdr_id.len = sizeof sess->ul_pdr->pdr_id;
+
+    pfcp_outer_hdr_t* outer_hdr = NULL;
+
+    req->update_far.presence = 1;
+    req->update_far.far_id.presence = 1;
+    req->update_far.far_id.data = far_id;
+    req->update_far.far_id.len = sizeof(c_uint32_t);
+    req->update_far.update_forwarding_parameters.presence = 1;
+    req->update_far.update_forwarding_parameters.destination_interface.presence = 1;
+    req->update_far.update_forwarding_parameters.destination_interface.len = 1;
+    req->update_far.update_forwarding_parameters.destination_interface.data = &sess->dl_pdr->far->destination_interface;
+        
+    smf_bearer_t *bearer = NULL;
+
+    bearer = smf_default_bearer_in_sess(sess);
+    d_assert(bearer, return CORE_ERROR, "No Bearer Context");
+
+    c_uint8_t len;
+    req->update_far.update_forwarding_parameters.outer_header_creation.presence = 1;            
+    len = 2 + 4;
+    outer_hdr = malloc(sizeof(pfcp_outer_hdr_t));
+    memset(outer_hdr, 0, sizeof(pfcp_outer_hdr_t));
+    outer_hdr->gtpu_ipv6 = 0;
+    outer_hdr->gtpu_ipv4 = 1;
+    outer_hdr->addr = bearer->addr;
+    outer_hdr->teid = htonl(bearer->enb_s1u_teid);
+    len += IPV4_LEN;
+    req->update_far.update_forwarding_parameters.outer_header_creation.len = len;
+    req->update_far.update_forwarding_parameters.outer_header_creation.data = outer_hdr;
     
     pfcp_message.h.type = PFCP_SESSION_MODIFICATION_REQUEST_TYPE;
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
+    free(far_id);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
     
     return CORE_OK;
@@ -325,14 +360,22 @@ status_t smf_n4_build_create_pdr(
     status_t rv;
     pfcp_f_teid_t *upf_f_teid;
     pfcp_ue_ip_addr_t *ue_ip = malloc(sizeof(pfcp_ue_ip_addr_t));
+    smf_bearer_t *bearer = NULL;
+    c_uint16_t *pdr_id = NULL;
+
+    pdr_id = malloc(sizeof(c_uint16_t));
+    *pdr_id = htons(pdr->pdr_id);
     
+    bearer = smf_default_bearer_in_sess(sess);
+    d_assert(bearer, return CORE_ERROR, "No Bearer Context!");
+
     /* Set Create PDR, mandatory */
     create_pdr->presence = 1;
     
     /* [Create PDR] Packet Detection Rule ID (PDR ID) */
     create_pdr->pdr_id.presence = 1;
-    create_pdr->pdr_id.data = &pdr->pdr_id;
-    create_pdr->pdr_id.len = sizeof pdr->pdr_id;
+    create_pdr->pdr_id.data = pdr_id;
+    create_pdr->pdr_id.len = sizeof(c_uint16_t);
     
     /* [Create PDR] Precedence */
     create_pdr->precedence.presence = 1;
@@ -355,7 +398,7 @@ status_t smf_n4_build_create_pdr(
         memset(upf_f_teid, 0, sizeof(pfcp_f_teid_t));
         pdi->local_f_teid.presence = 1;    
         pdi->local_f_teid.data = upf_f_teid;
-        upf_f_teid->teid = htonl(sess->upf_n4_seid);
+        upf_f_teid->teid = htonl(bearer->sgw_s1u_teid);
         if (sess->upf_node->sa_list->next)
             rv = pfcp_sockaddr_to_f_teid(sess->upf_node->sa_list,
                     sess->upf_node->sa_list->next,
@@ -415,9 +458,13 @@ status_t smf_n4_build_create_pdr(
     /* [Create PDR] FAR ID */
     if (pdr->far)
     {
+        c_uint32_t *far_id = NULL;
+        far_id = malloc(sizeof(c_uint32_t));
+        *far_id = htonl(pdr->far->far_id);
+
         create_pdr->far_id.presence = 1;
-        create_pdr->far_id.data = &pdr->far->far_id;
-        create_pdr->far_id.len = 4;
+        create_pdr->far_id.data = far_id;
+        create_pdr->far_id.len = sizeof(c_uint32_t);
     }
     
     /* [Create PDR] URR ID */
@@ -441,6 +488,8 @@ status_t smf_n4_build_create_pdr(
 
 status_t smf_n4_free_create_pdr(tlv_create_pdr_t *create_pdr)
 {
+    if (create_pdr->presence && create_pdr->pdr_id.data)
+        free(create_pdr->pdr_id.data);
     if (create_pdr->presence && create_pdr->pdi.local_f_teid.data)
         free(create_pdr->pdi.local_f_teid.data);
     if (create_pdr->presence && create_pdr->pdi.ue_ip_address.data)
@@ -452,14 +501,18 @@ status_t smf_n4_build_create_far(
         tlv_create_far_t *create_far, smf_far_t *far, smf_sess_t *sess)
 {
     pfcp_outer_hdr_t* outer_hdr = NULL;
-    
+    c_uint32_t *far_id = NULL;
+
+    far_id = malloc(sizeof(c_uint32_t));
+    *far_id = htonl(far->far_id);
+
     /* Set Create FAR, mandatory */
     create_far->presence = 1;
     
     /* Create FAR: FAR ID */
     create_far->far_id.presence = 1;
-    create_far->far_id.data = &far->far_id;
-    create_far->far_id.len = 4;
+    create_far->far_id.data = far_id;
+    create_far->far_id.len = sizeof(c_uint32_t);
     
     /* Create FAR: Apply Action */
     create_far->apply_action.presence = 1;
@@ -472,17 +525,22 @@ status_t smf_n4_build_create_far(
         create_far->forwarding_parameters.destination_interface.len = 1;
         create_far->forwarding_parameters.destination_interface.data = &far->destination_interface;
         
-        if (far->destination_interface==PFCP_FAR_DEST_INTF_ACCESS)
+        if (far->destination_interface == PFCP_FAR_DEST_INTF_ACCESS)
         {
+            smf_bearer_t *bearer = NULL;
+
+            bearer = smf_default_bearer_in_sess(sess);
+            d_assert(bearer, return CORE_ERROR, "No Bearer Context");
+
             c_uint8_t len;
             create_far->forwarding_parameters.outer_header_creation.presence = 1;            
             len = 2 + 4;
             outer_hdr = malloc(sizeof(pfcp_outer_hdr_t));
-            memset(outer_hdr, 0, sizeof(pfcp_outer_hdr_t)); 
+            memset(outer_hdr, 0, sizeof(pfcp_outer_hdr_t));
             outer_hdr->gtpu_ipv6 = 0;
             outer_hdr->gtpu_ipv4 = 1;
-            outer_hdr->addr = sess->ipv4->addr[0];
-            outer_hdr->teid = sess->index;
+            outer_hdr->addr = bearer->addr;
+            outer_hdr->teid = htonl(bearer->enb_s1u_teid);
             len += IPV4_LEN;
             create_far->forwarding_parameters.outer_header_creation.len = len;
             create_far->forwarding_parameters.outer_header_creation.data = outer_hdr;
@@ -494,6 +552,11 @@ status_t smf_n4_build_create_far(
 
 status_t smf_n4_free_create_far(tlv_create_far_t *create_far)
 {
+    if (create_far->far_id.presence && 
+            create_far->far_id.data)
+    {
+        free(create_far->far_id.data);
+    }
     if (create_far->forwarding_parameters.outer_header_creation.presence && 
             create_far->forwarding_parameters.outer_header_creation.data)
     {

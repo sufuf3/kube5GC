@@ -136,6 +136,20 @@ typedef struct _smf_bearer_t {
     gtp_node_t      *gnode;
 
     pkbuf_t         *gtp_pkbuf;
+
+    union {
+        /* PFCP_F_TEID_IPV4 */
+        c_uint32_t addr;
+
+        /* PFCP_F_TEID_IPV6 */
+        c_uint8_t addr6[IPV6_LEN];
+
+        /* PFCP_F_TEID_BOTH */
+        struct {
+            c_uint32_t addr;
+            c_uint8_t addr6[IPV6_LEN];
+        } both;
+    };
 } smf_bearer_t;
 
 typedef struct _smf_ue_ip_t {
@@ -183,7 +197,7 @@ typedef struct _smf_pdr_t {
 typedef struct _smf_far_t {
     index_t         index;
     
-    c_uint16_t      far_id;
+    c_uint32_t      far_id;
     c_uint8_t       apply_action;
     c_uint8_t       destination_interface;
     smf_bearer_t    *bearer;
@@ -192,13 +206,13 @@ typedef struct _smf_far_t {
 typedef struct _smf_urr_t {
     index_t         index;
     
-    c_uint16_t      urr_id;
+    c_uint32_t      urr_id;
 } smf_urr_t;
 
 typedef struct _smf_qer_t {
     index_t         index;
     
-    c_uint16_t      qer_id;
+    c_uint32_t      qer_id;
 } smf_qer_t;
 
 typedef struct _smf_rule_t {

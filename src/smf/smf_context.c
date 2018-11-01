@@ -1079,6 +1079,7 @@ smf_sess_t* smf_sess_add(
     hash_set(self.sess_hash, sess->hash_keybuf, sess->hash_keylen, sess);
     
     sess->upf_node = list_first(&smf_self()->upf_n4_list);
+    bearer->sgw_s1u_teid = bearer->index;
     
     smf_pdr_t *ul_pdr = smf_pdr_add(bearer);
     sess->ul_pdr = ul_pdr;
@@ -1088,6 +1089,8 @@ smf_sess_t* smf_sess_add(
     ul_pdr->far = smf_far_add(bearer);
     ul_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
     ul_pdr->far->destination_interface = PFCP_FAR_DEST_INTF_CORE;
+    d_trace(10, "SEID: [0x%016x] UL PDR ID: [%d] UL FAR ID: [%d]\n",
+                sess->smf_n4_seid, ul_pdr->pdr_id, ul_pdr->far->far_id);
     
     smf_pdr_t *dl_pdr = smf_pdr_add(bearer);
     sess->dl_pdr = dl_pdr;
@@ -1097,8 +1100,10 @@ smf_sess_t* smf_sess_add(
     dl_pdr->far = smf_far_add(bearer);
     dl_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
     dl_pdr->far->destination_interface = PFCP_FAR_DEST_INTF_ACCESS;
+    d_trace(10, "SEID: [0x%016x] UL PDR ID: [%d] UL FAR ID: [%d]\n",
+                sess->smf_n4_seid, dl_pdr->pdr_id, dl_pdr->far->far_id);
     
-    d_trace(9, "smf_sess_add(): [SEID: %08x, TEID: %08x]\n",
+    d_trace(9, "smf_sess_add(): [SEID: %016x, TEID: %08x]\n",
             sess->smf_n4_seid, sess->sgw_s11_teid);
     
     return sess;
@@ -1303,7 +1308,7 @@ smf_pdr_t* smf_pdr_add(smf_bearer_t *bearer)
     index_alloc(&smf_pdr_pool, &pdr);
     d_assert(pdr, return NULL, "PDR context allocation failed");
 
-    pdr->pdr_id = htons(pdr->index);
+    pdr->pdr_id = pdr->index;
     
     pdr->bearer = bearer;
 
@@ -1346,10 +1351,8 @@ smf_far_t* smf_far_add(smf_bearer_t *bearer)
     index_alloc(&smf_far_pool, &far);
     d_assert(far, return NULL, "FAR context allocation failed");
 
-    far->far_id = htonl(far->index);
-    
+    far->far_id = far->index;
     far->bearer = bearer;
-
 
     return far;
 }
