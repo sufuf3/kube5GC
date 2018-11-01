@@ -90,7 +90,7 @@ status_t smf_pfcp_open()
     pfcp_node_t *upf;
     for (upf = list_first(&smf_self()->upf_n4_list); upf; upf = list_next(upf)) {
         rv = pfcp_connect(smf_self()->pfcp_sock, smf_self()->pfcp_sock6, upf);
-        d_assert(rv == CORE_OK, , "upf not client");
+        d_assert(rv == CORE_OK, continue, "upf not client");
         smf_pfcp_send_association_setup_request(upf);
     }
 
@@ -104,6 +104,7 @@ status_t smf_pfcp_close()
 
     pfcp_node_t *upf;
     for (upf = list_first(&smf_self()->upf_n4_list); upf; upf = list_next(upf)) {
+        if (upf->state == PFCP_NODE_ST_ASSOCIATED)
             smf_pfcp_send_association_release_request(upf);
     }
 
@@ -240,7 +241,7 @@ status_t smf_pfcp_send_session_modification_request(smf_sess_t *sess)
 
     memset(&h, 0, sizeof(pfcp_header_t));
     h.type = PFCP_SESSION_MODIFICATION_REQUEST_TYPE;
-    h.seid = sess->smf_n4_seid;
+    h.seid = sess->upf_n4_seid;
 
     rv = smf_n4_build_session_modification_request(&pkbuf, sess);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build error");
