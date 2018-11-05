@@ -2144,8 +2144,8 @@ void ngap_handle_amf_configuration_update_acknowledge(amf_ran_t *ran, ngap_messa
     }
     for(j = 0 ; j < AMF_TNLAssociationSetupList->list.count; j++)
     {
-        NGAP_AMF_TNLAssociationSetupItem_t *AMF_TNLAssociationSetupItem =NULL;
-        AMF_TNLAssociationSetupItem = AMF_TNLAssociationSetupList->list.array[j];
+        NGAP_AMF_TNLAssociationSetupItem_t *AMF_TNLAssociationSetupItem = NULL;
+        AMF_TNLAssociationSetupItem = (NGAP_AMF_TNLAssociationSetupItem_t *) AMF_TNLAssociationSetupList->list.array[j];
         // AMF_TNLAssociationSetupItem->aMF_TNLAssociationAddress.choice.endpointIPAddress;
           //Previously received AMF Transport Layer information for the TNL association.
         d_assert(AMF_TNLAssociationSetupItem, return, );

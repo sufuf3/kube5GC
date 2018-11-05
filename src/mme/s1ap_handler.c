@@ -567,6 +567,7 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
     S1AP_TAI_t *TAI = NULL;
     S1AP_EUTRAN_CGI_t *EUTRAN_CGI = NULL;
     S1AP_S_TMSI_t *S_TMSI = NULL;
+    S1AP_UE_Application_Layer_Measurement_Capability_t *UE_Application_Layer_Measurement_Capability = NULL;
 
     S1AP_PLMNidentity_t    *pLMNidentity = NULL;
     S1AP_TAC_t *tAC = NULL;
@@ -605,6 +606,8 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
             case S1AP_ProtocolIE_ID_id_S_TMSI:
                 S_TMSI = &ie->value.choice.S_TMSI;
                 break;
+            case S1AP_ProtocolIE_ID_id_UE_Application_Layer_Measurement_Capability:
+                UE_Application_Layer_Measurement_Capability = &ie->value.choice.UE_Application_Layer_Measurement_Capability;
             default:
                 break;
         }
@@ -717,6 +720,9 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
 
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
         enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
+
+    memcpy(&enb_ue->ue_application_layer_measurement_capability, UE_Application_Layer_Measurement_Capability->buf,
+    sizeof(enb_ue->ue_application_layer_measurement_capability));
 
     /*if (enb_ue){
         pkbuf_t *s1apbuf = NULL;

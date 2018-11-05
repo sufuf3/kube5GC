@@ -588,6 +588,9 @@ struct _enb_ue_t {
     /* Related Context */
     mme_enb_t       *enb;
     mme_ue_t        *mme_ue;
+
+    /* UE Application Layer Measurement Capability */
+    c_uint8_t ue_application_layer_measurement_capability; /* 8 bit */
 }; 
 
 struct _mme_ue_t {
