@@ -1129,6 +1129,7 @@ status_t s1ap_build_downlink_nas_transport(
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_NAS_PDU_t *NAS_PDU = NULL;
+    // S1AP_NRUESecurityCapabilities_t	*NRUESecurityCapabilities = NULL;
 
     d_assert(emmbuf, return CORE_ERROR, "Null param");
     d_assert(enb_ue, return CORE_ERROR, "Null param");
@@ -1176,6 +1177,11 @@ status_t s1ap_build_downlink_nas_transport(
     ie->value.present = S1AP_DownlinkNASTransport_IEs__value_PR_NAS_PDU;
 
     NAS_PDU = &ie->value.choice.NAS_PDU;
+
+    // ie->id = S1AP_ProtocolIE_ID_id_NRUESecurityCapabilities;
+    // ie->criticality = S1AP_Criticality_ignore;
+    // ie->value.present = S1AP_DownlinkNASTransport_IEs__value_PR_NRUESecurityCapabilities;
+    // NRUESecurityCapabilities = &ie->value.choice.NRUESecurityCapabilities;
 
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);

@@ -426,6 +426,8 @@ struct _mme_ue_t {
     } gtp_counter[MAX_NUM_OF_GTP_COUNTER];
 
     gtp_node_t      *gnode;
+
+    nas_nr_ue_network_capability_t nr_ue_network_capability;
 };
 
 #define MME_HAVE_SGW_S1U_PATH(__sESS) \
