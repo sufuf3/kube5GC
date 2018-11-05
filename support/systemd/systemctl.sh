@@ -10,3 +10,4 @@ systemctl $1 nextepc-sgwd
 systemctl $1 nextepc-pgwd
 systemctl $1 nextepc-hssd
 systemctl $1 nextepc-pcrfd
+systemctl $1 nextepc-upfd
