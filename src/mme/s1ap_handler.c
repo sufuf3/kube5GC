@@ -721,6 +721,7 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
         enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
 
+    d_assert(UE_Application_Layer_Measurement_Capability, return,);
     memcpy(&enb_ue->ue_application_layer_measurement_capability, UE_Application_Layer_Measurement_Capability->buf,
     sizeof(enb_ue->ue_application_layer_measurement_capability));
 
@@ -1057,6 +1058,7 @@ void s1ap_handle_ue_capability_info_indication(
     S1AP_UECapabilityInfoIndicationIEs_t *ie = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_UERadioCapability_t *UERadioCapability = NULL;
+    S1AP_UE_Application_Layer_Measurement_Capability_t *UE_Application_Layer_Measurement_Capability = NULL;
 
     enb_ue_t *enb_ue = NULL;
 
@@ -1083,6 +1085,8 @@ void s1ap_handle_ue_capability_info_indication(
             case S1AP_ProtocolIE_ID_id_UERadioCapability:
                 UERadioCapability = &ie->value.choice.UERadioCapability;
                 break;
+            case S1AP_ProtocolIE_ID_id_UE_Application_Layer_Measurement_Capability:
+                UE_Application_Layer_Measurement_Capability = &ie->value.choice.UE_Application_Layer_Measurement_Capability;
             default:
                 break;
         }
@@ -1129,6 +1133,9 @@ void s1ap_handle_ue_capability_info_indication(
         S1AP_STORE_DATA(&enb_ue->mme_ue->ueRadioCapability, UERadioCapability);
 #endif
     }
+    d_assert(UE_Application_Layer_Measurement_Capability, return,);
+    memcpy(&enb_ue->ue_application_layer_measurement_capability, UE_Application_Layer_Measurement_Capability->buf,
+    sizeof(enb_ue->ue_application_layer_measurement_capability));
 }
 
 void s1ap_handle_initial_context_setup_response(
