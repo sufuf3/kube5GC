@@ -346,7 +346,7 @@ void s1ap_handle_ue_context_suspend(
             "s1ap_send_to_enb() failed");
 
 }
-void s1ap_handle_ERAB_release_response(
+void s1ap_handle_e_rab_release_response(
         mme_enb_t *enb, s1ap_message_t *message)
 {
     int i;
@@ -367,7 +367,7 @@ void s1ap_handle_ERAB_release_response(
     E_RABReleaseResponse = &successfulOutcome->value.choice.E_RABReleaseResponse;
     d_assert(E_RABReleaseResponse, return,);
 
-    d_trace(3, "[MME] ERAB release response\n");
+    d_trace(3, "[MME] E-RAB release response\n");
 
     for (i = 0; i < E_RABReleaseResponse->protocolIEs.list.count; i++)
     {
@@ -502,7 +502,8 @@ void s1ap_handle_e_rab_release_indication(
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_E_RABReleaseIndicationIEs_t *ie = NULL;
-    
+    S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList= NULL;
+
     d_assert(enb, return,);
     d_assert(enb->sock, return,);
 
@@ -528,6 +529,11 @@ void s1ap_handle_e_rab_release_indication(
                 break;
             case S1AP_ProtocolIE_ID_id_E_RABReleasedList:
                 break;
+			case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+                SecondaryRATDataUsageReportList =
+                    &ie->value.choice.SecondaryRATDataUsageReportList;
+        		break;
+
             default:
                 break;
         }
@@ -1679,7 +1685,7 @@ void s1ap_handle_e_rab_modify_response(
     S1AP_E_RABModifyResponseIEs_t *ie = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_E_RABModifyListBearerModRes_t *E_RABModifyListBearerModRes = NULL;
-    //S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList = NULL;
+    S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList = NULL;
 
     enb_ue_t *enb_ue = NULL;
     mme_ue_t *mme_ue = NULL;
@@ -1707,10 +1713,10 @@ void s1ap_handle_e_rab_modify_response(
                 E_RABModifyListBearerModRes =
                     &ie->value.choice.E_RABModifyListBearerModRes;
                 break;
-            /*case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
                 SecondaryRATDataUsageReportList =
                     &ie->value.choice.SecondaryRATDataUsageReportList;
-        break;*/
+        		break;
             default:
                 break;
         }
