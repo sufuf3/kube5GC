@@ -740,9 +740,13 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
         enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
 
-   d_assert(UE_Application_Layer_Measurement_Capability, return,);
-    memcpy(&enb_ue->ue_application_layer_measurement_capability, UE_Application_Layer_Measurement_Capability->buf,
-    sizeof(enb_ue->ue_application_layer_measurement_capability));
+    d_trace(1, "UE_Application_Layer_Measurement_Capability");
+    if (UE_Application_Layer_Measurement_Capability)
+    {
+        memcpy(&enb_ue->mme_ue->ue_application_layer_measurement_capability.qoe, UE_Application_Layer_Measurement_Capability->buf,
+        sizeof(enb_ue->mme_ue->ue_application_layer_measurement_capability.qoe));
+    }
+
 
     /*if (enb_ue){
         pkbuf_t *s1apbuf = NULL;
@@ -1157,9 +1161,13 @@ void s1ap_handle_ue_capability_info_indication(
         S1AP_STORE_DATA(&enb_ue->mme_ue->ueRadioCapability, UERadioCapability);
 #endif
     }
-    d_assert(UE_Application_Layer_Measurement_Capability, return,);
-    memcpy(&enb_ue->ue_application_layer_measurement_capability, UE_Application_Layer_Measurement_Capability->buf,
-    sizeof(enb_ue->ue_application_layer_measurement_capability));
+    
+    d_trace(1, "UE_Application_Layer_Measurement_Capability");
+    if (UE_Application_Layer_Measurement_Capability) {
+        memcpy(&enb_ue->mme_ue->ue_application_layer_measurement_capability.qoe, UE_Application_Layer_Measurement_Capability->buf,
+        sizeof(enb_ue->mme_ue->ue_application_layer_measurement_capability.qoe));
+    }
+    
 }
 
 void s1ap_handle_initial_context_setup_response(

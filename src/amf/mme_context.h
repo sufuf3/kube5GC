@@ -589,8 +589,6 @@ struct _enb_ue_t {
     mme_enb_t       *enb;
     mme_ue_t        *mme_ue;
 
-    /* UE Application Layer Measurement Capability */
-    c_uint8_t ue_application_layer_measurement_capability; /* 8 bit */
 }; 
 
 struct _mme_ue_t {
@@ -775,6 +773,8 @@ struct _mme_ue_t {
     } gtp_counter[MAX_NUM_OF_GTP_COUNTER];
 
     gtp_node_t      *gnode;
+    
+    ue_application_layer_measurement_capability_t ue_application_layer_measurement_capability;
 };
 
 #define MME_HAVE_SGW_S1U_PATH(__sESS) \
