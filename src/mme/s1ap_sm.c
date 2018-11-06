@@ -87,7 +87,7 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         }
                         case S1AP_ProcedureCode_id_UEContextSuspend :
                         {
-                            s1ap_handle_ue_context_suspend(enb, pdu);
+                            s1ap_handle_ue_context_suspend_request(enb, pdu);
                             break;
                         }
                         /////////////////
