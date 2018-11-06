@@ -332,17 +332,17 @@ void s1ap_handle_ue_context_suspend_request(
             case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
                 ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
                 break;
-			case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
                 SecondaryRATDataUsageReportList =
                     &ie->value.choice.SecondaryRATDataUsageReportList;
-        		break;
+                break;
 
             default:
                 break;
         }
     }
 
-	d_trace(5,"%s",SecondaryRATDataUsageReportList);
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(3, "[MME] ue context suspend response\n");
     d_assert(s1ap_build_ue_context_suspend_response(&s1apbuf,MME_UE_S1AP_ID,ENB_UE_S1AP_ID) == CORE_OK, 
             return, "s1ap_build_setup_rsp() failed");
@@ -389,13 +389,13 @@ void s1ap_handle_e_rab_release_response(
             case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
                 SecondaryRATDataUsageReportList =
                     &ie->value.choice.SecondaryRATDataUsageReportList;
-        		break;
-			default:
+                break;
+            default:
                 break;
         }
     }
-	
-	d_trace(5,"%s",SecondaryRATDataUsageReportList);
+    
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
 }
 
 // Handle MME configuration Update Acknowledge
@@ -540,18 +540,18 @@ void s1ap_handle_e_rab_release_indication(
                 break;
             case S1AP_ProtocolIE_ID_id_E_RABReleasedList:
                 break;
-			case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
                 SecondaryRATDataUsageReportList =
                     &ie->value.choice.SecondaryRATDataUsageReportList;
-        		break;
+                break;
 
             default:
                 break;
         }
     }
     d_trace(1, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n", *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID );
-	
-	d_trace(5,"%s",SecondaryRATDataUsageReportList);
+    
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
 }
 
 void s1ap_handle_CBC_write_replace_warning_message(mme_enb_t *enb)
@@ -1048,17 +1048,17 @@ void s1ap_handle_e_rab_modification_indication(
             case S1AP_ProtocolIE_ID_id_CSGMembershipInfo:
                 CSGMembershipInfo = &ie->value.choice.CSGMembershipInfo;
                 break;*/
-			case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
                 SecondaryRATDataUsageReportList =
                     &ie->value.choice.SecondaryRATDataUsageReportList;
-        		break;
+                break;
 
             default:
                 break;
         }
     }
 
-	d_trace(5,"%s",SecondaryRATDataUsageReportList);
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(5, "    IP[%s] ENB_ID[%d]\n",
             CORE_ADDR(enb->addr, buf), enb->enb_id);
 
@@ -1742,13 +1742,13 @@ void s1ap_handle_e_rab_modify_response(
             case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
                 SecondaryRATDataUsageReportList =
                     &ie->value.choice.SecondaryRATDataUsageReportList;
-        		break;
+                break;
             default:
                 break;
         }
     }
 
-	d_trace(5,"%s",SecondaryRATDataUsageReportList);
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(5, "    IP[%s] ENB_ID[%d]\n",
             CORE_ADDR(enb->addr, buf), enb->enb_id);
 
@@ -1849,17 +1849,17 @@ void s1ap_handle_ue_context_release_request(
             case S1AP_ProtocolIE_ID_id_Cause:
                 Cause = &ie->value.choice.Cause;
                 break;
-			case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
                 SecondaryRATDataUsageReportList =
                     &ie->value.choice.SecondaryRATDataUsageReportList;
-        		break;
+                break;
 
             default:
                 break;
         }
     }
 
-	d_trace(5,"%s",SecondaryRATDataUsageReportList);
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(5, "    IP[%s] ENB_ID[%d]\n",
             CORE_ADDR(enb->addr, buf), enb->enb_id);
 
@@ -1962,17 +1962,17 @@ void s1ap_handle_ue_context_release_complete(
             case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
                 MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
                 break;
-			case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
                 SecondaryRATDataUsageReportList =
                     &ie->value.choice.SecondaryRATDataUsageReportList;
-        		break;
+                break;
 
             default:
                 break;
         }
     }
 
-	d_trace(5,"%s",SecondaryRATDataUsageReportList);
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(5, "    IP[%s] ENB_ID[%d]\n",
             CORE_ADDR(enb->addr, buf), enb->enb_id);
 
@@ -2069,24 +2069,24 @@ void s1ap_handle_ue_context_resume_request(
     int i;
 
     S1AP_InitiatingMessage_t *initiatingMessage = NULL;
-	S1AP_UEContextResumeRequest_t *UEContextResumeRequest = NULL;
+    S1AP_UEContextResumeRequest_t *UEContextResumeRequest = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
-	S1AP_UEContextResumeRequestIEs_t *ie = NULL;
-    // S1AP_E_RABFailedToResumeListResumeReq_t	 *E_RABFailedToResumeListResumeReq;
+    S1AP_UEContextResumeRequestIEs_t *ie = NULL;
+    // S1AP_E_RABFailedToResumeListResumeReq_t   *E_RABFailedToResumeListResumeReq;
 
     d_assert(enb, return,);
     d_assert(enb->sock, return,);
 
-	// Message Type
+    // Message Type
     d_assert(message, return,);
     initiatingMessage = message->choice.initiatingMessage;
     d_assert(initiatingMessage, return,);
     UEContextResumeRequest= &initiatingMessage->value.choice.UEContextResumeRequest;
-	//--------------
-	
+    //--------------
+    
     d_trace(3, "[MME] UE Context Resume Request\n");
-	
+    
     for (i = 0; i <UEContextResumeRequest->protocolIEs.list.count; i++)
     {
         ie = UEContextResumeRequest->protocolIEs.list.array[i];
@@ -2098,9 +2098,9 @@ void s1ap_handle_ue_context_resume_request(
             case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
                 MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
                 break;
-			case S1AP_ProtocolIE_ID_id_E_RABFailedToResumeListResumeReq:
-				// E_RABFailedToResumeListResumeReq = &ie->value.choice.E_RABFailedToResumeListResumeReq;
-				break;
+            case S1AP_ProtocolIE_ID_id_E_RABFailedToResumeListResumeReq:
+                // E_RABFailedToResumeListResumeReq = &ie->value.choice.E_RABFailedToResumeListResumeReq;
+                break;
             default:
                 break;
         }
