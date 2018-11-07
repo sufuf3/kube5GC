@@ -281,7 +281,7 @@ status_t pfcp_xact_update_tx(pfcp_xact_t *xact,
     if (hdesc->type >=PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE)
     {
         h->seid_p = 1;
-        h->seid = hdesc->seid;//htonl(hdesc->seid);
+        h->seid = htobe64(hdesc->seid);
         h->sqn = PFCP_XID_TO_SQN(xact->xid);
     }
     else

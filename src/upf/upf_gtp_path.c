@@ -84,7 +84,7 @@ static int _gtpv1_u_recv_cb(sock_id sock, void *data)
 
     d_assert(sock, return -1, "Null param");
 
-    rv = gtp_recv(sock, &pkbuf);
+    rv = gtp_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK)
     {
         if (errno == EAGAIN)

@@ -80,6 +80,7 @@ void upf_n4_handle_create_pdr(upf_sess_t *sess, tlv_create_pdr_t *create_pdr, up
         
     if (pdr->source_interface==PFCP_SRC_INTF_ACCESS) //UL
     {
+        d_error("Add PDR[0x%08x] TEID[0x%08x]", pdr->pdr_id, pdr->upf_s5u_teid);
         list_append(&sess->ul_pdr_list, pdr);
     }
     else
@@ -207,8 +208,11 @@ void upf_n4_handle_session_establishment_request(
             return;
         }
 
+
+
         smf_f_seid = req->cp_f_seid.data;
-        sess->smf_seid = smf_f_seid->seid;
+        sess->smf_seid = be64toh(smf_f_seid->seid);
+        d_info("[UPF] SMF SEID[0x%016llx]", sess->smf_seid);
     
         /* Send Session Establishment Response */
         memset(&h, 0, sizeof(pfcp_header_t));
@@ -239,7 +243,7 @@ void upf_n4_handle_session_modification_request(
     //pfcp_xact_t *n4_xact;
 
     /* Update PDR */
-    if (&req->update_pdr.presence)
+    if (req->update_pdr.presence)
     {
         upf_pdr_t *target_pdr = upf_pdr_find_by_pdr_id(&req->update_pdr.pdr_id);
         if (target_pdr)
@@ -255,15 +259,34 @@ void upf_n4_handle_session_modification_request(
     }
 
     /* Update FAR */
-    if (&req->update_far.presence)
+    if (req->update_far.presence)
     {
         upf_far_t *target_far = upf_far_find_by_far_id(*(c_uint32_t *) req->update_far.far_id.data);
         if (target_far)
         {
-            /* Update SGW S5U-TEID */
-            memcpy(&target_far->sgw_s5u_teid, 
-                (c_uint32_t *) &req->update_far.update_forwarding_parameters.outer_header_creation, 
-                sizeof(c_uint32_t));
+            /* Update eNB S1U-TEID */
+            ip_t ip;
+            gtp_node_t *node = NULL;
+            pfcp_outer_hdr_t *outer_header;
+            outer_header = req->update_far.update_forwarding_parameters.outer_header_creation.data;
+            target_far->sgw_s5u_teid = ntohl(outer_header->teid);
+            rv = pfcp_outer_hdr_to_ip(outer_header, &ip);
+            d_assert(rv == CORE_OK, upf_far_remove(target_far);return, "Outer hdr IP convert fail for crdate_far");
+
+            node = gtp_find_node_by_ip(&upf_self()->sgw_s5u_list, &ip);
+            if (!node)
+            {
+                node = gtp_add_node_with_ip(&upf_self()->sgw_s5u_list, &ip,
+                    upf_self()->gtpu_port, 
+                    context_self()->parameter.no_ipv4,
+                    context_self()->parameter.no_ipv6,
+                    context_self()->parameter.prefer_ipv4);
+                
+                d_assert(node, upf_far_remove(target_far);return, "GTP node create fail for crdate_far");
+                rv = gtp_client(node);
+                d_assert(rv == CORE_OK, return,);
+            }
+            target_far->gnode = node;
         }
         else
         {
