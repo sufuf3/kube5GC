@@ -12,9 +12,9 @@ typedef enum {
     UPF_EVT_BASE = FSM_USER_SIG,
 
 #ifdef __CUPS__    
-    UPF_EVT_SXB_MESSAGE,
-    UPF_EVT_SXB_T3_RESPONSE,
-    UPF_EVT_SXB_T3_HOLDING,
+    UPF_EVT_N4_MESSAGE,
+    UPF_EVT_N4_T3_RESPONSE,
+    UPF_EVT_N4_T3_HOLDING,
 #endif
     UPF_EVT_TOP,
 

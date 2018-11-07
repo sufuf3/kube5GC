@@ -67,7 +67,7 @@ static void *THREAD_FUNC upf_main(thread_id id, void *data)
     tm_service_init(&upf_self()->tm_service);
 #ifdef __CUPS__
     pfcp_xact_init(&upf_self()->tm_service,
-            UPF_EVT_SXB_T3_RESPONSE, UPF_EVT_SXB_T3_HOLDING);//$ fixme: wrong event!
+            UPF_EVT_N4_T3_RESPONSE, UPF_EVT_N4_T3_HOLDING);//$ fixme: wrong event!
 #endif
     fsm_create(&upf_sm, upf_state_initial, upf_state_final);
     fsm_init(&upf_sm, 0);

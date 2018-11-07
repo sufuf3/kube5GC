@@ -1,4 +1,4 @@
-#define TRACE_MODULE _upf_sxb_build
+#define TRACE_MODULE _upf_n4_build
 
 #include "core_debug.h"
 
@@ -14,7 +14,7 @@
 #include "upf_context.h"
 
 
-status_t upf_sxb_build_session_establishment_response(
+status_t upf_n4_build_session_establishment_response(
         pkbuf_t **pkbuf, c_uint8_t type, upf_sess_t *sess,
         pfcp_session_establishment_request_t *pfcp_req)
 {
@@ -59,7 +59,7 @@ status_t upf_sxb_build_session_establishment_response(
     return CORE_OK;
 }
 
-status_t upf_sxb_build_session_modification_response(
+status_t upf_n4_build_session_modification_response(
         pkbuf_t **pkbuf, c_uint8_t type, upf_sess_t *sess,
         pfcp_session_modification_request_t *pfcp_req)
 {
@@ -86,7 +86,7 @@ status_t upf_sxb_build_session_modification_response(
     return CORE_OK;
 }
 
-status_t upf_sxb_build_session_deletion_response(
+status_t upf_n4_build_session_deletion_response(
         pkbuf_t **pkbuf, c_uint8_t type, upf_sess_t *sess,
         pfcp_session_deletion_request_t *pfcp_req)
 {
@@ -116,7 +116,7 @@ status_t upf_sxb_build_session_deletion_response(
     return CORE_OK;
 }
 
-status_t upf_sxb_build_association_setup_response(
+status_t upf_n4_build_association_setup_response(
         pkbuf_t **pkbuf, c_uint8_t type)
 {
     status_t rv;
@@ -173,7 +173,7 @@ status_t upf_sxb_build_association_setup_response(
     return CORE_OK;
 }
 
-status_t upf_sxb_build_association_release_response(
+status_t upf_n4_build_association_release_response(
         pkbuf_t **pkbuf, c_uint8_t type)
 {
     status_t rv;
@@ -206,7 +206,7 @@ status_t upf_sxb_build_association_release_response(
     return CORE_OK;
 }
 
-status_t upf_sxb_build_heartbeat_response(
+status_t upf_n4_build_heartbeat_response(
         pkbuf_t **pkbuf, c_uint8_t type)
 {
     status_t rv;

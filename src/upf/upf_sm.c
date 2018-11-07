@@ -7,7 +7,7 @@
 #include "upf_context.h"
 #include "upf_event.h"
 #ifdef __CUPS__
-#include "upf_sxb_handler.h"
+#include "upf_n4_handler.h"
 #include "upf_pfcp_path.h"
 #include "upf_gtp_path.h"
 #endif
@@ -76,7 +76,7 @@ void upf_state_operational(fsm_t *s, event_t *e)
         }
 
 #ifdef __CUPS__        
-        case UPF_EVT_SXB_MESSAGE:
+        case UPF_EVT_N4_MESSAGE:
         {
             status_t rv;
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
@@ -114,27 +114,27 @@ void upf_state_operational(fsm_t *s, event_t *e)
                 switch(message->h.type)
                 {
                     case PFCP_HEARTBEAT_REQUEST_TYPE:
-                        upf_sxb_handle_heartbeat_request(
+                        upf_n4_handle_heartbeat_request(
                             xact, &message->pfcp_heartbeat_request);
                         break;        
                     case PFCP_HEARTBEAT_RESPONSE_TYPE:
-                        upf_sxb_handle_heartbeat_response(
+                        upf_n4_handle_heartbeat_response(
                             xact, &message->pfcp_heartbeat_response);
                         break; 
                     case PFCP_ASSOCIATION_SETUP_REQUEST_TYPE:
-                        upf_sxb_handle_association_setup_request(
+                        upf_n4_handle_association_setup_request(
                             xact, &message->pfcp_association_setup_request);
                         break;
                     case PFCP_ASSOCIATION_UPDATE_REQUEST_TYPE:
-                        upf_sxb_handle_association_update_request(
+                        upf_n4_handle_association_update_request(
                             xact, &message->pfcp_association_update_request);
                         break;
                     case PFCP_ASSOCIATION_RELEASE_REQUEST_TYPE:
-                        upf_sxb_handle_association_release_request(
+                        upf_n4_handle_association_release_request(
                             xact, &message->pfcp_association_release_request);
                         break;
                     //case PFCP_VERSION_NOT_SUPPORTED_RESPONSE_TYPE:
-                    //    upf_sxb_handle_session_establishment_response(
+                    //    upf_n4_handle_session_establishment_response(
                     //        xact, &message->pfcp_version_not_supported_response);
                     //    break;    
                     default:
@@ -180,15 +180,15 @@ void upf_state_operational(fsm_t *s, event_t *e)
             switch(message->h.type)
             {
                 case PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE:
-                    upf_sxb_handle_session_establishment_request(
+                    upf_n4_handle_session_establishment_request(
                         sess, xact, &message->pfcp_session_establishment_request);
                     break;
                 case PFCP_SESSION_MODIFICATION_REQUEST_TYPE:
-                    upf_sxb_handle_session_modification_request(
+                    upf_n4_handle_session_modification_request(
                         sess, xact, &message->pfcp_session_modification_request);
                     break;
                 case PFCP_SESSION_DELETION_REQUEST_TYPE:
-                    upf_sxb_handle_session_deletion_request(
+                    upf_n4_handle_session_deletion_request(
                         sess, xact, &message->pfcp_session_deletion_request);
                     break;                                
                 default:
@@ -198,8 +198,8 @@ void upf_state_operational(fsm_t *s, event_t *e)
             pkbuf_free(copybuf); 
             break;
         }
-        case UPF_EVT_SXB_T3_RESPONSE:
-        case UPF_EVT_SXB_T3_HOLDING:
+        case UPF_EVT_N4_T3_RESPONSE:
+        case UPF_EVT_N4_T3_HOLDING:
         {
             c_uint8_t type;
             pfcp_xact_timeout(event_get_param1(e), event_get(e), &type);

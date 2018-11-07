@@ -1,4 +1,4 @@
-#define TRACE_MODULE _upf_sxb_handler
+#define TRACE_MODULE _upf_n4_handler
 
 #include "core_debug.h"
 #include "core_lib.h"
@@ -16,8 +16,8 @@
 #include "upf_event.h"
 #include "upf_context.h"
 #include "upf_pfcp_path.h"
-#include "upf_sxb_handler.h"
-#include "upf_sxb_build.h"
+#include "upf_n4_handler.h"
+#include "upf_n4_build.h"
 //#include "fd/gx/gx_message.h"
 //#include "upf_s5c_build.h"
 
@@ -25,7 +25,7 @@
 #include "gtp/gtp_node.h"
 #include "gtp/gtp_path.h"
 
-void upf_sxb_handle_create_pdr(upf_sess_t *sess, tlv_create_pdr_t *create_pdr, upf_pdr_t **rt_pdr)
+void upf_n4_handle_create_pdr(upf_sess_t *sess, tlv_create_pdr_t *create_pdr, upf_pdr_t **rt_pdr)
 {
     upf_pdr_t *pdr = NULL;
     c_uint32_t far_id;
@@ -92,7 +92,7 @@ void upf_sxb_handle_create_pdr(upf_sess_t *sess, tlv_create_pdr_t *create_pdr, u
     *rt_pdr = pdr;
 }
 
-void upf_sxb_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
+void upf_n4_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
 {
     upf_far_t *far = NULL;
     
@@ -148,7 +148,7 @@ void upf_sxb_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
     *rt_far = far;
 }
 
-void upf_sxb_handle_session_establishment_request(
+void upf_n4_handle_session_establishment_request(
         upf_sess_t *sess, pfcp_xact_t *p_xact, pfcp_session_establishment_request_t *req)
 {
     //status_t rv;
@@ -165,12 +165,12 @@ void upf_sxb_handle_session_establishment_request(
     
     if (req->create_far.presence)
     {
-        upf_sxb_handle_create_far(&req->create_far, &far);      
+        upf_n4_handle_create_far(&req->create_far, &far);      
     }    
 
     if (req->create_far1.presence)
     {
-        upf_sxb_handle_create_far(&req->create_far1, &far1);    
+        upf_n4_handle_create_far(&req->create_far1, &far1);    
     }
     
     if (req->create_urr.presence)
@@ -185,18 +185,18 @@ void upf_sxb_handle_session_establishment_request(
     //$ Handle Create PDR last 
     if (req->create_pdr.presence)
     {
-        upf_sxb_handle_create_pdr(sess, &req->create_pdr, &pdr);
+        upf_n4_handle_create_pdr(sess, &req->create_pdr, &pdr);
     }    
     if (req->create_pdr1.presence)
     {
-        upf_sxb_handle_create_pdr(sess, &req->create_pdr1, &pdr1);
+        upf_n4_handle_create_pdr(sess, &req->create_pdr1, &pdr1);
     }
 
     {
         status_t rv;
         pfcp_header_t h;
         pkbuf_t *pkbuf = NULL;
-        //pfcp_xact_t *sxb_xact;
+        //pfcp_xact_t *n4_xact;
         pfcp_f_seid_t *smf_f_seid = NULL;
         
         d_trace(3, "[UPF] Session Establishment Response\n");
@@ -215,9 +215,9 @@ void upf_sxb_handle_session_establishment_request(
         h.type = PFCP_SESSION_ESTABLISHMENT_RESPONSE_TYPE;
         h.seid = sess->smf_seid;
     
-        rv = upf_sxb_build_session_establishment_response(
+        rv = upf_n4_build_session_establishment_response(
             &pkbuf, h.type, sess, req);
-        d_assert(rv == CORE_OK, return, "Sxb build error");
+        d_assert(rv == CORE_OK, return, "N4 build error");
     
         rv = pfcp_xact_update_tx(p_xact, &h, pkbuf);
         d_assert(rv == CORE_OK, return, "pfcp_xact_update_tx error");
@@ -227,7 +227,7 @@ void upf_sxb_handle_session_establishment_request(
     }
 }
 
-void upf_sxb_handle_session_modification_request(
+void upf_n4_handle_session_modification_request(
         upf_sess_t *sess, pfcp_xact_t *xact, pfcp_session_modification_request_t *req)
 {
     d_assert(sess, return, "Null param");
@@ -236,7 +236,7 @@ void upf_sxb_handle_session_modification_request(
     status_t rv;
     pfcp_header_t h;
     pkbuf_t *pkbuf = NULL;
-    //pfcp_xact_t *sxb_xact;
+    //pfcp_xact_t *n4_xact;
 
     /* Update PDR */
     if (&req->update_pdr.presence)
@@ -278,9 +278,9 @@ void upf_sxb_handle_session_modification_request(
     h.type = PFCP_SESSION_MODIFICATION_RESPONSE_TYPE;
     h.seid = sess->smf_seid;
 
-    rv = upf_sxb_build_session_modification_response(
+    rv = upf_n4_build_session_modification_response(
         &pkbuf, h.type, sess, req);
-    d_assert(rv == CORE_OK, return, "Sxb build error");
+    d_assert(rv == CORE_OK, return, "N4 build error");
 
     rv = pfcp_xact_update_tx(xact, &h, pkbuf);
     d_assert(rv == CORE_OK, return, "pfcp_xact_update_tx error");
@@ -289,7 +289,7 @@ void upf_sxb_handle_session_modification_request(
     d_assert(rv == CORE_OK, return, "xact_commit error");
 }
 
-void upf_sxb_handle_session_deletion_request(
+void upf_n4_handle_session_deletion_request(
         upf_sess_t *sess, pfcp_xact_t *xact, pfcp_session_deletion_request_t *req)
 {
     d_assert(sess, return, "Null param");
@@ -299,7 +299,7 @@ void upf_sxb_handle_session_deletion_request(
         status_t rv;
         pfcp_header_t h;
         pkbuf_t *pkbuf = NULL;
-        //pfcp_xact_t *sxb_xact;
+        //pfcp_xact_t *n4_xact;
     
         /* Send Session Deletion Response */
         d_trace(3, "[UPF] Session Deletion Response\n");
@@ -307,9 +307,9 @@ void upf_sxb_handle_session_deletion_request(
         h.type = PFCP_SESSION_DELETION_RESPONSE_TYPE;
         h.seid = sess->smf_seid;
     
-        rv = upf_sxb_build_session_deletion_response(
+        rv = upf_n4_build_session_deletion_response(
             &pkbuf, h.type, sess, req);
-        d_assert(rv == CORE_OK, return, "Sxb build error");
+        d_assert(rv == CORE_OK, return, "N4 build error");
     
         rv = pfcp_xact_update_tx(xact, &h, pkbuf);
         d_assert(rv == CORE_OK, return, "pfcp_xact_update_tx error");
@@ -321,7 +321,7 @@ void upf_sxb_handle_session_deletion_request(
     upf_sess_remove(sess);
 }
 
-void upf_sxb_handle_association_setup_request(
+void upf_n4_handle_association_setup_request(
         pfcp_xact_t *xact, pfcp_association_setup_request_t *req)
 {    
     //c_uint8_t cause;
@@ -358,7 +358,7 @@ void upf_sxb_handle_association_setup_request(
         status_t rv;
         pfcp_header_t h;
         pkbuf_t *pkbuf = NULL;
-        //pfcp_xact_t *sxb_xact;
+        //pfcp_xact_t *n4_xact;
     
         
         d_trace(3, "[UPF] Association Setup Response\n");
@@ -368,9 +368,9 @@ void upf_sxb_handle_association_setup_request(
         h.type = PFCP_ASSOCIATION_SETUP_RESPONSE_TYPE;
         h.seid = 0;//sess->sgw_s5c_teid;
     
-        rv = upf_sxb_build_association_setup_response(
+        rv = upf_n4_build_association_setup_response(
                 &pkbuf, h.type);
-        d_assert(rv == CORE_OK, return, "Sxb build error");
+        d_assert(rv == CORE_OK, return, "N4 build error");
     
         rv = pfcp_xact_update_tx(xact, &h, pkbuf);
         d_assert(rv == CORE_OK, return, "pfcp_xact_update_tx error");
@@ -385,14 +385,14 @@ void upf_sxb_handle_association_setup_request(
     //req->user_plane_ip_resource_information;
 }
 
-void upf_sxb_handle_association_update_request(
+void upf_n4_handle_association_update_request(
         pfcp_xact_t *xact, pfcp_association_update_request_t *req)
 {
 
 
 }
 
-void upf_sxb_handle_association_release_request(
+void upf_n4_handle_association_release_request(
         pfcp_xact_t *xact, pfcp_association_release_request_t *req)
 {
     //$ Release all session in this association !!
@@ -412,7 +412,7 @@ void upf_sxb_handle_association_release_request(
         status_t rv;
         pfcp_header_t h;
         pkbuf_t *pkbuf = NULL;
-        //pfcp_xact_t *sxb_xact;
+        //pfcp_xact_t *n4_xact;
     
         
         d_trace(3, "[UPF] Association Release Response\n");  
@@ -422,9 +422,9 @@ void upf_sxb_handle_association_release_request(
         h.type = PFCP_ASSOCIATION_RELEASE_RESPONSE_TYPE;
         h.seid = 0;//sess->sgw_s5c_teid;
     
-        rv = upf_sxb_build_association_release_response(
+        rv = upf_n4_build_association_release_response(
                 &pkbuf, h.type);
-        d_assert(rv == CORE_OK, return, "Sxb build error");
+        d_assert(rv == CORE_OK, return, "N4 build error");
     
         rv = pfcp_xact_update_tx(xact, &h, pkbuf);
         d_assert(rv == CORE_OK, return, "pfcp_xact_update_tx error");
@@ -435,13 +435,13 @@ void upf_sxb_handle_association_release_request(
     }
 }  
 
-void upf_sxb_handle_heartbeat_request(
+void upf_n4_handle_heartbeat_request(
         pfcp_xact_t *xact, pfcp_heartbeat_request_t *req)
 {  
     status_t rv;
     pfcp_header_t h;
     pkbuf_t *pkbuf = NULL;
-    //pfcp_xact_t *sxb_xact;
+    //pfcp_xact_t *n4_xact;
 
     
     d_trace(3, "[UPF] Heartbeat Request\n");  
@@ -451,9 +451,9 @@ void upf_sxb_handle_heartbeat_request(
     h.type = PFCP_HEARTBEAT_RESPONSE_TYPE;
     h.seid = 0;//sess->sgw_s5c_teid;
 
-    rv = upf_sxb_build_heartbeat_response(
+    rv = upf_n4_build_heartbeat_response(
             &pkbuf, h.type);
-    d_assert(rv == CORE_OK, return, "Sxb build error");
+    d_assert(rv == CORE_OK, return, "N4 build error");
 
     rv = pfcp_xact_update_tx(xact, &h, pkbuf);
     d_assert(rv == CORE_OK, return, "pfcp_xact_update_tx error");
@@ -462,7 +462,7 @@ void upf_sxb_handle_heartbeat_request(
     d_assert(rv == CORE_OK, return, "xact_commit error");           
 }      
 
-void upf_sxb_handle_heartbeat_response(
+void upf_n4_handle_heartbeat_response(
         pfcp_xact_t *xact, pfcp_heartbeat_response_t *req)
 {
     d_trace(3, "[UPF] Heartbeat Response\n"); 

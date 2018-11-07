@@ -80,7 +80,7 @@ status_t upf_context_init()
     list_init(&self.sgw_s5u_list);
 #ifdef __CUPS__    
     pfcp_node_init();
-    list_init(&self.upf_sxb_list);
+    list_init(&self.upf_n4_list);
 #endif        
 
     list_init(&self.dev_list);
@@ -132,7 +132,7 @@ status_t upf_context_final()
     pool_final(&upf_qer_pool);
     pool_final(&upf_urr_pool);
     pool_final(&upf_bar_pool);
-    pfcp_remove_all_nodes(&self.upf_sxb_list);
+    pfcp_remove_all_nodes(&self.upf_n4_list);
     sock_remove_all_nodes(&self.pfcp_list);
     sock_remove_all_nodes(&self.pfcp_list6);
     pfcp_node_final();

@@ -69,7 +69,7 @@ typedef struct _upf_context_t {
 
     list_t          sgw_s5u_list;  /* SGW GTPU Node List */
 #ifdef __CUPS__    
-    list_t          upf_sxb_list;  /* UPF PFCP Node List */
+    list_t          upf_n4_list;  /* UPF PFCP Node List */
     list_t          far_list;
     list_t          qer_list;
     list_t          urr_list;

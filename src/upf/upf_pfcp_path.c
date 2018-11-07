@@ -10,7 +10,7 @@
 #include "upf_context.h"
 #include "upf_event.h"
 #include "upf_pfcp_path.h"
-#include "upf_sxb_build.h"
+#include "upf_n4_build.h"
 
 
 
@@ -54,7 +54,7 @@ static int _pfcp_recv_cb(sock_id sock, void *data)
         return 0;    
     }
     
-    upf = pfcp_find_node_sockaddr(&upf_self()->upf_sxb_list, &from);
+    upf = pfcp_find_node_sockaddr(&upf_self()->upf_n4_list, &from);
     if (!upf)
     {
         pfcp_f_seid_t f_seid;
@@ -62,14 +62,14 @@ static int _pfcp_recv_cb(sock_id sock, void *data)
         f_seid.ipv4 = 1;
         //f_seid.seid = ?
         f_seid.addr = from.sin.sin_addr.s_addr; 
-        upf = pfcp_add_node_with_seid(&upf_self()->upf_sxb_list, &f_seid,
+        upf = pfcp_add_node_with_seid(&upf_self()->upf_n4_list, &f_seid,
             upf_self()->pfcp_port,
             context_self()->parameter.no_ipv4,
             context_self()->parameter.no_ipv6,
             context_self()->parameter.prefer_ipv4);
         d_assert(upf, return CORE_ERROR,);
             
-        //list_append(&upf_self()->upf_sxb_list, upf);//0518 debug
+        //list_append(&upf_self()->upf_n4_list, upf);//0518 debug
             
         //rv = pfcp_client(upf);
         //d_assert(rv == CORE_OK, return CORE_ERROR,);   
@@ -110,7 +110,7 @@ static int _pfcp_recv_cb(sock_id sock, void *data)
         
     d_assert(upf, return -1, "pfcp node not found");
 
-    event_set(&e, UPF_EVT_SXB_MESSAGE);
+    event_set(&e, UPF_EVT_N4_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, (c_uintptr_t)upf);
     rv = upf_event_send(&e);
@@ -151,14 +151,14 @@ status_t upf_pfcp_open()
         f_seid.ipv4 = 1;
         //f_seid.seid = ?
         f_seid.addr = inet_addr("127.0.0.8"); //$ fixme: read from configuration file
-        upf = pfcp_add_node_with_seid(&upf_self()->upf_sxb_list, &f_seid,
+        upf = pfcp_add_node_with_seid(&upf_self()->upf_n4_list, &f_seid,
             upf_self()->pfcp_port,
             context_self()->parameter.no_ipv4,
             context_self()->parameter.no_ipv6,
             context_self()->parameter.prefer_ipv4);
         d_assert(upf, return CORE_ERROR,);
             
-        list_append(&upf_self()->upf_sxb_list, upf);
+        list_append(&upf_self()->upf_n4_list, upf);
             
         rv = pfcp_client(upf);
         d_assert(rv == CORE_OK, return CORE_ERROR,);        
