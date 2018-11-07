@@ -188,8 +188,6 @@ status_t gtp_ip_to_f_teid(ip_t *ip, gtp_f_teid_t *f_teid, int *len)
     return CORE_OK;
 }
 
-#ifdef __CUPS__
-//#if 1
 status_t gtp_ip_to_sockaddr(
     ip_t *ip, c_uint16_t port, c_sockaddr_t **list)
 {
@@ -240,4 +238,3 @@ status_t gtp_ip_to_sockaddr(
 
     return CORE_OK;
 }
-#endif

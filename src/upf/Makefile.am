@@ -35,7 +35,7 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 AM_CFLAGS = \
-	-Wall -Werror -D__CUPS__\
+	-Wall -Werror \
 	$(NULL)
 
 MAINTAINERCLEANFILES = Makefile.in

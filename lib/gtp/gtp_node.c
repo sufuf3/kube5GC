@@ -167,8 +167,6 @@ gtp_node_t* gtp_find_node(list_t *list, gtp_f_teid_t *f_teid)
     return node;
 }
 
-#ifdef __CUPS__
-//#if 1
 gtp_node_t *gtp_add_node_with_ip(list_t *list, ip_t *ip,
         c_uint16_t port, int no_ipv4, int no_ipv6, int prefer_ipv4)
 {
@@ -216,5 +214,3 @@ gtp_node_t* gtp_find_node_by_ip(list_t *list, ip_t *ip)
 
     return node;
 }
-
-#endif

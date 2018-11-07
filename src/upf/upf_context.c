@@ -20,7 +20,6 @@
 #include "app/context.h"
 #include "upf_context.h"
 
-#ifdef __CUPS__
 #include "pfcp/pfcp_types.h"
 #include "pfcp/pfcp_conv.h"
 #include "pfcp/pfcp_node.h"
@@ -29,7 +28,6 @@
 
 upf_pdr_t* upf_pdr_add(upf_sess_t *sess);
 upf_far_t* upf_far_add(void);
-#endif
 
 static upf_context_t self;
 //static fd_config_t g_fd_conf;
@@ -38,7 +36,6 @@ pool_declare(upf_dev_pool, upf_dev_t, MAX_NUM_OF_DEV);
 pool_declare(upf_subnet_pool, upf_subnet_t, MAX_NUM_OF_SUBNET);
 
 index_declare(upf_sess_pool, upf_sess_t, MAX_POOL_OF_SESS);
-#ifdef __CUPS__
 #define MAX_POOL_OF_PDR  (MAX_POOL_OF_BEARER*2)
 #define MAX_POOL_OF_FAR  (MAX_POOL_OF_SESS*2)
 #define MAX_POOL_OF_URR  (MAX_POOL_OF_UE)
@@ -50,7 +47,6 @@ index_declare(upf_far_pool, upf_far_t, MAX_POOL_OF_FAR);
 index_declare(upf_urr_pool, upf_urr_t, MAX_POOL_OF_URR);
 index_declare(upf_qer_pool, upf_qer_t, MAX_POOL_OF_QER);
 index_declare(upf_bar_pool, upf_bar_t, MAX_POOL_OF_BAR);
-#endif
 pool_declare(upf_pf_pool, upf_pf_t, MAX_POOL_OF_PF);
 
 static int context_initiaized = 0;
@@ -65,7 +61,6 @@ status_t upf_context_init()
 
     list_init(&self.gtpu_list);
     list_init(&self.gtpu_list6);
-#ifdef __CUPS__
     list_init(&self.pfcp_list);
     list_init(&self.pfcp_list6);
     {
@@ -74,14 +69,11 @@ status_t upf_context_init()
         //self.recovery_time = htonl(tv.tv_sec);
         self.recovery_time = htonl(time((time_t*)NULL));
     }
-#endif    
 
     gtp_node_init();
     list_init(&self.sgw_s5u_list);
-#ifdef __CUPS__    
     pfcp_node_init();
     list_init(&self.upf_n4_list);
-#endif        
 
     list_init(&self.dev_list);
     pool_init(&upf_dev_pool, MAX_NUM_OF_DEV);
@@ -89,13 +81,11 @@ status_t upf_context_init()
     pool_init(&upf_subnet_pool, MAX_NUM_OF_SUBNET);
 
     index_init(&upf_sess_pool, MAX_POOL_OF_SESS);
-#ifdef __CUPS__
     index_init(&upf_pdr_pool, MAX_POOL_OF_PDR);
     index_init(&upf_far_pool, MAX_POOL_OF_FAR);
     index_init(&upf_urr_pool, MAX_POOL_OF_URR);
     index_init(&upf_qer_pool, MAX_POOL_OF_QER);
     index_init(&upf_bar_pool, MAX_POOL_OF_BAR);
-#endif
     pool_init(&upf_pf_pool, MAX_POOL_OF_PF);
 
     self.sess_hash = hash_make();
@@ -126,7 +116,6 @@ status_t upf_context_final()
 
     index_final(&upf_sess_pool);
     pool_final(&upf_pf_pool);
-#ifdef __CUPS__
     pool_final(&upf_pdr_pool);
     pool_final(&upf_far_pool);
     pool_final(&upf_qer_pool);
@@ -136,7 +125,6 @@ status_t upf_context_final()
     sock_remove_all_nodes(&self.pfcp_list);
     sock_remove_all_nodes(&self.pfcp_list6);
     pfcp_node_final();
-#endif
     pool_final(&upf_dev_pool);
     pool_final(&upf_subnet_pool);
 
@@ -159,9 +147,7 @@ upf_context_t* upf_self()
 static status_t upf_context_prepare()
 {
     self.gtpu_port = GTPV1_U_UDP_PORT;
-#ifdef __CUPS__
     self.pfcp_port = PFCP_UDP_PORT; 
-#endif
     self.tun_ifname = "pgwtun";
 
     return CORE_OK;
@@ -532,7 +518,6 @@ status_t upf_context_parse_config()
                         yaml_iter_type(&dns_iter) ==
                             YAML_SEQUENCE_NODE);
                 }
-#ifdef __CUPS__
                 else if (!strcmp(upf_key, "pfcp"))
                 {
                     yaml_iter_t pfcp_array, pfcp_iter;
@@ -643,7 +628,6 @@ status_t upf_context_parse_config()
                         d_assert(rv == CORE_OK, return CORE_ERROR,);
                     }
                 }
-#endif                
                 else
                     d_warn("unknown key `%s`", upf_key);
             }
@@ -660,9 +644,7 @@ status_t upf_context_setup_trace_module()
 {
     int app = context_self()->logger.trace.app;
     int gtp = context_self()->logger.trace.gtp;
-#ifdef __CUPS__
     //int pfcp = context_self()->logger.trace.pfcp;
-#endif    
 
     if (app)
     {
@@ -704,7 +686,6 @@ upf_sess_t *upf_sess_add(
 
     sess->gnode = NULL;
 
-#ifdef __CUPS__
     /* UPF-SEID is derived from IP address + INDEX */
     if (self.pfcp_addr)
     {
@@ -718,7 +699,6 @@ upf_sess_t *upf_sess_add(
     }
     sess->upf_seid = htobe64(sess->upf_seid);       
     sess->upf_seid = 0;     /* initialized to 0 */
-#endif
 
     /* Set IMSI */
     //sess->imsi_len = imsi_len;
@@ -853,12 +833,10 @@ upf_sess_t* upf_sess_find_by_teid(c_uint32_t teid)
     return upf_sess_find(teid);
 }
 
-#ifdef __CUPS__
 upf_sess_t* upf_sess_find_by_seid(c_uint64_t seid)
 {
     return upf_sess_find(seid&0xFFFFFFFF);
 }
-#endif
 
 upf_sess_t* upf_sess_find_by_imsi_apn(
     c_uint8_t *imsi, int imsi_len, c_int8_t *apn)
@@ -872,7 +850,6 @@ upf_sess_t* upf_sess_find_by_imsi_apn(
     return (upf_sess_t *)hash_get(self.sess_hash, keybuf, keylen);
 }
 
-#ifdef __CUPS__
 upf_sess_t *upf_sess_add_by_message(pfcp_message_t *message)
 {
     upf_sess_t *sess = NULL;
@@ -942,7 +919,6 @@ upf_sess_t *upf_sess_add_by_message(pfcp_message_t *message)
   
     return sess;
 }
-#endif
 
 hash_index_t* upf_sess_first()
 {
@@ -1348,7 +1324,6 @@ upf_subnet_t* upf_subnet_next(upf_subnet_t *subnet)
     return list_next(subnet);
 }
 
-#ifdef __CUPS__
 upf_pdr_t* upf_pdr_add(upf_sess_t *sess)
 {
     upf_pdr_t *pdr = NULL;
@@ -1547,5 +1522,3 @@ upf_far_t* upf_far_find_by_far_id(c_uint32_t far_id)
 
     return far;
 }
-
-#endif

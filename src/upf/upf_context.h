@@ -12,11 +12,9 @@
 #include "gtp/gtp_types.h"
 #include "gtp/gtp_message.h"
 
-#ifdef __CUPS__
 #include "pfcp/pfcp_types.h"
 #include "pfcp/pfcp_message.h"
 typedef struct _pfcp_node_t pfcp_node_t;
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +30,6 @@ typedef struct _upf_context_t {
     c_uint32_t      gtpu_port;      /* Default: UPF GTP-U local port */
     const char      *tun_ifname;    /* Default:: pgwtun */
 
-#ifdef __CUPS__
     c_uint32_t      pfcp_port;      /* Default: SMF PFCP local port */
     list_t          pfcp_list;      /* SMF PFCP IPv4 Server List */
     list_t          pfcp_list6;     /* SMF PFCP IPv6 Server List */
@@ -41,7 +38,7 @@ typedef struct _upf_context_t {
     c_sockaddr_t    *pfcp_addr;     /* SMF PFCP IPv4 Address */
     c_sockaddr_t    *pfcp_addr6;    /* SMF PFCP IPv6 Address */
     c_uint32_t      recovery_time;  /* the UTC time when the node started */
-#endif
+
     list_t          gtpu_list;      /* UPF GTPU IPv4 Server List */
     list_t          gtpu_list6;     /* UPF GTPU IPv6 Server List */
     sock_id         gtpu_sock;      /* UPF GTPU IPv4 Socket */
@@ -68,12 +65,10 @@ typedef struct _upf_context_t {
     int             p_cscf6_index;
 
     list_t          sgw_s5u_list;  /* SGW GTPU Node List */
-#ifdef __CUPS__    
     list_t          upf_n4_list;  /* UPF PFCP Node List */
     list_t          far_list;
     list_t          qer_list;
     list_t          urr_list;
-#endif    
     list_t          ip_pool_list;
 
     hash_t          *sess_hash; /* hash table (IMSI+APN) */
@@ -117,22 +112,17 @@ typedef struct _upf_subnet_t {
     upf_dev_t   *dev;
 } upf_subnet_t;
 
-#ifdef __CUPS__
 typedef struct _upf_pdr_t upf_pdr_t;
-#endif
 
 typedef struct _upf_sess_t {
     index_t         index;          /**< An index of this node */
 
-#ifdef __CUPS__
     //c_uint32_t      smf_seid0;     /* SMF-SEID0 is derived from INDEX */
     //c_uint32_t      smf_seid1;     /* SMF-SEID0 is derived from IP address */
     //c_uint32_t      upf_seid0;     /* UPF-SEID0 is received from UPF */
     //c_uint32_t      upf_seid1;     /* UPF-SEID0 is received from UPF */
     c_uint64_t      smf_seid;      /* SMF-SEID0 is derived from INDEX */
     c_uint64_t      upf_seid;      /* UPF-SEID0 is received from UPF */
-#endif
-
 
     /* APN Configuration */
     pdn_t           pdn;
@@ -150,15 +140,12 @@ typedef struct _upf_sess_t {
 
     /* Related Context */
     gtp_node_t      *gnode;
-#ifdef __CUPS__    
-    pfcp_node_t      *pnode;
+    pfcp_node_t     *pnode;
     list_t          dl_pdr_list;
     list_t          ul_pdr_list;
-#endif    
 } upf_sess_t;
 
 
-#ifdef __CUPS__
 typedef struct _upf_far_t upf_far_t;
 typedef struct _upf_urr_t upf_urr_t;
 typedef struct _upf_qer_t upf_qer_t;
@@ -174,7 +161,6 @@ typedef struct _upf_pdr_t {
 
     c_uint16_t      pdr_id;   /* UPF_S5U is derived from INDEX */
 
-#ifdef __CUPS__
 #define SMF_TEID_IP_DESC_IPV4  1
 #define SMF_TEID_IP_DESC_IPV6  2
     //$ IP address of SGW-U is not the same as SGW-C, so need store 
@@ -192,7 +178,6 @@ typedef struct _upf_pdr_t {
             c_uint8_t addr6[IPV6_LEN];
         } both;
     };
-#endif
 
     //c_int8_t        *name;          /* PCC Rule Name */
     //qos_t           qos;            /* QoS Infomration */
@@ -256,8 +241,6 @@ typedef struct _upf_bar_t {
     pfcp_node_t     *pnode;
 } upf_bar_t;
 
-#endif
-
 typedef struct _upf_rule_t {
     c_uint8_t proto;
 ED5(c_uint8_t ipv4_local:1;,
@@ -313,9 +296,7 @@ CORE_DECLARE(status_t )     upf_sess_remove(upf_sess_t *sess);
 CORE_DECLARE(status_t )     upf_sess_remove_all();
 CORE_DECLARE(upf_sess_t*)   upf_sess_find(index_t index);
 CORE_DECLARE(upf_sess_t*)   upf_sess_find_by_teid(c_uint32_t teid);
-#ifdef __CUPS__
 CORE_DECLARE(upf_sess_t*)   upf_sess_find_by_seid(c_uint64_t seid);
-#endif
 CORE_DECLARE(upf_sess_t*)   upf_sess_find_by_imsi_apn(
         c_uint8_t *imsi, int imsi_len, c_int8_t *apn);
 CORE_DECLARE(hash_index_t *)  upf_sess_first();

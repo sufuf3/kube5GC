@@ -228,8 +228,6 @@ static status_t decode_ipv6_header(
     return CORE_OK;
 }
 
-
-#ifdef __CUPS__
 upf_pdr_t *upf_pdr_find_by_packet(pkbuf_t *pkt)
 {
     hash_index_t *hi = NULL;
@@ -341,5 +339,3 @@ upf_pdr_t *upf_pdr_find_by_packet(pkbuf_t *pkt)
 
     return NULL;
 }
-
-#endif

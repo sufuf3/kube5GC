@@ -237,11 +237,7 @@ status_t pfcp_send(pfcp_node_t *gnode, pkbuf_t *pkbuf)
     d_assert(addr, return CORE_ERROR,);
 
     //sent = core_send(sock, pkbuf->payload, pkbuf->len, 0);
-#ifdef __CUPS__
-//#if 1
-    sent = core_sendto(sock, pkbuf->payload, pkbuf->len, 0,
-        gnode->sa_list);
-#endif
+    sent = core_sendto(sock, pkbuf->payload, pkbuf->len, 0, gnode->sa_list);
     if (sent < 0 || sent != pkbuf->len)
     {
         d_error("core_send [%s]:%d failed(%d:%s)",

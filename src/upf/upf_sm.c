@@ -6,11 +6,9 @@
 #include "upf_sm.h"
 #include "upf_context.h"
 #include "upf_event.h"
-#ifdef __CUPS__
 #include "upf_n4_handler.h"
 #include "upf_pfcp_path.h"
 #include "upf_gtp_path.h"
-#endif
 
 void upf_state_initial(fsm_t *s, event_t *e)
 {
@@ -46,14 +44,12 @@ void upf_state_operational(fsm_t *s, event_t *e)
                 d_error("Can't establish UPF path");
                 break;
             }
-#ifdef __CUPS__
             rv = upf_pfcp_open();
             if (rv != CORE_OK)
             {
                 d_error("Can't establish UPF path (PFCP)");
                 break;
             }
-#endif            
             break;
         }
         case FSM_EXIT_SIG:
@@ -64,18 +60,16 @@ void upf_state_operational(fsm_t *s, event_t *e)
                 d_error("Can't close UPF path");
                 break;
             }
-#ifdef __CUPS__
+
             rv = upf_pfcp_close();
             if (rv != CORE_OK)
             {
                 d_error("Can't close UPF path (PFCP)");
                 break;
             }
-#endif              
             break;
         }
 
-#ifdef __CUPS__        
         case UPF_EVT_N4_MESSAGE:
         {
             status_t rv;
@@ -205,7 +199,7 @@ void upf_state_operational(fsm_t *s, event_t *e)
             pfcp_xact_timeout(event_get_param1(e), event_get(e), &type);
             break;
         }
-#endif        
+        
         default:
         {
             d_error("No handler for event %s", upf_event_get_name(e));

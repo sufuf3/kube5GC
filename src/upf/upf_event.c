@@ -15,14 +15,13 @@ char* upf_event_get_name(event_t *e)
         case FSM_EXIT_SIG: 
             return FSM_NAME_EXIT_SIG;
 
-#ifdef __CUPS__
         case UPF_EVT_N4_MESSAGE:
             return "UPF_EVT_N4_MESSAGE";
         case UPF_EVT_N4_T3_RESPONSE:
             return "UPF_EVT_N4_T3_RESPONSE";
         case UPF_EVT_N4_T3_HOLDING:
             return "UPF_EVT_N4_T3_HOLDING";
-#endif
+        
         default: 
            break;
     }

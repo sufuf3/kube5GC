@@ -351,7 +351,6 @@ static status_t upf_gtp_handle_slaac(upf_sess_t *sess, pkbuf_t *recvbuf)
     return CORE_OK;
 }
 
-#ifdef __CUPS__
 static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
 {
     char buf[CORE_ADDRSTRLEN];
@@ -407,7 +406,7 @@ static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
 
     return rv;
 }
-#endif
+
 #if 0
 static status_t upf_gtp_send_router_advertisement(
         upf_sess_t *sess, c_uint8_t *ip6_dst)
@@ -501,6 +500,7 @@ static status_t upf_gtp_send_router_advertisement(
     return rv;
 }
 #endif
+
 c_uint16_t in_cksum(c_uint16_t *addr, int len)
 {
     int nleft = len;

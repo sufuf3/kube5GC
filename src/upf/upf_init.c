@@ -4,9 +4,7 @@
 #include "core_thread.h"
 
 #include "gtp/gtp_xact.h"
-#ifdef __CUPS__
 #include "pfcp/pfcp_xact.h"
-#endif
 
 #include "upf_context.h"
 #include "upf_event.h"
@@ -65,10 +63,10 @@ static void *THREAD_FUNC upf_main(thread_id id, void *data)
     d_assert(upf_self()->queue_id, return NULL, 
             "UPF event queue creation failed");
     tm_service_init(&upf_self()->tm_service);
-#ifdef __CUPS__
+    
     pfcp_xact_init(&upf_self()->tm_service,
             UPF_EVT_N4_T3_RESPONSE, UPF_EVT_N4_T3_HOLDING);//$ fixme: wrong event!
-#endif
+
     fsm_create(&upf_sm, upf_state_initial, upf_state_final);
     fsm_init(&upf_sm, 0);
 
