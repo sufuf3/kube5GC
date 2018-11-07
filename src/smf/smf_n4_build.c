@@ -222,7 +222,7 @@ status_t smf_n4_build_session_establishment_request(
     /* Set CP F-SEID, mandatory */
     req->cp_f_seid.presence = 1;
     req->cp_f_seid.data = &smf_f_seid;
-    smf_f_seid.seid = htonll(sess->smf_n4_seid);
+    smf_f_seid.seid = htobe64(sess->smf_n4_seid);
     rv = pfcp_sockaddr_to_f_seid(smf_self()->pfcp_addr, smf_self()->pfcp_addr6,
             &smf_f_seid, (c_int32_t *)&req->cp_f_seid.len);
 

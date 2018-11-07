@@ -232,7 +232,7 @@ void smf_n4_handle_session_establishment_response(
         d_info("association_setup_response cause: %d", pfcp_cause_get_name(cause));
     } else
     {
-        sess->upf_n4_seid = up_f_seid->seid;
+        sess->upf_n4_seid = be64toh(up_f_seid->seid);
         memset(&h, 0, sizeof(gtp_header_t));
         h.type = GTP_CREATE_SESSION_RESPONSE_TYPE;
         h.teid = sess->mme_s11_teid;

@@ -1089,7 +1089,7 @@ smf_sess_t* smf_sess_add(
     ul_pdr->far = smf_far_add(bearer);
     ul_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
     ul_pdr->far->destination_interface = PFCP_FAR_DEST_INTF_CORE;
-    d_trace(10, "SEID: [0x%016x] UL PDR ID: [%d] UL FAR ID: [%d]\n",
+    d_trace(10, "SEID: [0x%016llx] UL PDR ID: [%d] UL FAR ID: [%d]\n",
                 sess->smf_n4_seid, ul_pdr->pdr_id, ul_pdr->far->far_id);
     
     smf_pdr_t *dl_pdr = smf_pdr_add(bearer);
@@ -1100,10 +1100,10 @@ smf_sess_t* smf_sess_add(
     dl_pdr->far = smf_far_add(bearer);
     dl_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
     dl_pdr->far->destination_interface = PFCP_FAR_DEST_INTF_ACCESS;
-    d_trace(10, "SEID: [0x%016x] UL PDR ID: [%d] UL FAR ID: [%d]\n",
+    d_trace(10, "SEID: [0x%016llx] DL PDR ID: [%d] DL FAR ID: [%d]\n",
                 sess->smf_n4_seid, dl_pdr->pdr_id, dl_pdr->far->far_id);
     
-    d_trace(9, "smf_sess_add(): [SEID: %016x, TEID: %08x]\n",
+    d_trace(9, "smf_sess_add(): [SEID: %016llx, TEID: %08x]\n",
             sess->smf_n4_seid, sess->sgw_s11_teid);
     
     return sess;

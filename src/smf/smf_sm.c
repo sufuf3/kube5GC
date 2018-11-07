@@ -172,7 +172,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
             d_assert(rv == CORE_OK,
                     pkbuf_free(recvbuf); pkbuf_free(copybuf); break,
                     "parse error");
-            d_trace(9, "N4 Message: [Type: %d, SEID: %08x]\n", 
+            d_trace(9, "N4 Message: [Type: %d, SEID: %016llx]\n", 
                     message->h.type,
                     message->h.seid_p ? message->h.seid : 0);
             if (!message->h.seid_p)
