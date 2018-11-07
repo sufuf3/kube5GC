@@ -35,7 +35,7 @@ status_t app_initialize(const char *config_path, const char *log_path)
     rv = app_did_initialize();
     if (rv != CORE_OK) return rv;
 
-    return CORE_OK;
+return CORE_OK;
 }
 
 void app_terminate(void)

@@ -166,3 +166,55 @@ gtp_node_t* gtp_find_node(list_t *list, gtp_f_teid_t *f_teid)
 
     return node;
 }
+
+#ifdef __CUPS__
+//#if 1
+gtp_node_t *gtp_add_node_with_ip(list_t *list, ip_t *ip,
+        c_uint16_t port, int no_ipv4, int no_ipv6, int prefer_ipv4)
+{
+    status_t rv;
+    gtp_node_t *node = NULL;
+    c_sockaddr_t *sa_list = NULL;
+
+    d_assert(list, return NULL,);
+    d_assert(ip, return NULL,);
+    d_assert(port, return NULL,);
+
+    rv = gtp_ip_to_sockaddr(ip, port, &sa_list);
+    d_assert(rv == CORE_OK, return NULL,);
+
+    rv = gtp_add_node(list, &node, sa_list, no_ipv4, no_ipv6, prefer_ipv4);
+    d_assert(rv == CORE_OK, return NULL,);
+    d_assert(node, return NULL,);
+
+    node->ip = *ip;
+
+    rv = sock_fill_scope_id_in_local(node->sa_list);
+    d_assert(rv == CORE_OK, return NULL,);
+
+    core_freeaddrinfo(sa_list);
+
+    return node;
+}
+
+gtp_node_t* gtp_find_node_by_ip(list_t *list, ip_t *ip)
+{
+    //status_t rv;
+    gtp_node_t *node = NULL;
+
+    d_assert(list, return NULL,);
+    d_assert(ip, return NULL,);
+
+    node = list_first(list);
+    while (node)
+    {
+        if (memcmp(&node->ip, ip, ip->len) == 0)
+            break;
+
+        node = list_next(node);
+    }
+
+    return node;
+}
+
+#endif
