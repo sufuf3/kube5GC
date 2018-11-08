@@ -237,11 +237,7 @@ status_t pfcp_send(pfcp_node_t *gnode, pkbuf_t *pkbuf)
     d_assert(addr, return CORE_ERROR,);
 
     //sent = core_send(sock, pkbuf->payload, pkbuf->len, 0);
-#ifdef __CUPS__
-//#if 1
-    sent = core_sendto(sock, pkbuf->payload, pkbuf->len, 0,
-        gnode->sa_list);
-#endif
+    sent = core_sendto(sock, pkbuf->payload, pkbuf->len, 0, gnode->sa_list);
     if (sent < 0 || sent != pkbuf->len)
     {
         d_error("core_send [%s]:%d failed(%d:%s)",
@@ -382,16 +378,16 @@ status_t pfcp_start_heartbeat(pfcp_node_t *gnode, c_uint32_t recovery_time)
     pkb_req->len = idx;                /* buffer length */
     
     
-    pfcp_xact_t *sxb_xact;
+    pfcp_xact_t *n4_xact;
     pfcp_header_t h;
     memset(&h, 0, sizeof(pfcp_header_t));
     h.type = PFCP_HEARTBEAT_REQUEST_TYPE;
     h.seid = 0;//sess->sgw_s5c_teid;
     
-    sxb_xact = pfcp_xact_local_create(gnode, &h, pkb_req);
-    d_assert(sxb_xact, return CORE_ERROR, "Null param");
+    n4_xact = pfcp_xact_local_create(gnode, &h, pkb_req);
+    d_assert(n4_xact, return CORE_ERROR, "Null param");
     
-    rt = pfcp_xact_commit(sxb_xact);
+    rt = pfcp_xact_commit(n4_xact);
     d_assert(rt == CORE_OK, return rt, "xact_commit error");
     //rt = pfcp_send(gnode, pkb_req);
     //pkbuf_free(pkb_req);

@@ -187,3 +187,54 @@ status_t gtp_ip_to_f_teid(ip_t *ip, gtp_f_teid_t *f_teid, int *len)
 
     return CORE_OK;
 }
+
+status_t gtp_ip_to_sockaddr(
+    ip_t *ip, c_uint16_t port, c_sockaddr_t **list)
+{
+    c_sockaddr_t *addr = NULL, *addr6 = NULL;
+
+    d_assert(ip, return CORE_ERROR,);
+    d_assert(list, return CORE_ERROR,);
+
+    addr = core_calloc(1, sizeof(c_sockaddr_t));
+    d_assert(addr, return CORE_ERROR,);
+    addr->c_sa_family = AF_INET;
+    addr->c_sa_port = htons(port);
+
+    addr6 = core_calloc(1, sizeof(c_sockaddr_t));
+    d_assert(addr6, return CORE_ERROR,);
+    addr6->c_sa_family = AF_INET6;
+    addr6->c_sa_port = htons(port);
+
+    if (ip->ipv4 && ip->ipv6)
+    {
+        addr->next = addr6;
+
+        addr->sin.sin_addr.s_addr = ip->both.addr;
+        memcpy(addr6->sin6.sin6_addr.s6_addr, ip->both.addr6, IPV6_LEN);
+
+        *list = addr;
+    }
+    else if (ip->ipv4)
+    {
+        addr->sin.sin_addr.s_addr = ip->addr;
+        CORE_FREE(addr6);
+
+        *list = addr;
+    }
+    else if (ip->ipv6)
+    {
+        memcpy(addr6->sin6.sin6_addr.s6_addr, ip->addr6, IPV6_LEN);
+        CORE_FREE(addr);
+
+        *list = addr6;
+    }
+    else
+    {
+        CORE_FREE(addr);
+        CORE_FREE(addr6);
+        d_assert(0, return CORE_ERROR,);
+    }
+
+    return CORE_OK;
+}

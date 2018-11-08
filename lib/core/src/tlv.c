@@ -424,6 +424,7 @@ c_uint32_t tlv_render(tlv_t *root_tlv,
 tlv_t *tlv_parse_block(c_uint32_t length, c_uint8_t *blk, c_uint8_t mode)
 {
     c_uint8_t* pos = blk;
+    c_uint8_t instance[256] = {};
 
     tlv_t* root_tlv = NULL;
     tlv_t* prev_tlv = NULL;
@@ -440,6 +441,8 @@ tlv_t *tlv_parse_block(c_uint32_t length, c_uint8_t *blk, c_uint8_t mode)
 
     while(pos - blk < length)
     {
+        // For mutiple instance
+        curr_tlv->instance = instance[curr_tlv->type]++;
         prev_tlv = curr_tlv;
 
         curr_tlv = tlv_get();

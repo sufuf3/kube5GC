@@ -31,6 +31,8 @@ CORE_DECLARE(status_t) gtp_sockaddr_to_f_teid(
 CORE_DECLARE(status_t) gtp_f_teid_to_ip(gtp_f_teid_t *f_teid, ip_t *ip);
 CORE_DECLARE(status_t) gtp_ip_to_f_teid(
         ip_t *ip, gtp_f_teid_t *f_teid, int *len);
+CORE_DECLARE(status_t) gtp_ip_to_sockaddr(
+    ip_t *ip, c_uint16_t port, c_sockaddr_t **list);
 
 #ifdef __cplusplus
 }

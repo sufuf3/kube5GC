@@ -3,6 +3,7 @@ configfiles = \
 	mme.conf \
 	sgw.conf \
 	pgw.conf \
+	upf.conf \
 	hss.conf \
 	pcrf.conf \
 	$(NULL)

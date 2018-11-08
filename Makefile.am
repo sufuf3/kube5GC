@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = lib src support test
 
-bin_PROGRAMS = nextepc-mmed nextepc-hssd nextepc-sgwd nextepc-pgwd nextepc-pcrfd nextepc-smfd nextepc-epcd
+bin_PROGRAMS = nextepc-mmed nextepc-hssd nextepc-sgwd nextepc-pgwd nextepc-pcrfd nextepc-smfd nextepc-upfd nextepc-epcd
 
 dist_nextepc_mmed_SOURCES = main.c
 nextepc_mmed_LDADD = $(top_srcdir)/src/libmme.la
@@ -23,6 +23,8 @@ nextepc_pcrfd_LDADD = $(top_srcdir)/src/libpcrf.la
 
 dist_nextepc_smfd_SOURCES = main.c
 nextepc_smfd_LDADD = $(top_srcdir)/src/libsmf.la
+dist_nextepc_upfd_SOURCES = main.c
+nextepc_upfd_LDADD = $(top_srcdir)/src/libupf.la
 
 dist_nextepc_epcd_SOURCES = main.c
 nextepc_epcd_LDADD = $(top_srcdir)/src/libepc.la
@@ -40,6 +42,7 @@ install-data-hook:
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-pcrfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-hssd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-smfd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-upfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-epcd
 
 CLEANFILES = -R data debian/test

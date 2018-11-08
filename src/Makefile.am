@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in.
 
-SUBDIRS = app mme hss sgw pgw pcrf smf
+SUBDIRS = app mme hss sgw pgw pcrf smf upf
 
-noinst_LTLIBRARIES = libmme.la libhss.la libsgw.la libpgw.la libpcrf.la libsmf.la libepc.la
+noinst_LTLIBRARIES = libmme.la libhss.la libsgw.la libpgw.la libpcrf.la libsmf.la libupf.la libepc.la
 
 libmme_la_SOURCES = mme.c
 libmme_la_DEPENDENCIES = $(top_srcdir)/src/mme/libmme.la 
@@ -14,7 +14,7 @@ libhss_la_LIBADD = $(top_srcdir)/src/hss/libhss.la
 
 libsgw_la_SOURCES = sgw.c
 libsgw_la_DEPENDENCIES = $(top_srcdir)/src/sgw/libsgw.la
-libsgw_la_LIBADD = $(top_srcdir)/src/sgw/libsgw.la 
+libsgw_la_LIBADD = $(top_srcdir)/src/sgw/libsgw.la
 
 libpgw_la_SOURCES = pgw.c
 libpgw_la_DEPENDENCIES = $(top_srcdir)/src/pgw/libpgw.la
@@ -22,7 +22,11 @@ libpgw_la_LIBADD = $(top_srcdir)/src/pgw/libpgw.la
 
 libpcrf_la_SOURCES = pcrf.c
 libpcrf_la_DEPENDENCIES = $(top_srcdir)/src/pcrf/libpcrf.la 
-libpcrf_la_LIBADD = $(top_srcdir)/src/pcrf/libpcrf.la 
+libpcrf_la_LIBADD = $(top_srcdir)/src/pcrf/libpcrf.la
+
+libupf_la_SOURCES = upf.c
+libupf_la_DEPENDENCIES = $(top_srcdir)/src/upf/libupf.la
+libupf_la_LIBADD = $(top_srcdir)/src/upf/libupf.la
 
 libsmf_la_SOURCES = smf.c
 libsmf_la_DEPENDENCIES = $(top_srcdir)/src/smf/libsmf.la 
@@ -35,6 +39,7 @@ libepc_la_DEPENDENCIES = \
     $(top_srcdir)/src/sgw/libsgw.la \
     $(top_srcdir)/src/pgw/libpgw.la \
     $(top_srcdir)/src/pcrf/libpcrf.la \
+    $(top_srcdir)/src/upf/libupf.la \
 	$(NULL)
 libepc_la_LIBADD = \
     $(top_srcdir)/src/mme/libmme.la \
@@ -42,6 +47,7 @@ libepc_la_LIBADD = \
     $(top_srcdir)/src/sgw/libsgw.la \
     $(top_srcdir)/src/pgw/libpgw.la \
     $(top_srcdir)/src/pcrf/libpcrf.la \
+    $(top_srcdir)/src/upf/libupf.la \
 	$(NULL)
 
 AM_CPPFLAGS = \

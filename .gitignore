@@ -52,6 +52,7 @@ nextepc-sgwd
 nextepc-epcd
 nextepc-hssd
 nextepc-smfd
+nextepc-upfd
 
 # debian
 debian/*.debhelper.log
