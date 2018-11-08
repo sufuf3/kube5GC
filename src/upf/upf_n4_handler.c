@@ -72,15 +72,19 @@ void upf_n4_handle_create_pdr(upf_sess_t *sess, tlv_create_pdr_t *create_pdr, up
     
     if(create_pdr->far_id.presence)
     {
-        far_id = *((c_uint32_t*)create_pdr->far_id.data);
+        far_id = ntohl(*((c_uint32_t*)create_pdr->far_id.data));
         far = upf_far_find_by_far_id(far_id);
         d_assert(far, upf_pdr_remove(pdr);return, "FAR id not found");
         pdr->far = far;
+
+        d_error("Create %s PDR[0x%04x] TEID[0x%08x] & FAR ID[0x%08x]", 
+                pdr->source_interface == PFCP_SRC_INTF_ACCESS ? "UL" : "DL", 
+                pdr->pdr_id, pdr->upf_s5u_teid, far_id);
     }
-        
+
     if (pdr->source_interface==PFCP_SRC_INTF_ACCESS) //UL
     {
-        d_error("Add PDR[0x%08x] TEID[0x%08x]", pdr->pdr_id, pdr->upf_s5u_teid);
+        
         list_append(&sess->ul_pdr_list, pdr);
     }
     else
@@ -101,12 +105,12 @@ void upf_n4_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
     
     //$ Create far
     far = upf_far_add();
-    far->far_id = *((c_uint32_t*)create_far->far_id.data);
+    far->far_id = ntohl(*((c_uint32_t*)create_far->far_id.data));
     far->apply_action = *((c_uint8_t*)(create_far->apply_action.data));
+    d_assert(create_far->forwarding_parameters.presence, upf_far_remove(far);return, "Mandatory IE missing: forwarding_parameters for create_far");
+    far->destination_interface = *((c_uint8_t*)create_far->forwarding_parameters.destination_interface.data);
     if (far->apply_action == PFCP_FAR_APPLY_ACTION_FORW)
     {
-        d_assert(create_far->forwarding_parameters.presence, upf_far_remove(far);return, "Mandatory IE missing: forwarding_parameters for crdate_far");
-        far->destination_interface = *((c_uint8_t*)create_far->forwarding_parameters.destination_interface.data);//PFCP_FAR_DEST_INTF_ACCESS;
         if (far->destination_interface == PFCP_FAR_DEST_INTF_ACCESS) //DL
         {
             pfcp_outer_hdr_t *outer_hdr;
@@ -114,7 +118,7 @@ void upf_n4_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
             gtp_node_t *node = NULL;
             status_t rv;
             //$ assume DL need GTP header
-            d_assert(create_far->forwarding_parameters.outer_header_creation.presence, return, "Mandatory IE missing: outer_header_creation for crdate_far");
+            d_assert(create_far->forwarding_parameters.outer_header_creation.presence, return, "Mandatory IE missing: outer_header_creation for create_far");
             
             outer_hdr = (pfcp_outer_hdr_t *)(create_far->forwarding_parameters.outer_header_creation.data);
             if (!(outer_hdr->gtpu_ipv4 || outer_hdr->gtpu_ipv6))
@@ -124,7 +128,7 @@ void upf_n4_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
             
             far->sgw_s5u_teid = ntohl(outer_hdr->teid);
             rv = pfcp_outer_hdr_to_ip(outer_hdr, &ip);
-            d_assert(rv == CORE_OK, upf_far_remove(far);return, "Outer hdr IP convert fail for crdate_far");
+            d_assert(rv == CORE_OK, upf_far_remove(far);return, "Outer hdr IP convert fail for create_far");
             
             node = gtp_find_node_by_ip(&upf_self()->sgw_s5u_list, &ip);
             if (!node)
@@ -135,16 +139,20 @@ void upf_n4_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
                     context_self()->parameter.no_ipv6,
                     context_self()->parameter.prefer_ipv4);
                 
-                d_assert(node, upf_far_remove(far);return, "GTP node create fail for crdate_far");
+                d_assert(node, upf_far_remove(far);return, "GTP node create fail for create_far");
                 //$ 20180615 bug:    
                 rv = gtp_client(node);
                 d_assert(rv == CORE_OK, return,);
             }
             
             far->gnode = node;
-        }            
+        }
     }  
     
+    d_error("Create %s FAR ID[0x%08x]",
+            far->destination_interface == PFCP_FAR_DEST_INTF_ACCESS ? "DL" : "UL",
+            far->far_id);
+
     list_append(&upf_self()->far_list, far);
     *rt_far = far;
 }
@@ -261,7 +269,7 @@ void upf_n4_handle_session_modification_request(
     /* Update FAR */
     if (req->update_far.presence)
     {
-        upf_far_t *target_far = upf_far_find_by_far_id(*(c_uint32_t *) req->update_far.far_id.data);
+        upf_far_t *target_far = upf_far_find_by_far_id(ntohl(*(c_uint32_t *) req->update_far.far_id.data));
         if (target_far)
         {
             /* Update eNB S1U-TEID */
