@@ -1,4 +1,5 @@
 EXTRA_DIST = \
+	nextepc-amfd.service.in \
 	nextepc-mmed.service.in \
 	nextepc-pgwd.service.in \
 	nextepc-hssd.service.in \

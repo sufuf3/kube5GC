@@ -1332,6 +1332,54 @@ ED8(c_uint8_t ebi15:1;,
     c_uint8_t ebi8:1;)
 } __attribute__ ((packed)) nas_serving_plmn_rate_control_t;
 
+/** TS 33.401 [15] */
+typedef struct nas_nr_ue_network_capability_t {
+    c_uint8_t length;
+    union { 
+        struct {
+        ED8(c_uint8_t nea0:1;,
+            c_uint8_t nea1:1;,
+            c_uint8_t nea2:1;,
+            c_uint8_t nea3:1;,
+            c_uint8_t nea4:1;,
+            c_uint8_t nea5:1;,
+            c_uint8_t nea6:1;,
+            c_uint8_t nea7:1;)
+        };
+        c_uint8_t nea; 
+    };
+    union { 
+        struct {
+        ED8(c_uint8_t nia0:1;,
+            c_uint8_t nia1:1;,
+            c_uint8_t nia2:1;,
+            c_uint8_t nia3:1;,
+            c_uint8_t nia4:1;,
+            c_uint8_t nia5:1;,
+            c_uint8_t nia6:1;,
+            c_uint8_t nia7:1;)
+        };
+        c_uint8_t nia; 
+    };
+} __attribute__ ((packed)) nas_nr_ue_network_capability_t;
+
+/** TS 25.331 [10] */
+typedef struct ue_application_layer_measurement_capability_t {
+    c_uint8_t length;
+    union { 
+        struct {
+        ED8(c_uint8_t qoe0:1;,
+            c_uint8_t qoe1:1;,
+            c_uint8_t qoe2:1;,
+            c_uint8_t qoe3:1;,
+            c_uint8_t qoe4:1;,
+            c_uint8_t qoe5:1;,
+            c_uint8_t qoe6:1;,
+            c_uint8_t qoe7:1;)
+        };
+        c_uint8_t qoe;
+    };
+} __attribute__ ((packed)) ue_application_layer_measurement_capability_t;
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

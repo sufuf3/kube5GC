@@ -8,12 +8,21 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define S1AP_SCTP_PORT              36412
+#define NGAP_SCTP_PORT              38412 /*add by Hu*/
 #define GTPV2_C_UDP_PORT            2123
 #define GTPV1_U_UDP_PORT            2152
 #define PFCP_UDP_PORT               8805
 
 #define SCTP_S1AP_PPID              18
 #define SCTP_X2AP_PPID              27
+#define SCTP_NGAP_PPID              60 /*add by Hu*/
+
+/*******************add by HU************************/
+#define MAX_NUM_OF_RAN              128
+#define MAX_NUM_OF_5G_UE            128
+
+#define MAX_POOL_OF_5G_UE           (MAX_NUM_OF_RAN * MAX_NUM_OF_5G_UE)
+/****************************************************/
 
 #define MAX_NUM_OF_ENB              128
 #define MAX_NUM_OF_UE               128
@@ -36,6 +45,11 @@ extern "C" {
 
 #define MAX_SDU_LEN             8192
 #define PLMN_ID_LEN             3
+#define AMF_REGION_ID_LEN       2
+#define AMF_SET_ID_LEN          4
+#define AMF_POINTER_LEN         4
+#define SST_LEN                 1
+#define SD_LEN                  3
 
 #define BCD_TO_BUFFER_LEN(x)    (((x)+1)/2)
 #define MAX_IMSI_BCD_LEN        15
@@ -88,6 +102,28 @@ typedef struct _e_cgi_t {
     c_uint32_t cell_id; /* 28 bit */
 } __attribute__ ((packed)) e_cgi_t;
 
+/****************add by Hu**************/
+typedef struct _s_nssai_t {
+    c_uint8_t sst;
+    c_uint32_t sd; /* 24 bit */
+} __attribute__ ((packed)) s_nssai_t;
+
+
+typedef struct _nr_cgi_t {
+    plmn_id_t plmn_id;
+    c_uint64_t cell_id; /* 36 bit */
+} __attribute__ ((packed)) nr_cgi_t;
+
+typedef struct _guti_5g_t {
+    plmn_id_t plmn_id;
+    c_uint16_t amf_rid;
+    c_uint8_t amf_sid;
+    c_uint8_t amf_ptr;
+    c_uint32_t tmsi_5g;
+} __attribute__ ((packed)) guti_5g_t;
+
+/**************************************/
+
 typedef struct _guti_t {
     plmn_id_t plmn_id;
     c_uint16_t mme_gid;
@@ -97,6 +133,7 @@ typedef struct _guti_t {
 
 /**************************************************
  * Common Structure
+ * NGAP : 9.3.2.4 Transport Layer Address, See 38.414
  * S1AP : 9.2.2.1 Transport Layer Address, See 36.414
  * GTP : 8.22 Fully Qualified TEID (F-TEID) */
 #define IPV4_LEN                4

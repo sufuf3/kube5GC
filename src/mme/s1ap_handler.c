@@ -296,7 +296,7 @@ void s1ap_handle_eNB_configuration_update(mme_enb_t *enb, s1ap_message_t *messag
             "s1ap_send_to_enb() failed");
 
 }
-void s1ap_handle_ue_context_suspend(
+void s1ap_handle_ue_context_suspend_request(
         mme_enb_t *enb, s1ap_message_t *message)
 {
     int i;
@@ -307,7 +307,7 @@ void s1ap_handle_ue_context_suspend(
     S1AP_UEContextSuspendRequestIEs_t *ie = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
-
+    S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList = NULL;
     pkbuf_t *s1apbuf = NULL;
 
     d_assert(enb, return,);
@@ -332,11 +332,17 @@ void s1ap_handle_ue_context_suspend(
             case S1AP_ProtocolIE_ID_id_eNB_UE_S1AP_ID:
                 ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
                 break;
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+                SecondaryRATDataUsageReportList =
+                    &ie->value.choice.SecondaryRATDataUsageReportList;
+                break;
+
             default:
                 break;
         }
     }
 
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(3, "[MME] ue context suspend response\n");
     d_assert(s1ap_build_ue_context_suspend_response(&s1apbuf,MME_UE_S1AP_ID,ENB_UE_S1AP_ID) == CORE_OK, 
             return, "s1ap_build_setup_rsp() failed");
@@ -344,9 +350,8 @@ void s1ap_handle_ue_context_suspend(
 
     d_assert(s1ap_send_to_enb(enb, s1apbuf,S1AP_NON_UE_SIGNALLING) == CORE_OK,,
             "s1ap_send_to_enb() failed");
-
 }
-void s1ap_handle_ERAB_release_response(
+void s1ap_handle_e_rab_release_response(
         mme_enb_t *enb, s1ap_message_t *message)
 {
     int i;
@@ -355,6 +360,7 @@ void s1ap_handle_ERAB_release_response(
     S1AP_E_RABReleaseResponse_t *E_RABReleaseResponse = NULL;
 
     S1AP_E_RABReleaseResponseIEs_t *ie = NULL;
+    S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList= NULL;
    // S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;    
 //    S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;    
 
@@ -367,7 +373,7 @@ void s1ap_handle_ERAB_release_response(
     E_RABReleaseResponse = &successfulOutcome->value.choice.E_RABReleaseResponse;
     d_assert(E_RABReleaseResponse, return,);
 
-    d_trace(3, "[MME] ERAB release response\n");
+    d_trace(3, "[MME] E-RAB release response\n");
 
     for (i = 0; i < E_RABReleaseResponse->protocolIEs.list.count; i++)
     {
@@ -380,11 +386,16 @@ void s1ap_handle_ERAB_release_response(
             case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
               //  MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
                 break;
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+                SecondaryRATDataUsageReportList =
+                    &ie->value.choice.SecondaryRATDataUsageReportList;
+                break;
             default:
                 break;
         }
     }
-
+    
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
 }
 
 // Handle MME configuration Update Acknowledge
@@ -502,7 +513,8 @@ void s1ap_handle_e_rab_release_indication(
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_E_RABReleaseIndicationIEs_t *ie = NULL;
-    
+    S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList= NULL;
+
     d_assert(enb, return,);
     d_assert(enb->sock, return,);
 
@@ -528,11 +540,18 @@ void s1ap_handle_e_rab_release_indication(
                 break;
             case S1AP_ProtocolIE_ID_id_E_RABReleasedList:
                 break;
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+                SecondaryRATDataUsageReportList =
+                    &ie->value.choice.SecondaryRATDataUsageReportList;
+                break;
+
             default:
                 break;
         }
     }
     d_trace(1, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n", *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID );
+    
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
 }
 
 void s1ap_handle_CBC_write_replace_warning_message(mme_enb_t *enb)
@@ -567,6 +586,7 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
     S1AP_TAI_t *TAI = NULL;
     S1AP_EUTRAN_CGI_t *EUTRAN_CGI = NULL;
     S1AP_S_TMSI_t *S_TMSI = NULL;
+    S1AP_UE_Application_Layer_Measurement_Capability_t *UE_Application_Layer_Measurement_Capability = NULL;
 
     S1AP_PLMNidentity_t    *pLMNidentity = NULL;
     S1AP_TAC_t *tAC = NULL;
@@ -605,6 +625,8 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
             case S1AP_ProtocolIE_ID_id_S_TMSI:
                 S_TMSI = &ie->value.choice.S_TMSI;
                 break;
+            case S1AP_ProtocolIE_ID_id_UE_Application_Layer_Measurement_Capability:
+                UE_Application_Layer_Measurement_Capability = &ie->value.choice.UE_Application_Layer_Measurement_Capability;
             default:
                 break;
         }
@@ -717,6 +739,14 @@ void s1ap_handle_initial_ue_message(mme_enb_t *enb, s1ap_message_t *message)
 
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
         enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
+
+    d_trace(5, "UE_Application_Layer_Measurement_Capability\n");
+    if (UE_Application_Layer_Measurement_Capability)
+    {
+        memcpy(&enb_ue->mme_ue->ue_application_layer_measurement_capability.qoe, UE_Application_Layer_Measurement_Capability->buf,
+        sizeof(enb_ue->mme_ue->ue_application_layer_measurement_capability.qoe));
+    }
+
 
     /*if (enb_ue){
         pkbuf_t *s1apbuf = NULL;
@@ -980,7 +1010,7 @@ void s1ap_handle_e_rab_modification_indication(
     //S1AP_E_RABToBeModifiedListBearerModInd_t*     E_RABToBeModifiedListBearerModInd = NULL;
     //S1AP_E_RABNotToBeModifiedListBearerModInd_t*     E_RABNotToBeModifiedListBearerModInd = NULL;
     //S1AP_CSGMembershipInfo_t*     CSGMembershipInfo = NULL;
-
+    S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList= NULL;
     enb_ue_t *enb_ue = NULL;
 
     d_assert(enb, return,);
@@ -1018,12 +1048,17 @@ void s1ap_handle_e_rab_modification_indication(
             case S1AP_ProtocolIE_ID_id_CSGMembershipInfo:
                 CSGMembershipInfo = &ie->value.choice.CSGMembershipInfo;
                 break;*/
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+                SecondaryRATDataUsageReportList =
+                    &ie->value.choice.SecondaryRATDataUsageReportList;
+                break;
 
             default:
                 break;
         }
     }
 
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(5, "    IP[%s] ENB_ID[%d]\n",
             CORE_ADDR(enb->addr, buf), enb->enb_id);
 
@@ -1051,6 +1086,7 @@ void s1ap_handle_ue_capability_info_indication(
     S1AP_UECapabilityInfoIndicationIEs_t *ie = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_UERadioCapability_t *UERadioCapability = NULL;
+    S1AP_UE_Application_Layer_Measurement_Capability_t *UE_Application_Layer_Measurement_Capability = NULL;
 
     enb_ue_t *enb_ue = NULL;
 
@@ -1077,6 +1113,8 @@ void s1ap_handle_ue_capability_info_indication(
             case S1AP_ProtocolIE_ID_id_UERadioCapability:
                 UERadioCapability = &ie->value.choice.UERadioCapability;
                 break;
+            case S1AP_ProtocolIE_ID_id_UE_Application_Layer_Measurement_Capability:
+                UE_Application_Layer_Measurement_Capability = &ie->value.choice.UE_Application_Layer_Measurement_Capability;
             default:
                 break;
         }
@@ -1123,6 +1161,13 @@ void s1ap_handle_ue_capability_info_indication(
         S1AP_STORE_DATA(&enb_ue->mme_ue->ueRadioCapability, UERadioCapability);
 #endif
     }
+    
+    d_trace(1, "UE_Application_Layer_Measurement_Capability");
+    if (UE_Application_Layer_Measurement_Capability) {
+        memcpy(&enb_ue->mme_ue->ue_application_layer_measurement_capability.qoe, UE_Application_Layer_Measurement_Capability->buf,
+        sizeof(enb_ue->mme_ue->ue_application_layer_measurement_capability.qoe));
+    }
+    
 }
 
 void s1ap_handle_initial_context_setup_response(
@@ -1666,7 +1711,7 @@ void s1ap_handle_e_rab_modify_response(
     S1AP_E_RABModifyResponseIEs_t *ie = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_E_RABModifyListBearerModRes_t *E_RABModifyListBearerModRes = NULL;
-    //S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList = NULL;
+    S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList = NULL;
 
     enb_ue_t *enb_ue = NULL;
     mme_ue_t *mme_ue = NULL;
@@ -1694,15 +1739,16 @@ void s1ap_handle_e_rab_modify_response(
                 E_RABModifyListBearerModRes =
                     &ie->value.choice.E_RABModifyListBearerModRes;
                 break;
-            /*case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
                 SecondaryRATDataUsageReportList =
                     &ie->value.choice.SecondaryRATDataUsageReportList;
-        break;*/
+                break;
             default:
                 break;
         }
     }
 
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(5, "    IP[%s] ENB_ID[%d]\n",
             CORE_ADDR(enb->addr, buf), enb->enb_id);
 
@@ -1772,6 +1818,7 @@ void s1ap_handle_ue_context_release_request(
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_Cause_t *Cause = NULL;
+    S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList = NULL;
 
     enb_ue_t *enb_ue = NULL;
     mme_ue_t *mme_ue = NULL;
@@ -1802,11 +1849,17 @@ void s1ap_handle_ue_context_release_request(
             case S1AP_ProtocolIE_ID_id_Cause:
                 Cause = &ie->value.choice.Cause;
                 break;
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+                SecondaryRATDataUsageReportList =
+                    &ie->value.choice.SecondaryRATDataUsageReportList;
+                break;
+
             default:
                 break;
         }
     }
 
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(5, "    IP[%s] ENB_ID[%d]\n",
             CORE_ADDR(enb->addr, buf), enb->enb_id);
 
@@ -1885,7 +1938,7 @@ void s1ap_handle_ue_context_release_complete(
 
     S1AP_UEContextReleaseComplete_IEs_t *ie = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
-
+    S1AP_SecondaryRATDataUsageReportList_t *SecondaryRATDataUsageReportList = NULL;
     mme_ue_t *mme_ue = NULL;
     enb_ue_t *enb_ue = NULL;
 
@@ -1909,11 +1962,17 @@ void s1ap_handle_ue_context_release_complete(
             case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
                 MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
                 break;
+            case S1AP_ProtocolIE_ID_id_SecondaryRATDataUsageReportList:
+                SecondaryRATDataUsageReportList =
+                    &ie->value.choice.SecondaryRATDataUsageReportList;
+                break;
+
             default:
                 break;
         }
     }
 
+    d_trace(5,"%s",SecondaryRATDataUsageReportList);
     d_trace(5, "    IP[%s] ENB_ID[%d]\n",
             CORE_ADDR(enb->addr, buf), enb->enb_id);
 
@@ -2010,24 +2069,24 @@ void s1ap_handle_ue_context_resume_request(
     int i;
 
     S1AP_InitiatingMessage_t *initiatingMessage = NULL;
-	S1AP_UEContextResumeRequest_t *UEContextResumeRequest = NULL;
+    S1AP_UEContextResumeRequest_t *UEContextResumeRequest = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
-	S1AP_UEContextResumeRequestIEs_t *ie = NULL;
-    // S1AP_E_RABFailedToResumeListResumeReq_t	 *E_RABFailedToResumeListResumeReq;
+    S1AP_UEContextResumeRequestIEs_t *ie = NULL;
+    // S1AP_E_RABFailedToResumeListResumeReq_t   *E_RABFailedToResumeListResumeReq;
 
     d_assert(enb, return,);
     d_assert(enb->sock, return,);
 
-	// Message Type
+    // Message Type
     d_assert(message, return,);
     initiatingMessage = message->choice.initiatingMessage;
     d_assert(initiatingMessage, return,);
     UEContextResumeRequest= &initiatingMessage->value.choice.UEContextResumeRequest;
-	//--------------
-	
+    //--------------
+    
     d_trace(3, "[MME] UE Context Resume Request\n");
-	
+    
     for (i = 0; i <UEContextResumeRequest->protocolIEs.list.count; i++)
     {
         ie = UEContextResumeRequest->protocolIEs.list.array[i];
@@ -2039,9 +2098,9 @@ void s1ap_handle_ue_context_resume_request(
             case S1AP_ProtocolIE_ID_id_MME_UE_S1AP_ID:
                 MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
                 break;
-			case S1AP_ProtocolIE_ID_id_E_RABFailedToResumeListResumeReq:
-				// E_RABFailedToResumeListResumeReq = &ie->value.choice.E_RABFailedToResumeListResumeReq;
-				break;
+            case S1AP_ProtocolIE_ID_id_E_RABFailedToResumeListResumeReq:
+                // E_RABFailedToResumeListResumeReq = &ie->value.choice.E_RABFailedToResumeListResumeReq;
+                break;
             default:
                 break;
         }

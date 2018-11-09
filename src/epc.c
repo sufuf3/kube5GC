@@ -231,10 +231,10 @@ status_t app_initialize(const char *config_path, const char *log_path)
     rv = app_did_initialize();
     if (rv != CORE_OK) return rv;
 
-    d_trace(1, "MME try to initialize\n");
+    d_trace(1, "AMF try to initialize\n");
     rv = mme_initialize();
-    d_assert(rv == CORE_OK, return rv, "Failed to intialize MME");
-    d_trace(1, "MME initialize...done\n");
+    d_assert(rv == CORE_OK, return rv, "Failed to intialize AMF");
+    d_trace(1, "AMF initialize...done\n");
 
     return CORE_OK;;
 }
@@ -243,9 +243,9 @@ void app_terminate(void)
 {
     app_will_terminate();
 
-    d_trace(1, "MME try to terminate\n");
+    d_trace(1, "AMF try to terminate\n");
     mme_terminate();
-    d_trace(1, "MME terminate...done\n");
+    d_trace(1, "AMF terminate...done\n");
 
     if (context_self()->parameter.no_hss == 0)
     {

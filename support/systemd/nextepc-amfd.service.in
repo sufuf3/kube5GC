@@ -1,0 +1,20 @@
+[Unit]
+Description=NextEPC AMF Daemon
+After=networking.service
+
+[Service]
+Type=simple
+
+User=nextepc
+Group=nextepc
+
+RuntimeDirectory=nextepc-amfd
+PIDFile=@LIB_DIR@/run/nextepc-amfd/pid
+
+Restart=always
+ExecStart=@BIN_DIR@/nextepc-amfd -f @SYSCONF_DIR@/nextepc/mme.conf
+RestartSec=2
+RestartPreventExitStatus=1
+
+[Install]
+WantedBy=multi-user.target

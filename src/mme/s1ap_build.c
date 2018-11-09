@@ -1129,6 +1129,7 @@ status_t s1ap_build_downlink_nas_transport(
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_NAS_PDU_t *NAS_PDU = NULL;
+    S1AP_NRUESecurityCapabilities_t	*NRUESecurityCapabilities = NULL;
 
     d_assert(emmbuf, return CORE_ERROR, "Null param");
     d_assert(enb_ue, return CORE_ERROR, "Null param");
@@ -1177,11 +1178,36 @@ status_t s1ap_build_downlink_nas_transport(
 
     NAS_PDU = &ie->value.choice.NAS_PDU;
 
+    ie = core_calloc(1, sizeof(S1AP_DownlinkNASTransport_IEs_t));
+    ASN_SEQUENCE_ADD(&DownlinkNASTransport->protocolIEs, ie);
+    
+    ie->id = S1AP_ProtocolIE_ID_id_NRUESecurityCapabilities;
+    ie->criticality = S1AP_Criticality_ignore;
+    ie->value.present = S1AP_DownlinkNASTransport_IEs__value_PR_NRUESecurityCapabilities;
+
+    NRUESecurityCapabilities = &ie->value.choice.NRUESecurityCapabilities;
+
     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
     *ENB_UE_S1AP_ID = enb_ue->enb_ue_s1ap_id;
+
+    NRUESecurityCapabilities->nRencryptionAlgorithms.size = 2;
+    NRUESecurityCapabilities->nRencryptionAlgorithms.buf = 
+        core_calloc(NRUESecurityCapabilities->nRencryptionAlgorithms.size, 
+                    sizeof(c_uint8_t));
+    NRUESecurityCapabilities->nRencryptionAlgorithms.bits_unused = 0;
+    NRUESecurityCapabilities->nRencryptionAlgorithms.buf[0] = 
+        (enb_ue->mme_ue->nr_ue_network_capability.nea << 1);
+
+    NRUESecurityCapabilities->nRintegrityProtectionAlgorithms.size = 2;
+    NRUESecurityCapabilities->nRintegrityProtectionAlgorithms.buf = 
+        core_calloc(NRUESecurityCapabilities->nRintegrityProtectionAlgorithms.size, 
+                    sizeof(c_uint8_t));
+    NRUESecurityCapabilities->nRintegrityProtectionAlgorithms.bits_unused = 0;
+    NRUESecurityCapabilities->nRintegrityProtectionAlgorithms.buf[0] = 
+        (enb_ue->mme_ue->nr_ue_network_capability.nia << 1);
 
     NAS_PDU->size = emmbuf->len;
     NAS_PDU->buf = core_calloc(NAS_PDU->size, sizeof(c_uint8_t));

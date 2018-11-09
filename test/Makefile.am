@@ -11,6 +11,7 @@ testepc_SOURCES = \
 	basic/testutil.c basic/s1ap_message_test.c basic/nas_message_test.c \
 	basic/gtp_message_test.c basic/security_test.c basic/s1setup_test.c \
 	basic/attach_test.c basic/volte_test.c basic/handover_test.c \
+	basic/ngsetup_test.c \
 	$(NULL)
 
 testvolte_SOURCES = \
@@ -33,6 +34,7 @@ AM_CPPFLAGS = \
     -I$(top_srcdir)/lib \
     -I$(top_srcdir)/src \
     -I$(top_srcdir)/lib/s1ap/asn1c \
+	-I$(top_srcdir)/lib/ngap/asn1c \
 	-I$(top_srcdir)/lib/@FREEDIAMETER_DIR@/include \
 	-I$(top_srcdir)/test/common \
 	@MONGOC_CFLAGS@ \
@@ -42,6 +44,10 @@ AM_CFLAGS = \
 	-Wall -Werror \
 	-Wno-unused-function -Wno-unused-variable \
 	@OSCPPFLAGS@ \
+	$(NULL)
+
+AM_LDFLAGS = \
+	-Wl,--no-relax \
 	$(NULL)
 
 DEFS = \

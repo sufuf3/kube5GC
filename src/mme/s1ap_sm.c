@@ -87,7 +87,7 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         }
                         case S1AP_ProcedureCode_id_UEContextSuspend :
                         {
-                            s1ap_handle_ue_context_suspend(enb, pdu);
+                            s1ap_handle_ue_context_suspend_request(enb, pdu);
                             break;
                         }
                         /////////////////
@@ -231,7 +231,7 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
                         }
                         case S1AP_ProcedureCode_id_E_RABRelease :
                         {
-                            s1ap_handle_ERAB_release_response(enb, pdu);
+                            s1ap_handle_e_rab_release_response(enb, pdu);
                             break;
                         }
                         case S1AP_ProcedureCode_id_UEContextRelease :

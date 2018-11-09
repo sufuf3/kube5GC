@@ -4,9 +4,10 @@
 
 #include "3gpp_types.h"
 
-#include "mme/s1ap_build.h"
-#include "mme/s1ap_conv.h"
+#include "amf/s1ap_build.h"
+#include "amf/s1ap_conv.h"
 
+#include "amf/ngap_conv.h"
 #include "testutil.h"
 #include "testpacket.h"
 
@@ -66,6 +67,7 @@ static void s1ap_message_test2(abts_case *tc, void *data)
     s1ap_free_pdu(&message);
 
     pkbuf_free(pkbuf);
+
 }
 
 static void s1ap_message_test3(abts_case *tc, void *data)

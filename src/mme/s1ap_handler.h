@@ -22,14 +22,14 @@ CORE_DECLARE(void) s1ap_handle_eNB_configuration_update(
         mme_enb_t *enb, s1ap_message_t *message);
 CORE_DECLARE(void) s1ap_handle_eNB_cp_relocation_indication(
         mme_enb_t *enb, s1ap_message_t *message);
-CORE_DECLARE(void) s1ap_handle_ue_context_suspend(
+CORE_DECLARE(void) s1ap_handle_ue_context_suspend_request(
         mme_enb_t *enb, s1ap_message_t *message);
 
 CORE_DECLARE(void) s1ap_handle_CBC_write_replace_warning_message(
         mme_enb_t *enb);        
 CORE_DECLARE(void) s1ap_handle_CBC_stop_warning_message(
         mme_enb_t *enb);
-CORE_DECLARE(void) s1ap_handle_ERAB_release_response(
+CORE_DECLARE(void) s1ap_handle_e_rab_release_response(
         mme_enb_t *enb, s1ap_message_t *message);
 
 CORE_DECLARE(void) s1ap_handle_mme_configuration_update_acknowledge(
