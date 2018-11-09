@@ -644,7 +644,7 @@ status_t upf_context_setup_trace_module()
 {
     int app = context_self()->logger.trace.app;
     int gtp = context_self()->logger.trace.gtp;
-    //int pfcp = context_self()->logger.trace.pfcp;
+    int pfcp = context_self()->logger.trace.pfcp;
 
     if (app)
     {
@@ -658,6 +658,16 @@ status_t upf_context_setup_trace_module()
         d_trace_level(&_upf_gtp_path, gtp);
         extern int _upf_ipfw;
         d_trace_level(&_upf_ipfw, gtp);
+    }
+
+    if (pfcp)
+    {
+        extern int _upf_pfcp_path;
+        d_trace_level(&_upf_pfcp_path, pfcp);
+        extern int _upf_n4_build;
+        d_trace_level(&_upf_n4_build, pfcp);
+        extern int _upf_n4_handler;
+        d_trace_level(&_upf_n4_handler, pfcp);
     }
 
     return CORE_OK;
@@ -1425,7 +1435,6 @@ upf_pdr_t* upf_pdr_find_by_upf_s5u_teid(c_uint32_t teid)
     for (hi = upf_sess_first(); hi; hi = upf_sess_next(hi))
     {
         upf_sess_t *sess = upf_sess_this(hi);
-        d_info("Session SEID[0x%016x]", sess->smf_seid);
         d_assert(sess, return NULL,);
 
         {
@@ -1445,9 +1454,6 @@ upf_pdr_t* upf_pdr_find_by_upf_s5u_teid(c_uint32_t teid)
             /* Find the bearer with matched */
             for (; pdr; pdr = upf_pdr_next(pdr))
             {
-                d_info("PDR TEID[0x%08x]", pdr->upf_s5u_teid);
-                //upf_pf_t *pf = NULL;
-
                 if (pdr->source_interface!=PFCP_SRC_INTF_ACCESS) //UL
                 {
                     /* Not DL PDR*/

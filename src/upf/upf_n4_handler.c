@@ -77,7 +77,7 @@ void upf_n4_handle_create_pdr(upf_sess_t *sess, tlv_create_pdr_t *create_pdr, up
         d_assert(far, upf_pdr_remove(pdr);return, "FAR id not found");
         pdr->far = far;
 
-        d_error("Create %s PDR[0x%04x] TEID[0x%08x] & FAR ID[0x%08x]", 
+        d_trace(10, "Create %s PDR[0x%04x] TEID[0x%08x] & FAR ID[0x%08x]", 
                 pdr->source_interface == PFCP_SRC_INTF_ACCESS ? "UL" : "DL", 
                 pdr->pdr_id, pdr->upf_s5u_teid, far_id);
     }
@@ -149,7 +149,7 @@ void upf_n4_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
         }
     }  
     
-    d_error("Create %s FAR ID[0x%08x]",
+    d_trace(10, "Create %s FAR ID[0x%08x]",
             far->destination_interface == PFCP_FAR_DEST_INTF_ACCESS ? "DL" : "UL",
             far->far_id);
 
@@ -220,7 +220,6 @@ void upf_n4_handle_session_establishment_request(
 
         smf_f_seid = req->cp_f_seid.data;
         sess->smf_seid = be64toh(smf_f_seid->seid);
-        d_info("[UPF] SMF SEID[0x%016llx]", sess->smf_seid);
     
         /* Send Session Establishment Response */
         memset(&h, 0, sizeof(pfcp_header_t));
