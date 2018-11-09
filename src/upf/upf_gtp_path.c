@@ -501,7 +501,7 @@ static status_t upf_gtp_send_router_advertisement(
 }
 #endif
 
-c_uint16_t in_cksum(c_uint16_t *addr, int len)
+c_uint16_t upf_in_cksum(c_uint16_t *addr, int len)
 {
     int nleft = len;
     c_uint32_t sum = 0;

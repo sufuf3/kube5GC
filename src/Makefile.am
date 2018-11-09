@@ -36,6 +36,7 @@ libepc_la_SOURCES = epc.c
 libepc_la_DEPENDENCIES = \
     $(top_srcdir)/src/mme/libmme.la \
     $(top_srcdir)/src/hss/libhss.la \
+    $(top_srcdir)/src/smf/libsmf.la \
     $(top_srcdir)/src/sgw/libsgw.la \
     $(top_srcdir)/src/pgw/libpgw.la \
     $(top_srcdir)/src/pcrf/libpcrf.la \
@@ -46,6 +47,7 @@ libepc_la_LIBADD = \
     $(top_srcdir)/src/hss/libhss.la \
     $(top_srcdir)/src/sgw/libsgw.la \
     $(top_srcdir)/src/pgw/libpgw.la \
+    $(top_srcdir)/src/smf/libsmf.la \
     $(top_srcdir)/src/pcrf/libpcrf.la \
     $(top_srcdir)/src/upf/libupf.la \
 	$(NULL)

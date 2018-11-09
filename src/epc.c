@@ -10,11 +10,11 @@
 static semaphore_id pcrf_sem1 = 0;
 static semaphore_id pcrf_sem2 = 0;
 
-static semaphore_id pgw_sem1 = 0;
-static semaphore_id pgw_sem2 = 0;
+static semaphore_id upf_sem1 = 0;
+static semaphore_id upf_sem2 = 0;
 
-static semaphore_id sgw_sem1 = 0;
-static semaphore_id sgw_sem2 = 0;
+static semaphore_id smf_sem1 = 0;
+static semaphore_id smf_sem2 = 0;
 
 static semaphore_id hss_sem1 = 0;
 static semaphore_id hss_sem2 = 0;
@@ -80,10 +80,10 @@ status_t app_initialize(const char *config_path, const char *log_path)
     }
 
 
-    /************************* PGW Process **********************/
+    /************************* UPF Process **********************/
 
-    semaphore_create(&pgw_sem1, 0); /* copied to PGW/SGW/HSS process */
-    semaphore_create(&pgw_sem2, 0); /* copied to PGW/SGW/HSS process */
+    semaphore_create(&upf_sem1, 0); /* copied to UPF/SGW/HSS process */
+    semaphore_create(&upf_sem2, 0); /* copied to UPF/SGW/HSS process */
 
     if (context_self()->parameter.no_pgw == 0)
     {
@@ -96,26 +96,26 @@ status_t app_initialize(const char *config_path, const char *log_path)
             if (pcrf_sem1) semaphore_delete(pcrf_sem1);
             if (pcrf_sem2) semaphore_delete(pcrf_sem2);
 
-            d_trace(1, "PGW try to initialize\n");
-            rv = pgw_initialize();
-            d_assert(rv == CORE_OK,, "Failed to intialize PGW");
-            d_trace(1, "PGW initialize...done\n");
+            d_trace(1, "UPF try to initialize\n");
+            rv = upf_initialize();
+            d_assert(rv == CORE_OK,, "Failed to intialize UPF");
+            d_trace(1, "UPF initialize...done\n");
 
-            if (pgw_sem1) semaphore_post(pgw_sem1);
-            if (pgw_sem2) semaphore_wait(pgw_sem2);
+            if (upf_sem1) semaphore_post(upf_sem1);
+            if (upf_sem2) semaphore_wait(upf_sem2);
 
             if (rv == CORE_OK)
             {
-                d_trace(1, "PGW try to terminate\n");
-                pgw_terminate();
-                d_trace(1, "PGW terminate...done\n");
+                d_trace(1, "UPF try to terminate\n");
+                upf_terminate();
+                d_trace(1, "UPF terminate...done\n");
             }
 
-            if (pgw_sem1) semaphore_post(pgw_sem1);
+            if (upf_sem1) semaphore_post(upf_sem1);
 
             /* allocated from parent process */
-            if (pgw_sem1) semaphore_delete(pgw_sem1);
-            if (pgw_sem2) semaphore_delete(pgw_sem2);
+            if (upf_sem1) semaphore_delete(upf_sem1);
+            if (upf_sem2) semaphore_delete(upf_sem2);
 
             app_did_terminate();
 
@@ -124,14 +124,14 @@ status_t app_initialize(const char *config_path, const char *log_path)
             _exit(EXIT_SUCCESS);
         }
 
-        if (pgw_sem1) semaphore_wait(pgw_sem1);
+        if (upf_sem1) semaphore_wait(upf_sem1);
     }
 
 
-    /************************* SGW Process **********************/
+    /************************* SMF Process **********************/
 
-    semaphore_create(&sgw_sem1, 0); /* copied to SGW/HSS process */
-    semaphore_create(&sgw_sem2, 0); /* copied to SGW/HSS process */
+    semaphore_create(&smf_sem1, 0); /* copied to SMF/HSS process */
+    semaphore_create(&smf_sem2, 0); /* copied to SMF/HSS process */
 
     if (context_self()->parameter.no_sgw == 0)
     {
@@ -143,29 +143,29 @@ status_t app_initialize(const char *config_path, const char *log_path)
             /* allocated from parent process */
             if (pcrf_sem1) semaphore_delete(pcrf_sem1);
             if (pcrf_sem2) semaphore_delete(pcrf_sem2);
-            if (pgw_sem1) semaphore_delete(pgw_sem1);
-            if (pgw_sem2) semaphore_delete(pgw_sem2);
+            if (upf_sem1) semaphore_delete(upf_sem1);
+            if (upf_sem2) semaphore_delete(upf_sem2);
 
-            d_trace(1, "SGW try to initialize\n");
-            rv = sgw_initialize();
-            d_assert(rv == CORE_OK,, "Failed to intialize SGW");
-            d_trace(1, "SGW initialize...done\n");
+            d_trace(1, "SMF try to initialize\n");
+            rv = smf_initialize();
+            d_assert(rv == CORE_OK,, "Failed to intialize SMF");
+            d_trace(1, "SMF initialize...done\n");
 
-            if (sgw_sem1) semaphore_post(sgw_sem1);
-            if (sgw_sem2) semaphore_wait(sgw_sem2);
+            if (smf_sem1) semaphore_post(smf_sem1);
+            if (smf_sem2) semaphore_wait(smf_sem2);
 
             if (rv == CORE_OK)
             {
-                d_trace(1, "SGW try to terminate\n");
-                sgw_terminate();
-                d_trace(1, "SGW terminate...done\n");
+                d_trace(1, "SMF try to terminate\n");
+                smf_terminate();
+                d_trace(1, "SMF terminate...done\n");
             }
 
-            if (sgw_sem1) semaphore_post(sgw_sem1);
+            if (smf_sem1) semaphore_post(smf_sem1);
 
             /* allocated from parent process */
-            if (sgw_sem1) semaphore_delete(sgw_sem1);
-            if (sgw_sem2) semaphore_delete(sgw_sem2);
+            if (smf_sem1) semaphore_delete(smf_sem1);
+            if (smf_sem2) semaphore_delete(smf_sem2);
 
             app_did_terminate();
 
@@ -174,7 +174,7 @@ status_t app_initialize(const char *config_path, const char *log_path)
             _exit(EXIT_SUCCESS);
         }
 
-        if (sgw_sem1) semaphore_wait(sgw_sem1);
+        if (smf_sem1) semaphore_wait(smf_sem1);
     }
 
 
@@ -193,10 +193,10 @@ status_t app_initialize(const char *config_path, const char *log_path)
             /* allocated from parent process */
             if (pcrf_sem1) semaphore_delete(pcrf_sem1);
             if (pcrf_sem2) semaphore_delete(pcrf_sem2);
-            if (pgw_sem1) semaphore_delete(pgw_sem1);
-            if (pgw_sem2) semaphore_delete(pgw_sem2);
-            if (sgw_sem1) semaphore_delete(sgw_sem1);
-            if (sgw_sem2) semaphore_delete(sgw_sem2);
+            if (upf_sem1) semaphore_delete(upf_sem1);
+            if (upf_sem2) semaphore_delete(upf_sem2);
+            if (smf_sem1) semaphore_delete(smf_sem1);
+            if (smf_sem2) semaphore_delete(smf_sem2);
 
             d_trace(1, "HSS try to initialize\n");
             rv = hss_initialize();
@@ -257,19 +257,19 @@ void app_terminate(void)
 
     if (context_self()->parameter.no_sgw == 0)
     {
-        if (sgw_sem2) semaphore_post(sgw_sem2);
-        if (sgw_sem1) semaphore_wait(sgw_sem1);
+        if (smf_sem2) semaphore_post(smf_sem2);
+        if (smf_sem1) semaphore_wait(smf_sem1);
     }
-    if (sgw_sem1) semaphore_delete(sgw_sem1);
-    if (sgw_sem2) semaphore_delete(sgw_sem2);
+    if (smf_sem1) semaphore_delete(smf_sem1);
+    if (smf_sem2) semaphore_delete(smf_sem2);
 
     if (context_self()->parameter.no_pgw == 0)
     {
-        if (pgw_sem2) semaphore_post(pgw_sem2);
-        if (pgw_sem1) semaphore_wait(pgw_sem1);
+        if (upf_sem2) semaphore_post(upf_sem2);
+        if (upf_sem1) semaphore_wait(upf_sem1);
     }
-    if (pgw_sem1) semaphore_delete(pgw_sem1);
-    if (pgw_sem2) semaphore_delete(pgw_sem2);
+    if (upf_sem1) semaphore_delete(upf_sem1);
+    if (upf_sem2) semaphore_delete(upf_sem2);
 
     if (context_self()->parameter.no_pcrf == 0)
     {
