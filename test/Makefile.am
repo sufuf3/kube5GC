@@ -46,6 +46,10 @@ AM_CFLAGS = \
 	@OSCPPFLAGS@ \
 	$(NULL)
 
+AM_LDFLAGS = \
+	-Wl,--no-relax \
+	$(NULL)
+
 DEFS = \
    @DEFS@ \
    -DFD_EXT_DIR=\"$(abs_top_builddir)/lib/@FREEDIAMETER_DIR@/extensions\" \
