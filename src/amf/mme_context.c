@@ -1737,6 +1737,8 @@ status_t mme_context_setup_trace_module()
     int s1ap = context_self()->logger.trace.s1ap;
     int nas = context_self()->logger.trace.nas;
     int diameter = context_self()->logger.trace.diameter;
+    int ngap = context_self()->logger.trace.ngap;
+
 
     int gtpv2 = context_self()->logger.trace.gtpv2;
     if (app)
@@ -1819,6 +1821,12 @@ status_t mme_context_setup_trace_module()
 
         extern int _tlv_msg;
         d_trace_level(&_tlv_msg, gtpv2);
+    }
+
+    if (ngap)
+    {
+        extern int _ngap_sctp;
+        d_trace_level(&_ngap_sctp, ngap);
     }
     return CORE_OK;
 }

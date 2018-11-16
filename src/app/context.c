@@ -230,6 +230,11 @@ status_t context_parse_config()
                             const char *v = yaml_iter_value(&trace_iter);
                             if (v) self.logger.trace.pfcp = atoi(v);
                         }
+                        else if (!strcmp(trace_key, "ngap"))
+                        {
+                            const char *v = yaml_iter_value(&trace_iter);
+                            if (v) self.logger.trace.ngap = atoi(v);
+                        }
                         else
                             d_warn("unknown key `%s`", trace_key);
                     }
