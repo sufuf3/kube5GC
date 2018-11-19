@@ -24,18 +24,16 @@ static void ngsetup_test1(abts_case *tc, void *data)
     ngap_message_t message;
     int i;
     
-    printf("\n test tests1ap_enb_connect \n");
     for (i = 0; i < NUM_OF_TEST_DUPLICATED_RAN; i++)
     {
         rv = testngap_ran_connect(&sock[i]);
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
     }
 
-    printf("\n test testngap_build_setup_req \n");
     for (i = 0; i < NUM_OF_TEST_DUPLICATED_RAN; i++)
     {
         rv = testngap_build_setup_req(
-                &sendbuf, NGAP_GNB_ID_PR_gNB_ID, 0xfffff);
+                &sendbuf, NGAP_GNB_ID_PR_gNB_ID, 0xABCDE);
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
         printf("\n test testngap_ran_send \n");

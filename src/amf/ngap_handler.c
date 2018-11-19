@@ -12,7 +12,7 @@
 
 void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 {
-    int i = 0, j = 0, k = 0;
+    int i = 0;//, j = 0, k = 0;
                               
     NGAP_InitiatingMessage_t *initiatingMessage = NULL;
     NGAP_NGSetupRequest_t *NGSetupRequest = NULL;
@@ -24,10 +24,9 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 	NGAP_PagingDRX_t *PagingDRX = NULL;
 
     pkbuf_t *ngapbuf = NULL;
-    //c_uint32_t gnb_id = 0;
+    c_uint32_t gnb_id = 0;
     NGAP_Cause_PR group = NGAP_Cause_PR_NOTHING;
     long cause = 0;
-
     d_assert(ran, return,);
     d_assert(ran->sock, return,);
 
@@ -37,9 +36,7 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 
     NGSetupRequest = &initiatingMessage->value.choice.NGSetupRequest;
     d_assert(NGSetupRequest, return,);
-
     d_trace(3, "[AMF] NG-Setup request\n");
-
     for (i = 0; i < NGSetupRequest->protocolIEs.list.count; i++)
     {
         ie = NGSetupRequest->protocolIEs.list.array[i];
@@ -47,13 +44,16 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
         {
             case NGAP_ProtocolIE_ID_id_GlobalRANNodeID:
                 Global_RAN_Node_ID = &ie->value.choice.GlobalRANNodeID;
+                printf("\n NGAP_ProtocolIE_ID_id_GlobalRANNodeID :%d\n", __LINE__);
                 d_assert(Global_RAN_Node_ID, return,);
                 break;
             case NGAP_ProtocolIE_ID_id_SupportedTAList:
                 SupportedTAList = &ie->value.choice.SupportedTAList;
+                printf("\n NGAP_ProtocolIE_ID_id_SupportedTAList :%d\n", __LINE__);
                 d_assert(SupportedTAList, return,);
                 break;
             case NGAP_ProtocolIE_ID_id_DefaultPagingDRX:
+                printf("\n NGAP_ProtocolIE_ID_id_DefaultPagingDRX :%d\n", __LINE__);
                 PagingDRX = &ie->value.choice.PagingDRX;
                 d_assert(PagingDRX, return,);
                 break;
@@ -66,10 +66,11 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
         }
     }
     
-    // ngap_RAN_ID_to_unit32(&Global_RAN_Node_ID->gNB_ID, &gnb_id);
-    // amf_ran_set_gnb_id(ran, gnb_id);
+    ngap_GNB_ID_to_uint32(&Global_RAN_Node_ID->choice.globalGNB_ID->gNB_ID, &gnb_id);
+    printf("\n NGAP_ProtocolIE_ID_id_GlobalRANNodeID :%d gnb_id: %x\n", __LINE__, gnb_id);
+    amf_ran_set_ran_id(ran, gnb_id, 0, 0, RAN_PR_GNB_ID);
 
-    /* Parse Supported TA */
+    /* Parse Supported TA 
     ran->num_of_supported_ta_list = 0;
     for (i = 0; i < SupportedTAList->list.count; i++)
     {
@@ -153,6 +154,7 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
             cause = S1AP_CauseMisc_unknown_PLMN;
         }
     }
+*/
 
     if (group == NGAP_Cause_PR_NOTHING)
     {

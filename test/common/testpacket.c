@@ -3545,7 +3545,6 @@ status_t testngap_build_setup_req(
         NGAP_PagingDRX_t *PagingDRX = NULL;
         NGAP_SupportedTAList_t *SupportedTAList = NULL;            
 
-printf("\n  %d \n", __LINE__);
     memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
     pdu.present = NGAP_NGAP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
@@ -3560,11 +3559,10 @@ printf("\n  %d \n", __LINE__);
 #if 1
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
-printf("\n  %d add GlobalRANNodeID \n", __LINE__);
     ie->id = NGAP_ProtocolIE_ID_id_GlobalRANNodeID;
     ie->criticality = NGAP_Criticality_reject;
     ie->value.present = NGAP_NGSetupRequestIEs__value_PR_GlobalRANNodeID;
-   
+  
     Global_RAN_Node_ID = &ie->value.choice.GlobalRANNodeID;
     Global_RAN_Node_ID->present = NGAP_GlobalRANNodeID_PR_globalGNB_ID;
 #endif
@@ -3581,12 +3579,10 @@ printf("\n  %d add GlobalRANNodeID \n", __LINE__);
 
 #if 1
     plmn_id_build(&plmn_id, 1, 1, 2);
-printf("\n  %d \n", __LINE__);
     Global_RAN_Node_ID->choice.globalGNB_ID = core_calloc(1, sizeof(struct NGAP_GlobalGNB_ID));
         ngap_buffer_to_OCTET_STRING(
            &plmn_id, PLMN_ID_LEN, &Global_RAN_Node_ID->choice.globalGNB_ID->pLMNIdentity);
 
-printf("\n  %d \n", __LINE__);
     ngap_uint32_to_GNB_ID(present, gnb_id, &Global_RAN_Node_ID->choice.globalGNB_ID->gNB_ID);
 #endif
 #if 0
@@ -3607,7 +3603,6 @@ printf("\n  %d \n", __LINE__);
 #if 1
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
-    printf("\n  %d SupportedTAList\n", __LINE__);
     ie->id = NGAP_ProtocolIE_ID_id_SupportedTAList;
     ie->criticality = NGAP_Criticality_reject;
     ie->value.present = NGAP_NGSetupRequestIEs__value_PR_SupportedTAList;
@@ -3637,10 +3632,9 @@ printf("\n  %d \n", __LINE__);
 
     *PagingDRX = 1;
 
-printf("\n  %d \n", __LINE__);
     rv = ngap_encode_pdu(pkbuf, &pdu);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
-printf("\n  %d \n", __LINE__);
+
     ngap_free_pdu(&pdu);
 
     if (rv != CORE_OK)
@@ -3648,7 +3642,6 @@ printf("\n  %d \n", __LINE__);
         d_error("ngap_encode_pdu() failed");
         return CORE_ERROR;
     }
-printf("\n  %d %d \n", rv, __LINE__);
 
     return CORE_OK;
 }
