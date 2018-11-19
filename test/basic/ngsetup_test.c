@@ -13,7 +13,7 @@
 #include "testutil.h"
 #include "testpacket.h"
 
-#define NUM_OF_TEST_DUPLICATED_RAN 4
+#define NUM_OF_TEST_DUPLICATED_RAN 1
 
 static void ngsetup_test1(abts_case *tc, void *data)
 {
@@ -39,12 +39,15 @@ static void ngsetup_test1(abts_case *tc, void *data)
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
         printf("\n test testngap_ran_send \n");
+        sleep(5);
         rv = testngap_ran_send(sock[i], sendbuf);
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
+        
 
-#if 0
-        printf("\n test testngap_ran_read \n");
+#if 1
+        printf("\n test testngap_ran_read start\n");
         rv = testngap_ran_read(sock[i], recvbuf);
+        printf("\n test testngap_ran_read end\n");
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
        
         printf("\n test ngap_decode_pdu \n");
@@ -89,9 +92,9 @@ abts_suite *test_ngsetup(abts_suite *suite)
 {
     suite = ADD_SUITE(suite)
     printf("\n test ngsetup \n");
-    //abts_run_test(suite, ngsetup_test1, NULL);
-    abts_run_test(suite, ngsetup_test2, NULL);
-    abts_run_test(suite, ngsetup_test3, NULL);
+    abts_run_test(suite, ngsetup_test1, NULL);
+    // abts_run_test(suite, ngsetup_test2, NULL);
+    // abts_run_test(suite, ngsetup_test3, NULL);
 
     return suite;
 

@@ -3544,9 +3544,6 @@ status_t testngap_build_setup_req(
         NGAP_GlobalRANNodeID_t *Global_RAN_Node_ID = NULL;
         NGAP_PagingDRX_t *PagingDRX = NULL;
         NGAP_SupportedTAList_t *SupportedTAList = NULL;            
-            NGAP_SupportedTAItem_t *SupportedTAItem = NULL;
-            NGAP_BroadcastPLMNItem_t *BroadcastPLMNItem = NULL;
-            NGAP_SliceSupportItem_t *SliceSupportItem = NULL;
 
 printf("\n  %d \n", __LINE__);
     memset(&pdu, 0, sizeof (NGAP_NGAP_PDU_t));
@@ -3556,11 +3553,11 @@ printf("\n  %d \n", __LINE__);
 
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = NGAP_ProcedureCode_id_NGSetup;
-    initiatingMessage->criticality = NGAP_Criticality_ignore;
+    initiatingMessage->criticality = NGAP_Criticality_reject;
     initiatingMessage->value.present = NGAP_InitiatingMessage__value_PR_NGSetupRequest;
 
-    //NGSetupRequest = &initiatingMessage->value.choice.NGSetupRequest;    
-#if 0
+    NGSetupRequest = &initiatingMessage->value.choice.NGSetupRequest;    
+#if 1
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
 printf("\n  %d add GlobalRANNodeID \n", __LINE__);
@@ -3571,16 +3568,8 @@ printf("\n  %d add GlobalRANNodeID \n", __LINE__);
     Global_RAN_Node_ID = &ie->value.choice.GlobalRANNodeID;
     Global_RAN_Node_ID->present = NGAP_GlobalRANNodeID_PR_globalGNB_ID;
 #endif
-#if 0
-    ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
-    ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
-    printf("\n  %d SupportedTAList\n", __LINE__);
-    ie->id = NGAP_ProtocolIE_ID_id_SupportedTAList;
-    ie->criticality = NGAP_Criticality_reject;
-    ie->value.present = NGAP_NGSetupRequestIEs__value_PR_SupportedTAList;
-    SupportedTAList = &ie->value.choice.SupportedTAList;
-#endif
-#if 0
+
+#if 1
     ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
     ie->id = NGAP_ProtocolIE_ID_id_DefaultPagingDRX;
@@ -3590,7 +3579,7 @@ printf("\n  %d add GlobalRANNodeID \n", __LINE__);
 #endif
 
 
-#if 0
+#if 1
     plmn_id_build(&plmn_id, 1, 1, 2);
 printf("\n  %d \n", __LINE__);
     Global_RAN_Node_ID->choice.globalGNB_ID = core_calloc(1, sizeof(struct NGAP_GlobalGNB_ID));
@@ -3600,7 +3589,7 @@ printf("\n  %d \n", __LINE__);
 printf("\n  %d \n", __LINE__);
     ngap_uint32_to_GNB_ID(present, gnb_id, &Global_RAN_Node_ID->choice.globalGNB_ID->gNB_ID);
 #endif
-#if 0    
+#if 0
     Global_RAN_Node_ID->choice.globalNgENB_ID = core_calloc(1, sizeof(struct NGAP_GlobalNgENB_ID));
     ngap_buffer_to_OCTET_STRING(
             &plmn_id, PLMN_ID_LEN, &Global_RAN_Node_ID->choice.globalNgENB_ID->pLMNIdentity);
@@ -3612,27 +3601,45 @@ printf("\n  %d \n", __LINE__);
     ngap_buffer_to_OCTET_STRING(
             &plmn_id, PLMN_ID_LEN, &Global_RAN_Node_ID->choice.globalN3IWF_ID->pLMNIdentity);
     ngap_uint32_to_3IWF_ID(present, enb_id, &Global_RAN_Node_ID->choice.globalN3IWF_ID->n3IWF_ID);
-
 #endif
 
-#if 0
-        SupportedTAItem = (NGAP_SupportedTAItem_t *) core_calloc(1, sizeof(NGAP_SupportedTAItem_t));
-        ngap_uint16_to_OCTET_STRING(tac, &SupportedTAItem->tAC);
-            BroadcastPLMNItem = (NGAP_BroadcastPLMNItem_t *) core_calloc(1, sizeof(NGAP_BroadcastPLMNItem_t));
-            ngap_buffer_to_OCTET_STRING(&plmn_id, PLMN_ID_LEN, &BroadcastPLMNItem->pLMNIdentity);
-                SliceSupportItem = (NGAP_SliceSupportItem_t *) core_calloc(1, sizeof(NGAP_SliceSupportItem_t));
-                    ngap_buffer_to_OCTET_STRING(&plmn_id, 1, &SliceSupportItem->s_NSSAI.sST);
-                    ngap_buffer_to_OCTET_STRING(&plmn_id, 1, &SliceSupportItem->s_NSSAI.sD);
+
+#if 1
+    ie = core_calloc(1, sizeof(NGAP_NGSetupRequestIEs_t));
+    ASN_SEQUENCE_ADD(&NGSetupRequest->protocolIEs, ie);
+    printf("\n  %d SupportedTAList\n", __LINE__);
+    ie->id = NGAP_ProtocolIE_ID_id_SupportedTAList;
+    ie->criticality = NGAP_Criticality_reject;
+    ie->value.present = NGAP_NGSetupRequestIEs__value_PR_SupportedTAList;
+    SupportedTAList = &ie->value.choice.SupportedTAList;
+    
+#endif
+#if 1
+    NGAP_SupportedTAItem_t *SupportedTAItem = NULL;    
+    SupportedTAItem = (NGAP_SupportedTAItem_t *) core_calloc(1, sizeof(NGAP_SupportedTAItem_t));
+        char tmp3[3] = {0x12, 0x12, 0x12};
+        ngap_buffer_to_OCTET_STRING(tmp3, 3,&SupportedTAItem->tAC);
+        NGAP_BroadcastPLMNItem_t *BroadcastPLMNItem = NULL;
+        BroadcastPLMNItem = (NGAP_BroadcastPLMNItem_t *) core_calloc(1, sizeof(NGAP_BroadcastPLMNItem_t));        
+            ngap_buffer_to_OCTET_STRING(&plmn_id, PLMN_ID_LEN, &BroadcastPLMNItem->pLMNIdentity);                
+            NGAP_SliceSupportItem_t *SliceSupportItem = NULL;
+            SliceSupportItem = (NGAP_SliceSupportItem_t *) core_calloc(1, sizeof(NGAP_SliceSupportItem_t));
+            char tmp1[1] = {0x12};
+            ngap_buffer_to_OCTET_STRING(tmp1, 1, &SliceSupportItem->s_NSSAI.sST);
+            ngap_buffer_to_OCTET_STRING(tmp3, 3, &SliceSupportItem->s_NSSAI.sD);
             ASN_SEQUENCE_ADD(&BroadcastPLMNItem->tAISliceSupportList.list, SliceSupportItem);
         ASN_SEQUENCE_ADD(&SupportedTAItem->broadcastPLMNList.list, BroadcastPLMNItem);
     ASN_SEQUENCE_ADD(&SupportedTAList->list, SupportedTAItem);
+    
+    d_trace(1, "SupportedTAList:d", SupportedTAList);
 #endif
-printf("\n  %d \n", __LINE__);
 
-    //*PagingDRX = 1;
+
+    *PagingDRX = 1;
 
 printf("\n  %d \n", __LINE__);
     rv = ngap_encode_pdu(pkbuf, &pdu);
+    d_assert(rv == CORE_OK, return CORE_ERROR,);
 printf("\n  %d \n", __LINE__);
     ngap_free_pdu(&pdu);
 
