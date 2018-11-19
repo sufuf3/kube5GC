@@ -3612,7 +3612,7 @@ status_t testngap_build_setup_req(
 #if 1
     NGAP_SupportedTAItem_t *SupportedTAItem = NULL;    
     SupportedTAItem = (NGAP_SupportedTAItem_t *) core_calloc(1, sizeof(NGAP_SupportedTAItem_t));
-        char tmp3[3] = {0x12, 0x12, 0x12};
+        char tmp3[3] = {0x30, 0x39, 0x00};
         ngap_buffer_to_OCTET_STRING(tmp3, 3,&SupportedTAItem->tAC);
         NGAP_BroadcastPLMNItem_t *BroadcastPLMNItem = NULL;
         BroadcastPLMNItem = (NGAP_BroadcastPLMNItem_t *) core_calloc(1, sizeof(NGAP_BroadcastPLMNItem_t));        
