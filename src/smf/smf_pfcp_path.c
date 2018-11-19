@@ -108,6 +108,7 @@ status_t smf_pfcp_close()
             smf_pfcp_send_association_release_request(upf);
     }
 
+    pfcp_remove_all_nodes(&smf_self()->upf_n4_list);
     return CORE_OK;
 }
 
