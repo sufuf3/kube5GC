@@ -1165,6 +1165,7 @@ status_t mme_context_parse_config()
                             gummei->num_of_mme_gid && gummei->num_of_mme_code)
                         {
                             self.max_num_of_served_gummei++;
+                            self.max_num_of_served_guami++;
                         }
                         else
                         {
@@ -1826,7 +1827,12 @@ status_t mme_context_setup_trace_module()
     if (ngap)
     {
         extern int _ngap_sctp;
+        extern int _ngap_handler;
+        extern int _ngap_build;
         d_trace_level(&_ngap_sctp, ngap);
+        d_trace_level(&_ngap_handler, ngap);
+        d_trace_level(&_ngap_build, ngap);
+        
     }
     return CORE_OK;
 }

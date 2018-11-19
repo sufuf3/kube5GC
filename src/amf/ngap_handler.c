@@ -12,7 +12,7 @@
 
 void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 {
-    int i = 0;//, j = 0, k = 0;
+    int i = 0, j = 0, k = 0;
                               
     NGAP_InitiatingMessage_t *initiatingMessage = NULL;
     NGAP_NGSetupRequest_t *NGSetupRequest = NULL;
@@ -55,6 +55,7 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
             case NGAP_ProtocolIE_ID_id_DefaultPagingDRX:
                 printf("\n NGAP_ProtocolIE_ID_id_DefaultPagingDRX :%d\n", __LINE__);
                 PagingDRX = &ie->value.choice.PagingDRX;
+                d_assert(PagingDRX, return,);
                 break;
             /* */    
             // case NGAP_ProtocolIE_ID_id_RANNodeName:
@@ -69,10 +70,11 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
     printf("\n NGAP_ProtocolIE_ID_id_GlobalRANNodeID :%d gnb_id: %x\n", __LINE__, gnb_id);
     amf_ran_set_ran_id(ran, gnb_id, 0, 0, RAN_PR_GNB_ID);
 
-    if (PagingDRX)
+    if (PagingDRX) {
         d_trace(5, "    PagingDRX[%ld]\n", *PagingDRX);
+    }
 
-    /* Parse Supported TA 
+    /* Parse Supported TA */
     ran->num_of_supported_ta_list = 0;
     for (i = 0; i < SupportedTAList->list.count; i++)
     {
@@ -150,13 +152,12 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 
         if (served_tai_index < 0)
         {
-            d_warn("S1-Setup failure:");
+            d_warn("NG-Setup failure:");
             d_warn("    Cannot find Served TAI. Check 'amf.tai' configuration");
-            group = S1AP_Cause_PR_misc;
-            cause = S1AP_CauseMisc_unknown_PLMN;
+            group = NGAP_Cause_PR_misc;
+            cause = NGAP_CauseMisc_unknown_PLMN;
         }
     }
-*/
 
     if (group == NGAP_Cause_PR_NOTHING)
     {
@@ -166,7 +167,7 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
     }
     else
     {
-        d_trace(3, "[AMF] N{-Setup failure\n");
+        d_trace(3, "[AMF] NG-Setup failure\n");
         d_assert(ngap_build_setup_failure(
                 &ngapbuf, group, cause, NGAP_TimeToWait_v10s) == CORE_OK, 
                 return, "ngap_build_setup_failure() failed");
