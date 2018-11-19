@@ -1165,6 +1165,7 @@ status_t mme_context_parse_config()
                             gummei->num_of_mme_gid && gummei->num_of_mme_code)
                         {
                             self.max_num_of_served_gummei++;
+                            self.max_num_of_served_guami++;
                         }
                         else
                         {
@@ -1737,6 +1738,8 @@ status_t mme_context_setup_trace_module()
     int s1ap = context_self()->logger.trace.s1ap;
     int nas = context_self()->logger.trace.nas;
     int diameter = context_self()->logger.trace.diameter;
+    int ngap = context_self()->logger.trace.ngap;
+
 
     int gtpv2 = context_self()->logger.trace.gtpv2;
     if (app)
@@ -1819,6 +1822,17 @@ status_t mme_context_setup_trace_module()
 
         extern int _tlv_msg;
         d_trace_level(&_tlv_msg, gtpv2);
+    }
+
+    if (ngap)
+    {
+        extern int _ngap_sctp;
+        extern int _ngap_handler;
+        extern int _ngap_build;
+        d_trace_level(&_ngap_sctp, ngap);
+        d_trace_level(&_ngap_handler, ngap);
+        d_trace_level(&_ngap_build, ngap);
+        
     }
     return CORE_OK;
 }

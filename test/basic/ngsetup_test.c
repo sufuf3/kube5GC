@@ -1,3 +1,4 @@
+#define TRACE_MODULE _ngsetup_test
 #include "core_debug.h"
 #include "core_pkbuf.h"
 
@@ -13,7 +14,7 @@
 #include "testutil.h"
 #include "testpacket.h"
 
-#define NUM_OF_TEST_DUPLICATED_RAN 4
+#define NUM_OF_TEST_DUPLICATED_RAN 1
 
 static void ngsetup_test1(abts_case *tc, void *data)
 {
@@ -24,30 +25,31 @@ static void ngsetup_test1(abts_case *tc, void *data)
     ngap_message_t message;
     int i;
     
-    printf("\n test tests1ap_enb_connect \n");
     for (i = 0; i < NUM_OF_TEST_DUPLICATED_RAN; i++)
     {
         rv = testngap_ran_connect(&sock[i]);
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
     }
 
-    printf("\n test testngap_build_setup_req \n");
     for (i = 0; i < NUM_OF_TEST_DUPLICATED_RAN; i++)
     {
         rv = testngap_build_setup_req(
-                &sendbuf, NGAP_GNB_ID_PR_gNB_ID, 0xfffff);
+                &sendbuf, NGAP_GNB_ID_PR_gNB_ID, 0xABCDE);
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-        printf("\n test testngap_ran_send \n");
+        d_trace(3, " test testngap_ran_send");
+        sleep(5);
         rv = testngap_ran_send(sock[i], sendbuf);
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
+        
 
-#if 0
-        printf("\n test testngap_ran_read \n");
+#if 1
+        d_trace(3, "test testngap_ran_read start");
         rv = testngap_ran_read(sock[i], recvbuf);
+        d_trace(3, "test testngap_ran_read end");
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
        
-        printf("\n test ngap_decode_pdu \n");
+        d_trace(3, "test ngap_decode_pdu");
         rv = ngap_decode_pdu(&message, recvbuf);
         ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -55,7 +57,7 @@ static void ngsetup_test1(abts_case *tc, void *data)
 #endif
     }
 
-    printf("\n test testngap_ran_close \n");
+    d_trace(3, "test testngap_ran_close");
     for (i = 0; i < NUM_OF_TEST_DUPLICATED_RAN; i++)
     {
         rv = testngap_ran_close(sock[i]);
@@ -88,10 +90,10 @@ static void ngsetup_test3(abts_case *tc, void *data)
 abts_suite *test_ngsetup(abts_suite *suite)
 {
     suite = ADD_SUITE(suite)
-    printf("\n test ngsetup \n");
-    //abts_run_test(suite, ngsetup_test1, NULL);
-    abts_run_test(suite, ngsetup_test2, NULL);
-    abts_run_test(suite, ngsetup_test3, NULL);
+    d_trace(3, "test ngsetup");
+    abts_run_test(suite, ngsetup_test1, NULL);
+    // abts_run_test(suite, ngsetup_test2, NULL);
+    // abts_run_test(suite, ngsetup_test3, NULL);
 
     return suite;
 

@@ -24,10 +24,9 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 	NGAP_PagingDRX_t *PagingDRX = NULL;
 
     pkbuf_t *ngapbuf = NULL;
-    //c_uint32_t gnb_id = 0;
+    c_uint32_t gnb_id = 0;
     NGAP_Cause_PR group = NGAP_Cause_PR_NOTHING;
     long cause = 0;
-
     d_assert(ran, return,);
     d_assert(ran->sock, return,);
 
@@ -37,9 +36,7 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 
     NGSetupRequest = &initiatingMessage->value.choice.NGSetupRequest;
     d_assert(NGSetupRequest, return,);
-
     d_trace(3, "[AMF] NG-Setup request\n");
-
     for (i = 0; i < NGSetupRequest->protocolIEs.list.count; i++)
     {
         ie = NGSetupRequest->protocolIEs.list.array[i];
@@ -47,13 +44,16 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
         {
             case NGAP_ProtocolIE_ID_id_GlobalRANNodeID:
                 Global_RAN_Node_ID = &ie->value.choice.GlobalRANNodeID;
+                d_trace(3, "NGAP_ProtocolIE_ID_id_GlobalRANNodeID :%d", __LINE__);
                 d_assert(Global_RAN_Node_ID, return,);
                 break;
             case NGAP_ProtocolIE_ID_id_SupportedTAList:
                 SupportedTAList = &ie->value.choice.SupportedTAList;
+                d_trace(3, "NGAP_ProtocolIE_ID_id_SupportedTAList :%d", __LINE__);
                 d_assert(SupportedTAList, return,);
                 break;
             case NGAP_ProtocolIE_ID_id_DefaultPagingDRX:
+                d_trace(3, "NGAP_ProtocolIE_ID_id_DefaultPagingDRX :%d", __LINE__);
                 PagingDRX = &ie->value.choice.PagingDRX;
                 d_assert(PagingDRX, return,);
                 break;
@@ -66,8 +66,13 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
         }
     }
     
-    // ngap_RAN_ID_to_unit32(&Global_RAN_Node_ID->gNB_ID, &gnb_id);
-    // amf_ran_set_gnb_id(ran, gnb_id);
+    ngap_GNB_ID_to_uint32(&Global_RAN_Node_ID->choice.globalGNB_ID->gNB_ID, &gnb_id);
+    d_trace(3," NGAP_ProtocolIE_ID_id_GlobalRANNodeID :%d gnb_id: %x", __LINE__, gnb_id);
+    amf_ran_set_ran_id(ran, gnb_id, 0, 0, RAN_PR_GNB_ID);
+
+    if (PagingDRX) {
+        d_trace(5, "    PagingDRX[%ld]\n", *PagingDRX);
+    }
 
     /* Parse Supported TA */
     ran->num_of_supported_ta_list = 0;
@@ -147,10 +152,10 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
 
         if (served_tai_index < 0)
         {
-            d_warn("S1-Setup failure:");
+            d_warn("NG-Setup failure:");
             d_warn("    Cannot find Served TAI. Check 'amf.tai' configuration");
-            group = S1AP_Cause_PR_misc;
-            cause = S1AP_CauseMisc_unknown_PLMN;
+            group = NGAP_Cause_PR_misc;
+            cause = NGAP_CauseMisc_unknown_PLMN;
         }
     }
 
@@ -162,7 +167,7 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
     }
     else
     {
-        d_trace(3, "[AMF] N{-Setup failure\n");
+        d_trace(3, "[AMF] NG-Setup failure\n");
         d_assert(ngap_build_setup_failure(
                 &ngapbuf, group, cause, NGAP_TimeToWait_v10s) == CORE_OK, 
                 return, "ngap_build_setup_failure() failed");
