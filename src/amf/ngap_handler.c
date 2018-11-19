@@ -55,7 +55,6 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
             case NGAP_ProtocolIE_ID_id_DefaultPagingDRX:
                 printf("\n NGAP_ProtocolIE_ID_id_DefaultPagingDRX :%d\n", __LINE__);
                 PagingDRX = &ie->value.choice.PagingDRX;
-                d_assert(PagingDRX, return,);
                 break;
             /* */    
             // case NGAP_ProtocolIE_ID_id_RANNodeName:
@@ -69,6 +68,9 @@ void ngap_handle_ng_setup_request(amf_ran_t *ran, ngap_message_t *message)
     ngap_GNB_ID_to_uint32(&Global_RAN_Node_ID->choice.globalGNB_ID->gNB_ID, &gnb_id);
     printf("\n NGAP_ProtocolIE_ID_id_GlobalRANNodeID :%d gnb_id: %x\n", __LINE__, gnb_id);
     amf_ran_set_ran_id(ran, gnb_id, 0, 0, RAN_PR_GNB_ID);
+
+    if (PagingDRX)
+        d_trace(5, "    PagingDRX[%ld]\n", *PagingDRX);
 
     /* Parse Supported TA 
     ran->num_of_supported_ta_list = 0;
