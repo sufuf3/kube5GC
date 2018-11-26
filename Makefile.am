@@ -49,7 +49,7 @@ install-data-hook:
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-upfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-epcd
 
-CLEANFILES = -R data debian/test
+CLEANFILES = -R data
 DISTCLEANFILES = $(DIST_ARCHIVES)
 MAINTAINERCLEANFILES = \
     configure config.in \
