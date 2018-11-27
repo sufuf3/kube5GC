@@ -2704,7 +2704,7 @@ status_t testgtpu_enb_read(sock_id sock, pkbuf_t *recvbuf)
     return CORE_OK;
 }
 
-c_uint16_t in_cksum(c_uint16_t *addr, int len); /* from pgw_gtp_path.c */
+c_uint16_t in_cksum(c_uint16_t *addr, int len); /* from upf_gtp_path.c */
 
 status_t testgtpu_build_ping(
         pkbuf_t **sendbuf, const char *src_ip, const char *dst_ip)

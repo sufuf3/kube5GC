@@ -1,5 +1,5 @@
 [Unit]
-Description=NextEPC S-GW Daemon
+Description=NextEPC SMF Daemon
 After=networking.service
 
 [Service]
@@ -8,11 +8,11 @@ Type=simple
 User=nextepc
 Group=nextepc
 
-RuntimeDirectory=nextepc-sgwd
-PIDFile=@LIB_DIR@/run/nextepc-sgwd/pid
+RuntimeDirectory=nextepc-smfd
+PIDFile=@LIB_DIR@/run/nextepc-smfd/pid
 
 Restart=always
-ExecStart=@BIN_DIR@/nextepc-sgwd -f @SYSCONF_DIR@/nextepc/sgw.conf
+ExecStart=@BIN_DIR@/nextepc-smfd -f @SYSCONF_DIR@/nextepc/smf.conf
 RestartSec=2
 RestartPreventExitStatus=1
 
