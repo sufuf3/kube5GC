@@ -4,19 +4,16 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = lib src support test
 
-bin_PROGRAMS = nextepc-mmed nextepc-hssd nextepc-pcrfd nextepc-smfd nextepc-upfd nextepc-amfd nextepc-epcd
-
-dist_nextepc_mmed_SOURCES = main.c
-nextepc_mmed_LDADD = $(top_srcdir)/src/libmme.la
-
-dist_nextepc_amfd_SOURCES = main.c
-nextepc_amfd_LDADD = $(top_srcdir)/src/libamf.la
+bin_PROGRAMS = nextepc-hssd nextepc-pcrfd nextepc-amfd nextepc-smfd nextepc-upfd nextepc-epcd
 
 dist_nextepc_hssd_SOURCES = main.c
 nextepc_hssd_LDADD = $(top_srcdir)/src/libhss.la
 
 dist_nextepc_pcrfd_SOURCES = main.c
 nextepc_pcrfd_LDADD = $(top_srcdir)/src/libpcrf.la
+
+dist_nextepc_amfd_SOURCES = main.c
+nextepc_amfd_LDADD = $(top_srcdir)/src/libamf.la
 
 dist_nextepc_smfd_SOURCES = main.c
 nextepc_smfd_LDADD = $(top_srcdir)/src/libsmf.la
@@ -34,10 +31,9 @@ AM_CPPFLAGS = \
 
 install-data-hook:
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/log/nextepc
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-mmed
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-amfd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-pcrfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-hssd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-pcrfd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-amfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-smfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-upfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-epcd

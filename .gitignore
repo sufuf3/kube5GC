@@ -45,30 +45,12 @@ test/testsuite.log
 lib/core/test/testcore
 test/testvolte
 test/testepc
-nextepc-mmed
 nextepc-pcrfd
-nextepc-pgwd
-nextepc-sgwd
-nextepc-epcd
 nextepc-hssd
-nextepc-smfd
 nextepc-upfd
+nextepc-smfd
 nextepc-amfd
-
-# debian
-debian/*.debhelper.log
-debian/*.debhelper
-debian/*.substvars
-debian/tmp
-debian/files
-debian/autoreconf.before
-debian/autoreconf.after
-debian/nextepc-core
-debian/nextepc-mme
-debian/nextepc-sgw
-debian/nextepc-pgw
-debian/nextepc-pcrf
-debian/nextepc-hss
+nextepc-epcd
 
 # webui
 webui/.next/
