@@ -64,7 +64,7 @@ mme:
 #      dev: eth0
 #
     s1ap:
-
+      addr: 192.188.2.2
 #
 #  <GTP-C Server>>
 #
@@ -100,9 +100,9 @@ mme:
 #
     gummei: 
       plmn_id:
-        mcc: 001
-        mnc: 01
-      mme_gid: 2
+        mcc: 208
+        mnc: 93
+      mme_gid: 1
       mme_code: 1
 
 #
@@ -139,9 +139,9 @@ mme:
 #
     tai:
       plmn_id:
-        mcc: 001
-        mnc: 01
-      tac: 12345
+        mcc: 208
+        mnc: 93
+      tac: 1
 
     security:
         integrity_order : [ EIA1, EIA2, EIA0 ]
@@ -352,11 +352,11 @@ smf:
         - ::1
 
     pfcp:
-      - addr: 127.0.0.10
+      - addr: 127.0.0.2
       - addr: ::1
 
     upf:
-      - addr: 127.0.0.8
+      - addr: 192.188.2.2
 
     ue_pool:
       - addr: 45.45.0.1/16
@@ -371,7 +371,7 @@ smf:
 upf:
     pfcp:
       addr:
-        - 127.0.0.8
+        - 192.188.2.2
         - ::1
 
     gtpu:
