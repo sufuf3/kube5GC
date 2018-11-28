@@ -3569,7 +3569,7 @@ status_t mme_m_tmsi_free(mme_m_tmsi_t *m_tmsi)
 /******************** Added by Chi ********************/
 status_t mme_overload_checking_init()
 {
-    c_uint32_t duration = 500;
+    c_uint32_t duration = 10 * 1000;
 
     tm_block_id *timer = &self.overloading_checking_timer;
     *timer = timer_create(
