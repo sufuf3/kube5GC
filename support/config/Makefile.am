@@ -1,9 +1,9 @@
 configfiles = \
 	nextepc.conf \
-	mme.conf \
-	upf.conf \
 	hss.conf \
 	pcrf.conf \
+	upf.conf \
+	smf.conf \
 	$(NULL)
 
 configdir = ${sysconfdir}/nextepc
