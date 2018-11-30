@@ -9,6 +9,8 @@
 #include "mme_event.h"
 #include "mme_gtp_path.h"
 #include "mme_s11_build.h"
+#include "amf_json_build.h"
+#include "amf_json_handler.h"
 #include "mme_sm.h"
 
 static int _gtpv2_c_recv_cb(sock_id sock, void *data)
@@ -123,6 +125,11 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
     h.teid = mme_ue->sgw_s11_teid;
 
     rv = mme_s11_build_create_session_request(&pkbuf, h.type, sess);
+    char json_string[10000];
+    strcpy(json_string,create_session(sess));
+    d_info(json_string);
+    // handle_create_session(json_string, sess);
+
     d_assert(rv == CORE_OK, return CORE_ERROR,
             "S11 build error");
 
