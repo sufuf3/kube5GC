@@ -5,11 +5,37 @@
 #include "core_errno.h"
 #include "cJSON.h"
 #include "commonJsonKey.h"
+#include "3gpp_types.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+typedef struct _ue_pco_t {
+    c_uint8_t length;
+    c_uint8_t *buffer;
+}ue_pco_t;
+
+typedef struct _creat_session_t {
+    c_int8_t        imsi_bcd[MAX_IMSI_BCD_LEN+1];
+    tai_t           tai;
+    e_cgi_t         e_cgi;
+    plmn_id_t       visited_plmn_id;
+    ue_pco_t        ue_pco;
+    c_int8_t        apn[MAX_APN_LEN+1];
+    c_uint8_t       pdn_type;
+    pdn_t           pdn;
+    c_uint8_t       ebi;
+    guti_t          guti;
+} creat_session_t;
+
+
+
+
+
+
+
 
 CORE_DECLARE(void) JSONTRANSFORM_S2J_create_session_request(void *sess, cJSON *pJson);
 
