@@ -28,6 +28,7 @@ libamf_la_SOURCES = \
 	mme_gtp_path.c mme_s11_build.c mme_s11_handler.c \
 	mme_sm.c mme_path.c \
 	amf_sbi_path.h amf_sbi_path.c \
+	JsonTransform.h \
 	$(NULL)
 
 if USRSCTP
@@ -66,6 +67,8 @@ AM_CPPFLAGS = \
     -I$(top_srcdir)/lib/s1ap/asn1c \
 	-I$(top_srcdir)/lib/ngap/asn1c \
 	-I$(top_srcdir)/lib/@FREEDIAMETER_DIR@/include \
+	-I$(top_srcdir)/lib/cJSON \
+	-I$(top_srcdir)/lib/sbiJson
 	@MONGOC_CFLAGS@ \
 	$(NULL)
 

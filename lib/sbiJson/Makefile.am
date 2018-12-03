@@ -7,10 +7,12 @@ libsbiJson_la_SOURCES = \
 
 libsbiJson_la_DEPENDENCIES = \
     $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/cJSON/libcJSON.la \
 	$(NULL)
 
 libsbiJson_la_LIBADD = \
     $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/cJSON/libcJSON.la \
 	$(NULL)
 
 AM_CFLAGS = \

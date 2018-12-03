@@ -5,8 +5,8 @@
 #include "3gpp_types.h"
 #include "mme_context.h"
 #include "sbiJson/commonJsonKey.h"
+#include "sbiJson/JsonTransform.h"
 #include "amf_json_build.h"
-
 
 
 void plmn_id_to_buffer(plmn_id_t plmn_id, char* mcc, char* mnc){
@@ -143,7 +143,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     char conv[1000];
     char *string = NULL;
     cJSON *session = cJSON_CreateObject();
-
+    creat_session_t createSession = {0};
     
     d_assert(sess, return CORE_ERROR, "Null param");
     pdn = sess->pdn;
@@ -153,9 +153,25 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     mme_ue = sess->mme_ue;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
 
+    d_info("createSession:%d", &createSession);
+    memcpy(createSession.imsi_bcd,  mme_ue->imsi_bcd, sizeof( mme_ue->imsi_bcd));
+    memcpy(&createSession.tai, &mme_ue->tai, sizeof( mme_ue->tai));
+    memcpy(&createSession.e_cgi, &mme_ue->e_cgi, sizeof( mme_ue->e_cgi));
+    memcpy(&createSession.visited_plmn_id, &mme_ue->visited_plmn_id, sizeof( mme_ue->visited_plmn_id));
+    if (sess->ue_pco.length && sess->ue_pco.buffer) {
+        createSession.ue_pco.buffer = malloc(sizeof(char)* sess->ue_pco.length);
+        memcpy(&createSession.ue_pco.length, &sess->ue_pco.length, sizeof( sess->ue_pco.length));
+        memcpy(&createSession.ue_pco.buffer, &sess->ue_pco.buffer, sizeof( sess->ue_pco.length));
+    }
+    memcpy(&createSession.apn, &pdn->apn, sizeof( pdn->apn));
+    memcpy(&createSession.pdn, &pdn, sizeof(pdn));
+    memcpy(&createSession.ebi, &bearer->ebi, sizeof(bearer->ebi));
+    memcpy(&createSession.ebi, &mme_ue->guti, sizeof(mme_ue->guti));
+    
+
+
     /* imsi */
     cJSON_AddStringToObject(session, JSONKEY_4G_IMSI, mme_ue->imsi_bcd);
-
     /* user location information */
     add_uli_to_json(session, mme_ue->tai, mme_ue->e_cgi);
 
