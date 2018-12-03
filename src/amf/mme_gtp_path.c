@@ -140,13 +140,12 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 }
 #else
     mme_ue_t *mme_ue = NULL;
-    char *json_string = NULL;
+    pkbuf_t *pkbuf = NULL;
     mme_ue = sess->mme_ue;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
     
-    json_string = amf_json_build_create_session(sess);
-    d_info(json_string);
-    free(json_string);
+    amf_json_build_create_session(&pkbuf, sess);
+
 #if 0 // TempDisable Test
     // handle_create_session(json_string, sess);
 #endif

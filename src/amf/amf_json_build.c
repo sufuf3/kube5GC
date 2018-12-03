@@ -1,6 +1,7 @@
 #include <cJSON/cJSON.h>
 
 #include "core_debug.h"
+#include "core_pkbuf.h"
 #include "3gpp_types.h"
 #include "mme_context.h"
 #include "sbiJson/commonJsonKey.h"
@@ -134,7 +135,7 @@ char* uint_to_buffer(char* conv, c_uint8_t* input, int len){
     return conv;
 }
 
-char* amf_json_build_create_session(mme_sess_t *sess) {
+status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     
     pdn_t *pdn = NULL;
     mme_ue_t *mme_ue = NULL;
@@ -144,13 +145,13 @@ char* amf_json_build_create_session(mme_sess_t *sess) {
     cJSON *session = cJSON_CreateObject();
 
     
-    d_assert(sess, return NULL, "Null param");
+    d_assert(sess, return CORE_ERROR, "Null param");
     pdn = sess->pdn;
-    d_assert(pdn, return NULL, "Null param");
+    d_assert(pdn, return CORE_ERROR, "Null param");
     bearer = mme_default_bearer_in_sess(sess);
-    d_assert(bearer, return NULL, "Null param");
+    d_assert(bearer, return CORE_ERROR, "Null param");
     mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return NULL, "Null param");
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
 
     /* imsi */
     cJSON_AddStringToObject(session, JSONKEY_4G_IMSI, mme_ue->imsi_bcd);
@@ -181,7 +182,7 @@ char* amf_json_build_create_session(mme_sess_t *sess) {
         pdn->pdn_type == HSS_PDN_TYPE_IPV4V6)
     {
         pdn_type = ((pdn->pdn_type + 1) & sess->request_type.pdn_type);
-        d_assert(pdn_type != 0, return NULL,
+        d_assert(pdn_type != 0, return CORE_ERROR,
                 "PDN Configuration Error:(%d, %d)",
                 pdn->pdn_type, sess->request_type.pdn_type);
     }
@@ -190,7 +191,7 @@ char* amf_json_build_create_session(mme_sess_t *sess) {
         pdn_type = sess->request_type.pdn_type;
     }
     else
-        d_assert(0, return NULL,
+        d_assert(0, return CORE_ERROR,
                 "HSS PDN Confiugration Error(%d)", pdn->pdn_type);
     
     add_pdn_to_json(session, pdn_type, pdn);
@@ -213,7 +214,7 @@ char* amf_json_build_create_session(mme_sess_t *sess) {
     add_gummei_to_json(session, mme_ue->guti);
     
     string = cJSON_Print(session);
-
+    d_info(string);
     cJSON_Delete(session);
-    return string;
+    return CORE_OK;
 }
