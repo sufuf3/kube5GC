@@ -145,7 +145,8 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
     d_assert(mme_ue, return CORE_ERROR, "Null param");
     
     amf_json_build_create_session(&pkbuf, sess);
-
+    
+    pkbuf_free(pkbuf);
 #if 0 // TempDisable Test
     // handle_create_session(json_string, sess);
 #endif

@@ -16,7 +16,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     char *string = NULL;
     cJSON *session = cJSON_CreateObject();
     creat_session_t createSession = {0};
-    
+    c_uint32_t length = 0;
     d_assert(sess, return CORE_ERROR, "Null param");
     pdn = sess->pdn;
     d_assert(pdn, return CORE_ERROR, "Null param");
@@ -65,6 +65,13 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
 
     string = cJSON_Print(session);
     d_info(string);
+
+    length = strlen(string) + 1;
+    
+    *pkbuf = pkbuf_alloc(0, length);
+    (*pkbuf)->len = length;
+    memcpy((*pkbuf)->payload, string, length -1);
     cJSON_Delete(session);
+
     return CORE_OK;
 }
