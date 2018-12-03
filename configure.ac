@@ -372,6 +372,8 @@ if test "$ap_cv_atomic_builtins" = "yes"; then
     AC_DEFINE(HAVE_ATOMIC_BUILTINS, 1, [Define if compiler provides atomic builtins])
 fi
 
+AC_DEFINE(FIVE_G_CORE, 1, [This is 5GC])
+
 #######################################
 #### Checks for library functions. ####
 #######################################

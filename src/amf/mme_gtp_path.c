@@ -111,6 +111,7 @@ status_t mme_gtp_close()
 
 status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 {
+#ifndef FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
@@ -125,10 +126,6 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
     h.teid = mme_ue->sgw_s11_teid;
 
     rv = mme_s11_build_create_session_request(&pkbuf, h.type, sess);
-    char json_string[10000];
-    strcpy(json_string,create_session(sess));
-    d_info(json_string);
-    // handle_create_session(json_string, sess);
 
     d_assert(rv == CORE_OK, return CORE_ERROR,
             "S11 build error");
@@ -141,7 +138,23 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 
     return CORE_OK;
 }
+#else
+    mme_ue_t *mme_ue = NULL;
+    char *json_string = NULL;
+    mme_ue = sess->mme_ue;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    
+    json_string = amf_json_build_create_session(sess);
+    d_info(json_string);
+    free(json_string);
+#if 0 // TempDisable Test
+    // handle_create_session(json_string, sess);
+#endif
+    return CORE_OK;
 
+
+}
+#endif
 
 status_t mme_gtp_send_modify_bearer_request(
         mme_bearer_t *bearer, int uli_presence)
