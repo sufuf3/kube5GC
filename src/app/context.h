@@ -44,6 +44,7 @@ typedef struct _context_t {
             int gtp;
             int pfcp;
             int diameter;
+            int ngap;
         } trace;
     } logger;
 

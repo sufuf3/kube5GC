@@ -64,7 +64,11 @@ void ngap_state_operational(fsm_t *s, event_t *e)
 
                     switch(initiatingMessage->procedureCode)
                     {
-                        
+                        case NGAP_ProcedureCode_id_NGSetup:
+                        {
+                            ngap_handle_ng_setup_request(ran, pdu);
+                            break;
+                        }
                         default:
                         {
                             d_warn("Not implemented(choice:%d, proc:%d)",

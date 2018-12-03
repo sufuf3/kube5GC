@@ -835,8 +835,8 @@ void mme_state_operational(fsm_t *s, event_t *e)
             int n_enb_to_send = 0;
             pkbuf_t *s1apbuf = NULL;
 
-            d_trace(9, "MME_EVT_CHECK_OVERLOAD: load_avg=%.2f, n_cores=%d, threshold=%.2f\n", 
-                load_avg, n_cores, OVERLOAD_THRESHOLD);
+            /* d_trace(9, "MME_EVT_CHECK_OVERLOAD: load_avg=%.2f, n_cores=%d, threshold=%.2f\n", 
+                load_avg, n_cores, OVERLOAD_THRESHOLD); */
 
             if (load_per_core > OVERLOAD_THRESHOLD)
             {

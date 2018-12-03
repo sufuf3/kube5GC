@@ -4,7 +4,7 @@
 #include "3gpp_types.h"
 
 #include "nas/nas_message.h"
-#include "mme/nas_security.h"
+#include "amf/nas_security.h"
 
 #include "testutil.h"
 
