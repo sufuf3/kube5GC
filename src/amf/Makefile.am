@@ -68,7 +68,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/ngap/asn1c \
 	-I$(top_srcdir)/lib/@FREEDIAMETER_DIR@/include \
 	-I$(top_srcdir)/lib/cJSON \
-	-I$(top_srcdir)/lib/sbiJson
+	-I$(top_srcdir)/lib/sbiJson \
 	@MONGOC_CFLAGS@ \
 	$(NULL)
 
