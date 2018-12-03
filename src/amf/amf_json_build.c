@@ -61,7 +61,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     /*TODO : ue timezone*/
     memcpy(&createSession.guti, &mme_ue->guti, sizeof(mme_ue->guti));
     
-    JSONTRANSFORM_create_session_request(&createSession, session);
+    JSONTRANSFORM_StToJs_create_session_request(&createSession, session);
 
     string = cJSON_Print(session);
     d_info(string);
@@ -71,6 +71,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;
     memcpy((*pkbuf)->payload, string, length -1);
+    free(string);
     cJSON_Delete(session);
 
     return CORE_OK;

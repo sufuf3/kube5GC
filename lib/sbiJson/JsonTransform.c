@@ -129,7 +129,7 @@ char* uint_to_buffer(char* conv, c_uint8_t* input, int len){
     return conv;
 }
 
-status_t JSONTRANSFORM_create_session_request(creat_session_t *sess, cJSON *pJson)
+status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSON *pJson)
 {
     d_assert(sess, return CORE_ERROR, "Null param");
     d_assert(pJson, return CORE_ERROR, "Null param");
