@@ -25,6 +25,7 @@ libamf_la_SOURCES = \
 	esm_sm.c esm_handler.c esm_build.c \
 	mme_gtp_path.c mme_s11_build.c mme_s11_handler.c \
 	mme_sm.c mme_path.c \
+	amf_sbi_path.h amf_sbi_path.c \
 	$(NULL)
 
 if USRSCTP
