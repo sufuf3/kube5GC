@@ -63,6 +63,8 @@ extern "C" {
 #define MAX_APN_LEN             100
 #define MAX_PCO_LEN             251
 
+#define MAX_SBI_MESSAGE_LEN     4096
+
 #define NEXT_ID(__id, __min, __max) \
     ((__id) = ((__id) == (__max) ? (__min) : ((__id) + 1)))
 #define COMPARE_ID(__id1, __id2, __max) \

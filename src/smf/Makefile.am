@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in.
 
+SUBDIRS = http_server
+
 noinst_LTLIBRARIES = libsmf.la
 
 libsmf_la_SOURCES = \
@@ -14,6 +16,7 @@ libsmf_la_SOURCES = \
 	smf_gx_handler.h smf_gx_handler.c \
 	smf_s11_handler.h smf_s11_handler.c \
 	smf_s11_build.h smf_s11_build.c \
+	smf_sbi_path.h smf_sbi_path.c \
 	smf_ipfw.h smf_ipfw.c \
 	smf_init.c \
 	$(NULL)

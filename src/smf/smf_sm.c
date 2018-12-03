@@ -7,6 +7,7 @@
 #include "smf_event.h"
 #include "smf_gtp_path.h"
 #include "smf_pfcp_path.h"
+#include "smf_sbi_path.h"
 #include "smf_n4_handler.h"
 #include "smf_s11_handler.h"
 #include "smf_gx_handler.h"
@@ -55,7 +56,14 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 d_error("Can't establish N4-PFCP path");
                 break;
             }
+            rv = smf_sbi_server_open();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't establish SMF-SBI path");
+                break;
+            }
             break;
+
         }
         case FSM_EXIT_SIG:
         {
@@ -69,6 +77,12 @@ void smf_state_operational(fsm_t *s, event_t *e)
             if (rv != CORE_OK)
             {
                 d_error("Can't close N4-PFCP path");
+                break;
+            }
+            rv = smf_sbi_server_close();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't close SMF-SBI path");
                 break;
             }
             break;
