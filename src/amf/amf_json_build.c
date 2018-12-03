@@ -134,7 +134,7 @@ char* uint_to_buffer(char* conv, c_uint8_t* input, int len){
     return conv;
 }
 
-char* create_session(mme_sess_t *sess) {
+char* amf_json_build_create_session(mme_sess_t *sess) {
     
     pdn_t *pdn = NULL;
     mme_ue_t *mme_ue = NULL;

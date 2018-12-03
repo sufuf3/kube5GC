@@ -7,7 +7,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-CORE_DECLARE(char *) create_session(mme_sess_t *);
+CORE_DECLARE(char *) amf_json_build_create_session(mme_sess_t *);
 
 #ifdef __cplusplus
 }
