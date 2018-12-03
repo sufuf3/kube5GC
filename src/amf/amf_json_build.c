@@ -71,6 +71,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;
     memcpy((*pkbuf)->payload, string, length -1);
+    free(createSession.ue_pco.buffer);
     free(string);
     cJSON_Delete(session);
 

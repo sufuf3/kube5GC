@@ -28,6 +28,7 @@ typedef struct _creat_session_t {
     pdn_t           pdn;
     c_uint8_t       ebi;
     guti_t          guti;
+    c_uint8_t       rat_type[10];
 } creat_session_t;
 
 CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSON *pJson);

@@ -63,10 +63,12 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
 
 
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
-    d_info(cJSON_Print(session));
+    // d_info(cJSON_Print(session));
     d_assert(session, return CORE_ERROR, "Null param");
 
     JSONTRANSFORM_JsToSt_create_session_request(&createSession, session);
+    
+    cJSON_Delete(session);
     return 0;
 
 }
