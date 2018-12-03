@@ -31,7 +31,7 @@ typedef struct _creat_session_t {
 } creat_session_t;
 
 CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSON *pJson);
-
+CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_create_session_request(creat_session_t *sess, cJSON *pJson);
 #ifdef __cplusplus
 }
 #endif 

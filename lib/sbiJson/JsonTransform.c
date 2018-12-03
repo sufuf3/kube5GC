@@ -175,3 +175,8 @@ status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSO
     
     return CORE_OK;
 }
+
+status_t JSONTRANSFORM_JsToSt_create_session_request(creat_session_t *sess, cJSON *pJson)
+{
+    return CORE_OK;
+}
