@@ -1,10 +1,10 @@
-#define TRACE_MODULE _smf_sbi_path
+#define TRACE_MODULE _amf_sbi_path
 
 #include "core_network.h"
 
-#include "smf_sbi_path.h"
+#include "amf_sbi_path.h"
 
-static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
+static int _amf_sbi_message_amf_smContextCreate(sock_id sock, void *data)
 {
     status_t rv;
     pkbuf_t *pkbuf = NULL;
@@ -22,7 +22,7 @@ static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
     return CORE_OK;
 }
 
-static int _smf_sbi_message_smf_smContextUpdate(sock_id sock, void *data)
+static int _amf_sbi_message_amf_smContextUpdate(sock_id sock, void *data)
 {
     status_t rv;
     pkbuf_t *pkbuf = NULL;
@@ -40,7 +40,7 @@ static int _smf_sbi_message_smf_smContextUpdate(sock_id sock, void *data)
     return CORE_OK;
 }
 
-static int _smf_sbi_message_smf_smContextRelease(sock_id sock, void *data)
+static int _amf_sbi_message_amf_smContextRelease(sock_id sock, void *data)
 {
     status_t rv;
     pkbuf_t *pkbuf = NULL;
@@ -58,7 +58,7 @@ static int _smf_sbi_message_smf_smContextRelease(sock_id sock, void *data)
     return CORE_OK;
 }
 
-static int _smf_sbi_message_smf_smContextRetrieve(sock_id sock, void *data)
+static int _amf_sbi_message_amf_smContextRetrieve(sock_id sock, void *data)
 {
     status_t rv;
     pkbuf_t *pkbuf = NULL;
@@ -76,48 +76,48 @@ static int _smf_sbi_message_smf_smContextRetrieve(sock_id sock, void *data)
     return CORE_OK;
 }
 
-status_t smf_sbi_server_open()
+status_t amf_sbi_server_open()
 {
     status_t rv;
     sock_id new;
     c_sockaddr_t addr_smContextCreate, addr_smContextUpdate, addr_smContextRelease, addr_smContextRetrieve;
 
     // Create csock for smContextCreate
-    memcpy(addr_smContextCreate.sun_path, "/tmp/smf_smContextCreate.csock", sizeof(addr_smContextCreate.sun_path));
+    memcpy(addr_smContextCreate.sun_path, "/tmp/amf_smContextCreate.csock", sizeof(addr_smContextCreate.sun_path));
     addr_smContextCreate.sun.sun_family = AF_UNIX;
     rv = unixgram_server(&new, &addr_smContextCreate);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SBI failed");
-    rv = sock_register(new, _smf_sbi_message_smf_smContextCreate, NULL);
+    rv = sock_register(new, _amf_sbi_message_amf_smContextCreate, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
     // Create csock for smContextUpdate
-    memcpy(addr_smContextUpdate.sun_path, "/tmp/smf_smContextUpdate.csock", sizeof(addr_smContextUpdate.sun_path));
+    memcpy(addr_smContextUpdate.sun_path, "/tmp/amf_smContextUpdate.csock", sizeof(addr_smContextUpdate.sun_path));
     addr_smContextUpdate.sun.sun_family = AF_UNIX;
     rv = unixgram_server(&new, &addr_smContextUpdate);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SBI failed");
-    rv = sock_register(new, _smf_sbi_message_smf_smContextUpdate, NULL);
+    rv = sock_register(new, _amf_sbi_message_amf_smContextUpdate, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
     // Create csock for smContextRelease
-    memcpy(addr_smContextRelease.sun_path, "/tmp/smf_smContextRelease.csock", sizeof(addr_smContextRelease.sun_path));
+    memcpy(addr_smContextRelease.sun_path, "/tmp/amf_smContextRelease.csock", sizeof(addr_smContextRelease.sun_path));
     addr_smContextRelease.sun.sun_family = AF_UNIX;
     rv = unixgram_server(&new, &addr_smContextRelease);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SBI failed");
-    rv = sock_register(new, _smf_sbi_message_smf_smContextRelease, NULL);
+    rv = sock_register(new, _amf_sbi_message_amf_smContextRelease, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
     // Create csock for smContextRetrieve
-    memcpy(addr_smContextRetrieve.sun_path, "/tmp/smf_smContextRetrieve.csock", sizeof(addr_smContextRetrieve.sun_path));
+    memcpy(addr_smContextRetrieve.sun_path, "/tmp/amf_smContextRetrieve.csock", sizeof(addr_smContextRetrieve.sun_path));
     addr_smContextRetrieve.sun.sun_family = AF_UNIX;
     rv = unixgram_server(&new, &addr_smContextRetrieve);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SBI failed");
-    rv = sock_register(new, _smf_sbi_message_smf_smContextRetrieve, NULL);
+    rv = sock_register(new, _amf_sbi_message_amf_smContextRetrieve, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
     return CORE_OK;
 }
 
-status_t smf_sbi_server_close()
+status_t amf_sbi_server_close()
 {
     return CORE_OK;
 }

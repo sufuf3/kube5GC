@@ -35,6 +35,7 @@
 #include "mme_fd_path.h"
 #include "mme_s6a_handler.h"
 #include "mme_path.h"
+#include "amf_sbi_path.h"
 
 void mme_state_initial(fsm_t *s, event_t *e)
 {
@@ -85,7 +86,12 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 break;
             }
             /**************************************************/
-    
+            rv = amf_sbi_server_open();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't establish AMF-SBI path");
+                break;
+            }
             break;
         }
         case FSM_EXIT_SIG:
@@ -108,6 +114,12 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 break;
             }
             /**************************************************/
+            rv = amf_sbi_server_close();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't close SMF-SBI path");
+                break;
+            }
             break;
         }
         case MME_EVT_S1AP_LO_ACCEPT:
