@@ -340,7 +340,11 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
  void _add_ebi_to_struct(cJSON* json_key, c_uint8_t *ebi) {
     
     cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_EBI);
-    memcpy(ebi, j_ebi->valuestring, strlen(j_ebi->valuestring));
+    d_info(j_ebi->valuestring);
+    int tmpData = 0;
+    tmpData = atoi(j_ebi->valuestring);
+    *ebi = tmpData;
+     
  }
 
  void _add_gummei_to_struct(cJSON* json_key, guti_t *guti) {

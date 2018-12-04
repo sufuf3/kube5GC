@@ -62,6 +62,8 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     mme_ue_t *ori_mme_ue = NULL;
     pdn_t *ori_pdn = NULL;
     pdn_t *pdn = NULL;
+    mme_bearer_t *bearer = NULL;
+    mme_bearer_t *ori_bearer = NULL;
     // char *string = NULL;
     d_assert(pSess, return CORE_ERROR, "Null param");
     d_assert(pkbuf, return CORE_ERROR, "Null param");
@@ -69,7 +71,8 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     d_assert(ori_mme_ue, return CORE_ERROR, "Null param");
     d_assert(pSess, return CORE_ERROR, "Null param");
     ori_pdn = pSess->pdn;
-
+    ori_bearer = mme_default_bearer_in_sess(pSess);
+    d_assert(ori_bearer, return CORE_ERROR, "Null param");
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
     // string = cJSON_Print(session);
     // d_info(string);
@@ -77,6 +80,7 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
 
     mme_ue = core_calloc(1, sizeof(mme_ue_t));
     pdn = core_calloc(1, sizeof(pdn_t));
+    bearer = core_calloc(1, sizeof(mme_bearer_t));
 
     JSONTRANSFORM_JsToSt_create_session_request(&createSession, session);
     memcpy(mme_ue->imsi_bcd, createSession.imsi_bcd, sizeof(createSession.imsi_bcd));
@@ -156,6 +160,13 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     if(pdn->ambr.downlink != ori_pdn->ambr.downlink) {
        d_error("ambr.downlink Error %d, ori_pdn->ambr.downlink :%d", pdn->ambr.downlink, ori_pdn->ambr.downlink);
     }  
+
+    /* create bearer contexts */
+    bearer->ebi = createSession.ebi;
+    if(bearer->ebi != ori_bearer->ebi) {
+        d_error("ebi Error bearer->ebi:%d, ori_bearer->ebi:%d", bearer->ebi, ori_bearer->ebi);
+    }
+        
     cJSON_Delete(session);
     return 0;
 
