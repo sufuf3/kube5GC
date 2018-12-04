@@ -69,7 +69,12 @@ void add_pdn_to_json(cJSON* json_key, c_uint8_t pdn_type, pdn_t* _pdn){
     cJSON *ambr = cJSON_AddObjectToObject(pdn, JSONKEY_4G_PDN_AMBR); // aggregate maximum bit rate
     bzero(str, 20);
     sprintf(str, "%u", pdn_type);
+    d_info("pdn_type :%d\n", pdn_type);
+    d_info("str :%s\n", str);
     cJSON_AddStringToObject(pdn, JSONKEY_4G_PDN_PDNTYPE, str);
+    bzero(str, 20);
+    sprintf(str, "%u", _pdn->paa.pdn_type);
+    d_info("str :%s\n", str);
     cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_PDNTYPE, str);
     char buf[CORE_ADDRSTRLEN], buf2[CORE_ADDRSTRLEN];
     
@@ -159,6 +164,7 @@ status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSO
     cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
 
     /* packet data network */
+    d_info("sess->pdn_type :%d\n", sess->pdn_type);
     add_pdn_to_json(pJson, sess->pdn_type, &sess->pdn);
     
     /* create bearer contexts */
@@ -309,7 +315,7 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     bzero(paa_pdn_len, 16);
     
     strcpy(paa_pdn_type, j_pdn_paa_pdntype->valuestring);
-    // d_info(paa_pdn_type);
+    d_info(paa_pdn_type);
     pdn->paa.pdn_type = atoi(paa_pdn_type);
     strcpy(paa_pdn_addr,j_pdn_paa_addr->valuestring);
     // d_info(paa_pdn_type);
@@ -328,7 +334,7 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     pdn->ambr.downlink = atoi(j_pdn_ambr_downlink->valuestring);
     
     cJSON *j_pdn_pdnType = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_PDNTYPE);
-    memcpy(&pdn->pdn_type, j_pdn_pdnType->valuestring, strlen(j_pdn_pdnType->valuestring));
+    pdn->pdn_type = atoi(j_pdn_pdnType->valuestring);
 
 }
  void _add_ebi_to_struct(cJSON* json_key, c_uint8_t *ebi) {

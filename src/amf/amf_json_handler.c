@@ -60,11 +60,15 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     creat_session_t createSession = {0}; 
     mme_ue_t *mme_ue = NULL;
     mme_ue_t *ori_mme_ue = NULL;
+    pdn_t *ori_pdn = NULL;
+    pdn_t *pdn = NULL;
     // char *string = NULL;
     d_assert(pSess, return CORE_ERROR, "Null param");
     d_assert(pkbuf, return CORE_ERROR, "Null param");
     ori_mme_ue = pSess->mme_ue;
     d_assert(ori_mme_ue, return CORE_ERROR, "Null param");
+    d_assert(pSess, return CORE_ERROR, "Null param");
+    ori_pdn = pSess->pdn;
 
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
     // string = cJSON_Print(session);
@@ -72,6 +76,7 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     d_assert(session, return CORE_ERROR, "Null param");
 
     mme_ue = core_calloc(1, sizeof(mme_ue_t));
+    pdn = core_calloc(1, sizeof(pdn_t));
 
     JSONTRANSFORM_JsToSt_create_session_request(&createSession, session);
     memcpy(mme_ue->imsi_bcd, createSession.imsi_bcd, sizeof(createSession.imsi_bcd));
@@ -110,10 +115,47 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     if(!compare_plmnid(mme_ue->visited_plmn_id, ori_mme_ue->visited_plmn_id)){
         d_error("visited_plmn_id Error");
     }
+
+    char rat_type[10]; 
+    memcpy(rat_type, createSession.rat_type , sizeof(createSession.rat_type));   
+    if(strcmp(rat_type, "EUTRA") != 0) {
+        d_error("rat_type Error");
+    }
         
-
-
-
+    /* packet data network */
+    pdn->pdn_type = createSession.pdn_type;
+    pdn->paa.pdn_type = createSession.pdn.paa.pdn_type;
+    d_info("pdn->paa.pdn_type:%d pdn->pdn_type:%d", pdn->paa.pdn_type, pdn->pdn_type);
+    if(pdn->paa.pdn_type != ori_pdn->paa.pdn_type)
+        d_error("paa.pdn_type Error pdn->paa.pdn_type:%d ori_pdn->paa.pdn_type:%d", pdn->paa.pdn_type, ori_pdn->paa.pdn_type);
+    
+    if (pdn->paa.pdn_type == SBI_PDN_TYPE_IPV4){
+        pdn->paa.addr = createSession.pdn.paa.addr;
+    }
+    else if (pdn->paa.pdn_type == SBI_PDN_TYPE_IPV6){
+        pdn->paa.len = createSession.pdn.paa.len;
+        memcpy(pdn->paa.addr6, createSession.pdn.paa.addr6, sizeof(createSession.pdn.paa.addr6));
+    }
+    else if (pdn->paa.pdn_type == SBI_PDN_TYPE_IPV4V6){
+        pdn->paa.both.addr = createSession.pdn.paa.addr;
+        pdn->paa.both.len = createSession.pdn.paa.len;
+        memcpy(pdn->paa.addr6, createSession.pdn.paa.addr6, sizeof(createSession.pdn.paa.addr6));
+    }
+    else {
+        // d_assert(0, return CORE_ERROR, "Not supported(%d)", pdn->pdn_type);
+         d_error( "Not supported(%d)", pdn->pdn_type);
+    }
+        
+    pdn->ambr.uplink = createSession.pdn.ambr.uplink;
+    pdn->ambr.downlink = createSession.pdn.ambr.downlink;
+    
+    if(pdn->ambr.uplink != ori_pdn->ambr.uplink) {
+        d_error("ambr.uplink Error %d  ori_pdn->ambr.uplink :%d", pdn->ambr.uplink, ori_pdn->ambr.uplink);
+    }
+        
+    if(pdn->ambr.downlink != ori_pdn->ambr.downlink) {
+       d_error("ambr.downlink Error %d, ori_pdn->ambr.downlink :%d", pdn->ambr.downlink, ori_pdn->ambr.downlink);
+    }  
     cJSON_Delete(session);
     return 0;
 

@@ -62,9 +62,12 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     else
         d_assert(0, return CORE_ERROR,
                 "HSS PDN Confiugration Error(%d)", pdn->pdn_type);
+    d_info("pdn->pdn_type :%d\n", pdn->pdn_type);
     memcpy(&createSession.pdn_type, &pdn_type, sizeof(pdn_type));
-    memcpy(&createSession.pdn, &pdn, sizeof(pdn_t));
-
+    d_info("pdn->pdn_type :%d\n", pdn->pdn_type);
+    
+    memcpy(&createSession.pdn, pdn, sizeof(pdn_t));
+    d_info("pdn->paa.pdn_type :%d\n", pdn->paa.pdn_type);
     memcpy(&createSession.ebi, &bearer->ebi, sizeof(bearer->ebi));
     /*TODO : ue timezone*/
     memcpy(&createSession.guti, &mme_ue->guti, sizeof(mme_ue->guti));
@@ -72,7 +75,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     JSONTRANSFORM_StToJs_create_session_request(&createSession, session);
 
     string = cJSON_Print(session);
-    // d_info(string);
+    d_info(string);
 
     length = strlen(string) + 1;
     
