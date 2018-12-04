@@ -11,13 +11,15 @@ top_srcdir = @top_srcdir@
 all: $(BINARY)
 
 $(BINARY): main.go handler.go routers.go
-	$(GO) build -o $(top_builddir)/http_servers/$@ $^
+	$(GO) build -o $@ $^
 
-distdir: $(BIANRY)
-	$(CP) $< $(top_builddir)/http_servers
+distdir: $(BINARY)
+	mkdir -p $(top_builddir)/http_server
+	cp $(BINARY) $(top_builddir)/http_server
+
 clean:
-	$(RM) $(top_builddir)/http_servers/smf
+	$(RM) $(top_builddir)/http_server/$(BINARY)
 
 install: $(BINARY) distdir
-	mkdir -p $(prefix)/http_servers
-	$(CP) $(top_builddir)/http_servers/$< $(prefix)/http_servers/smf
+	mkdir -p $(prefix)/http_server
+	cp $(top_builddir)/http_server/$(BINARY) $(prefix)/http_server/

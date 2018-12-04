@@ -17,26 +17,70 @@ import (
 	"syscall"
 )
 
-var unixConn *net.UnixConn
+var (
+	smContextCreateConn   *net.UnixConn
+	smContextUpdateConn   *net.UnixConn
+	smContextReleaseConn  *net.UnixConn
+	smContextRetrieveConn *net.UnixConn
+)
 var err error
 
-var smContextCreateRaddr = net.UnixAddr{
-	Name: "/tmp/smf_smContextCreate.csock",
-	Net:  "unixgram",
-}
-
-var smContextCreateLaddr = net.UnixAddr{
-	Name: "/tmp/smf_smContextCreate.gsock",
-	Net:  "unixgram",
-}
+var (
+	smContextCreateLaddr = net.UnixAddr{
+		Name: "/tmp/smf_smContextCreate.gsock",
+		Net:  "unixgram",
+	}
+	smContextCreateRaddr = net.UnixAddr{
+		Name: "/tmp/smf_smContextCreate.csock",
+		Net:  "unixgram",
+	}
+	smContextUpdateLaddr = net.UnixAddr{
+		Name: "/tmp/smf_smContextUpdate.gsock",
+		Net:  "unixgram",
+	}
+	smContextUpdateRaddr = net.UnixAddr{
+		Name: "/tmp/smf_smContextUpdate.csock",
+		Net:  "unixgram",
+	}
+	smContextReleaseLaddr = net.UnixAddr{
+		Name: "/tmp/smf_smContextRelease.gsock",
+		Net:  "unixgram",
+	}
+	smContextReleaseRaddr = net.UnixAddr{
+		Name: "/tmp/smf_smContextRelease.csock",
+		Net:  "unixgram",
+	}
+	smContextRetrieveLaddr = net.UnixAddr{
+		Name: "/tmp/smf_smContextRetrieve.gsock",
+		Net:  "unixgram",
+	}
+	smContextRetrieveRaddr = net.UnixAddr{
+		Name: "/tmp/smf_smContextRetrieve.csock",
+		Net:  "unixgram",
+	}
+)
 
 func init() {
+	syscall.Unlink(smContextCreateLaddr.String())
+	smContextCreateConn, err = net.DialUnix("unixgram", &smContextCreateLaddr, &smContextCreateRaddr)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	syscall.Unlink(smContextCreateLaddr.String())
-	unixConn, err = net.DialUnix("unixgram", &smContextCreateLaddr, &smContextCreateRaddr)
+	syscall.Unlink(smContextUpdateLaddr.String())
+	smContextUpdateConn, err = net.DialUnix("unixgram", &smContextUpdateLaddr, &smContextUpdateRaddr)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	syscall.Unlink(smContextReleaseLaddr.String())
+	smContextReleaseConn, err = net.DialUnix("unixgram", &smContextReleaseLaddr, &smContextReleaseRaddr)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	syscall.Unlink(smContextRetrieveLaddr.String())
+	smContextRetrieveConn, err = net.DialUnix("unixgram", &smContextRetrieveLaddr, &smContextRetrieveRaddr)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -49,11 +93,62 @@ func SMContextCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	r.Body.Read(buf)
-	_, err := unixConn.Write(buf)
+	_, err := smContextCreateConn.Write(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
-	len, _, err2 := unixConn.ReadFromUnix(buf)
+	len, _, err2 := smContextCreateConn.ReadFromUnix(buf)
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+	fmt.Fprintln(w, string(buf[0:len]))
+}
+
+func SMContextUpdate(w http.ResponseWriter, r *http.Request) {
+	var buf []byte
+	buf = make([]byte, 1000)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	r.Body.Read(buf)
+	_, err := smContextUpdateConn.Write(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	len, _, err2 := smContextUpdateConn.ReadFromUnix(buf)
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+	fmt.Fprintln(w, string(buf[0:len]))
+}
+
+func SMContextRelease(w http.ResponseWriter, r *http.Request) {
+	var buf []byte
+	buf = make([]byte, 1000)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	r.Body.Read(buf)
+	_, err := smContextReleaseConn.Write(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	len, _, err2 := smContextReleaseConn.ReadFromUnix(buf)
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+	fmt.Fprintln(w, string(buf[0:len]))
+}
+
+func SMContextRetrieve(w http.ResponseWriter, r *http.Request) {
+	var buf []byte
+	buf = make([]byte, 1000)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	r.Body.Read(buf)
+	_, err := smContextRetrieveConn.Write(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	len, _, err2 := smContextRetrieveConn.ReadFromUnix(buf)
 	if err2 != nil {
 		log.Fatal(err2)
 	}
