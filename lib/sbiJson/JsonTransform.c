@@ -69,12 +69,12 @@ void add_pdn_to_json(cJSON* json_key, c_uint8_t pdn_type, pdn_t* _pdn){
     cJSON *ambr = cJSON_AddObjectToObject(pdn, JSONKEY_4G_PDN_AMBR); // aggregate maximum bit rate
     bzero(str, 20);
     sprintf(str, "%u", pdn_type);
-    d_info("pdn_type :%d\n", pdn_type);
-    d_info("str :%s\n", str);
+    // d_info("pdn_type :%d\n", pdn_type);
+    // d_info("str :%s\n", str);
     cJSON_AddStringToObject(pdn, JSONKEY_4G_PDN_PDNTYPE, str);
     bzero(str, 20);
     sprintf(str, "%u", _pdn->paa.pdn_type);
-    d_info("str :%s\n", str);
+    // d_info("str :%s\n", str);
     cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_PDNTYPE, str);
     char buf[CORE_ADDRSTRLEN], buf2[CORE_ADDRSTRLEN];
     
@@ -164,7 +164,7 @@ status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSO
     cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
 
     /* packet data network */
-    d_info("sess->pdn_type :%d\n", sess->pdn_type);
+    // d_info("sess->pdn_type :%d\n", sess->pdn_type);
     add_pdn_to_json(pJson, sess->pdn_type, &sess->pdn);
     
     /* create bearer contexts */
@@ -315,7 +315,7 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     bzero(paa_pdn_len, 16);
     
     strcpy(paa_pdn_type, j_pdn_paa_pdntype->valuestring);
-    d_info(paa_pdn_type);
+    // d_info(paa_pdn_type);
     pdn->paa.pdn_type = atoi(paa_pdn_type);
     strcpy(paa_pdn_addr,j_pdn_paa_addr->valuestring);
     // d_info(paa_pdn_type);
@@ -324,7 +324,7 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     // d_info(paa_pdn_len);
     pdn->paa.len = atoi(paa_pdn_len);
     //TODO : FIX ipv6 input
-    d_info(j_pdn_paa_addr6->valuestring);
+    // d_info(j_pdn_paa_addr6->valuestring);
     inet_pton(AF_INET6, j_pdn_paa_addr6->valuestring, pdn->paa.addr6);
 
     cJSON *j_pdn_ambr = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_AMBR);
@@ -340,7 +340,7 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
  void _add_ebi_to_struct(cJSON* json_key, c_uint8_t *ebi) {
     
     cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_EBI);
-    d_info(j_ebi->valuestring);
+    // d_info(j_ebi->valuestring);
     int tmpData = 0;
     tmpData = atoi(j_ebi->valuestring);
     *ebi = tmpData;

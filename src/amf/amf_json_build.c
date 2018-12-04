@@ -25,7 +25,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     mme_ue = sess->mme_ue;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
 
-    d_info("createSession:%d", &createSession);
+    // d_info("createSession:%d", &createSession);
     memcpy(createSession.imsi_bcd,  mme_ue->imsi_bcd, sizeof( mme_ue->imsi_bcd));
 #if 0
     int i = 0;
@@ -35,7 +35,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     }
 #endif
     memcpy(&createSession.tai, &mme_ue->tai, sizeof( mme_ue->tai));
-    printf("\ttai :\n\t\ttac : %d\n\t\tplmn_id :\n\t\t\t\n", createSession.tai.tac);  
+    // printf("\ttai :\n\t\ttac : %d\n\t\tplmn_id :\n\t\t\t\n", createSession.tai.tac);  
     memcpy(&createSession.e_cgi, &mme_ue->e_cgi, sizeof( mme_ue->e_cgi));
     memcpy(&createSession.visited_plmn_id, &mme_ue->visited_plmn_id, sizeof( mme_ue->visited_plmn_id));
     if (sess->ue_pco.length && sess->ue_pco.buffer) {
@@ -62,12 +62,12 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     else
         d_assert(0, return CORE_ERROR,
                 "HSS PDN Confiugration Error(%d)", pdn->pdn_type);
-    d_info("pdn->pdn_type :%d\n", pdn->pdn_type);
+    // d_info("pdn->pdn_type :%d\n", pdn->pdn_type);
     memcpy(&createSession.pdn_type, &pdn_type, sizeof(pdn_type));
-    d_info("pdn->pdn_type :%d\n", pdn->pdn_type);
+    // d_info("pdn->pdn_type :%d\n", pdn->pdn_type);
     
     memcpy(&createSession.pdn, pdn, sizeof(pdn_t));
-    d_info("pdn->paa.pdn_type :%d\n", pdn->paa.pdn_type);
+    // d_info("pdn->paa.pdn_type :%d\n", pdn->paa.pdn_type);
     memcpy(&createSession.ebi, &bearer->ebi, sizeof(bearer->ebi));
     /*TODO : ue timezone*/
     memcpy(&createSession.guti, &mme_ue->guti, sizeof(mme_ue->guti));
@@ -75,7 +75,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     JSONTRANSFORM_StToJs_create_session_request(&createSession, session);
 
     string = cJSON_Print(session);
-    d_info(string);
+    // d_info(string);
 
     length = strlen(string) + 1;
     
