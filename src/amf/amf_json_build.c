@@ -27,7 +27,15 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
 
     d_info("createSession:%d", &createSession);
     memcpy(createSession.imsi_bcd,  mme_ue->imsi_bcd, sizeof( mme_ue->imsi_bcd));
+#if 0
+    int i = 0;
+    for (i = 0; i<16; i++)
+    {
+        printf("%x ", createSession.imsi_bcd[i]);
+    }
+#endif
     memcpy(&createSession.tai, &mme_ue->tai, sizeof( mme_ue->tai));
+    printf("\ttai :\n\t\ttac : %d\n\t\tplmn_id :\n\t\t\t\n", createSession.tai.tac);  
     memcpy(&createSession.e_cgi, &mme_ue->e_cgi, sizeof( mme_ue->e_cgi));
     memcpy(&createSession.visited_plmn_id, &mme_ue->visited_plmn_id, sizeof( mme_ue->visited_plmn_id));
     if (sess->ue_pco.length && sess->ue_pco.buffer) {
@@ -64,14 +72,13 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     JSONTRANSFORM_StToJs_create_session_request(&createSession, session);
 
     string = cJSON_Print(session);
-    d_info(string);
+    // d_info(string);
 
     length = strlen(string) + 1;
     
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;
     memcpy((*pkbuf)->payload, string, length -1);
-    free(createSession.ue_pco.buffer);
     free(string);
     cJSON_Delete(session);
 

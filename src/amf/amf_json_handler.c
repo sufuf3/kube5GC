@@ -57,13 +57,14 @@ bool compare_plmnid(plmn_id_t id1, plmn_id_t id2){
 
 status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     creat_session_t createSession = {0}; 
-
+    // char *string = NULL;
     d_assert(pSess, return CORE_ERROR, "Null param");
     d_assert(pkbuf, return CORE_ERROR, "Null param");
 
 
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
-    // d_info(cJSON_Print(session));
+    // string = cJSON_Print(session);
+    // d_info(string);
     d_assert(session, return CORE_ERROR, "Null param");
 
     JSONTRANSFORM_JsToSt_create_session_request(&createSession, session);

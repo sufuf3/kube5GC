@@ -1,7 +1,10 @@
+#include "core_lib.h"
 #include "core_debug.h"
 #include "core_pkbuf.h"
 #include "core_network.h"
 #include "JsonTransform.h"
+#include "string.h"
+#include <arpa/inet.h>
 
 void plmn_id_to_buffer(plmn_id_t plmn_id, char* mcc, char* mnc){
     bzero(mcc, 4);
@@ -176,100 +179,214 @@ status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSO
     return CORE_OK;
 }
 
-status_t JSONTRANSFORM_JsToSt_create_session_request(creat_session_t *sess, cJSON *pJson)
-{
+void buffer_to_uint(c_uint8_t* output, const char* input, int len){
+    c_uint8_t from, end;
+    for(int i = 0; i < len; i++){
+        if(input[i*2] >= 'a')
+            from = input[i*2] - 'a' + 10;
+        else 
+            from = input[i*2] - '0';
+        if(input[i*2+1] >= 'a')
+            end = input[i*2+1] - 'a' + 10;
+        else 
+            end = input[i*2+1] - '0';
+#if WORDS_BIGENDIAN
+        output[i] = ((from<<4) & 0xf0) + (end & 0x0f);
+#else
+         
+        output[i] = ((end<<4) & 0xf0) + (from & 0x0f);
+#endif
+    }
+    return ;
+}
+
+void _add_imsi_to_struct(cJSON* json_key, c_int8_t *pImsi) {
+    
+    cJSON *j_imsi = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_IMSI);
+    memcpy(pImsi, j_imsi->valuestring, strlen(j_imsi->valuestring));
+    memset(&pImsi[15], 0x00, 1);
+#if 0
+    d_info("j_imsi->valuestring %s ", j_imsi->valuestring);
+    int i = 0;
+    for (i = 0; i<16; i++)
+    {
+        printf("%x ", pImsi[i]);
+    }
+#endif
+}
+
+void _add_uld_to_struct(cJSON* json_key, creat_session_t *sess) {
     char mcc[4];
     char mnc[4];
     bzero(mcc, 4);
     bzero(mnc, 4);
-    /* imsi */
-    cJSON *j_imsi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_IMSI);
-    memcpy(sess->imsi_bcd, j_imsi->string, j_imsi->valueint);
-
-    /* user location information */
-    cJSON *j_uli = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_ULI);
+    cJSON *j_uli = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_ULI);
     cJSON *j_eutra = cJSON_GetObjectItemCaseSensitive(j_uli, JSONKEY_4G_ULI_EUTRAL);
     cJSON *j_tai = cJSON_GetObjectItemCaseSensitive(j_eutra, JSONKEY_4G_ULI_EUTRAL_TAI);
     cJSON *j_tai_plmnid = cJSON_GetObjectItemCaseSensitive(j_tai, JSONKEY_4G_ULI_EUTRAL_TAI_PLMNID);
+    cJSON *j_tai_plmnid_mmc = cJSON_GetObjectItemCaseSensitive(j_tai_plmnid, JSONKEY_4G_ULI_EUTRAL_TAI_PLMNID_MCC);
+    cJSON *j_tai_plmnid_mnc = cJSON_GetObjectItemCaseSensitive(j_tai_plmnid, JSONKEY_4G_ULI_EUTRAL_TAI_PLMNID_MNC);
     bzero(mcc, 4);
     bzero(mnc, 4);
-    strcpy(mcc, cJSON_GetObjectItemCaseSensitive(j_tai_plmnid, JSONKEY_4G_ULI_EUTRAL_TAI_PLMNID_MCC) -> valuestring);
-    strcpy(mnc, cJSON_GetObjectItemCaseSensitive(j_tai_plmnid, JSONKEY_4G_ULI_EUTRAL_TAI_PLMNID_MNC) -> valuestring);
+    strcpy(mcc, j_tai_plmnid_mmc->valuestring);
+    // d_info("j_tai_plmnid_mmc->valuestring %s ",j_tai_plmnid_mmc->valuestring);
+    strcpy(mnc, j_tai_plmnid_mnc->valuestring);
+    // d_info("j_tai_plmnid_mmc->valuestring %s ",j_tai_plmnid_mmc->valuestring);
     plmn_id_build(&sess->tai.plmn_id, atoi(mcc), atoi(mnc), strlen(mnc));
-    cJSON *j_tai_tac = cJSON_GetObjectItemCaseSensitive(j_eutra, JSONKEY_4G_ULI_EUTRAL_TAI_TAC);
-    memcpy(&sess->tai.tac, j_tai_tac->valuestring, strlen(j_tai_tac->valuestring));
+    cJSON *j_tai_tac = cJSON_GetObjectItemCaseSensitive(j_tai, JSONKEY_4G_ULI_EUTRAL_TAI_TAC);
+    // d_info("j_tai_tac->valuestring %s ",j_tai_tac->valuestring);
+    // _str2short(j_tai_tac->valuestring, strlen(j_tai_tac->valuestring),&sess->tai.tac);
+    sess->tai.tac = atoi(j_tai_tac->valuestring);
+    // printf("\ttai :\n\t\ttac : %d\n\t\tplmn_id :\n\t\t\tmcc : %s\n\t\t\t mnc : %s\n", sess->tai.tac, mcc, mnc);    
+
     cJSON *j_e_cgi = cJSON_GetObjectItemCaseSensitive(j_eutra, JSONKEY_4G_ULI_EUTRAL_ECGI);
     cJSON *j_e_cgi_plmnid = cJSON_GetObjectItemCaseSensitive(j_e_cgi, JSONKEY_4G_ULI_EUTRAL_ECGI_PLMNID);
+    cJSON *j_e_cgi_plmnid_mmc = cJSON_GetObjectItemCaseSensitive(j_e_cgi_plmnid, JSONKEY_4G_ULI_EUTRAL_ECGI_PLMNID_MCC);
+    cJSON *j_e_cgi_plmnid_mnc = cJSON_GetObjectItemCaseSensitive(j_e_cgi_plmnid, JSONKEY_4G_ULI_EUTRAL_ECGI_PLMNID_MNC);
     bzero(mcc, 4);
     bzero(mnc, 4);
-    strcpy(mcc, cJSON_GetObjectItemCaseSensitive(j_e_cgi_plmnid, JSONKEY_4G_ULI_EUTRAL_ECGI_PLMNID_MCC) -> valuestring);
-    strcpy(mnc, cJSON_GetObjectItemCaseSensitive(j_e_cgi_plmnid, JSONKEY_4G_ULI_EUTRAL_ECGI_PLMNID_MNC) -> valuestring);
+    strcpy(mcc, j_e_cgi_plmnid_mmc->valuestring);
+    // d_info("j_tai_plmnid_mmc->valuestring %s ",j_tai_plmnid_mmc->valuestring);
+    strcpy(mnc, j_e_cgi_plmnid_mnc->valuestring);
+    // d_info("j_tai_plmnid_mmc->valuestring %s ",j_tai_plmnid_mmc->valuestring);
     plmn_id_build(&sess->e_cgi.plmn_id, atoi(mcc), atoi(mnc), strlen(mnc));
-    sess->e_cgi.cell_id = (c_uint32_t)cJSON_GetObjectItemCaseSensitive(j_e_cgi, JSONKEY_4G_ULI_EUTRAL_ECGI_EUTRACELLID) -> valueint;
+    cJSON *j_e_cgi_eutraCellId = cJSON_GetObjectItemCaseSensitive(j_e_cgi, JSONKEY_4G_ULI_EUTRAL_ECGI_EUTRACELLID);
+    sess->e_cgi.cell_id = atoi(j_e_cgi_eutraCellId->valuestring);
+    // printf("\tecgi :\n\t\tcell id : %d\n \t\t\tmcc : %s\n\t\t\t mnc : %s\n", sess->e_cgi.cell_id, mcc, mnc);    
+}
 
-    /* serving network */
-    cJSON *j_serving_network = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_SERVINGNETWORK);
+void _add_serving_network_to_struct(cJSON* json_key, plmn_id_t *visited_plmn_id) {
+    char mcc[4];
+    char mnc[4];
     bzero(mcc, 4);
     bzero(mnc, 4);
-    strcpy(mcc, cJSON_GetObjectItemCaseSensitive(j_serving_network, JSONKEY_4G_SERVINGNETWORK_MMC) -> valuestring);
-    strcpy(mnc, cJSON_GetObjectItemCaseSensitive(j_serving_network, JSONKEY_4G_SERVINGNETWORK_MNC) -> valuestring);
-    plmn_id_build(&sess->visited_plmn_id, atoi(mcc), atoi(mnc), strlen(mnc));
-    // printf("visited_plmn_id :\n\tmcc : %s\n\t mnc : %s\n", mcc, mnc);
+    cJSON *j_serving_network = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_SERVINGNETWORK);
+    cJSON *j_serving_network_mmc = cJSON_GetObjectItemCaseSensitive(j_serving_network, JSONKEY_4G_SERVINGNETWORK_MMC);
+    cJSON *j_serving_network_mnc= cJSON_GetObjectItemCaseSensitive(j_serving_network, JSONKEY_4G_SERVINGNETWORK_MNC);
+    bzero(mcc, 4);
+    bzero(mnc, 4);
+    strcpy(mcc, j_serving_network_mmc->valuestring);
+    strcpy(mnc, j_serving_network_mnc->valuestring);
+    plmn_id_build(visited_plmn_id, atoi(mcc), atoi(mnc), strlen(mnc));
+}
+
+void _add_radio_type_to_struct(cJSON* json_key, c_uint8_t *radioType) {
+
+    memset(radioType, 0x00, 10);
+    cJSON *j_ratType = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_RATTYPE);
+    memcpy(radioType, j_ratType->valuestring, strlen(j_ratType->valuestring));
+    
+}
+
+void _add_pco_to_struct(cJSON* json_key, ue_pco_t *ue_pco) {
+
+    cJSON *j_pco = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_PCO);
+    
+    ue_pco->length = strlen(j_pco->valuestring);
+    ue_pco->buffer = core_calloc(ue_pco->length +1 , sizeof(c_uint8_t));
+    // strcpy(sess->ue_pco.buffer, cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_PCO) -> valuestring);
+    core_ascii_to_hex(j_pco->valuestring, ue_pco->length, ue_pco->buffer, (ue_pco->length)/2 );
+}
+
+void _add_apn_to_struct(cJSON* json_key, c_int8_t *apn) {
+    cJSON *j_apn = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_APN);
+    strcpy(apn, j_apn->valuestring);
+}
+
+void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
+    char paa_pdn_type[1+1] = {0};
+    char paa_pdn_addr[32]= {0};
+    char paa_pdn_len[16]= {0};
+
+    cJSON *j_pdn = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_PDN);
+    cJSON *j_pdn_paa = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_PAA); // PDN Address Allocation 
+    cJSON *j_pdn_paa_pdntype = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_PDNTYPE);
+    cJSON *j_pdn_paa_addr = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_ADDR);
+    cJSON *j_pdn_paa_addr6 = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_ADDR6);
+    cJSON *j_pdn_paa_len = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_LEN);
+    bzero(paa_pdn_type, 1+1); 
+    bzero(paa_pdn_addr, 32);
+    bzero(paa_pdn_len, 16);
+    
+    strcpy(paa_pdn_type, j_pdn_paa_pdntype->valuestring);
+    // d_info(paa_pdn_type);
+    pdn->paa.pdn_type = atoi(paa_pdn_type);
+    strcpy(paa_pdn_addr,j_pdn_paa_addr->valuestring);
+    // d_info(paa_pdn_type);
+    pdn->paa.addr = atoi(paa_pdn_addr);
+    strcpy(paa_pdn_len,j_pdn_paa_len->valuestring);
+    // d_info(paa_pdn_len);
+    pdn->paa.len = atoi(paa_pdn_len);
+    //TODO : FIX ipv6 input
+    d_info(j_pdn_paa_addr6->valuestring);
+    inet_pton(AF_INET6, j_pdn_paa_addr6->valuestring, pdn->paa.addr6);
+
+    cJSON *j_pdn_ambr = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_AMBR);
+    cJSON *j_pdn_ambr_uplink = cJSON_GetObjectItemCaseSensitive(j_pdn_ambr, JSONKEY_4G_PDN_AMBR_UPLINK);
+    cJSON *j_pdn_ambr_downlink = cJSON_GetObjectItemCaseSensitive(j_pdn_ambr, JSONKEY_4G_PDN_AMBR_DOWMLINK);
+    pdn->ambr.uplink = atoi(j_pdn_ambr_uplink->valuestring);
+    pdn->ambr.downlink = atoi(j_pdn_ambr_downlink->valuestring);
+    
+    cJSON *j_pdn_pdnType = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_PDNTYPE);
+    memcpy(&pdn->pdn_type, j_pdn_pdnType->valuestring, strlen(j_pdn_pdnType->valuestring));
+
+}
+ void _add_ebi_to_struct(cJSON* json_key, c_uint8_t *ebi) {
+    
+    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_EBI);
+    memcpy(ebi, j_ebi->valuestring, strlen(j_ebi->valuestring));
+ }
+
+ void _add_gummei_to_struct(cJSON* json_key, guti_t *guti) {
+    char mcc[4];
+    char mnc[4];
+    bzero(mcc, 4);
+    bzero(mnc, 4);
+    cJSON *j_gummei = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_GUMMEI);
+    cJSON *j_gummei_plmnid = cJSON_GetObjectItemCaseSensitive(j_gummei, JSONKEY_4G_GUMMEI_PLMNID);
+    cJSON *j_gummei_plmnid_mcc = cJSON_GetObjectItemCaseSensitive(j_gummei_plmnid, JSONKEY_4G_GUMMEI_PLMNID_MCC);
+    cJSON *j_gummei_plmnid_mnc = cJSON_GetObjectItemCaseSensitive(j_gummei_plmnid, JSONKEY_4G_GUMMEI_PLMNID_MNC);
+    bzero(mcc, 4);
+    bzero(mnc, 4);
+    strcpy(mcc, j_gummei_plmnid_mcc->valuestring);
+    strcpy(mnc, j_gummei_plmnid_mnc->valuestring);
+    plmn_id_build(&guti->plmn_id, atoi(mcc), atoi(mnc), strlen(mnc));
+    cJSON *j_gummei_mmegid = cJSON_GetObjectItemCaseSensitive(j_gummei, JSONKEY_4G_GUMMEI_MMEGID);
+    cJSON *j_gummei_mmecode = cJSON_GetObjectItemCaseSensitive(j_gummei, JSONKEY_4G_GUMMEI_MMECODE);
+
+    guti->mme_gid = atoi(j_gummei_mmegid->valuestring);
+    guti->mme_code = atoi(j_gummei_mmecode->valuestring);
+ }
+
+
+status_t JSONTRANSFORM_JsToSt_create_session_request(creat_session_t *sess, cJSON *pJson)
+{
+    /* imsi */
+    _add_imsi_to_struct(pJson, sess->imsi_bcd);
+    
+    /* user location information */
+    _add_uld_to_struct(pJson, sess);
+    
+    // /* serving network */
+    _add_serving_network_to_struct(pJson, &sess->visited_plmn_id);
 
     /* radio access technology */
-    memcpy(&sess->rat_type, cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_RATTYPE)->valuestring, strlen(cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_RATTYPE)->valuestring));
-    // printf("rat_type : %s\n", rat_type);
-
+    _add_radio_type_to_struct(pJson, sess->rat_type);
 
     /* protocol_configuration_options(nas) */
-    // cJSON *j_pco = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_PCO);
-    // sess->ue_pco.length = j_pco->valueint;
-    // sess->ue_pco.buffer = core_calloc(sess->ue_pco.length, sizeof(c_uint8_t));
-    // strcpy(sess->ue_pco.buffer, cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_PCO) -> valuestring);
-
-//     /* APN */
-//     strcpy(sess->apn, cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_APN) -> valuestring);
-
-//     /* packet data network */
-//     cJSON *j_pdn = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_PDN);
-//     cJSON *j_pdn_paa = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_PAA); // PDN Address Allocation 
-//     cJSON *j_pdn_paa_pdntype = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_PDNTYPE);
-//     cJSON *j_pdn_paa_addr = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_ADDR);
-//     cJSON *j_pdn_paa_addr6 = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_ADDR6);
-//     cJSON *j_pdn_paa_len = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_LEN);
-//     strcpy(sess->pdn.paa.pdn_type, j_pdn_paa_pdntype->valuestring);
-//     strcpy(sess->pdn.paa.addr,j_pdn_paa_addr->valuestring);
-//     strcpy(sess->pdn.paa.len, j_pdn_paa_len->valuestring);
-
-//     cJSON *j_pdn_ambr = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_AMBR);
-//     cJSON *j_pdn_ambr_uplink = cJSON_GetObjectItemCaseSensitive(j_pdn_ambr, JSONKEY_4G_PDN_AMBR_UPLINK);
-//     cJSON *j_pdn_ambr_downlink = cJSON_GetObjectItemCaseSensitive(j_pdn_ambr, JSONKEY_4G_PDN_AMBR_DOWMLINK);
-//     strcpy(sess->pdn.ambr.uplink , j_pdn_ambr_uplink->valuestring);
-//     strcpy(sess->pdn.ambr.downlink , j_pdn_ambr_downlink->valuestring);
+    _add_pco_to_struct(pJson, &sess->ue_pco);
     
-//     cJSON *j_pdn_pdnType = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_PDNTYPE);
-//     strcpy(sess->pdn_type, j_pdn_pdnType->valuestring);
+    /* APN */
+    _add_apn_to_struct(pJson, sess->apn);
 
-//     /* ebi */
-//     cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
-//     strcpy(sess->ebi, j_ebi->valuestring);
+    /* packet data network */
+    _add_pdn_to_struct(pJson, &sess->pdn);
+
+    /* ebi */
+    _add_ebi_to_struct(pJson, &sess->ebi);
     
-//     /* gummei */
-//     cJSON *j_gummei = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_GUMMEI);
-//     cJSON *j_gummei_plmnid = cJSON_GetObjectItemCaseSensitive(j_gummei, JSONKEY_4G_GUMMEI_PLMNID);
-//     cJSON *j_gummei_plmnid_mcc = cJSON_GetObjectItemCaseSensitive(j_gummei_plmnid, JSONKEY_4G_GUMMEI_PLMNID_MCC);
-//     cJSON *j_gummei_plmnid_mnc = cJSON_GetObjectItemCaseSensitive(j_gummei_plmnid, JSONKEY_4G_GUMMEI_PLMNID_MNC);
-//     bzero(mcc, 4);
-//     bzero(mnc, 4);
-//     strcpy(mcc, j_gummei_plmnid_mcc->valuestring);
-//     strcpy(mnc, j_gummei_plmnid_mnc->valuestring);
-//     plmn_id_build(&sess->guti.plmn_id, atoi(mcc), atoi(mnc), strlen(mnc));
-//     cJSON *j_gummei_mmegid = cJSON_GetObjectItemCaseSensitive(j_gummei, JSONKEY_4G_GUMMEI_MMEGID);
-//     cJSON *j_gummei_mmecode = cJSON_GetObjectItemCaseSensitive(j_gummei, JSONKEY_4G_GUMMEI_MMECODE);
-
-//      strcpy(sess->guti.mme_gid, j_gummei_mmegid->valuestring);
-//     strcpy(sess->guti.mme_code, j_gummei_mmecode->valuestring);
-
+    /* gummei */
+    _add_gummei_to_struct(pJson, &sess->guti);
 
     return CORE_OK;
 }
