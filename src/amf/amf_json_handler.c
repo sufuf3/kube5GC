@@ -87,7 +87,31 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     if(mme_ue->imsi_len != ori_mme_ue->imsi_len) {
         d_error("imsi_len Error %d %d", mme_ue->imsi_len, ori_mme_ue->imsi_len);    
     }
+    /* tai */
+    memcpy(&mme_ue->tai.tac, &createSession.tai.tac, sizeof(createSession.tai.tac));
+    memcpy(&mme_ue->tai.plmn_id, &createSession.tai.plmn_id, sizeof(createSession.tai.plmn_id));
+    /* e-cgi */
+    memcpy(&mme_ue->e_cgi.cell_id, &createSession.e_cgi.cell_id, sizeof(createSession.e_cgi.cell_id));
+    memcpy(&mme_ue->e_cgi.plmn_id, &createSession.e_cgi.plmn_id, sizeof(createSession.e_cgi.plmn_id));
+    if(!compare_plmnid(mme_ue->tai.plmn_id, ori_mme_ue->tai.plmn_id)){
+        d_error("tai.plmn_id Error");
+    }        
+    if(mme_ue->tai.tac != ori_mme_ue->tai.tac) {
+        d_error("tai.tac Error");
+    }
+    if(!compare_plmnid(mme_ue->e_cgi.plmn_id, ori_mme_ue->e_cgi.plmn_id)) {
+        d_error("e_cgi.plmn_id Error");
+    }     
+    if(mme_ue->e_cgi.cell_id != ori_mme_ue->e_cgi.cell_id) {
+        d_error("e_cgi.cell_id Error");
+    }
+    /*visited plmn id */
+    memcpy(&mme_ue->visited_plmn_id, &createSession.visited_plmn_id, sizeof(createSession.visited_plmn_id));    
+    if(!compare_plmnid(mme_ue->visited_plmn_id, ori_mme_ue->visited_plmn_id)){
+        d_error("visited_plmn_id Error");
+    }
         
+
 
 
     cJSON_Delete(session);
