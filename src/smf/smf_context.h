@@ -59,6 +59,8 @@ typedef struct _smf_context_t {
     
     hash_t              *sess_hash;     /* Session Hash Table (IMSI + APN) */
 
+    pid_t               server_pid;
+    
     #define MAX_NUM_OF_DNS              2
     const char          *dns[MAX_NUM_OF_DNS];
     const char          *dns6[MAX_NUM_OF_DNS];
