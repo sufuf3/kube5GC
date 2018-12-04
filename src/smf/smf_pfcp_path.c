@@ -90,7 +90,7 @@ status_t smf_pfcp_open()
     pfcp_node_t *upf;
     for (upf = list_first(&smf_self()->upf_n4_list); upf; upf = list_next(upf)) {
         rv = pfcp_connect(smf_self()->pfcp_sock, smf_self()->pfcp_sock6, upf);
-        d_assert(rv == CORE_OK, continue, "upf not client");
+        d_assert(rv == CORE_OK, continue, "error connecting upf");
         smf_pfcp_send_association_setup_request(upf);
     }
 
