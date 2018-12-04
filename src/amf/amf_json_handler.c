@@ -56,19 +56,40 @@ bool compare_plmnid(plmn_id_t id1, plmn_id_t id2){
 }
 
 status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
+    
     creat_session_t createSession = {0}; 
+    mme_ue_t *mme_ue = NULL;
+    mme_ue_t *ori_mme_ue = NULL;
     // char *string = NULL;
     d_assert(pSess, return CORE_ERROR, "Null param");
     d_assert(pkbuf, return CORE_ERROR, "Null param");
-
+    ori_mme_ue = pSess->mme_ue;
+    d_assert(ori_mme_ue, return CORE_ERROR, "Null param");
 
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
     // string = cJSON_Print(session);
     // d_info(string);
     d_assert(session, return CORE_ERROR, "Null param");
 
+    mme_ue = core_calloc(1, sizeof(mme_ue_t));
+
     JSONTRANSFORM_JsToSt_create_session_request(&createSession, session);
+    memcpy(mme_ue->imsi_bcd, createSession.imsi_bcd, sizeof(createSession.imsi_bcd));
+    mme_ue->imsi_len = strlen(createSession.imsi_bcd)/2;
+    if (mme_ue->imsi_len %2 == 1) {
+        mme_ue->imsi_len += 1;
+    }
+
+    if(strcmp(mme_ue->imsi_bcd, ori_mme_ue->imsi_bcd) != 0) {
+        d_error("imsi_data Error");
+    }
     
+    if(mme_ue->imsi_len != ori_mme_ue->imsi_len) {
+        d_error("imsi_len Error %d %d", mme_ue->imsi_len, ori_mme_ue->imsi_len);    
+    }
+        
+
+
     cJSON_Delete(session);
     return 0;
 
