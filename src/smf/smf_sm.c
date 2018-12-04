@@ -284,6 +284,19 @@ void smf_state_operational(fsm_t *s, event_t *e)
             }
             break;
         }
+        case SMF_EVT_N11_MESSAGE:
+        {
+            pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
+	    int msg_type = event_get_param2(e);
+
+            d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+            
+	    d_info("msgtype: %d", msg_type);
+
+        release_n11_pkbuf:
+            pkbuf_free(recvbuf);
+            break;
+        }
         case SMF_EVT_GX_MESSAGE:
         {
             index_t sess_index = event_get_param1(e);
