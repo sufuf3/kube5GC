@@ -6,6 +6,8 @@
 #include "string.h"
 #include <arpa/inet.h>
 
+#define JSON_DEBUG 0
+
 void plmn_id_to_buffer(plmn_id_t plmn_id, char* mcc, char* mnc){
     bzero(mcc, 4);
     bzero(mnc, 4);
@@ -69,21 +71,31 @@ void add_pdn_to_json(cJSON* json_key, c_uint8_t pdn_type, pdn_t* _pdn){
     cJSON *ambr = cJSON_AddObjectToObject(pdn, JSONKEY_4G_PDN_AMBR); // aggregate maximum bit rate
     bzero(str, 20);
     sprintf(str, "%u", pdn_type);
-    // d_info("pdn_type :%d\n", pdn_type);
-    // d_info("str :%s\n", str);
+#if JSON_DEBUG
+    d_info("%d %s pdn_type :%d\n", __LINE__, __FUNCTION__, pdn_type);
+    d_info("%d %s str :%s\n", __LINE__, __FUNCTION__, str);
+#endif
     cJSON_AddStringToObject(pdn, JSONKEY_4G_PDN_PDNTYPE, str);
     bzero(str, 20);
     sprintf(str, "%u", _pdn->paa.pdn_type);
-    // d_info("str :%s\n", str);
+#if JSON_DEBUG
+    d_info("%d %s str :%s\n", __LINE__, __FUNCTION__, str);
+#endif
     cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_PDNTYPE, str);
     char buf[CORE_ADDRSTRLEN], buf2[CORE_ADDRSTRLEN];
     
     if (pdn_type == SBI_PDN_TYPE_IPV4){
         INET_NTOP(&_pdn->paa.addr, buf);
+#if JSON_DEBUG
+        d_info("%s %d str _pdn->paa.addr,:%s\n", __LINE__, __FUNCTION__, buf);
+#endif
         cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_ADDR, buf);
     }
     else if (pdn_type == SBI_PDN_TYPE_IPV6){
         INET6_NTOP(&_pdn->paa.addr6, buf);
+#if JSON_DEBUG
+        d_info("%d %s str _pdn->paa.addr6,:%s\n", __LINE__, __FUNCTION__, buf);
+#endif
         bzero(str, 20);
         sprintf(str, "%u", _pdn->paa.both.len);
         cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_LEN, str);
@@ -91,7 +103,13 @@ void add_pdn_to_json(cJSON* json_key, c_uint8_t pdn_type, pdn_t* _pdn){
     }
     else if (pdn_type == SBI_PDN_TYPE_IPV4V6){
         INET_NTOP(&_pdn->paa.both.addr, buf);
+#if JSON_DEBUG
+        d_info("%d %s str _pdn->paa.addr,:%s\n", __LINE__, __FUNCTION__, buf);
+#endif
         INET6_NTOP(&_pdn->paa.both.addr6, buf2);
+#if JSON_DEBUG
+        d_info("%d %s str _pdn->paa.addr6,:%s\n", __LINE__, __FUNCTION__, buf2);
+#endif
         bzero(str, 20);
         sprintf(str, "%u", _pdn->paa.both.len);
         cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_ADDR, buf);
@@ -143,31 +161,52 @@ status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSO
     d_assert(pJson, return CORE_ERROR, "Null param");
 
     /* imsi */
+#if JSON_DEBUG
+    d_info("%d %s \n", __LINE__, __FUNCTION__);
+#endif
     cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, sess->imsi_bcd);
     /* user location information */
     add_uli_to_json(pJson, sess->tai, sess->e_cgi);
 
     /* serving network */
+#if JSON_DEBUG
+    d_info("%d %s \n", __LINE__, __FUNCTION__);
+#endif
     add_servingnw_to_json(pJson, sess->visited_plmn_id);
 
     /* radio access technology */
+#if JSON_DEBUG
+    d_info("%d %s \n", __LINE__, __FUNCTION__);
+#endif
     cJSON_AddStringToObject(pJson, JSONKEY_4G_RATTYPE, EUTRA);
 
     /* protocol_configuration_options(nas) */
     if (sess->ue_pco.length && sess->ue_pco.buffer)
     {
         char conv[1000] = {0};
+#if JSON_DEBUG
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
+#endif
         cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, uint_to_buffer(conv, sess->ue_pco.buffer, sess->ue_pco.length));
     }
     
     /* APN */
+#if JSON_DEBUG
+    d_info("%d %s \n", __LINE__, __FUNCTION__);
+#endif
     cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
 
     /* packet data network */
     // d_info("sess->pdn_type :%d\n", sess->pdn_type);
+#if JSON_DEBUG
+    d_info("%d %s \n", __LINE__, __FUNCTION__);
+#endif
     add_pdn_to_json(pJson, sess->pdn_type, &sess->pdn);
     
     /* create bearer contexts */
+#if JSON_DEBUG
+    d_info("%d %s \n", __LINE__, __FUNCTION__);
+#endif
     add_ebi_to_json(pJson, sess->ebi);
     // cJSON *j_bearer = cJSON_AddObjectToObject(session, "bearer_contexts");
     // cJSON *j_bearer_qos = cJSON_AddObjectToObject(j_bearer, "bearer_qos");
@@ -180,6 +219,9 @@ status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSO
     /*TODO : ue timezone*/
 
     /* gummei */
+#if JSON_DEBUG
+    d_info("%d %s \n", __LINE__, __FUNCTION__);
+#endif
     add_gummei_to_json(pJson, sess->guti);
     
     return CORE_OK;
