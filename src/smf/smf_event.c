@@ -33,6 +33,9 @@ char* smf_event_get_name(event_t *e)
         case SMF_EVT_N4_T_HEARTBEAT:
             return "SMF_EVT_N4_T_HEARTBEAT";
 
+        case SMF_EVT_N11_MESSAGE:
+            return "SMF_EVT_N11_MESSAGE";
+
         default:
            break;
     }

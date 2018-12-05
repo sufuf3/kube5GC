@@ -3,21 +3,35 @@
 #include "core_network.h"
 
 #include "smf_sbi_path.h"
+#include "smf_event.h"
+#include "smf_sm.h"
+
+#include <unistd.h>
+#include <signal.h>
 
 static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
 {
     status_t rv;
+    event_t e;
     pkbuf_t *pkbuf = NULL;
     c_sockaddr_t from;
 
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
-    d_info("Recv: %s, from: %s", pkbuf->payload, from.sun_path);
 
     rv = unixgram_sendto(sock, pkbuf, &from);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
-    pkbuf_free(pkbuf);
+    event_set(&e, SMF_EVT_N11_MESSAGE);
+    event_set_param1(&e, (c_uintptr_t)pkbuf);
+    event_set_param2(&e, N11_TYPE_SM_CONTEXT_CREATE);
+    rv = smf_event_send(&e);
+    if (rv != CORE_OK)
+    {
+        d_error("smf_event_send error");
+	pkbuf_free(pkbuf);
+	return 0;
+    }
 
     return CORE_OK;
 }
@@ -25,17 +39,26 @@ static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
 static int _smf_sbi_message_smf_smContextUpdate(sock_id sock, void *data)
 {
     status_t rv;
+    event_t e;
     pkbuf_t *pkbuf = NULL;
     c_sockaddr_t from;
 
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
-    d_info("Recv: %s, from: %s", pkbuf->payload, from.sun_path);
 
     rv = unixgram_sendto(sock, pkbuf, &from);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
-    pkbuf_free(pkbuf);
+    event_set(&e, SMF_EVT_N11_MESSAGE);
+    event_set_param1(&e, (c_uintptr_t)pkbuf);
+    event_set_param2(&e, N11_TYPE_SM_CONTEXT_UPDATE);
+    rv = smf_event_send(&e);
+    if (rv != CORE_OK)
+    {
+        d_error("smf_event_send error");
+	pkbuf_free(pkbuf);
+	return 0;
+    }
 
     return CORE_OK;
 }
@@ -43,17 +66,26 @@ static int _smf_sbi_message_smf_smContextUpdate(sock_id sock, void *data)
 static int _smf_sbi_message_smf_smContextRelease(sock_id sock, void *data)
 {
     status_t rv;
+    event_t e;
     pkbuf_t *pkbuf = NULL;
     c_sockaddr_t from;
 
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
-    d_info("Recv: %s, from: %s", pkbuf->payload, from.sun_path);
 
     rv = unixgram_sendto(sock, pkbuf, &from);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
-    pkbuf_free(pkbuf);
+    event_set(&e, SMF_EVT_N11_MESSAGE);
+    event_set_param1(&e, (c_uintptr_t)pkbuf);
+    event_set_param2(&e, N11_TYPE_SM_CONTEXT_RELEASE);
+    rv = smf_event_send(&e);
+    if (rv != CORE_OK)
+    {
+        d_error("smf_event_send error");
+	pkbuf_free(pkbuf);
+	return 0;
+    }
 
     return CORE_OK;
 }
@@ -61,19 +93,55 @@ static int _smf_sbi_message_smf_smContextRelease(sock_id sock, void *data)
 static int _smf_sbi_message_smf_smContextRetrieve(sock_id sock, void *data)
 {
     status_t rv;
+    event_t e;
     pkbuf_t *pkbuf = NULL;
     c_sockaddr_t from;
 
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
-    d_info("Recv: %s, from: %s", pkbuf->payload, from.sun_path);
 
     rv = unixgram_sendto(sock, pkbuf, &from);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
-    pkbuf_free(pkbuf);
+    event_set(&e, SMF_EVT_N11_MESSAGE);
+    event_set_param1(&e, (c_uintptr_t)pkbuf);
+    event_set_param2(&e, N11_TYPE_SM_CONTEXT_RETRIEVE);
+    rv = smf_event_send(&e);
+    if (rv != CORE_OK)
+    {
+        d_error("smf_event_send error");
+	pkbuf_free(pkbuf);
+	return 0;
+    }
 
     return CORE_OK;
+}
+
+void start_server()
+{
+    status_t rv;
+    rv = fork();
+    if (rv < 0)
+    {
+        d_fatal("Open server fail");
+        return;
+    }
+    else if (rv == 0)
+    {
+        rv = setsid();
+        if (rv == -1)
+        {
+            d_fatal("Server set session fail");
+            exit(EXIT_FAILURE);
+        } else
+        {
+            rv = execl("./http_server/smf_http_server", "smf_http_server", NULL);
+            d_assert(rv != -1, return, "exec server error: %s", strerror(errno));
+        }
+    } else if (rv > 0)
+    {
+        smf_self()->server_pid = rv;
+    }
 }
 
 status_t smf_sbi_server_open()
@@ -114,10 +182,12 @@ status_t smf_sbi_server_open()
     rv = sock_register(new, _smf_sbi_message_smf_smContextRetrieve, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
+    start_server();
     return CORE_OK;
 }
 
 status_t smf_sbi_server_close()
 {
+    kill(smf_self()->server_pid, SIGINT);
     return CORE_OK;
 }

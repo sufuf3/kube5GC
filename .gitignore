@@ -77,6 +77,8 @@ webui/node_modules/
 # installation
 install
 
+http_server
+
 # development env
 .idea
 .vscode

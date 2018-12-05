@@ -1,0 +1,25 @@
+# @configure_input@
+GO = go
+
+BINARY = smf_http_server
+prefix = @prefix@
+top_builddir = @top_builddir@
+top_srcdir = @top_srcdir@
+
+.PHONY: all install clean
+
+all: $(BINARY)
+
+$(BINARY): main.go handler.go routers.go
+	$(GO) build -o $@ $^
+
+distdir: $(BINARY)
+	mkdir -p $(top_builddir)/http_server
+	cp $(BINARY) $(top_builddir)/http_server
+
+clean:
+	$(RM) $(top_builddir)/http_server/$(BINARY)
+
+install: $(BINARY) distdir
+	mkdir -p $(prefix)/http_server
+	cp $(top_builddir)/http_server/$(BINARY) $(prefix)/http_server/
