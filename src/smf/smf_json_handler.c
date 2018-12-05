@@ -5,7 +5,7 @@
 #include "3gpp_types.h"
 #include "smf_json_handler.h"
 
-status_t smf_json_handler_create_session(pkbuf_t **pkbuf)
+status_t smf_json_handler_create_session(pkbuf_t **pkbuf, creat_session_t *createSession)
 {
     return CORE_OK;
 }

@@ -49,6 +49,8 @@ AM_CPPFLAGS = \
     -I$(top_srcdir)/lib \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/lib/@FREEDIAMETER_DIR@/include \
+	-I$(top_srcdir)/lib/cJSON \
+	-I$(top_srcdir)/lib/sbiJson \
 	@MONGOC_CFLAGS@ \
 	$(NULL)
 
