@@ -18,6 +18,8 @@
 
 #include "fd/fd_lib.h"
 
+#include "JsonTransform.h"
+
 #define MAX_NUM_OF_SUBNET       16
 #define MAX_SMF_SESS_HASH_LEN   MAX_IMSI_LEN + MAX_APN_LEN + 1
 
@@ -332,3 +334,6 @@ CORE_DECLARE(status_t)          smf_subnet_remove(smf_subnet_t *subnet);
 CORE_DECLARE(status_t)          smf_subnet_remove_all();
 CORE_DECLARE(smf_subnet_t*)     smf_subnet_first();
 CORE_DECLARE(smf_subnet_t*)     smf_subnet_next(smf_subnet_t *subnet);
+
+
+CORE_DECLARE(smf_sess_t*)       smf_sess_add_or_find_by_JsonCreateSession(creat_session_t *createSession);

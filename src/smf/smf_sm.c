@@ -16,6 +16,8 @@
 #include "gtp/gtp_message.h"
 #include "pfcp/pfcp_message.h"
 
+#include "sbiJson/JsonTransform.h"
+#include "smf_json_handler.h"
 
 void smf_state_initial(fsm_t *s, event_t *e)
 {
@@ -287,8 +289,15 @@ void smf_state_operational(fsm_t *s, event_t *e)
         case SMF_EVT_N11_MESSAGE:
         {
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
+            creat_session_t createSession = {0};
+            smf_sess_t *sess = NULL;
 	    int msg_type = event_get_param2(e);
+            
+            smf_json_handler_create_session(&recvbuf, &createSession);
+            
+            sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
 
+            smf_s11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
             d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
             
 	    d_info("msgtype: %d", msg_type);

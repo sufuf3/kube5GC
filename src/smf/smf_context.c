@@ -1665,3 +1665,45 @@ smf_subnet_t* smf_subnet_next(smf_subnet_t *subnet)
 {
     return list_next(subnet);
 }
+
+smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(creat_session_t *createSession)
+{
+    smf_sess_t *sess = NULL;
+    c_int8_t apn[MAX_APN_LEN] = {0};
+    c_uint8_t imsi[32] = {0};
+    int imsiLen = 0;
+    if (createSession->imsi_bcd == NULL) {
+        d_error("No IMSI");
+        return NULL;
+    }
+    // apn_parse(apn, req->access_point_name.data, req->access_point_name.len);
+    if (createSession->apn != NULL) {
+        memcpy(apn, createSession->apn, strlen(createSession->apn));
+    }
+    else {
+        d_error("No APN");
+        return NULL;
+    }
+        
+    d_trace(9, "smf_sess_add_by_message() [APN:%s, PDN:%d, EDI:%d]\n",
+             apn, createSession->pdn_type, createSession->ebi);
+    
+    memset(imsi , 0 , sizeof(imsi));
+    imsiLen = strlen(createSession->imsi_bcd);
+    if (imsiLen == 0) {
+        d_error("No IMSI");
+        return NULL;
+    }
+
+    memcpy(imsi, createSession->imsi_bcd, imsiLen);
+    sess = smf_sess_find_by_imsi_apn(imsi, imsiLen, apn);
+    if (!sess)
+    {
+        sess = smf_sess_add(imsi, imsiLen, apn,
+            createSession->pdn_type,
+            createSession->ebi);
+        d_assert(sess, return NULL, "No Session Context");
+    }
+
+    return sess;
+}
