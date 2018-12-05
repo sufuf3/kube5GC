@@ -1,5 +1,6 @@
 configfiles = \
 	open5gc.conf \
+	open5gc.testngc.conf \
 	hss.conf \
 	pcrf.conf \
 	upf.conf \
