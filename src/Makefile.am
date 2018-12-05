@@ -2,7 +2,7 @@
 
 SUBDIRS = app hss pcrf smf upf amf
 
-noinst_LTLIBRARIES = libhss.la libpcrf.la libsmf.la libupf.la libamf.la libepc.la
+noinst_LTLIBRARIES = libhss.la libpcrf.la libsmf.la libupf.la libamf.la libngc.la
 
 libamf_la_SOURCES = amf.c
 libamf_la_DEPENDENCIES = $(top_srcdir)/src/amf/libamf.la 
@@ -24,15 +24,15 @@ libsmf_la_SOURCES = smf.c
 libsmf_la_DEPENDENCIES = $(top_srcdir)/src/smf/libsmf.la 
 libsmf_la_LIBADD = $(top_srcdir)/src/smf/libsmf.la 
 
-libepc_la_SOURCES = epc.c
-libepc_la_DEPENDENCIES = \
+libngc_la_SOURCES = ngc.c
+libngc_la_DEPENDENCIES = \
     $(top_srcdir)/src/amf/libamf.la \
     $(top_srcdir)/src/hss/libhss.la \
     $(top_srcdir)/src/smf/libsmf.la \
     $(top_srcdir)/src/pcrf/libpcrf.la \
     $(top_srcdir)/src/upf/libupf.la \
 	$(NULL)
-libepc_la_LIBADD = \
+libngc_la_LIBADD = \
     $(top_srcdir)/src/amf/libamf.la \
     $(top_srcdir)/src/hss/libhss.la \
     $(top_srcdir)/src/smf/libsmf.la \

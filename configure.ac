@@ -47,8 +47,8 @@ AC_SUBST(IPFW_CPPFLAGS)
 AC_SUBST(LO_DEV)
 
 AH_TOP([
-#ifndef __NEXTEPC_CONFIG_H__
-#define __NEXTEPC_CONFIG_H__
+#ifndef __OPEN5GC_CONFIG_H__
+#define __OPEN5GC_CONFIG_H__
 /* need this, because some autoconf tests rely on this (e.g. stpcpy)
  * and it should be used for new programs  */
 #define _DEFAULT_SOURCE 1
@@ -56,7 +56,7 @@ AH_TOP([
 ])
 
 AH_BOTTOM([
-#endif /* __NEXTEPC_CONFIG_H__ */
+#endif /* __OPEN5GC_CONFIG_H__ */
 ])
 
 AH_VERBATIM([_REENTRANT],
@@ -455,10 +455,10 @@ AC_CONFIG_FILES([support/freeDiameter/pgw.conf])
 AC_CONFIG_FILES([support/freeDiameter/hss.conf])
 AC_CONFIG_FILES([support/freeDiameter/pcrf.conf])
 AC_CONFIG_FILES([support/freeDiameter/Makefile])
-AC_CONFIG_FILES([support/systemd/nextepc-amfd.service])
-AC_CONFIG_FILES([support/systemd/nextepc-hssd.service])
-AC_CONFIG_FILES([support/systemd/nextepc-pcrfd.service])
-AC_CONFIG_FILES([support/systemd/nextepc-upfd.service])
+AC_CONFIG_FILES([support/systemd/open5gc-amfd.service])
+AC_CONFIG_FILES([support/systemd/open5gc-hssd.service])
+AC_CONFIG_FILES([support/systemd/open5gc-pcrfd.service])
+AC_CONFIG_FILES([support/systemd/open5gc-upfd.service])
 AC_CONFIG_FILES([support/systemd/Makefile])
 AC_CONFIG_FILES([support/logrotate/nextepc])
 AC_CONFIG_FILES([support/logrotate/Makefile])
@@ -472,7 +472,7 @@ AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
 echo "
-NextEPC configuration
+Open5GC configuration
 --------------------
 version                 : ${PACKAGE_VERSION}
 host                    : ${host}

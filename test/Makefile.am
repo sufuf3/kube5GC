@@ -22,11 +22,11 @@ testvolte_SOURCES = \
 	$(NULL)
 
 LDADD = \
-    $(top_srcdir)/src/libepc.la \
+    $(top_srcdir)/src/libngc.la \
 	$(NULL)
 
 DEPENDENCIES = \
-    $(top_srcdir)/src/libepc.la \
+    $(top_srcdir)/src/libngc.la \
 	$(NULL)
 
 AM_CPPFLAGS = \

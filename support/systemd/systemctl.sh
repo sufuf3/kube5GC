@@ -5,8 +5,8 @@ then
     exit;
 fi
 
-systemctl $1 nextepc-hssd
-systemctl $1 nextepc-pcrfd
-systemctl $1 nextepc-amfd
-systemctl $1 nextepc-upfd
-systemctl $1 nextepc-smfd
+systemctl $1 open5gc-hssd
+systemctl $1 open5gc-pcrfd
+systemctl $1 open5gc-amfd
+systemctl $1 open5gc-upfd
+systemctl $1 open5gc-smfd

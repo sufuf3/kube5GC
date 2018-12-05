@@ -1,4 +1,4 @@
-#define TRACE_MODULE _epc_main
+#define TRACE_MODULE _ngc_main
 
 #include "core_general.h"
 #include "core_debug.h"
@@ -19,7 +19,7 @@ static semaphore_id smf_sem2 = 0;
 static semaphore_id hss_sem1 = 0;
 static semaphore_id hss_sem2 = 0;
 
-const char *app_name = "epc";
+const char *app_name = "ngc";
 
 status_t app_initialize(const char *config_path, const char *log_path)
 {
@@ -33,7 +33,7 @@ status_t app_initialize(const char *config_path, const char *log_path)
     app = context_self()->logger.trace.app;
     if (app)
     {
-        d_trace_level(&_epc_main, app);
+        d_trace_level(&_ngc_main, app);
     }
 
 
