@@ -101,3 +101,13 @@ void smf_s11_handle_modify_bearer_request(gtp_xact_t *s11_xact,
     rv = gtp_xact_commit(s11_xact);
     d_assert(rv == CORE_OK, return, "xact_commit error");
 }
+
+void smf_s11_handle_create_session_request_by_JsonCreateSession(smf_sess_t *sess, creat_session_t *createSession)
+{
+    d_trace(3, "[SMF] S11 Create Session Reqeust by_JsonCreateSession\n");
+    status_t rv;
+
+    rv = smf_pfcp_send_session_establishment_request(sess);
+    d_assert(rv == CORE_OK, , "pfcp session create fail");
+
+}
