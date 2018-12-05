@@ -901,6 +901,21 @@ void mme_state_operational(fsm_t *s, event_t *e)
             break;
         }
         /******************************************************/
+        case AMF_EVT_N11_MESSAGE:
+        {
+            pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
+            // creat_session_t createSession = {0};
+
+	    int msg_type = event_get_param2(e);
+            
+               d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
+            
+	    d_info("msgtype: %d", msg_type);
+
+        release_amf_n11_pkbuf:
+            pkbuf_free(recvbuf);
+            break;
+        }
         default:
         {
             d_error("No handler for event %s", mme_event_get_name(e));
