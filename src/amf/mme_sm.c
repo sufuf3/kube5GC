@@ -76,14 +76,14 @@ void mme_state_operational(fsm_t *s, event_t *e)
             if (rv != CORE_OK)
             {
                 d_error("Can't establish S1AP path");
-                // break;
+                break;
             }
             /******************add by HU***********************/
             rv = ngap_open();
             if(rv != CORE_OK)
             {
                 d_error("Can't establish NGAP path");
-                // break;
+                break;
             }
             /**************************************************/
             rv = amf_sbi_server_open();
