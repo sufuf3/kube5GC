@@ -43,7 +43,9 @@ typedef enum {
     /******************** Added by Chi ********************/
     MME_EVT_CHECK_OVERLOAD,
     /******************************************************/
-
+    
+    AMF_EVT_N11_MESSAGE,
+    
     MME_EVT_TOP,
 
 } event_e;
