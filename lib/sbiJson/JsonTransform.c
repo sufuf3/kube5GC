@@ -64,15 +64,15 @@ void add_ebi_to_json(cJSON* json_key, c_uint8_t ebi){
     return;
 }
 
-void add_pdn_to_json(cJSON* json_key, c_uint8_t pdn_type, pdn_t* _pdn){
+void add_pdn_to_json(cJSON* json_key, pdn_t* _pdn){
     char str[20];
     cJSON *pdn = cJSON_AddObjectToObject(json_key, JSONKEY_4G_PDN);
     cJSON *paa = cJSON_AddObjectToObject(pdn, JSONKEY_4G_PDN_PAA); // PDN Address Allocation 
     cJSON *ambr = cJSON_AddObjectToObject(pdn, JSONKEY_4G_PDN_AMBR); // aggregate maximum bit rate
     bzero(str, 20);
-    sprintf(str, "%u", pdn_type);
+    sprintf(str, "%u", _pdn->pdn_type);
 #if JSON_DEBUG
-    d_info("%d %s pdn_type :%d\n", __LINE__, __FUNCTION__, pdn_type);
+    d_info("%d %s pdn_type :%d\n", __LINE__, __FUNCTION__, _pdn->pdn_type);
     d_info("%d %s str :%s\n", __LINE__, __FUNCTION__, str);
 #endif
     cJSON_AddStringToObject(pdn, JSONKEY_4G_PDN_PDNTYPE, str);
@@ -84,14 +84,14 @@ void add_pdn_to_json(cJSON* json_key, c_uint8_t pdn_type, pdn_t* _pdn){
     cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_PDNTYPE, str);
     char buf[CORE_ADDRSTRLEN], buf2[CORE_ADDRSTRLEN];
     
-    if (pdn_type == SBI_PDN_TYPE_IPV4){
+    if (_pdn->pdn_type == SBI_PDN_TYPE_IPV4){
         INET_NTOP(&_pdn->paa.addr, buf);
 #if JSON_DEBUG
         d_info("%s %d str _pdn->paa.addr,:%s\n", __LINE__, __FUNCTION__, buf);
 #endif
         cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_ADDR, buf);
     }
-    else if (pdn_type == SBI_PDN_TYPE_IPV6){
+    else if (_pdn->pdn_type == SBI_PDN_TYPE_IPV6){
         INET6_NTOP(&_pdn->paa.addr6, buf);
 #if JSON_DEBUG
         d_info("%d %s str _pdn->paa.addr6,:%s\n", __LINE__, __FUNCTION__, buf);
@@ -101,7 +101,7 @@ void add_pdn_to_json(cJSON* json_key, c_uint8_t pdn_type, pdn_t* _pdn){
         cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_LEN, str);
         cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_ADDR6, buf);
     }
-    else if (pdn_type == SBI_PDN_TYPE_IPV4V6){
+    else if (_pdn->pdn_type == SBI_PDN_TYPE_IPV4V6){
         INET_NTOP(&_pdn->paa.both.addr, buf);
 #if JSON_DEBUG
         d_info("%d %s str _pdn->paa.addr,:%s\n", __LINE__, __FUNCTION__, buf);
@@ -117,7 +117,7 @@ void add_pdn_to_json(cJSON* json_key, c_uint8_t pdn_type, pdn_t* _pdn){
         cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_ADDR6, buf2);
     }
     else
-        d_assert(0, return , "Not supported(%d)", pdn_type);
+        d_assert(0, return , "Not supported(%d)", _pdn->pdn_type);
     if (_pdn->ambr.uplink || _pdn->ambr.downlink)
     {
         bzero(str, 20);
@@ -201,7 +201,7 @@ status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSO
 #if JSON_DEBUG
     d_info("%d %s \n", __LINE__, __FUNCTION__);
 #endif
-    add_pdn_to_json(pJson, sess->pdn_type, &sess->pdn);
+    add_pdn_to_json(pJson, &sess->pdn);
     
     /* create bearer contexts */
 #if JSON_DEBUG
@@ -342,8 +342,8 @@ void _add_apn_to_struct(cJSON* json_key, c_int8_t *apn) {
 }
 
 void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
+    c_sockaddr_t *addr;
     char paa_pdn_type[1+1] = {0};
-    char paa_pdn_addr[32]= {0};
     char paa_pdn_len[16]= {0};
 
     cJSON *j_pdn = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_PDN);
@@ -353,21 +353,21 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     cJSON *j_pdn_paa_addr6 = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_ADDR6);
     cJSON *j_pdn_paa_len = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_LEN);
     bzero(paa_pdn_type, 1+1); 
-    bzero(paa_pdn_addr, 32);
     bzero(paa_pdn_len, 16);
     
     strcpy(paa_pdn_type, j_pdn_paa_pdntype->valuestring);
     // d_info(paa_pdn_type);
     pdn->paa.pdn_type = atoi(paa_pdn_type);
-    strcpy(paa_pdn_addr,j_pdn_paa_addr->valuestring);
     // d_info(paa_pdn_type);
-    pdn->paa.addr = atoi(paa_pdn_addr);
+    core_addaddrinfo(&addr, AF_INET, j_pdn_paa_addr->valuestring, 0, 0);
+    memcpy((void *)&pdn->paa.addr, (void *)&addr->sin.sin_addr.s_addr, IPV4_LEN);
     strcpy(paa_pdn_len,j_pdn_paa_len->valuestring);
     // d_info(paa_pdn_len);
     pdn->paa.len = atoi(paa_pdn_len);
     //TODO : FIX ipv6 input
     // d_info(j_pdn_paa_addr6->valuestring);
-    inet_pton(AF_INET6, j_pdn_paa_addr6->valuestring, pdn->paa.addr6);
+    core_addaddrinfo(&addr, AF_INET6, j_pdn_paa_addr6->valuestring, 0, 0);
+    memcpy((void *)pdn->paa.addr6, (void *)addr->sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
 
     cJSON *j_pdn_ambr = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_AMBR);
     cJSON *j_pdn_ambr_uplink = cJSON_GetObjectItemCaseSensitive(j_pdn_ambr, JSONKEY_4G_PDN_AMBR_UPLINK);

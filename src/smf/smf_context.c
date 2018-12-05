@@ -1686,7 +1686,7 @@ smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(creat_session_t *createSes
     }
         
     d_trace(9, "smf_sess_add_by_message() [APN:%s, PDN:%d, EDI:%d]\n",
-             apn, createSession->pdn_type, createSession->ebi);
+             apn, createSession->pdn.pdn_type, createSession->ebi);
     
     memset(imsi , 0 , sizeof(imsi));
     imsiLen = strlen(createSession->imsi_bcd);
@@ -1700,7 +1700,7 @@ smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(creat_session_t *createSes
     if (!sess)
     {
         sess = smf_sess_add(imsi, imsiLen, apn,
-            createSession->pdn_type,
+            createSession->pdn.pdn_type,
             createSession->ebi);
         d_assert(sess, return NULL, "No Session Context");
     }
