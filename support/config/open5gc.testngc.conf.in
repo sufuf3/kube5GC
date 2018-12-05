@@ -1,4 +1,4 @@
-db_uri: mongodb://localhost/nextepc
+db_uri: mongodb://localhost/open5gc
 
 logger:
     file: /home/wirelab/nctu_5gc/install/var/log/open5gc/open5gc.log
