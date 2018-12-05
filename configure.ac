@@ -8,7 +8,7 @@ dnl This program is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_INIT([NextEPC], [0.3.9], [acetcom@gmail.com])
+AC_INIT([Open5GC], [1.0.0], [nctuwirelab@gmail.com])
 
 AC_SUBST(LIBVERSION)
 LIBVERSION=1:0:0
@@ -444,7 +444,7 @@ AC_CONFIG_FILES([src/smf/Makefile])
 AC_CONFIG_FILES([src/pcrf/Makefile])
 AC_CONFIG_FILES([src/upf/Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([support/config/nextepc.conf])
+AC_CONFIG_FILES([support/config/open5gc.conf])
 AC_CONFIG_FILES([support/config/hss.conf])
 AC_CONFIG_FILES([support/config/pcrf.conf])
 AC_CONFIG_FILES([support/config/smf.conf])
@@ -481,7 +481,7 @@ compiler                : ${CC}
 compiler flags          : ${CFLAGS} ${YAML_CFLAGS} ${MONGOC_CFLAGS} 
 linker flags            : ${LDFLAGS} ${LIBS} ${YAML_LIBS} ${MONGOC_LIBS}
 bin directory           : ${BIN_DIR}
-lib directory           : ${LIB_DIR}/nextepc
-config directory        : ${SYSCONF_DIR}/nextepc
-log directory           : ${LOCALSTATE_DIR}/log/nextepc
+lib directory           : ${LIB_DIR}/open5gc
+config directory        : ${SYSCONF_DIR}/open5gc
+log directory           : ${LOCALSTATE_DIR}/log/open5gc
 "
