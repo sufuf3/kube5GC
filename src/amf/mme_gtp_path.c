@@ -9,6 +9,8 @@
 #include "mme_event.h"
 #include "mme_gtp_path.h"
 #include "mme_s11_build.h"
+#include "amf_json_build.h"
+#include "amf_json_handler.h"
 #include "mme_sm.h"
 
 static int _gtpv2_c_recv_cb(sock_id sock, void *data)
@@ -109,6 +111,7 @@ status_t mme_gtp_close()
 
 status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 {
+#ifndef FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
@@ -123,6 +126,7 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
     h.teid = mme_ue->sgw_s11_teid;
 
     rv = mme_s11_build_create_session_request(&pkbuf, h.type, sess);
+
     d_assert(rv == CORE_OK, return CORE_ERROR,
             "S11 build error");
 
@@ -134,7 +138,24 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 
     return CORE_OK;
 }
+#else
+    mme_ue_t *mme_ue = NULL;
+    pkbuf_t *pkbuf = NULL;
+    mme_ue = sess->mme_ue;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    
+    amf_json_build_create_session(&pkbuf, sess);
+    
+    pkbuf_free(pkbuf);
+#if 0 // TempDisable Test
+    amf_json_handle_create_session(&pkbuf, sess); 
+#endif
 
+    return CORE_OK;
+
+
+}
+#endif
 
 status_t mme_gtp_send_modify_bearer_request(
         mme_bearer_t *bearer, int uli_presence)
