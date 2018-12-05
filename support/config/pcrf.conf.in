@@ -1,9 +1,9 @@
-### For reference, see `nextepc.conf`
+### For reference, see `open5gc.conf`
 
 db_uri: mongodb://localhost/nextepc
 
 logger:
-    file: @LOCALSTATE_DIR@/log/nextepc/pcrf.log
+    file: @LOCALSTATE_DIR@/log/open5gc/pcrf.log
     trace: 
         app: 1
         diameter: 1

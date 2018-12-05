@@ -7,8 +7,8 @@ if [ "$SYSTEM" = "Linux" ]; then
         ip tuntap add name pgwtun mode tun
     fi
 	if test "x`sysctl -n net.ipv6.conf.pgwtun.disable_ipv6`" = x1; then
-		echo "net.ipv6.conf.pgwtun.disable_ipv6=0" > /etc/sysctl.d/30-nextepc.conf
-		sysctl -p /etc/sysctl.d/30-nextepc.conf
+		echo "net.ipv6.conf.pgwtun.disable_ipv6=0" > /etc/sysctl.d/30-open5gc.conf
+		sysctl -p /etc/sysctl.d/30-open5gc.conf
 	fi
     ip addr del 45.45.0.1/16 dev pgwtun 2> /dev/null
     ip addr add 45.45.0.1/16 dev pgwtun
@@ -22,9 +22,9 @@ else
     ifconfig lo0 alias 127.0.0.4 netmask 255.255.255.255
     ifconfig lo0 alias 127.0.0.5 netmask 255.255.255.255
     if [ "$SYSTEM" = "Darwin" ]; then
-        if ! test -f /etc/pf.anchors/org.nextepc; then
-            sudo sh -c "echo 'nat on {en0} from 45.45.0.0/16 to any -> {en0}' > /etc/pf.anchors/org.nextepc"
+        if ! test -f /etc/pf.anchors/org.open5gc; then
+            sudo sh -c "echo 'nat on {en0} from 45.45.0.0/16 to any -> {en0}' > /etc/pf.anchors/org.open5gc"
         fi
-        pfctl -e -f /etc/pf.anchors/org.nextepc
+        pfctl -e -f /etc/pf.anchors/org.open5gc
     fi
 fi

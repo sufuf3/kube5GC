@@ -9,11 +9,11 @@ Type=simple
 User=nextepc
 Group=nextepc
 
-RuntimeDirectory=nextepc-pcrfd
-PIDFile=@LIB_DIR@/run/nextepc-pcrfd/pid
+RuntimeDirectory=open5gc-pcrfd
+PIDFile=@LIB_DIR@/run/open5gc-pcrfd/pid
 
 Restart=always
-ExecStart=@BIN_DIR@/nextepc-pcrfd -f @SYSCONF_DIR@/nextepc/pcrf.conf
+ExecStart=@BIN_DIR@/open5gc-pcrfd -f @SYSCONF_DIR@/open5gc/pcrf.conf
 RestartSec=2
 RestartPreventExitStatus=1
 

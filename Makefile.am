@@ -30,7 +30,7 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 install-data-hook:
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/log/nextepc
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/log/open5gc
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-hssd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-pcrfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-amfd

@@ -2,7 +2,7 @@
 
 bin_PROGRAMS = testepc testvolte
 
-configdir = ${sysconfdir}/nextepc/test
+configdir = ${sysconfdir}/open5gc/test
 config_DATA = sample.conf sample-volte.conf
 
 testepc_SOURCES = \

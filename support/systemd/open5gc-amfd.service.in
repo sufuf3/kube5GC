@@ -8,11 +8,11 @@ Type=simple
 User=nextepc
 Group=nextepc
 
-RuntimeDirectory=nextepc-amfd
-PIDFile=@LIB_DIR@/run/nextepc-amfd/pid
+RuntimeDirectory=open5gc-amfd
+PIDFile=@LIB_DIR@/run/open5gc-amfd/pid
 
 Restart=always
-ExecStart=@BIN_DIR@/nextepc-amfd -f @SYSCONF_DIR@/nextepc/mme.conf
+ExecStart=@BIN_DIR@/open5gc-amfd -f @SYSCONF_DIR@/open5gc/mme.conf
 RestartSec=2
 RestartPreventExitStatus=1
 

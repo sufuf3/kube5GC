@@ -36,15 +36,15 @@ pgwtun    Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
           ...
 ```
 
-The NextEPC service is registered in `systemd` environment, and is started automatically during the installation phase. The service names are *nextepc-mmed*, *nextepc-sgwd*, *nextepc-pgwd*, *nextepc-hssd*, and *nextepc-pcrfd*. You can use the `systemctl` command to control specific services.
+The NextEPC service is registered in `systemd` environment, and is started automatically during the installation phase. The service names are *open5gc-mmed*, *open5gc-sgwd*, *open5gc-pgwd*, *open5gc-hssd*, and *open5gc-pcrfd*. You can use the `systemctl` command to control specific services.
 
 ```bash
-sudo systemctl status nextepc-mmed (Check the service status)
-sudo systemctl stop nextepc-mmed (Stop the service)
-sudo systemctl disable nextepc-mmed (Will not be started after rebooting)
-sudo systemctl enable nextepc-mmed (Will be started after rebooting)
-sudo systemctl start nextepc-mmed (Start the service)
-sudo systemctl restart nextepc-mmed (Stop and start)
+sudo systemctl status open5gc-mmed (Check the service status)
+sudo systemctl stop open5gc-mmed (Stop the service)
+sudo systemctl disable open5gc-mmed (Will not be started after rebooting)
+sudo systemctl enable open5gc-mmed (Will be started after rebooting)
+sudo systemctl start open5gc-mmed (Start the service)
+sudo systemctl restart open5gc-mmed (Stop and start)
 ```
 
 
@@ -56,10 +56,10 @@ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 curl -sL http://nextepc.org/static/webui/install | sudo -E bash -
 ```
 
-The service name is *nextepc-webui*, and it will be running on _http://localhost:3000_.
+The service name is *open5gc-webui*, and it will be running on _http://localhost:3000_.
 
 ```bash
-sudo systemctl start nextepc-webui
+sudo systemctl start open5gc-webui
 ```
 
 

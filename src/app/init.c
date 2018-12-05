@@ -9,7 +9,7 @@
 
 #include "app.h"
 
-#define DEFAULT_CONFIG_FILE_PATH SYSCONF_DIR PACKAGE "/nextepc.conf"
+#define DEFAULT_CONFIG_FILE_PATH SYSCONF_DIR PACKAGE "/open5gc.conf"
 #define DEFAULT_RUNTIME_DIR_PATH LOCALSTATE_DIR "run/"
 
 static status_t app_logger_init();
@@ -102,7 +102,7 @@ status_t app_log_pid(const char *pid_path)
     if (pid_path == NULL)
     {
         snprintf(default_pid_path, sizeof(default_pid_path),
-                "%snextepc-%sd/pid", DEFAULT_RUNTIME_DIR_PATH, app_name);
+                "%sopen5gc-%sd/pid", DEFAULT_RUNTIME_DIR_PATH, app_name);
         pid_path = default_pid_path;
     }
 

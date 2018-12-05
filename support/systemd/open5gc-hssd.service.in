@@ -9,11 +9,11 @@ Type=simple
 User=nextepc
 Group=nextepc
 
-RuntimeDirectory=nextepc-hssd
-PIDFile=@LIB_DIR@/run/nextepc-hssd/pid
+RuntimeDirectory=open5gc-hssd
+PIDFile=@LIB_DIR@/run/open5gc-hssd/pid
 
 Restart=always
-ExecStart=@BIN_DIR@/nextepc-hssd -f @SYSCONF_DIR@/nextepc/hss.conf
+ExecStart=@BIN_DIR@/open5gc-hssd -f @SYSCONF_DIR@/open5gc/hss.conf
 RestartSec=2
 RestartPreventExitStatus=1
 

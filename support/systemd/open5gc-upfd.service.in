@@ -8,11 +8,11 @@ Type=simple
 User=nextepc
 Group=nextepc
 
-RuntimeDirectory=nextepc-upfd
-PIDFile=@LIB_DIR@/run/nextepc-upfd/pid
+RuntimeDirectory=open5gc-upfd
+PIDFile=@LIB_DIR@/run/open5gc-upfd/pid
 
 Restart=always
-ExecStart=@BIN_DIR@/nextepc-upfd -f @SYSCONF_DIR@/nextepc/upf.conf
+ExecStart=@BIN_DIR@/open5gc-upfd -f @SYSCONF_DIR@/open5gc/upf.conf
 RestartSec=2
 RestartPreventExitStatus=1
 
