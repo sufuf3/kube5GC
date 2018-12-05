@@ -20,6 +20,8 @@ libsmf_la_SOURCES = \
 	smf_sbi_build.h smf_sbi_build.c \
 	smf_ipfw.h smf_ipfw.c \
 	smf_init.c \
+	smf_json_build.h smf_json_build.c \
+	smf_json_handler.h smf_json_handler.c
 	$(NULL)
 
 libsmf_la_DEPENDENCIES = \
@@ -29,6 +31,7 @@ libsmf_la_DEPENDENCIES = \
     $(top_srcdir)/lib/ipfw/libipfw.la \
 	$(top_srcdir)/lib/cJSON/libcJSON.la \
     $(top_srcdir)/src/app/libapp.la \
+	$(top_srcdir)/lib/sbiJson/libsbiJson.la \
 	$(NULL)
 
 libsmf_la_LIBADD = \
@@ -38,6 +41,7 @@ libsmf_la_LIBADD = \
     $(top_srcdir)/lib/ipfw/libipfw.la \
 	$(top_srcdir)/lib/cJSON/libcJSON.la \
     $(top_srcdir)/src/app/libapp.la \
+	$(top_srcdir)/lib/sbiJson/libsbiJson.la \
 	$(NULL)
 
 AM_CPPFLAGS = \
