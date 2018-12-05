@@ -36,7 +36,7 @@ pgwtun    Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
           ...
 ```
 
-The NextEPC service is registered in `systemd` environment, and is started automatically during the installation phase. The service names are *open5gc-mmed*, *open5gc-sgwd*, *open5gc-pgwd*, *open5gc-hssd*, and *open5gc-pcrfd*. You can use the `systemctl` command to control specific services.
+The NextEPC service is registered in `systemd` environment, and is started automatically during the installation phase. The service names are *open5gc-mmed*, *open5gc-sgwd*, *open5gc-pgwd*, *nextepc-hssd*, and *nextepc-pcrfd*. You can use the `systemctl` command to control specific services.
 
 ```bash
 sudo systemctl status open5gc-mmed (Check the service status)

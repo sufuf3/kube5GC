@@ -149,15 +149,15 @@ int main(int argc, char *argv[])
         if (rv == CORE_EAGAIN)
             return EXIT_SUCCESS;
 
-        d_fatal("NextEPC initialization failed. Aborted");
+        d_fatal("Open5GC initialization failed. Aborted");
         return EXIT_FAILURE;
     }
 
     d_print("\n\n");
-    d_info("NextEPC daemon start");
+    d_info("Open5GC daemon start");
     signal_thread(check_signal);
 
-    d_info("NextEPC daemon terminating...");
+    d_info("Open5GC daemon terminating...");
 
     return EXIT_SUCCESS;
 }

@@ -1,12 +1,12 @@
 [Unit]
-Description=NextEPC P-GWU Daemon
+Description=Open5GC P-GWU Daemon
 After=networking.service
 
 [Service]
 Type=simple
 
-User=nextepc
-Group=nextepc
+User=open5gc
+Group=open5gc
 
 RuntimeDirectory=open5gc-upfd
 PIDFile=@LIB_DIR@/run/open5gc-upfd/pid

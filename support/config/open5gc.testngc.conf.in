@@ -150,12 +150,12 @@ mme:
 #
 #  <Network Name>
 #    network_name:
-#        full: NextEPC
+#        full: Open5GC
 #        short: Next
 #
 
     network_name:
-        full: NextEPC
+        full: Open5GC
 
 hss:
     freeDiameter: hss.conf
@@ -185,7 +185,7 @@ sgw:
 #      - addr
 #        - 127.0.0.12
 #        - fe80::12%lo
-#      - name: sgw3.nextepc.org
+#      - name: sgw3.open5gc.org
 #
 #  ------------------------ SGW --------------------------
 #

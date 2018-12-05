@@ -1,8 +1,8 @@
 # truncate rails logs every day at midnight, keep 14 previous logs, compress previous logs
 #
 # logfilename                         [owner:group] mode count size  when  flags [/pid_file]        [sig_num]
-@LOCALSTATE_DIR@/log/open5gc/pcrf.log              644  14    *     $D0   GZ    @LOCALSTATE_DIR@/run/open5gc-pcrfd/pid`
-@LOCALSTATE_DIR@/log/open5gc/hss.log               644  14    *     $D0   GZ    @LOCALSTATE_DIR@/run/open5gc-hssd/pid`
+@LOCALSTATE_DIR@/log/open5gc/pcrf.log              644  14    *     $D0   GZ    @LOCALSTATE_DIR@/run/nextepc-pcrfd/pid`
+@LOCALSTATE_DIR@/log/open5gc/hss.log               644  14    *     $D0   GZ    @LOCALSTATE_DIR@/run/nextepc-hssd/pid`
 @LOCALSTATE_DIR@/log/open5gc/amf.log               644  14    *     $D0   GZ    @LOCALSTATE_DIR@/run/open5gc-amfd/pid`
 @LOCALSTATE_DIR@/log/open5gc/smf.log               644  14    *     $D0   GZ    @LOCALSTATE_DIR@/run/open5gc-smfd/pid`
 @LOCALSTATE_DIR@/log/open5gc/upf.log               644  14    *     $D0   GZ    @LOCALSTATE_DIR@/run/open5gc-upfd/pid`

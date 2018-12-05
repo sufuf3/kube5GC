@@ -6,14 +6,14 @@ After=networking.service mongodb.service
 [Service]
 Type=simple
 
-User=nextepc
-Group=nextepc
+User=open5gc
+Group=open5gc
 
-RuntimeDirectory=open5gc-pcrfd
-PIDFile=@LIB_DIR@/run/open5gc-pcrfd/pid
+RuntimeDirectory=nextepc-pcrfd
+PIDFile=@LIB_DIR@/run/nextepc-pcrfd/pid
 
 Restart=always
-ExecStart=@BIN_DIR@/open5gc-pcrfd -f @SYSCONF_DIR@/open5gc/pcrf.conf
+ExecStart=@BIN_DIR@/nextepc-pcrfd -f @SYSCONF_DIR@/open5gc/pcrf.conf
 RestartSec=2
 RestartPreventExitStatus=1
 

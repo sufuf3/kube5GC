@@ -1,12 +1,12 @@
 [Unit]
-Description=NextEPC SMF Daemon
+Description=Open5GC SMF Daemon
 After=networking.service
 
 [Service]
 Type=simple
 
-User=nextepc
-Group=nextepc
+User=open5gc
+Group=open5gc
 
 RuntimeDirectory=open5gc-smfd
 PIDFile=@LIB_DIR@/run/open5gc-smfd/pid

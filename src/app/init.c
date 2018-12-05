@@ -111,7 +111,7 @@ status_t app_log_pid(const char *pid_path)
         && file_stat(&finfo, pid_path, FILE_INFO_MTIME) == CORE_OK)
     {
         d_warn("pid file %s overwritten -- Unclean "
-                "shutdown of previous NextEPC run?", pid_path);
+                "shutdown of previous Open5GC run?", pid_path);
     }
 
     if ((rv = file_open(&pid_file, pid_path,

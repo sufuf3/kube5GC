@@ -4,13 +4,13 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = lib src support test
 
-bin_PROGRAMS = open5gc-hssd open5gc-pcrfd open5gc-amfd open5gc-smfd open5gc-upfd open5gc-ngcd
+bin_PROGRAMS = nextepc-hssd nextepc-pcrfd open5gc-amfd open5gc-smfd open5gc-upfd open5gc-ngcd
 
-dist_open5gc_hssd_SOURCES = main.c
-open5gc_hssd_LDADD = $(top_srcdir)/src/libhss.la
+dist_nextepc_hssd_SOURCES = main.c
+nextepc_hssd_LDADD = $(top_srcdir)/src/libhss.la
 
-dist_open5gc_pcrfd_SOURCES = main.c
-open5gc_pcrfd_LDADD = $(top_srcdir)/src/libpcrf.la
+dist_nextepc_pcrfd_SOURCES = main.c
+nextepc_pcrfd_LDADD = $(top_srcdir)/src/libpcrf.la
 
 dist_open5gc_amfd_SOURCES = main.c
 open5gc_amfd_LDADD = $(top_srcdir)/src/libamf.la
@@ -31,8 +31,8 @@ AM_CPPFLAGS = \
 
 install-data-hook:
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/log/open5gc
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-hssd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-pcrfd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-hssd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-pcrfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-amfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-smfd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-upfd
