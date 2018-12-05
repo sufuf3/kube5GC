@@ -8,7 +8,7 @@ dnl This program is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_INIT([NextEPC], [0.3.9], [acetcom@gmail.com])
+AC_INIT([Open5GC], [1.0.0], [nctuwirelab@gmail.com])
 
 AC_SUBST(LIBVERSION)
 LIBVERSION=1:0:0
@@ -47,8 +47,8 @@ AC_SUBST(IPFW_CPPFLAGS)
 AC_SUBST(LO_DEV)
 
 AH_TOP([
-#ifndef __NEXTEPC_CONFIG_H__
-#define __NEXTEPC_CONFIG_H__
+#ifndef __OPEN5GC_CONFIG_H__
+#define __OPEN5GC_CONFIG_H__
 /* need this, because some autoconf tests rely on this (e.g. stpcpy)
  * and it should be used for new programs  */
 #define _DEFAULT_SOURCE 1
@@ -56,7 +56,7 @@ AH_TOP([
 ])
 
 AH_BOTTOM([
-#endif /* __NEXTEPC_CONFIG_H__ */
+#endif /* __OPEN5GC_CONFIG_H__ */
 ])
 
 AH_VERBATIM([_REENTRANT],
@@ -444,7 +444,8 @@ AC_CONFIG_FILES([src/smf/Makefile])
 AC_CONFIG_FILES([src/pcrf/Makefile])
 AC_CONFIG_FILES([src/upf/Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([support/config/nextepc.conf])
+AC_CONFIG_FILES([support/config/open5gc.conf])
+AC_CONFIG_FILES([support/config/open5gc.testngc.conf])
 AC_CONFIG_FILES([support/config/hss.conf])
 AC_CONFIG_FILES([support/config/pcrf.conf])
 AC_CONFIG_FILES([support/config/smf.conf])
@@ -455,14 +456,14 @@ AC_CONFIG_FILES([support/freeDiameter/pgw.conf])
 AC_CONFIG_FILES([support/freeDiameter/hss.conf])
 AC_CONFIG_FILES([support/freeDiameter/pcrf.conf])
 AC_CONFIG_FILES([support/freeDiameter/Makefile])
-AC_CONFIG_FILES([support/systemd/nextepc-amfd.service])
+AC_CONFIG_FILES([support/systemd/open5gc-amfd.service])
 AC_CONFIG_FILES([support/systemd/nextepc-hssd.service])
 AC_CONFIG_FILES([support/systemd/nextepc-pcrfd.service])
-AC_CONFIG_FILES([support/systemd/nextepc-upfd.service])
+AC_CONFIG_FILES([support/systemd/open5gc-upfd.service])
 AC_CONFIG_FILES([support/systemd/Makefile])
-AC_CONFIG_FILES([support/logrotate/nextepc])
+AC_CONFIG_FILES([support/logrotate/open5gc])
 AC_CONFIG_FILES([support/logrotate/Makefile])
-AC_CONFIG_FILES([support/newsyslog/nextepc.conf])
+AC_CONFIG_FILES([support/newsyslog/open5gc.conf])
 AC_CONFIG_FILES([support/newsyslog/Makefile])
 AC_CONFIG_FILES([support/Makefile])
 AC_CONFIG_FILES([test/sample.conf])
@@ -472,7 +473,7 @@ AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
 echo "
-NextEPC configuration
+Open5GC configuration
 --------------------
 version                 : ${PACKAGE_VERSION}
 host                    : ${host}
@@ -481,7 +482,7 @@ compiler                : ${CC}
 compiler flags          : ${CFLAGS} ${YAML_CFLAGS} ${MONGOC_CFLAGS} 
 linker flags            : ${LDFLAGS} ${LIBS} ${YAML_LIBS} ${MONGOC_LIBS}
 bin directory           : ${BIN_DIR}
-lib directory           : ${LIB_DIR}/nextepc
-config directory        : ${SYSCONF_DIR}/nextepc
-log directory           : ${LOCALSTATE_DIR}/log/nextepc
+lib directory           : ${LIB_DIR}/open5gc
+config directory        : ${SYSCONF_DIR}/open5gc
+log directory           : ${LOCALSTATE_DIR}/log/open5gc
 "
