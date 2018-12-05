@@ -117,7 +117,7 @@ static int _smf_sbi_message_smf_smContextRetrieve(sock_id sock, void *data)
     return CORE_OK;
 }
 
-void start_server()
+void smf_start_server()
 {
     status_t rv;
     rv = fork();
@@ -182,7 +182,7 @@ status_t smf_sbi_server_open()
     rv = sock_register(new, _smf_sbi_message_smf_smContextRetrieve, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
-    start_server();
+    smf_start_server();
     return CORE_OK;
 }
 

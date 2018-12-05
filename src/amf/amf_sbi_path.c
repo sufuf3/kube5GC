@@ -10,6 +10,8 @@ sock_id gAmf_smContextCreateSock;
 sock_id gAmf_smContextUpdateSock;
 sock_id gAmf_smContextReleaseSock;
 sock_id gAmf_smContextRetrieveSock;
+#include <unistd.h>
+#include <signal.h>
 
 static int _amf_sbi_message_amf_smContextCreate(sock_id sock, void *data)
 {
@@ -122,6 +124,33 @@ static int _amf_sbi_message_amf_smContextRetrieve(sock_id sock, void *data)
     return CORE_OK;
 }
 
+void amf_start_server()
+{
+    status_t rv;
+    rv = fork();
+    if (rv < 0)
+    {
+        d_fatal("Open server fail");
+        return;
+    }
+    else if (rv == 0)
+    {
+        rv = setsid();
+        if (rv == -1)
+        {
+            d_fatal("Server set session fail");
+            exit(EXIT_FAILURE);
+        } else
+        {
+            rv = execl("./http_server/amf_http_server", "amf_http_server", NULL);
+            d_assert(rv != -1, return, "exec server error: %s", strerror(errno));
+        }
+    } else if (rv > 0)
+    {
+        mme_self()->server_pid = rv;
+    }
+}
+
 status_t amf_sbi_server_open()
 {
     status_t rv;
@@ -159,10 +188,12 @@ status_t amf_sbi_server_open()
     rv = sock_register(gAmf_smContextRetrieveSock, _amf_sbi_message_amf_smContextRetrieve, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
+    amf_start_server();
     return CORE_OK;
 }
 
 status_t amf_sbi_server_close()
 {
+    kill(mme_self()->server_pid, SIGINT);
     return CORE_OK;
 }
