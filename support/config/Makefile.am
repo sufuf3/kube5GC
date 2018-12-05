@@ -1,5 +1,6 @@
 configfiles = \
 	nextepc.conf \
+	nextepc.testepc.conf \
 	hss.conf \
 	pcrf.conf \
 	upf.conf \
