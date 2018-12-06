@@ -1,3 +1,4 @@
+#define TRACE_MODULE _json
 #include "core_lib.h"
 #include "core_debug.h"
 #include "core_pkbuf.h"
@@ -7,6 +8,8 @@
 #include <arpa/inet.h>
 
 #define JSON_DEBUG 0
+
+int _json = 10;
 
 void plmn_id_to_buffer(plmn_id_t plmn_id, char* mcc, char* mnc){
     bzero(mcc, 4);
@@ -342,7 +345,7 @@ void _add_apn_to_struct(cJSON* json_key, c_int8_t *apn) {
 }
 
 void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
-    c_sockaddr_t *addr;
+    c_sockaddr_t addr;
     char paa_pdn_type[1+1] = {0};
     char paa_pdn_len[16]= {0};
 
@@ -351,23 +354,48 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     cJSON *j_pdn_paa_pdntype = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_PDNTYPE);
     cJSON *j_pdn_paa_addr = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_ADDR);
     cJSON *j_pdn_paa_addr6 = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_ADDR6);
-    cJSON *j_pdn_paa_len = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_LEN);
+    // cJSON *j_pdn_paa_len = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_LEN);
     bzero(paa_pdn_type, 1+1); 
     bzero(paa_pdn_len, 16);
     
+    // PDN Type
+    d_trace(10, "PDN Type: %d", pdn->paa.pdn_type);
     strcpy(paa_pdn_type, j_pdn_paa_pdntype->valuestring);
     // d_info(paa_pdn_type);
     pdn->paa.pdn_type = atoi(paa_pdn_type);
     // d_info(paa_pdn_type);
-    core_addaddrinfo(&addr, AF_INET, j_pdn_paa_addr->valuestring, 0, 0);
-    memcpy((void *)&pdn->paa.addr, (void *)&addr->sin.sin_addr.s_addr, IPV4_LEN);
-    strcpy(paa_pdn_len,j_pdn_paa_len->valuestring);
-    // d_info(paa_pdn_len);
+    
+    switch (pdn->pdn_type) {
+        case SBI_PDN_TYPE_IPV4:
+        {
+            core_inet_pton(AF_INET, j_pdn_paa_addr->valuestring, &addr);
+            memcpy((void *)&pdn->paa.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+            d_trace(10, "IPV4 address: %d", pdn->paa.addr);
+            break;
+        }
+        case SBI_PDN_TYPE_IPV6:
+        {
+            char buf[INET6_ADDRSTRLEN];
+            core_inet_pton(AF_INET6, j_pdn_paa_addr6->valuestring, &addr);
+            memcpy((void *)&pdn->paa.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+            CORE_ADDR(&addr, buf);
+            d_trace(10, "IPV6 address: %s", buf);
+            break;
+        }
+        case SBI_PDN_TYPE_IPV4V6:
+        {
+            core_inet_pton(AF_INET, j_pdn_paa_addr->valuestring, &addr);
+            memcpy((void *)&pdn->paa.both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+            core_inet_pton(AF_INET6, j_pdn_paa_addr6->valuestring, &addr);
+            memcpy((void *)&pdn->paa.both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+            break;
+        }
+        default:
+            d_error("Not support PDN Type");
+    }
+    
+    // TODO: This len rename to Prefix Len
     pdn->paa.len = atoi(paa_pdn_len);
-    //TODO : FIX ipv6 input
-    // d_info(j_pdn_paa_addr6->valuestring);
-    core_addaddrinfo(&addr, AF_INET6, j_pdn_paa_addr6->valuestring, 0, 0);
-    memcpy((void *)pdn->paa.addr6, (void *)addr->sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
 
     cJSON *j_pdn_ambr = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_AMBR);
     cJSON *j_pdn_ambr_uplink = cJSON_GetObjectItemCaseSensitive(j_pdn_ambr, JSONKEY_4G_PDN_AMBR_UPLINK);
