@@ -24,7 +24,6 @@ typedef struct _creat_session_t {
     plmn_id_t       visited_plmn_id;
     ue_pco_t        ue_pco;
     c_int8_t        apn[MAX_APN_LEN+1];
-    c_uint8_t       pdn_type;
     pdn_t           pdn;
     c_uint8_t       ebi;
     guti_t          guti;

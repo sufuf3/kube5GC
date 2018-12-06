@@ -19,13 +19,23 @@ import (
 )
 
 var (
-	ip   string
-	port uint
+	sysConfigPath string
+	packageName   string
+)
+
+var (
+	ip       string
+	port     uint
+	certFile string
+	keyFile  string
 )
 
 func init() {
+
 	flag.StringVar(&ip, "ip", "localhost", "ip address of sbi server")
 	flag.UintVar(&port, "port", 8080, "port")
+	flag.StringVar(&certFile, "cert", sysConfigPath+"/"+packageName+"/https/smf.cert", "TLS certificate")
+	flag.StringVar(&keyFile, "key", sysConfigPath+"/"+packageName+"/https/smf.key", "TLS key")
 	flag.Parse()
 }
 
@@ -37,6 +47,6 @@ func main() {
 
 	http2.ConfigureServer(&server, &http2.Server{})
 
-	log.Fatal(server.ListenAndServe())
+	log.Fatal(server.ListenAndServeTLS(certFile, keyFile))
 
 }

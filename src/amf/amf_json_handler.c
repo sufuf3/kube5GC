@@ -127,7 +127,7 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     }
         
     /* packet data network */
-    pdn->pdn_type = createSession.pdn_type;
+    pdn->pdn_type = createSession.pdn.pdn_type;
     pdn->paa.pdn_type = createSession.pdn.paa.pdn_type;
     // d_info("pdn->paa.pdn_type:%d pdn->pdn_type:%d", pdn->paa.pdn_type, pdn->pdn_type);
     if(pdn->paa.pdn_type != ori_pdn->paa.pdn_type)

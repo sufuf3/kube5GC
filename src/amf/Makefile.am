@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in.
 
+SUBDIRS = http_server
+
 noinst_LTLIBRARIES = libamf.la
 
 libamf_la_SOURCES = \

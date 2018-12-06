@@ -289,18 +289,27 @@ void smf_state_operational(fsm_t *s, event_t *e)
         case SMF_EVT_N11_MESSAGE:
         {
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
+            int msgType = event_get_param2(e);
             creat_session_t createSession = {0};
             smf_sess_t *sess = NULL;
-	    int msg_type = event_get_param2(e);
             
-            smf_json_handler_create_session(&recvbuf, &createSession);
-            
-            sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
-
-            smf_s11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
-            d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
-            
-	    d_info("msgtype: %d", msg_type);
+            switch (msgType)
+            {
+                case N11_TYPE_SM_CONTEXT_CREATE:
+                {
+                    d_trace(10, "Create Session OK");
+                    smf_json_handler_create_session(&recvbuf, &createSession);
+                    sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
+                    smf_s11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
+                    d_trace(10, "Create Session Ended");
+                    d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    break;
+                }
+                default:
+                {
+                    d_error("Not support N11 Message");
+                }
+            }
 
         release_n11_pkbuf:
             pkbuf_free(recvbuf);

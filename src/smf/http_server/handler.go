@@ -89,7 +89,7 @@ func init() {
 
 func SMContextCreate(w http.ResponseWriter, r *http.Request) {
 	var buf []byte
-	buf = make([]byte, 1000)
+	buf = make([]byte, 4096)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	r.Body.Read(buf)
@@ -106,7 +106,7 @@ func SMContextCreate(w http.ResponseWriter, r *http.Request) {
 
 func SMContextUpdate(w http.ResponseWriter, r *http.Request) {
 	var buf []byte
-	buf = make([]byte, 1000)
+	buf = make([]byte, 4096)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	r.Body.Read(buf)
@@ -123,7 +123,7 @@ func SMContextUpdate(w http.ResponseWriter, r *http.Request) {
 
 func SMContextRelease(w http.ResponseWriter, r *http.Request) {
 	var buf []byte
-	buf = make([]byte, 1000)
+	buf = make([]byte, 4096)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	r.Body.Read(buf)
@@ -140,7 +140,7 @@ func SMContextRelease(w http.ResponseWriter, r *http.Request) {
 
 func SMContextRetrieve(w http.ResponseWriter, r *http.Request) {
 	var buf []byte
-	buf = make([]byte, 1000)
+	buf = make([]byte, 4096)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	r.Body.Read(buf)

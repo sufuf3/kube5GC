@@ -19,9 +19,6 @@ static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
 
-    rv = unixgram_sendto(sock, pkbuf, &from);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
-
     event_set(&e, SMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_TYPE_SM_CONTEXT_CREATE);
@@ -29,7 +26,7 @@ static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
     if (rv != CORE_OK)
     {
         d_error("smf_event_send error");
-	pkbuf_free(pkbuf);
+	    pkbuf_free(pkbuf);
 	return 0;
     }
 
@@ -45,9 +42,6 @@ static int _smf_sbi_message_smf_smContextUpdate(sock_id sock, void *data)
 
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
-
-    rv = unixgram_sendto(sock, pkbuf, &from);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
 
     event_set(&e, SMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
@@ -73,9 +67,6 @@ static int _smf_sbi_message_smf_smContextRelease(sock_id sock, void *data)
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
 
-    rv = unixgram_sendto(sock, pkbuf, &from);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
-
     event_set(&e, SMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_TYPE_SM_CONTEXT_RELEASE);
@@ -100,9 +91,6 @@ static int _smf_sbi_message_smf_smContextRetrieve(sock_id sock, void *data)
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
 
-    rv = unixgram_sendto(sock, pkbuf, &from);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
-
     event_set(&e, SMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_TYPE_SM_CONTEXT_RETRIEVE);
@@ -117,7 +105,7 @@ static int _smf_sbi_message_smf_smContextRetrieve(sock_id sock, void *data)
     return CORE_OK;
 }
 
-void start_server()
+void smf_start_server()
 {
     status_t rv;
     rv = fork();
@@ -182,7 +170,7 @@ status_t smf_sbi_server_open()
     rv = sock_register(new, _smf_sbi_message_smf_smContextRetrieve, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
-    start_server();
+    smf_start_server();
     return CORE_OK;
 }
 

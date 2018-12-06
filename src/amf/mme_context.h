@@ -262,6 +262,7 @@ typedef struct _amf_context_t {
     c_sockaddr_t    *pgw_addr;      /* First IPv4 Address Selected */
     c_sockaddr_t    *pgw_addr6;     /* First IPv6 Address Selected */
 
+    pid_t           server_pid;
 
     /* Serve GUAMI */
     c_uint8_t       max_num_of_served_guami;

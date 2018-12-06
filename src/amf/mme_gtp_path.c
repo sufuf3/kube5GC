@@ -12,6 +12,7 @@
 #include "amf_json_build.h"
 #include "amf_json_handler.h"
 #include "mme_sm.h"
+extern sock_id gAmf_smContextCreateSock;
 
 static int _gtpv2_c_recv_cb(sock_id sock, void *data)
 {
@@ -146,6 +147,12 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
     
     amf_json_build_create_session(&pkbuf, sess);
     
+    c_sockaddr_t addr_smContextCreate;
+    memcpy(addr_smContextCreate.sun_path, "/tmp/amf_smContextCreate.gsock", sizeof(addr_smContextCreate.sun_path));
+    addr_smContextCreate.sun.sun_family = AF_UNIX;
+
+    unixgram_sendto(gAmf_smContextCreateSock, pkbuf, &addr_smContextCreate);
+
     pkbuf_free(pkbuf);
 #if 0 // TempDisable Test
     amf_json_handle_create_session(&pkbuf, sess); 
