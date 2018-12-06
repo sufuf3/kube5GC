@@ -24,9 +24,6 @@ static int _amf_sbi_message_amf_smContextCreate(sock_id sock, void *data)
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
     d_info("Recv: %s, from: %s", pkbuf->payload, from.sun_path);
 
-    rv = unixgram_sendto(sock, pkbuf, &from);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
-
     event_set(&e, AMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_SM_CONTEXT_CREATE);
@@ -50,9 +47,6 @@ static int _amf_sbi_message_amf_smContextUpdate(sock_id sock, void *data)
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
     d_info("Recv: %s, from: %s", pkbuf->payload, from.sun_path);
-
-    rv = unixgram_sendto(sock, pkbuf, &from);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
 
     event_set(&e, AMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
@@ -79,9 +73,6 @@ static int _amf_sbi_message_amf_smContextRelease(sock_id sock, void *data)
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
     d_info("Recv: %s, from: %s", pkbuf->payload, from.sun_path);
 
-    rv = unixgram_sendto(sock, pkbuf, &from);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
-
     event_set(&e, AMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_SM_CONTEXT_RELEASE);
@@ -106,9 +97,6 @@ static int _amf_sbi_message_amf_smContextRetrieve(sock_id sock, void *data)
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
     d_info("Recv: %s, from: %s", pkbuf->payload, from.sun_path);
-
-    rv = unixgram_sendto(sock, pkbuf, &from);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
 
     event_set(&e, AMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
