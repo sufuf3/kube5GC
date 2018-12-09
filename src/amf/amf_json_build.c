@@ -62,8 +62,9 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     else
         d_assert(0, return CORE_ERROR,
                 "HSS PDN Confiugration Error(%d)", pdn->pdn_type);
-    
     memcpy(&createSession.pdn, pdn, sizeof(pdn_t));
+    
+    createSession.pdn.paa.pdn_type = pdn_type;
     // d_info("pdn->paa.pdn_type :%d\n", pdn->paa.pdn_type);
     memcpy(&createSession.ebi, &bearer->ebi, sizeof(bearer->ebi));
     /*TODO : ue timezone*/

@@ -96,19 +96,20 @@ void add_servingnw_to_json(cJSON* json_key,plmn_id_t plmn_id){
 
 
 
-void add_pdn_to_json(cJSON* json_key, c_uint8_t pdn_type, pdn_t* _pdn){
+void add_pdn_to_json(cJSON* json_key, pdn_t* _pdn){
     
     cJSON *pdn = cJSON_AddObjectToObject(json_key, JSONKEY_4G_PDN);
     cJSON *paa = cJSON_AddObjectToObject(pdn, JSONKEY_4G_PDN_PAA); // PDN Address Allocation 
     cJSON *ambr = cJSON_AddObjectToObject(pdn, JSONKEY_4G_PDN_AMBR); // aggregate maximum bit rate
     
-    add_uint8_to_json(pdn, pdn_type, JSONKEY_4G_PDN_PDNTYPE);
+    add_uint8_to_json(pdn, _pdn->pdn_type, JSONKEY_4G_PDN_PDNTYPE);
+
 #if JSON_DEBUG
-    d_info("%d %s pdn_type :%d\n", __LINE__, __FUNCTION__, pdn_type);
-    // d_info("%d %s str :%s\n", __LINE__, __FUNCTION__, str);
+    d_info("%d %s pdn_type :%d\n", __LINE__, __FUNCTION__, _pdn->pdn_type);
 #endif
     
     add_uint8_to_json(paa, _pdn->paa.pdn_type, JSONKEY_4G_PDN_PAA_PDNTYPE);
+
 #if JSON_DEBUG
     // d_info("%d %s str :%s\n", __LINE__, __FUNCTION__, str);
 #endif
@@ -233,7 +234,7 @@ status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSO
 #if JSON_DEBUG
     d_info("%d %s \n", __LINE__, __FUNCTION__);
 #endif
-    add_pdn_to_json(pJson, &sess->pdn);
+    add_pdn_to_json(pJson , &sess->pdn);
     
     /* create bearer contexts */
 #if JSON_DEBUG
@@ -405,7 +406,7 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     pdn->paa.pdn_type = atoi(paa_pdn_type);
     // d_info(paa_pdn_type);
     
-    switch (pdn->pdn_type) {
+    switch (pdn->paa.pdn_type) {
         case SBI_PDN_TYPE_IPV4:
         {
             core_inet_pton(AF_INET, j_pdn_paa_addr->valuestring, &addr);
