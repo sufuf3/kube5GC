@@ -165,6 +165,7 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 status_t mme_gtp_send_modify_bearer_request(
         mme_bearer_t *bearer, int uli_presence)
 {
+#ifndef FIVE_G_CORE
     status_t rv;
 
     gtp_xact_t *xact = NULL;
@@ -192,6 +193,15 @@ status_t mme_gtp_send_modify_bearer_request(
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
     return CORE_OK;
+#else
+    mme_ue_t *mme_ue = NULL;
+    pkbuf_t *pkbuf = NULL;
+    mme_ue = bearer->mme_ue;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf_json_build_modify_bearer(&pkbuf, bearer);
+
+    return CORE_OK;
+#endif
 }
 
 status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)

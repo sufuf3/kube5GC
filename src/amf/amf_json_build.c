@@ -85,3 +85,14 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
 
     return CORE_OK;
 }
+
+CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf,  mme_bearer_t *bearer)
+{
+    // char *string = NULL;
+    // cJSON *session = cJSON_CreateObject();
+    // modify_bearer_t modifyBearer = {0};
+
+    // d_assert(bearer, return CORE_ERROR, "Null param");
+
+    return 0;
+}

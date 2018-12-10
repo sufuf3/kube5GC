@@ -9,7 +9,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 CORE_DECLARE(status_t) amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess);
-
+CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_t *bearer);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
