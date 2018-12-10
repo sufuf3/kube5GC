@@ -86,13 +86,38 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     return CORE_OK;
 }
 
-CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf,  mme_bearer_t *bearer)
+CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_t *bearer)
 {
-    // char *string = NULL;
-    // cJSON *session = cJSON_CreateObject();
-    // modify_bearer_t modifyBearer = {0};
+    char *string = NULL;
+    cJSON *j_modifyBearerReq = cJSON_CreateObject();
+    modify_bearer_t modifyBearer = {0};
+    c_uint32_t length = 0;
 
-    // d_assert(bearer, return CORE_ERROR, "Null param");
+    d_assert(bearer, return CORE_ERROR, "Null param");
+    
+    // c_uint32_t      enb_s1u_teid;
+    memcpy(modifyBearer.imsi_bcd,  bearer->mme_ue->imsi_bcd, sizeof( bearer->mme_ue->imsi_bcd));
+    //TODO: fix it how to get uli presence?
+    memcpy(&modifyBearer.uli_presence, "\x01" , sizeof(c_uint8_t));
+    memcpy(&modifyBearer.tai, &bearer->mme_ue->tai, sizeof(bearer->mme_ue->tai));
+    memcpy(&modifyBearer.e_cgi, &bearer->mme_ue->e_cgi, sizeof(bearer->mme_ue->e_cgi));
+    memcpy(&modifyBearer.visited_plmn_id, &bearer->mme_ue->visited_plmn_id, sizeof( bearer->mme_ue->visited_plmn_id));;
+    memcpy(&modifyBearer.guti, &bearer->mme_ue->guti, sizeof(bearer->mme_ue->guti));
+    //TODO: fix it how to get rat type??
+    //memcpy(&modifyBearer.rat_type, 0x00, sizeof(modifyBearer.rat_type));
+    memcpy(&modifyBearer.ebi, &bearer->ebi, sizeof(bearer->ebi));
+    memcpy(&modifyBearer.enb_s1u_ip, &bearer->enb_s1u_ip, sizeof(bearer->enb_s1u_ip));
+    memcpy(&modifyBearer.enb_s1u_teid, &bearer->enb_s1u_teid, sizeof(bearer->enb_s1u_teid));
 
+
+    JSONTRANSFORM_StToJs_modify_bearer_request(&modifyBearer, j_modifyBearerReq);
+    string = cJSON_Print(j_modifyBearerReq);
+    d_info(string);
+    length = strlen(string) + 1;
+    *pkbuf = pkbuf_alloc(0, length);
+    (*pkbuf)->len = length;
+    memcpy((*pkbuf)->payload, string, length -1);
+    free(string);
+    cJSON_Delete(j_modifyBearerReq);
     return 0;
 }

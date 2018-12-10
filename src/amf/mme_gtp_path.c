@@ -114,7 +114,7 @@ status_t mme_gtp_close()
 
 status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 {
-#ifndef FIVE_G_CORE
+#if 1
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
