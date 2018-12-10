@@ -9,6 +9,20 @@
 #include <unistd.h>
 #include <signal.h>
 
+c_sockaddr_t smContextCreateLocalAddr,
+        smContextCreateRemoteAddr,
+        smContextUpdateLocalAddr,
+        smContextUpdateRemoteAddr,
+        smContextReleaseLocalAddr,
+        smContextReleaseRemoteAddr,
+        smContextRetrieveLocalAddr,
+        smContextRetrieveRemoteAddr;
+
+sock_id smContextCreateSock,
+        smContextUpdateSock,
+        smContextReleaseSock,
+        smContextRetrieveSock;
+
 static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
 {
     status_t rv;
@@ -135,42 +149,80 @@ void smf_start_server()
 status_t smf_sbi_server_open()
 {
     status_t rv;
-    sock_id new;
-    c_sockaddr_t addr_smContextCreate, addr_smContextUpdate, addr_smContextRelease, addr_smContextRetrieve;
 
     // Create csock for smContextCreate
-    memcpy(addr_smContextCreate.sun_path, "/tmp/smf_smContextCreate.csock", sizeof(addr_smContextCreate.sun_path));
-    addr_smContextCreate.sun.sun_family = AF_UNIX;
-    rv = unixgram_server(&new, &addr_smContextCreate);
+    memcpy(smContextCreateLocalAddr.sun_path, "/tmp/smf_smContextCreate.csock", sizeof(smContextCreateLocalAddr.sun_path));
+    smContextCreateLocalAddr.sun.sun_family = AF_UNIX;
+    rv = unixgram_server(&smContextCreateSock, &smContextCreateLocalAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SBI failed");
-    rv = sock_register(new, _smf_sbi_message_smf_smContextCreate, NULL);
+    rv = sock_register(smContextCreateSock, _smf_sbi_message_smf_smContextCreate, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
+    memcpy(smContextCreateRemoteAddr.sun_path, "/tmp/smf_smContextCreate.gsock", sizeof(smContextCreateRemoteAddr.sun_path));
+    smContextCreateRemoteAddr.sun.sun_family = AF_UNIX;
 
     // Create csock for smContextUpdate
-    memcpy(addr_smContextUpdate.sun_path, "/tmp/smf_smContextUpdate.csock", sizeof(addr_smContextUpdate.sun_path));
-    addr_smContextUpdate.sun.sun_family = AF_UNIX;
-    rv = unixgram_server(&new, &addr_smContextUpdate);
+    memcpy(smContextUpdateLocalAddr.sun_path, "/tmp/smf_smContextUpdate.csock", sizeof(smContextUpdateLocalAddr.sun_path));
+    smContextUpdateLocalAddr.sun.sun_family = AF_UNIX;
+    rv = unixgram_server(&smContextUpdateSock, &smContextUpdateLocalAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SBI failed");
-    rv = sock_register(new, _smf_sbi_message_smf_smContextUpdate, NULL);
+    rv = sock_register(smContextUpdateSock, _smf_sbi_message_smf_smContextUpdate, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
+    memcpy(smContextUpdateRemoteAddr.sun_path, "/tmp/smf_smContextUpdate.gsock", sizeof(smContextUpdateRemoteAddr.sun_path));
+    smContextUpdateRemoteAddr.sun.sun_family = AF_UNIX;
 
     // Create csock for smContextRelease
-    memcpy(addr_smContextRelease.sun_path, "/tmp/smf_smContextRelease.csock", sizeof(addr_smContextRelease.sun_path));
-    addr_smContextRelease.sun.sun_family = AF_UNIX;
-    rv = unixgram_server(&new, &addr_smContextRelease);
+    memcpy(smContextReleaseLocalAddr.sun_path, "/tmp/smf_smContextRelease.csock", sizeof(smContextReleaseLocalAddr.sun_path));
+    smContextReleaseLocalAddr.sun.sun_family = AF_UNIX;
+    rv = unixgram_server(&smContextReleaseSock, &smContextReleaseLocalAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SBI failed");
-    rv = sock_register(new, _smf_sbi_message_smf_smContextRelease, NULL);
+    rv = sock_register(smContextReleaseSock, _smf_sbi_message_smf_smContextRelease, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
+    memcpy(smContextReleaseRemoteAddr.sun_path, "/tmp/smf_smContextRelease.gsock", sizeof(smContextReleaseRemoteAddr.sun_path));
+    smContextReleaseRemoteAddr.sun.sun_family = AF_UNIX;
 
     // Create csock for smContextRetrieve
-    memcpy(addr_smContextRetrieve.sun_path, "/tmp/smf_smContextRetrieve.csock", sizeof(addr_smContextRetrieve.sun_path));
-    addr_smContextRetrieve.sun.sun_family = AF_UNIX;
-    rv = unixgram_server(&new, &addr_smContextRetrieve);
+    memcpy(smContextRetrieveLocalAddr.sun_path, "/tmp/smf_smContextRetrieve.csock", sizeof(smContextRetrieveLocalAddr.sun_path));
+    smContextRetrieveLocalAddr.sun.sun_family = AF_UNIX;
+    rv = unixgram_server(&smContextRetrieveSock, &smContextRetrieveLocalAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SBI failed");
-    rv = sock_register(new, _smf_sbi_message_smf_smContextRetrieve, NULL);
+    rv = sock_register(smContextRetrieveSock, _smf_sbi_message_smf_smContextRetrieve, NULL);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
+    memcpy(smContextRetrieveRemoteAddr.sun_path, "/tmp/smf_smContextRetrieve.gsock", sizeof(smContextRetrieveRemoteAddr.sun_path));
+    smContextRetrieveRemoteAddr.sun.sun_family = AF_UNIX;
 
     smf_start_server();
+    return CORE_OK;
+}
+
+status_t smf_sbi_send_sm_context_create(pkbuf_t *pkbuf)
+{
+    status_t rv;
+    rv = unixgram_sendto(smContextCreateSock, pkbuf, &smContextCreateRemoteAddr);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Create Send Failed!");
+    return CORE_OK;
+}
+
+status_t smf_sbi_send_sm_context_update(pkbuf_t *pkbuf)
+{
+    status_t rv;
+    rv = unixgram_sendto(smContextUpdateSock, pkbuf, &smContextUpdateRemoteAddr);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Update Send Failed!");
+    return CORE_OK;
+}
+
+status_t smf_sbi_send_sm_context_release(pkbuf_t *pkbuf)
+{
+    status_t rv;
+    rv = unixgram_sendto(smContextReleaseSock, pkbuf, &smContextReleaseRemoteAddr);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Release Send Failed!");
+    return CORE_OK;
+}
+
+status_t smf_sbi_send_sm_context_retrieve(pkbuf_t *pkbuf)
+{
+    status_t rv;
+    rv = unixgram_sendto(smContextRetrieveSock, pkbuf, &smContextRetrieveRemoteAddr);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Retrieve Send Failed!");
     return CORE_OK;
 }
 
