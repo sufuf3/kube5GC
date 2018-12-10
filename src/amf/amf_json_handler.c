@@ -186,3 +186,8 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     return 0;
 
 }
+
+status_t amf_json_handler_create_session_response(pkbuf_t **pkbuf, creat_session_t *pCreateRspSess)
+{
+    return CORE_OK;
+}

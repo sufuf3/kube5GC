@@ -37,6 +37,9 @@
 #include "mme_path.h"
 #include "amf_sbi_path.h"
 
+#include "JsonTransform.h"
+#include "amf_json_handler.h"
+
 void mme_state_initial(fsm_t *s, event_t *e)
 {
     mme_sm_trace(3, e);
@@ -904,13 +907,36 @@ void mme_state_operational(fsm_t *s, event_t *e)
         case AMF_EVT_N11_MESSAGE:
         {
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
-            // creat_session_t createSession = {0};
-
-	    int msg_type = event_get_param2(e);
+            creat_session_t createSession = {0};
+	        int msg_type = event_get_param2(e);
             
-               d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
-            
-	    d_info("msgtype: %d", msg_type);
+            switch (msg_type)
+            {
+                case N11_SM_CONTEXT_CREATE:
+                {
+                    d_trace(10, "create Session Rsp");
+                    amf_json_handler_create_session_response(&recvbuf, &createSession);
+                    d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
+                    break;
+                }
+                    
+                case N11_SM_CONTEXT_RELEASE:
+                {
+                    break;
+                }
+                case N11_SM_CONTEXT_RETRIEVE:
+                {
+                    break;
+                }   
+                case N11_SM_CONTEXT_UPDATE:
+                {    
+                    break;
+                }
+                default :
+                {
+                    d_error("Not support N11 Message");
+                }    
+            }
 
         release_amf_n11_pkbuf:
             pkbuf_free(recvbuf);
