@@ -15,6 +15,11 @@ extern "C" {
 CORE_DECLARE(status_t) smf_sbi_server_open();
 CORE_DECLARE(status_t) smf_sbi_server_close();
 
+CORE_DECLARE(status_t) smf_sbi_send_sm_context_create(pkbuf_t *pkbuf);
+CORE_DECLARE(status_t) smf_sbi_send_sm_context_update(pkbuf_t *pkbuf);
+CORE_DECLARE(status_t) smf_sbi_send_sm_context_release(pkbuf_t *pkbuf);
+CORE_DECLARE(status_t) smf_sbi_send_sm_context_retrieve(pkbuf_t *pkbuf);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

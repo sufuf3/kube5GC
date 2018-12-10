@@ -6,6 +6,8 @@
 #include "gtp/gtp_path.h"
 #include "gtp/gtp_xact.h"
 
+#include "amf_sbi_path.h"
+
 #include "mme_event.h"
 #include "mme_gtp_path.h"
 #include "mme_s11_build.h"
@@ -146,12 +148,8 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
     d_assert(mme_ue, return CORE_ERROR, "Null param");
     
     amf_json_build_create_session(&pkbuf, sess);
-    
-    c_sockaddr_t addr_smContextCreate;
-    memcpy(addr_smContextCreate.sun_path, "/tmp/amf_smContextCreate.gsock", sizeof(addr_smContextCreate.sun_path));
-    addr_smContextCreate.sun.sun_family = AF_UNIX;
 
-    unixgram_sendto(gAmf_smContextCreateSock, pkbuf, &addr_smContextCreate);
+    amf_sbi_send_sm_context_create(pkbuf);
 
     pkbuf_free(pkbuf);
 #if 0 // TempDisable Test
