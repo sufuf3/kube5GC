@@ -48,7 +48,7 @@ CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_create_session_request(creat_session
 CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_create_session_request(creat_session_t *sess, cJSON *pJson);
 CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_modify_bearer_request(modify_bearer_t *sess, cJSON *pJson);
 CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *sess, cJSON *pJson);
-
+CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_create_session_response(creat_session_t *sess, cJSON *pJson);
 #ifdef __cplusplus
 }
 #endif 

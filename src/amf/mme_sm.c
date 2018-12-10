@@ -909,13 +909,18 @@ void mme_state_operational(fsm_t *s, event_t *e)
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
             creat_session_t createSession = {0};
 	        int msg_type = event_get_param2(e);
-            
+            mme_ue_t *mme_ue = NULL;
             switch (msg_type)
             {
                 case N11_SM_CONTEXT_CREATE:
                 {
                     d_trace(10, "create Session Rsp");
                     amf_json_handler_create_session_response(&recvbuf, &createSession);
+                    
+                    mme_ue = mme_ue_find_by_imsi((c_uint8_t *)createSession.imsi_bcd, strlen(createSession.imsi_bcd));
+                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+
+                    amf_n11_handle_create_session_response(mme_ue, &createSession);
                     d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
                     break;
                 }

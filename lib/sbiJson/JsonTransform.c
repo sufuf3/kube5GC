@@ -600,3 +600,36 @@ status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBear
     
     return CORE_OK;
 }
+
+
+status_t JSONTRANSFORM_JsToSt_create_session_response(creat_session_t *sess, cJSON *pJson)
+{
+    /* imsi */
+    _add_imsi_to_struct(pJson, sess->imsi_bcd);
+    
+    /* user location information */
+    _add_uld_to_struct(pJson, sess);
+    
+    // /* serving network */
+    _add_serving_network_to_struct(pJson, &sess->visited_plmn_id);
+
+    /* radio access technology */
+    _add_radio_type_to_struct(pJson, sess->rat_type);
+
+    /* protocol_configuration_options(nas) */
+    _add_pco_to_struct(pJson, &sess->ue_pco);
+    
+    /* APN */
+    _add_apn_to_struct(pJson, sess->apn);
+
+    /* packet data network */
+    _add_pdn_to_struct(pJson, &sess->pdn);
+
+    /* ebi */
+    _add_ebi_to_struct(pJson, &sess->ebi);
+    
+    /* gummei */
+    _add_gummei_to_struct(pJson, &sess->guti);
+
+    return CORE_OK;
+}

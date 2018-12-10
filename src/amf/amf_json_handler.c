@@ -189,5 +189,15 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
 
 status_t amf_json_handler_create_session_response(pkbuf_t **pkbuf, creat_session_t *pCreateRspSess)
 {
+    cJSON *session = cJSON_Parse((*pkbuf)->payload);
+    // string = cJSON_Print(session);
+    // d_info(string);
+    d_assert(session, return CORE_ERROR, "Null param");
+
+    JSONTRANSFORM_JsToSt_create_session_response(pCreateRspSess, session);
+    
+    cJSON_Delete(session);
+    return CORE_OK;
+
     return CORE_OK;
 }
