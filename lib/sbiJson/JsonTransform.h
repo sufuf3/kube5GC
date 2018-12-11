@@ -22,7 +22,7 @@ typedef struct _create_session_t {
     tai_t           tai;
     e_cgi_t         e_cgi;
     plmn_id_t       visited_plmn_id;
-    c_int32_t       sgw_s1u_teid;
+    c_uint32_t      sgw_s1u_teid;
     ue_pco_t        ue_pco;
     c_int8_t        apn[MAX_APN_LEN+1];
     pdn_t           pdn;

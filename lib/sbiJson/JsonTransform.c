@@ -93,8 +93,6 @@ void add_servingnw_to_json(cJSON* json_key,plmn_id_t plmn_id){
     return;
 }
 
-
-
 void add_pdn_to_json(cJSON* json_key, pdn_t* _pdn){
     
     cJSON *pdn = cJSON_AddObjectToObject(json_key, JSONKEY_4G_PDN);
@@ -165,23 +163,29 @@ void add_m_bearer_ctx_to_json(cJSON* json_key, c_uint8_t ebi, ip_t ip, c_uint32_
     cJSON *m_br_ctx_ip = cJSON_AddObjectToObject(json_key, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP);
     add_uint8_to_json(m_br_ctx, ebi, JSONKEY_4G_M_BEARER_CTX_EBI);
     add_uint32_to_json(m_br_ctx, teid, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_TEID);
-    char buf[CORE_ADDRSTRLEN], buf2[CORE_ADDRSTRLEN];    
+    char buf[CORE_ADDRSTRLEN] = {0}, buf2[CORE_ADDRSTRLEN] = {0};
     if(ip.ipv4 && ip.ipv6){
-        INET_NTOP(ip.both.addr, buf);
-        INET6_NTOP(ip.both.addr6, buf2);
+        INET_NTOP(&ip.both.addr, buf);
+        INET6_NTOP(&ip.both.addr6, buf2);
         cJSON_AddStringToObject(m_br_ctx_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR, buf);
         cJSON_AddStringToObject(m_br_ctx_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR6, buf2);
     }
     else if(ip.ipv4){
-        INET_NTOP(ip.addr, buf);
+        d_trace(1, "Modify bearer context ipv4");
+        INET_NTOP(&ip.addr, buf);
+        d_trace(1, "Modify bearer context ipv4 inet");
         cJSON_AddStringToObject(m_br_ctx_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR, buf);
     }
     else if(ip.ipv6){
-        INET6_NTOP(ip.addr6, buf2);
+        d_trace(1, "Modify bearer context ipv6");
+        INET6_NTOP(&ip.addr6, buf2);
         cJSON_AddStringToObject(m_br_ctx_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR6, buf2);
+        d_trace(1, "Modify bearer context ipv6");
     }
+    d_trace(1, "Modify bearer context ipv6");
     add_uint8_to_json(m_br_ctx_ip, ip.ipv4, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_IPV4);
     add_uint8_to_json(m_br_ctx_ip, ip.ipv6, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_IPV6);
+    d_trace(1, "finish");
     return;
 }
 
@@ -256,7 +260,6 @@ status_t JSONTRANSFORM_StToJs_create_session_request(create_session_t *sess, cJS
     
     return CORE_OK;
 }
-
 
 status_t JSONTRANSFORM_StToJs_modify_bearer_request(modify_bearer_t *sess, cJSON *pJson)
 {
@@ -448,13 +451,11 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
 
 }
  void _add_ebi_to_struct(cJSON* json_key, c_uint8_t *ebi) {
-    
-    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_EBI);
-    // d_info(j_ebi->valuestring);
+    cJSON *j_modify_bearer_ctx = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_M_BEARER_CTX);
+    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(j_modify_bearer_ctx, JSONKEY_4G_EBI);
     int tmpData = 0;
     tmpData = atoi(j_ebi->valuestring);
     *ebi = tmpData;
-     
  }
 
  void _add_gummei_to_struct(cJSON* json_key, guti_t *guti) {
@@ -522,7 +523,6 @@ void _add_json_to_struct_ui8_by_key(cJSON* json_key, c_uint8_t *ui8value, const 
     int tmpData = 0;
     tmpData = atoi(j_sub_data->valuestring);
     *ui8value = tmpData;
-     
 }
 
 void _add_json_to_struct_ui32_by_key(cJSON* json_key, c_uint32_t *ui32value, const char *jsonkeyString) {
@@ -539,11 +539,13 @@ void _add_ipt_to_struct(cJSON* json_key, ip_t *pIP)
 {
     c_sockaddr_t addr;
     cJSON *j_enb_s1u_ip = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP);
+    cJSON *j_enb_s1u_ip4 = cJSON_GetObjectItemCaseSensitive(j_enb_s1u_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_IPV4);
+    cJSON *j_enb_s1u_ip6 = cJSON_GetObjectItemCaseSensitive(j_enb_s1u_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_IPV6);
     cJSON *j_enb_s1u_ip_addr4 = cJSON_GetObjectItemCaseSensitive(j_enb_s1u_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR);
     cJSON *j_enb_s1u_ip_addr6 = cJSON_GetObjectItemCaseSensitive(j_enb_s1u_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR6);
 
-    pIP->ipv4 = atoi(j_enb_s1u_ip_addr4->valuestring);
-    pIP->ipv6 = atoi(j_enb_s1u_ip_addr6->valuestring);
+    pIP->ipv4 = atoi(j_enb_s1u_ip4->valuestring);
+    pIP->ipv6 = atoi(j_enb_s1u_ip6->valuestring);
 
     if ((pIP->ipv4 == 1) && (pIP->ipv6 ==1)) {
         core_inet_pton(AF_INET, j_enb_s1u_ip_addr4->valuestring, &addr);
@@ -562,7 +564,13 @@ void _add_ipt_to_struct(cJSON* json_key, ip_t *pIP)
     else {
         d_error("error ip_t");
     }
- }
+}
+
+void _add_enb_s1u_teid(cJSON *json_key, c_uint32_t *teid)
+{
+    cJSON *m_bearer_ctx = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_M_BEARER_CTX);
+    _add_json_to_struct_ui32_by_key(m_bearer_ctx, teid, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_TEID);
+}
 
 status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBearer, cJSON *pJson)
 {
@@ -590,7 +598,7 @@ status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBear
     // ip_t            enb_s1u_ip;
     _add_ipt_to_struct(pJson, &pModifyBearer->enb_s1u_ip);
     // c_uint32_t      enb_s1u_teid;
-    _add_json_to_struct_ui32_by_key(pJson, &pModifyBearer->enb_s1u_teid, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_TEID);
+    _add_enb_s1u_teid(pJson, &pModifyBearer->enb_s1u_teid);
     
     /* APN */
     _add_apn_to_struct(pJson, pModifyBearer->apn);
@@ -598,20 +606,38 @@ status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBear
     return CORE_OK;
 }
 
+void _add_sgw_ipt_to_struct(cJSON* json_key, ip_t *pIP)
+{
+    c_sockaddr_t addr;
+    cJSON *j_sgw_s1u_addr4 = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_SGW_S1U_IP_IPV4);
+    cJSON *j_sgw_s1u_addr6 = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_SGW_S1U_IP_IPV6);
+
+    if (j_sgw_s1u_addr4 && j_sgw_s1u_addr6) {
+        core_inet_pton(AF_INET, j_sgw_s1u_addr4->valuestring, &addr);
+        memcpy((void *)&pIP->both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+        core_inet_pton(AF_INET6, j_sgw_s1u_addr6->valuestring, &addr);
+        memcpy((void *)&pIP->both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+    }
+    else if (j_sgw_s1u_addr4) {
+        core_inet_pton(AF_INET, j_sgw_s1u_addr4->valuestring, &addr);
+        memcpy((void *)&pIP->both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+    }
+    else if (j_sgw_s1u_addr6) {
+        core_inet_pton(AF_INET6, j_sgw_s1u_addr6->valuestring, &addr);
+        memcpy((void *)&pIP->both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+    }
+    else {
+        d_error("error ip_t");
+    }
+}
 
 status_t JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJSON *pJson)
 {
     /* imsi */
     _add_imsi_to_struct(pJson, sess->imsi_bcd);
-    
-    /* user location information */
-    _add_uld_to_struct(pJson, sess);
-    
-    // /* serving network */
-    _add_serving_network_to_struct(pJson, &sess->visited_plmn_id);
 
-    /* radio access technology */
-    _add_radio_type_to_struct(pJson, sess->rat_type);
+    /* sgw_s1u_teid */
+    _add_json_to_struct_ui32_by_key(pJson, &sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
 
     /* protocol_configuration_options(nas) */
     _add_pco_to_struct(pJson, &sess->ue_pco);
@@ -624,10 +650,10 @@ status_t JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJ
 
     /* ebi */
     _add_ebi_to_struct(pJson, &sess->ebi);
-    
-    /* gummei */
-    _add_gummei_to_struct(pJson, &sess->guti);
 
+    /* sgw_ip */
+    _add_sgw_ipt_to_struct(pJson, &sess->sgw_ip);
+    
     return CORE_OK;
 }
 
@@ -644,6 +670,16 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
     /* sgw_s1u_teid */
     add_uint32_to_json(pJson, sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
     
+    /* PCO */
+    if (sess->ue_pco.length && sess->ue_pco.buffer)
+    {
+        char conv[1000] = {0};
+#if JSON_DEBUG
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
+#endif
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, uint_to_buffer(conv, sess->ue_pco.buffer, sess->ue_pco.length));
+    }
+
     /* sgw_s1u_ip */
     if(sess->sgw_ip.ipv4 && sess->sgw_ip.ipv6){
         INET_NTOP(sess->sgw_ip.both.addr, ip4_buf);
@@ -653,22 +689,18 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
     }
     else if(sess->sgw_ip.ipv4){
         INET_NTOP(sess->sgw_ip.addr, ip4_buf);
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR, ip4_buf);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
     }
     else if(sess->sgw_ip.ipv6){
         INET6_NTOP(sess->sgw_ip.addr6, ip6_buf);
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR6, ip6_buf);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
     }
 
     /* APN */
-    _add_apn_to_struct(pJson, sess->apn);
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
 
     /* PDN Address Allocation */
-    return CORE_OK;
-}
-
-CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJSON *pJson)
-{
+    add_pdn_to_json(pJson , &sess->pdn);
     
     return CORE_OK;
 }
