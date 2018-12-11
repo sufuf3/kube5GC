@@ -37,7 +37,7 @@ CORE_DECLARE(void) mme_s11_handle_delete_indirect_data_forwarding_tunnel_respons
         gtp_delete_indirect_data_forwarding_tunnel_response_t *rsp);
 
 CORE_DECLARE(void)  amf_n11_handle_create_session_response(
-        mme_ue_t *mme_ue, creat_session_t *pCreateSession);
+        mme_ue_t *mme_ue, create_session_t *pCreateSession);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -1681,7 +1681,7 @@ smf_subnet_t* smf_subnet_next(smf_subnet_t *subnet)
     return list_next(subnet);
 }
 
-smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(creat_session_t *createSession)
+smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(create_session_t *createSession)
 {
     smf_sess_t *sess = NULL;
     c_int8_t apn[MAX_APN_LEN] = {0};

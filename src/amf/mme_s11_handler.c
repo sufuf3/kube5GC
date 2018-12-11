@@ -664,12 +664,10 @@ void mme_s11_handle_delete_indirect_data_forwarding_tunnel_response(
 }
 
 void amf_n11_handle_create_session_response(
-        mme_ue_t *mme_ue, creat_session_t *pCreateSession)
+        mme_ue_t *mme_ue, create_session_t *pCreateSession)
 {
 #if 1
     status_t rv;
-    gtp_f_teid_t *sgw_s11_teid = NULL;
-    gtp_f_teid_t *sgw_s1u_teid = NULL;
 
     mme_bearer_t *bearer = NULL;
     mme_sess_t *sess = NULL;
@@ -689,34 +687,22 @@ void amf_n11_handle_create_session_response(
     pdn = sess->pdn;
     d_assert(pdn, return, "Null param");
 
-    /* Control Plane(UL) : SGW-S11 */
-    sgw_s11_teid = rsp->sender_f_teid_for_control_plane.data;
-    mme_ue->sgw_s11_teid = ntohl(sgw_s11_teid->teid);
-
-    memcpy(&pdn->paa, rsp->pdn_address_allocation.data,
-            rsp->pdn_address_allocation.len);
+    memcpy(&pdn->paa, &pCreateSession->pdn.paa, pCreateSession->pdn.paa.len);
 
     /* PCO */
-    if (rsp->protocol_configuration_options.presence)
-    {
-        TLV_STORE_DATA(&sess->pgw_pco, &rsp->protocol_configuration_options);
-    }
+    memcpy(&sess->pgw_pco, pCreateSession->ue_pco.buffer, pCreateSession->ue_pco.length);
 
     /* Data Plane(UL) : SGW-S1U */
-    sgw_s1u_teid = rsp->bearer_contexts_created.s1_u_enodeb_f_teid.data;
-    bearer->sgw_s1u_teid = ntohl(sgw_s1u_teid->teid);
+    bearer->sgw_s1u_teid = pCreateSession->sgw_s1u_teid;
 
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
     d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
         bearer->enb_s1u_teid, bearer->sgw_s1u_teid);
 
-    rv = gtp_f_teid_to_ip(sgw_s1u_teid, &bearer->sgw_s1u_ip);
-    d_assert(rv == CORE_OK, return,);
+    memcpy(&bearer->sgw_s1u_ip, &pCreateSession->sgw_ip, IPV4V6_LEN);
 
-    rv = gtp_xact_commit(xact);
-    d_assert(rv == CORE_OK, return, "xact_commit error");
-
+    d_info("create Session");
     if (FSM_CHECK(&mme_ue->sm, emm_state_initial_context_setup))
     {
         rv = nas_send_attach_accept(mme_ue);

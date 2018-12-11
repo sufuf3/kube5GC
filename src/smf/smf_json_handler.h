@@ -11,7 +11,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-status_t smf_json_handler_create_session(pkbuf_t **pkbuf, creat_session_t *createSession);
+status_t smf_json_handler_create_session(pkbuf_t **pkbuf, create_session_t *createSession);
 status_t smf_json_handler_update_session(pkbuf_t **pkbuf, modify_bearer_t *modifyBearer);
 #ifdef __cplusplus
 }

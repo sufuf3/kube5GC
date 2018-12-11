@@ -57,7 +57,7 @@ bool compare_plmnid(plmn_id_t id1, plmn_id_t id2){
 
 status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     
-    creat_session_t createSession = {0}; 
+    create_session_t createSession = {0}; 
     mme_ue_t *mme_ue = NULL;
     mme_ue_t *ori_mme_ue = NULL;
     pdn_t *ori_pdn = NULL;
@@ -187,7 +187,7 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
 
 }
 
-status_t amf_json_handler_create_session_response(pkbuf_t **pkbuf, creat_session_t *pCreateRspSess)
+status_t amf_json_handler_create_session_response(pkbuf_t **pkbuf, create_session_t *pCreateRspSess)
 {
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
     // string = cJSON_Print(session);

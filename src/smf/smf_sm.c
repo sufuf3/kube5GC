@@ -290,8 +290,9 @@ void smf_state_operational(fsm_t *s, event_t *e)
         {
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
             int msgType = event_get_param2(e);
-            creat_session_t createSession = {0};
+            create_session_t createSession = {0};
             smf_sess_t *sess = NULL;
+            d_info("N11 message enter");
             switch (msgType)
             {
                 case N11_TYPE_SM_CONTEXT_CREATE:
@@ -307,11 +308,13 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 case N11_TYPE_SM_CONTEXT_UPDATE:
                 {
                     modify_bearer_t modifyBearer = {0};
-                    d_trace(10, "update OK");
+                    d_info("smf_json_handler_update_session");
                     smf_json_handler_update_session(&recvbuf, &modifyBearer);
+                    d_info("update smf_sess_find_by_JsonUpdateSession");
                     sess = smf_sess_find_by_JsonUpdateSession(&modifyBearer);
+                    d_info("update smf_n11_handle_update_session_request_by_JsonUpdateSession");
                     smf_n11_handle_update_session_request_by_JsonUpdateSession(sess, &modifyBearer);
-                    d_trace(10, "update Ended");
+                    d_info("update Ended");
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
                     break;
                 }

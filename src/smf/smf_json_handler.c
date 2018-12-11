@@ -5,7 +5,7 @@
 #include "3gpp_types.h"
 #include "smf_json_handler.h"
 
-status_t smf_json_handler_create_session(pkbuf_t **pkbuf, creat_session_t *createSession)
+status_t smf_json_handler_create_session(pkbuf_t **pkbuf, create_session_t *createSession)
 { 
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
     // string = cJSON_Print(session);

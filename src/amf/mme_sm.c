@@ -907,7 +907,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
         case AMF_EVT_N11_MESSAGE:
         {
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
-            creat_session_t createSession = {0};
+            create_session_t createSession = {0};
 	        int msg_type = event_get_param2(e);
             mme_ue_t *mme_ue = NULL;
             switch (msg_type)

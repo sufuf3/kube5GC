@@ -1,3 +1,4 @@
+#define TRACE_MODULE _amf_json_build
 #include <cJSON/cJSON.h>
 
 #include "core_debug.h"
@@ -8,6 +9,8 @@
 #include "sbiJson/JsonTransform.h"
 #include "amf_json_build.h"
 
+int _amf_json_build = 10;
+
 status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     
     pdn_t *pdn = NULL;
@@ -15,7 +18,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     mme_bearer_t *bearer = NULL;
     char *string = NULL;
     cJSON *session = cJSON_CreateObject();
-    creat_session_t createSession = {0};
+    create_session_t createSession = {0};
     c_uint32_t length = 0;
     d_assert(sess, return CORE_ERROR, "Null param");
     pdn = sess->pdn;
@@ -109,7 +112,7 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_
     memcpy(&modifyBearer.enb_s1u_ip, &bearer->enb_s1u_ip, sizeof(bearer->enb_s1u_ip));
     memcpy(&modifyBearer.enb_s1u_teid, &bearer->enb_s1u_teid, sizeof(bearer->enb_s1u_teid));
     memcpy(&modifyBearer.apn, &bearer->sess->pdn->apn, sizeof( bearer->sess->pdn->apn));
-
+    d_trace(5, "JSONTRANSFORM_StToJs_modify_bearer_request");
     JSONTRANSFORM_StToJs_modify_bearer_request(&modifyBearer, j_modifyBearerReq);
     string = cJSON_Print(j_modifyBearerReq);
     d_info(string);
