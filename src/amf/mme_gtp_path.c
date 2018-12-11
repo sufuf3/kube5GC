@@ -114,7 +114,7 @@ status_t mme_gtp_close()
 
 status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 {
-#if 1
+#if FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
@@ -199,7 +199,10 @@ status_t mme_gtp_send_modify_bearer_request(
     mme_ue = bearer->mme_ue;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
     amf_json_build_modify_bearer(&pkbuf, bearer);
-
+    // d_info("send sbi sm context update start");
+    amf_sbi_send_sm_context_update(pkbuf);
+    // d_info("send sbi sm context update end");
+    pkbuf_free(pkbuf);
     return CORE_OK;
 #endif
 }

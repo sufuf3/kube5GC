@@ -292,7 +292,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
             int msgType = event_get_param2(e);
             creat_session_t createSession = {0};
             smf_sess_t *sess = NULL;
-            
             switch (msgType)
             {
                 case N11_TYPE_SM_CONTEXT_CREATE:
@@ -302,6 +301,17 @@ void smf_state_operational(fsm_t *s, event_t *e)
                     sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
                     smf_s11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
                     d_trace(10, "Create Session Ended");
+                    d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    break;
+                }
+                case N11_TYPE_SM_CONTEXT_UPDATE:
+                {
+                    modify_bearer_t modifyBearer = {0};
+                    d_trace(10, "update OK");
+                    smf_json_handler_update_session(&recvbuf, &modifyBearer);
+                    // sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
+                    // smf_s11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
+                    d_trace(10, "update Ended");
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
                     break;
                 }
