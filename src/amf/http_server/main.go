@@ -126,18 +126,87 @@ func handleSMContextCreate() {
 }
 
 func handleSMContextUpdate() {
+	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/modify"
+	var buf []byte
+	buf = make([]byte, 1000)
+	for {
+		_, _, err2 := smContextCreateConn.ReadFromUnix(buf)
+		if err2 != nil {
+			log.Fatal(err2)
+		}
+		req, err := http.NewRequest("POST", url, bytes.NewBuffer(buf))
+		if err != nil {
+			log.Fatal(fmt.Errorf("error making request: %v", err))
+		}
+		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Fatal(fmt.Errorf("error making request: %v", err))
+		}
+		body, _ := ioutil.ReadAll(resp.Body)
+		_, err = smContextCreateConn.Write(body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resp.Body.Close()
+	}
 	wg.Done()
-	// url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts"
 }
 
 func handleSMContextRelease() {
+	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/release"
+	var buf []byte
+	buf = make([]byte, 1000)
+	for {
+		_, _, err2 := smContextCreateConn.ReadFromUnix(buf)
+		if err2 != nil {
+			log.Fatal(err2)
+		}
+		req, err := http.NewRequest("POST", url, bytes.NewBuffer(buf))
+		if err != nil {
+			log.Fatal(fmt.Errorf("error making request: %v", err))
+		}
+		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Fatal(fmt.Errorf("error making request: %v", err))
+		}
+		body, _ := ioutil.ReadAll(resp.Body)
+		_, err = smContextCreateConn.Write(body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resp.Body.Close()
+	}
 	wg.Done()
-	// url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts"
 }
 
 func handleSMContextRetrieve() {
+	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/retrieve"
+	var buf []byte
+	buf = make([]byte, 1000)
+	for {
+		_, _, err2 := smContextCreateConn.ReadFromUnix(buf)
+		if err2 != nil {
+			log.Fatal(err2)
+		}
+		req, err := http.NewRequest("POST", url, bytes.NewBuffer(buf))
+		if err != nil {
+			log.Fatal(fmt.Errorf("error making request: %v", err))
+		}
+		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Fatal(fmt.Errorf("error making request: %v", err))
+		}
+		body, _ := ioutil.ReadAll(resp.Body)
+		_, err = smContextCreateConn.Write(body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resp.Body.Close()
+	}
 	wg.Done()
-	// url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts"
 }
 
 func main() {

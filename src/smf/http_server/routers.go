@@ -48,19 +48,19 @@ var routes = Routes{
 	Route{
 		"SMContextUpdate",
 		"POST",
-		"/nsmf-pdusession/v1/sm-contexts/{smContextRef}/modify",
+		"/nsmf-pdusession/v1/sm-contexts/modify",
 		SMContextUpdate,
 	},
 	Route{
 		"SMContextRelease",
 		"POST",
-		"/nsmf-pdusession/v1/sm-contexts/{smContextRef}/release",
+		"/nsmf-pdusession/v1/sm-contexts/release",
 		SMContextRelease,
 	},
 	Route{
 		"SMContextRetrieve",
 		"POST",
-		"/nsmf-pdusession/v1/sm-contexts{smContextRef}/retrieve",
+		"/nsmf-pdusession/v1/sm-contexts/retrieve",
 		SMContextRetrieve,
 	},
 }
