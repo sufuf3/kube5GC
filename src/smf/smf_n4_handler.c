@@ -251,7 +251,7 @@ void smf_n4_handle_session_establishment_response(
 #else
     pkbuf_t *pkbuf = NULL;
     smf_n11_build_create_session_response(&pkbuf, sess);
-    smf_sbi_send_sm_context_update(pkbuf);
+    smf_sbi_send_sm_context_create(pkbuf);
 #endif
 }
 

@@ -14,7 +14,7 @@ extern "C"
 
 typedef struct _ue_pco_t {
     c_uint8_t length;
-    c_uint8_t *buffer;
+    c_uint8_t buffer[MAX_PCO_LEN * 2 + 1];
 }ue_pco_t;
 
 typedef struct _create_session_t {

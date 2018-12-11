@@ -657,7 +657,11 @@ status_t JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJ
     _add_pdn_to_struct(pJson, &sess->pdn);
 
     /* ebi */
-    _add_ebi_to_struct(pJson, &sess->ebi);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+    c_int16_t ebi;
+    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
+    ebi = atoi(j_ebi->valuestring);
+    sess->ebi = ebi;
 
     /* sgw_ip */
     _add_sgw_ipt_to_struct(pJson, &sess->sgw_ip);
@@ -685,22 +689,30 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
 #if JSON_DEBUG
         d_info("%d %s \n", __LINE__, __FUNCTION__);
 #endif
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, uint_to_buffer(conv, sess->ue_pco.buffer, sess->ue_pco.length));
+        d_info("PCO length: %d", sess->ue_pco.length);
+        d_print_hex(sess->ue_pco.buffer, sess->ue_pco.length);
+        core_hex_to_ascii_no_space(sess->ue_pco.buffer, sess->ue_pco.length, conv, sizeof(conv));
+        d_info("PCO: %s", conv);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, conv);
     }
 
     /* sgw_s1u_ip */
     if(sess->sgw_ip.ipv4 && sess->sgw_ip.ipv6){
-        INET_NTOP(sess->sgw_ip.both.addr, ip4_buf);
-        INET6_NTOP(sess->sgw_ip.both.addr6, ip6_buf);
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
+        INET_NTOP(&sess->sgw_ip.both.addr, ip4_buf);
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
+        INET6_NTOP(&sess->sgw_ip.both.addr6, ip6_buf);
         cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
         cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
     }
     else if(sess->sgw_ip.ipv4){
-        INET_NTOP(sess->sgw_ip.addr, ip4_buf);
+        INET_NTOP(&sess->sgw_ip.addr, ip4_buf);
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
         cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
     }
     else if(sess->sgw_ip.ipv6){
-        INET6_NTOP(sess->sgw_ip.addr6, ip6_buf);
+        INET6_NTOP(&sess->sgw_ip.addr6, ip6_buf);
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
         cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
     }
 

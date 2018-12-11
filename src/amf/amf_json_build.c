@@ -42,12 +42,11 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     memcpy(&createSession.e_cgi, &mme_ue->e_cgi, sizeof( mme_ue->e_cgi));
     memcpy(&createSession.visited_plmn_id, &mme_ue->visited_plmn_id, sizeof( mme_ue->visited_plmn_id));
     if (sess->ue_pco.length && sess->ue_pco.buffer) {
-        createSession.ue_pco.buffer = malloc(sizeof(char)* sess->ue_pco.length);
-        memcpy(&createSession.ue_pco.length, &sess->ue_pco.length, sizeof( sess->ue_pco.length));
-        memcpy(&createSession.ue_pco.buffer, &sess->ue_pco.buffer, sess->ue_pco.length);
+        createSession.ue_pco.length = sess->ue_pco.length;
+        memcpy(createSession.ue_pco.buffer, sess->ue_pco.buffer, sess->ue_pco.length);
         d_print_hex(createSession.ue_pco.buffer, createSession.ue_pco.length);
     }
-    memcpy(&createSession.apn, &pdn->apn, sizeof( pdn->apn));
+    memcpy(createSession.apn, pdn->apn, sizeof(pdn->apn));
 
     c_uint8_t pdn_type;
     if (pdn->pdn_type == HSS_PDN_TYPE_IPV4 ||
@@ -70,7 +69,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     
     createSession.pdn.paa.pdn_type = pdn_type;
     // d_info("pdn->paa.pdn_type :%d\n", pdn->paa.pdn_type);
-    memcpy(&createSession.ebi, &bearer->ebi, sizeof(bearer->ebi));
+    createSession.ebi = bearer->ebi;
     /*TODO : ue timezone*/
     memcpy(&createSession.guti, &mme_ue->guti, sizeof(mme_ue->guti));
     

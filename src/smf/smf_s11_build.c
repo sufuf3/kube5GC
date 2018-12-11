@@ -434,7 +434,7 @@ status_t smf_n11_build_create_session_response(
     // PCO
     pco_len = smf_sbi_pco_build(pco_buf, (c_uint8_t *)&sess->pco_buf, sess->pco_len);
     d_assert(pco_len > 0, return CORE_ERROR, "pco build failed");
-    memcpy(&createSession.ue_pco.buffer, pco_buf, pco_len);
+    memcpy(createSession.ue_pco.buffer, pco_buf, pco_len);
     createSession.ue_pco.length = pco_len;
 
     /* APN Restriction */
