@@ -237,7 +237,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 pkbuf_free(copybuf);
                 break;
             }
-                      
+
             d_assert(message->h.seid, pkbuf_free(recvbuf); pkbuf_free(copybuf); break,
                     "No Session seid");
             sess = smf_sess_find_by_seid(message->h.seid);

@@ -19,7 +19,6 @@ void plmn_id_to_buffer(plmn_id_t plmn_id, char* mcc, char* mnc){
         sprintf(mnc, "%d%d%d", plmn_id.mnc1, plmn_id.mnc2, plmn_id.mnc3);
     else
         sprintf(mnc, "%d%d", plmn_id.mnc2, plmn_id.mnc3);
-
     return;
 }
 
@@ -186,9 +185,7 @@ void add_m_bearer_ctx_to_json(cJSON* json_key, c_uint8_t ebi, ip_t ip, c_uint32_
     return;
 }
 
-
-
-status_t JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSON *pJson)
+status_t JSONTRANSFORM_StToJs_create_session_request(create_session_t *sess, cJSON *pJson)
 {
     d_assert(sess, return CORE_ERROR, "Null param");
     d_assert(pJson, return CORE_ERROR, "Null param");
@@ -345,7 +342,7 @@ void _add_imsi_to_struct(cJSON* json_key, c_int8_t *pImsi) {
 }
 
 
-void _add_uld_to_struct(cJSON* json_key, creat_session_t *sess) {
+void _add_uld_to_struct(cJSON* json_key, create_session_t *sess) {
     
     cJSON *uli = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_ULI);
     cJSON *eutra = cJSON_GetObjectItemCaseSensitive(uli, JSONKEY_4G_ULI_EUTRAL);
@@ -470,7 +467,7 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
  }
 
 
-status_t JSONTRANSFORM_JsToSt_create_session_request(creat_session_t *sess, cJSON *pJson)
+status_t JSONTRANSFORM_JsToSt_create_session_request(create_session_t *sess, cJSON *pJson)
 {
     /* imsi */
     _add_imsi_to_struct(pJson, sess->imsi_bcd);
@@ -602,7 +599,7 @@ status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBear
 }
 
 
-status_t JSONTRANSFORM_JsToSt_create_session_response(creat_session_t *sess, cJSON *pJson)
+status_t JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJSON *pJson)
 {
     /* imsi */
     _add_imsi_to_struct(pJson, sess->imsi_bcd);
@@ -631,5 +628,47 @@ status_t JSONTRANSFORM_JsToSt_create_session_response(creat_session_t *sess, cJS
     /* gummei */
     _add_gummei_to_struct(pJson, &sess->guti);
 
+    return CORE_OK;
+}
+
+status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJSON *pJson)
+{
+    char ip4_buf[INET6_ADDRSTRLEN];
+    char ip6_buf[INET6_ADDRSTRLEN];
+    /* imsi */
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, sess->imsi_bcd);
+
+    /* ebi */
+    add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
+
+    /* sgw_s1u_teid */
+    add_uint32_to_json(pJson, sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
+    
+    /* sgw_s1u_ip */
+    if(sess->sgw_ip.ipv4 && sess->sgw_ip.ipv6){
+        INET_NTOP(sess->sgw_ip.both.addr, ip4_buf);
+        INET6_NTOP(sess->sgw_ip.both.addr6, ip6_buf);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
+    }
+    else if(sess->sgw_ip.ipv4){
+        INET_NTOP(sess->sgw_ip.addr, ip4_buf);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR, ip4_buf);
+    }
+    else if(sess->sgw_ip.ipv6){
+        INET6_NTOP(sess->sgw_ip.addr6, ip6_buf);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR6, ip6_buf);
+    }
+
+    /* APN */
+    _add_apn_to_struct(pJson, sess->apn);
+
+    /* PDN Address Allocation */
+    return CORE_OK;
+}
+
+CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJSON *pJson)
+{
+    
     return CORE_OK;
 }
