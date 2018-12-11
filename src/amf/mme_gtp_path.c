@@ -114,7 +114,7 @@ status_t mme_gtp_close()
 
 status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 {
-#ifndef FIVE_G_CORE
+#if FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
@@ -165,6 +165,7 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 status_t mme_gtp_send_modify_bearer_request(
         mme_bearer_t *bearer, int uli_presence)
 {
+#ifndef FIVE_G_CORE
     status_t rv;
 
     gtp_xact_t *xact = NULL;
@@ -192,6 +193,18 @@ status_t mme_gtp_send_modify_bearer_request(
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
     return CORE_OK;
+#else
+    mme_ue_t *mme_ue = NULL;
+    pkbuf_t *pkbuf = NULL;
+    mme_ue = bearer->mme_ue;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf_json_build_modify_bearer(&pkbuf, bearer);
+    // d_info("send sbi sm context update start");
+    amf_sbi_send_sm_context_update(pkbuf);
+    // d_info("send sbi sm context update end");
+    pkbuf_free(pkbuf);
+    return CORE_OK;
+#endif
 }
 
 status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)

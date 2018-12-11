@@ -499,3 +499,100 @@ status_t JSONTRANSFORM_JsToSt_create_session_request(creat_session_t *sess, cJSO
 
     return CORE_OK;
 }
+
+void _add_uld_to_modfiy_bearer_struct(cJSON* json_key, modify_bearer_t *pModifyBearer) {
+    
+    cJSON *uli = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_ULI);
+    cJSON *eutra = cJSON_GetObjectItemCaseSensitive(uli, JSONKEY_4G_ULI_EUTRAL);
+    cJSON *tai = cJSON_GetObjectItemCaseSensitive(eutra, JSONKEY_4G_ULI_EUTRAL_TAI);
+    conv_json_to_plmnid(tai, &pModifyBearer->tai.plmn_id, JSONKEY_4G_ULI_EUTRAL_TAI_PLMNID);
+    cJSON *j_tai_tac = cJSON_GetObjectItemCaseSensitive(tai, JSONKEY_4G_ULI_EUTRAL_TAI_TAC);
+    pModifyBearer->tai.tac = atoi(j_tai_tac->valuestring);
+
+    cJSON *e_cgi = cJSON_GetObjectItemCaseSensitive(eutra, JSONKEY_4G_ULI_EUTRAL_ECGI);
+    conv_json_to_plmnid(e_cgi, &pModifyBearer->e_cgi.plmn_id, JSONKEY_4G_ULI_EUTRAL_ECGI_PLMNID);
+    cJSON *e_cgi_eutraCellId = cJSON_GetObjectItemCaseSensitive(e_cgi, JSONKEY_4G_ULI_EUTRAL_ECGI_EUTRACELLID);
+    pModifyBearer->e_cgi.cell_id = atoi(e_cgi_eutraCellId->valuestring);
+}
+
+
+void _add_json_to_struct_ui8_by_key(cJSON* json_key, c_uint8_t *ui8value, const char *jsonkeyString) {
+    
+    cJSON *j_sub_data = cJSON_GetObjectItemCaseSensitive(json_key, jsonkeyString);
+    // d_info(j_ebi->valuestring);
+    int tmpData = 0;
+    tmpData = atoi(j_sub_data->valuestring);
+    *ui8value = tmpData;
+     
+}
+
+void _add_json_to_struct_ui32_by_key(cJSON* json_key, c_uint32_t *ui32value, const char *jsonkeyString) {
+    
+    cJSON *j_sub_data = cJSON_GetObjectItemCaseSensitive(json_key, jsonkeyString);
+    // d_info(j_ebi->valuestring);
+    int tmpData = 0;
+    tmpData = atoi(j_sub_data->valuestring);
+    *ui32value = tmpData;
+     
+ }
+
+void _add_ipt_to_struct(cJSON* json_key, ip_t *pIP)
+{
+    c_sockaddr_t addr;
+    cJSON *j_enb_s1u_ip = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP);
+    cJSON *j_enb_s1u_ip_addr4 = cJSON_GetObjectItemCaseSensitive(j_enb_s1u_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR);
+    cJSON *j_enb_s1u_ip_addr6 = cJSON_GetObjectItemCaseSensitive(j_enb_s1u_ip, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR6);
+
+    pIP->ipv4 = atoi(j_enb_s1u_ip_addr4->valuestring);
+    pIP->ipv6 = atoi(j_enb_s1u_ip_addr6->valuestring);
+
+    if ((pIP->ipv4 == 1) && (pIP->ipv6 ==1)) {
+        core_inet_pton(AF_INET, j_enb_s1u_ip_addr4->valuestring, &addr);
+        memcpy((void *)&pIP->both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+        core_inet_pton(AF_INET6, j_enb_s1u_ip_addr6->valuestring, &addr);
+        memcpy((void *)&pIP->both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+    }
+    else if ((pIP->ipv4 == 1)) {
+        core_inet_pton(AF_INET, j_enb_s1u_ip_addr4->valuestring, &addr);
+        memcpy((void *)&pIP->both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+    }
+    else if ((pIP->ipv6 == 1)) {
+        core_inet_pton(AF_INET6, j_enb_s1u_ip_addr6->valuestring, &addr);
+        memcpy((void *)&pIP->both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+    }
+    else {
+        d_error("error ip_t");
+    }
+ }
+
+status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBearer, cJSON *pJson)
+{
+    /* imsi */
+    _add_imsi_to_struct(pJson, pModifyBearer->imsi_bcd);
+    
+    // c_uint8_t       uli_presence;
+    _add_json_to_struct_ui8_by_key(pJson, &pModifyBearer->uli_presence, JSONKEY_4G_ULI_PRESENCE);
+
+    /* user location information */
+    _add_uld_to_modfiy_bearer_struct(pJson, pModifyBearer);  
+    
+    // /* serving network */
+    _add_serving_network_to_struct(pJson, &pModifyBearer->visited_plmn_id);
+
+    /* radio access technology */
+    _add_radio_type_to_struct(pJson, pModifyBearer->rat_type);
+
+    /* ebi */
+    _add_ebi_to_struct(pJson, &pModifyBearer->ebi);
+    
+    /* gummei */
+    _add_gummei_to_struct(pJson, &pModifyBearer->guti);
+
+    // ip_t            enb_s1u_ip;
+    _add_ipt_to_struct(pJson, &pModifyBearer->enb_s1u_ip);
+    // c_uint32_t      enb_s1u_teid;
+    _add_json_to_struct_ui32_by_key(pJson, &pModifyBearer->enb_s1u_teid, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_TEID);
+    
+
+    return CORE_OK;
+}
