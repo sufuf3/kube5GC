@@ -102,12 +102,40 @@ void smf_s11_handle_modify_bearer_request(gtp_xact_t *s11_xact,
     d_assert(rv == CORE_OK, return, "xact_commit error");
 }
 
-void smf_s11_handle_create_session_request_by_JsonCreateSession(smf_sess_t *sess, creat_session_t *createSession)
+void smf_n11_handle_create_session_request_by_JsonCreateSession(smf_sess_t *sess, creat_session_t *createSession)
 {
-    d_trace(3, "[SMF] S11 Create Session Reqeust by_JsonCreateSession\n");
+    d_trace(3, "[SMF] N11 Create Session Reqeust by_JsonCreateSession\n");
     status_t rv;
 
     rv = smf_pfcp_send_session_establishment_request(sess);
     d_assert(rv == CORE_OK, , "pfcp session create fail");
+
+}
+
+void smf_n11_handle_update_session_request_by_JsonUpdateSession(smf_sess_t *sess, modify_bearer_t *pModifyBearer)
+{
+    d_trace(3, "[SMF] N11 update Session Reqeust by_JsonUpdateSession\n");
+    status_t rv;
+    pkbuf_t *pkbuf = NULL;
+    smf_bearer_t *bearer = NULL;
+
+    bearer = smf_bearer_find_by_ebi(sess, pModifyBearer->ebi);
+    d_assert(bearer, return, "Bearer Context Not Found");
+
+    
+    bearer->enb_s1u_teid = ntohl(pModifyBearer->enb_s1u_teid);
+    bearer->addr = pModifyBearer->enb_s1u_ip.addr;
+
+    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+        sess->mme_s11_teid, sess->sgw_s11_teid);
+    d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
+        bearer->sgw_s1u_teid, bearer->enb_s1u_teid);
+
+    rv = smf_pfcp_send_session_modification_request(sess);
+    d_assert(rv == CORE_OK, , "pfcp session modification fail");
+
+    rv = smf_s11_build_modify_bearer_response(
+        &pkbuf, sess);
+    d_assert(rv == CORE_OK, return, "gtp build error");
 
 }

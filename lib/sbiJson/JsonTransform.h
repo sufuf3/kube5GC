@@ -41,6 +41,7 @@ typedef struct _modify_bearer_t {
     c_uint8_t       ebi;
     ip_t            enb_s1u_ip;
     c_uint32_t      enb_s1u_teid;
+    c_int8_t        apn[MAX_APN_LEN+1];
 } modify_bearer_t;
 
 CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_create_session_request(creat_session_t *sess, cJSON *pJson);

@@ -337,3 +337,4 @@ CORE_DECLARE(smf_subnet_t*)     smf_subnet_next(smf_subnet_t *subnet);
 
 
 CORE_DECLARE(smf_sess_t*)       smf_sess_add_or_find_by_JsonCreateSession(creat_session_t *createSession);
+CORE_DECLARE(smf_sess_t*)       smf_sess_find_by_JsonUpdateSession(modify_bearer_t *pModifyBearer);

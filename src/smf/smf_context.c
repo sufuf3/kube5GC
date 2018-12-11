@@ -1738,3 +1738,55 @@ smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(creat_session_t *createSes
 #endif
     return sess;
 }
+
+smf_sess_t *smf_sess_find_by_JsonUpdateSession(modify_bearer_t *pModifyBearer)
+{
+    smf_sess_t *sess = NULL;
+    c_int8_t apn[MAX_APN_LEN] = {0};
+    c_uint8_t imsi[8] = {0};
+    int imsi_len = 0;
+    if (pModifyBearer->imsi_bcd == NULL) {
+        d_error("No IMSI");
+        return NULL;
+    }
+    // apn_parse(apn, req->access_point_name.data, req->access_point_name.len);
+    if (pModifyBearer->apn != NULL) {
+        memcpy(apn, pModifyBearer->apn, strlen(pModifyBearer->apn));
+    }
+    else {
+        d_error("No APN");
+        return NULL;
+    }
+          
+    core_bcd_to_buffer(pModifyBearer->imsi_bcd, imsi, &imsi_len);
+
+#if 0 // dummy 
+    d_trace(10, "APN");
+    // d_print_hex(apn, strlen(apn));
+
+    d_trace(10, "IMSI BCD");
+    // d_print_hex(createSession->imsi_bcd, strlen(createSession->imsi_bcd));
+    d_trace(10, "IMSI BCD");
+    // d_print_hex(createSession->imsi_bcd, strlen(createSession->imsi_bcd));
+    d_trace(10, "IMSI LEN: %d ", imsi_len);
+
+    // memcpy(imsi, "\x20\x9A\xFA\xD4\x29\x7F\x00\x00", 8);
+    // memcpy(apn, "\x69\x6E\x74\x65\x72\x6E\x65\x74", 9);
+
+    sess = smf_sess_find_by_imsi_apn(imsi, 8, apn);
+    if (!sess)
+    {
+        sess = smf_sess_add(imsi, 8, apn,
+            3,
+            5);
+        d_assert(sess, return NULL, "No Session Context");
+    }
+#else
+    sess = smf_sess_find_by_imsi_apn(imsi, imsi_len, apn);
+    if (!sess)
+    {
+        d_assert(sess, return NULL, "No Session Context");
+    }
+#endif
+    return sess;
+}

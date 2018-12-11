@@ -299,7 +299,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
                     d_trace(10, "Create Session OK");
                     smf_json_handler_create_session(&recvbuf, &createSession);
                     sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
-                    smf_s11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
+                    smf_n11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
                     d_trace(10, "Create Session Ended");
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
                     break;
@@ -309,8 +309,8 @@ void smf_state_operational(fsm_t *s, event_t *e)
                     modify_bearer_t modifyBearer = {0};
                     d_trace(10, "update OK");
                     smf_json_handler_update_session(&recvbuf, &modifyBearer);
-                    // sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
-                    // smf_s11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
+                    sess = smf_sess_find_by_JsonUpdateSession(&modifyBearer);
+                    smf_n11_handle_update_session_request_by_JsonUpdateSession(sess, &modifyBearer);
                     d_trace(10, "update Ended");
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
                     break;

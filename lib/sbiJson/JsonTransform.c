@@ -287,6 +287,8 @@ status_t JSONTRANSFORM_StToJs_modify_bearer_request(modify_bearer_t *sess, cJSON
     /* modified bearer context */
     add_m_bearer_ctx_to_json(pJson, sess->ebi, sess->enb_s1u_ip, sess->enb_s1u_teid);
 
+    /* apn */
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
     
     return CORE_OK;
 }
@@ -593,6 +595,8 @@ status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBear
     // c_uint32_t      enb_s1u_teid;
     _add_json_to_struct_ui32_by_key(pJson, &pModifyBearer->enb_s1u_teid, JSONKEY_4G_M_BEARER_CTX_ENB_S1U_TEID);
     
-
+    /* APN */
+    _add_apn_to_struct(pJson, pModifyBearer->apn);
+    
     return CORE_OK;
 }

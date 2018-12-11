@@ -108,7 +108,7 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_
     memcpy(&modifyBearer.ebi, &bearer->ebi, sizeof(bearer->ebi));
     memcpy(&modifyBearer.enb_s1u_ip, &bearer->enb_s1u_ip, sizeof(bearer->enb_s1u_ip));
     memcpy(&modifyBearer.enb_s1u_teid, &bearer->enb_s1u_teid, sizeof(bearer->enb_s1u_teid));
-
+    memcpy(&modifyBearer.apn, &bearer->sess->pdn->apn, sizeof( bearer->sess->pdn->apn));
 
     JSONTRANSFORM_StToJs_modify_bearer_request(&modifyBearer, j_modifyBearerReq);
     string = cJSON_Print(j_modifyBearerReq);
