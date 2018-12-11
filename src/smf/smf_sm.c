@@ -298,8 +298,11 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 case N11_TYPE_SM_CONTEXT_CREATE:
                 {
                     d_trace(10, "Create Session OK");
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
                     smf_json_handler_create_session(&recvbuf, &createSession);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
                     sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
                     smf_n11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
                     d_trace(10, "Create Session Ended");
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");

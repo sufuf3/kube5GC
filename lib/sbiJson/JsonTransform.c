@@ -198,7 +198,9 @@ status_t JSONTRANSFORM_StToJs_create_session_request(create_session_t *sess, cJS
 #if JSON_DEBUG
     d_info("%d %s \n", __LINE__, __FUNCTION__);
 #endif
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, sess->imsi_bcd);
+    char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
+    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
     /* user location information */
     add_uli_to_json(pJson, sess->tai, sess->e_cgi);
 
@@ -269,7 +271,9 @@ status_t JSONTRANSFORM_StToJs_modify_bearer_request(modify_bearer_t *sess, cJSON
     d_assert(pJson, return CORE_ERROR, "Null param");
 
     /* imsi */
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, sess->imsi_bcd);
+    char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
+    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
     
     /* uli */
     if(sess->uli_presence)
@@ -331,11 +335,10 @@ void conv_json_to_plmnid(cJSON* json_key, plmn_id_t* ptr_plmnid,char* key){
     return;
 }
 
-void _add_imsi_to_struct(cJSON* json_key, c_int8_t *pImsi) {
-    
+void _add_imsi_to_struct(cJSON* json_key, c_uint8_t *pImsi, c_int32_t *imsi_len) {
     cJSON *j_imsi = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_IMSI);
-    memcpy(pImsi, j_imsi->valuestring, strlen(j_imsi->valuestring));
-    memset(&pImsi[15], 0x00, 1);
+    d_info("_add_imsi_to_struct: %s", j_imsi->valuestring);
+    core_bcd_to_buffer(j_imsi->valuestring, pImsi, imsi_len);
 #if 0
     d_info("j_imsi->valuestring %s ", j_imsi->valuestring);
     int i = 0;
@@ -379,7 +382,6 @@ void _add_pco_to_struct(cJSON* json_key, ue_pco_t *ue_pco) {
     cJSON *j_pco = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_PCO);
     d_info(j_pco->valuestring);
     ue_pco->length = strlen(j_pco->valuestring) / 2;
-    ue_pco->buffer = core_calloc(ue_pco->length , sizeof(c_uint8_t));
     // strcpy(sess->ue_pco.buffer, cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_PCO) -> valuestring);
     core_ascii_to_hex(j_pco->valuestring, ue_pco->length * 2, ue_pco->buffer, ue_pco->length);
     d_info("SMF PCO:");
@@ -406,35 +408,49 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     bzero(paa_pdn_len, 16);
     
     // PDN Type
-    d_trace(10, "PDN Type: %d", pdn->paa.pdn_type);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     strcpy(paa_pdn_type, j_pdn_paa_pdntype->valuestring);
-    // d_info(paa_pdn_type);
+    d_info(paa_pdn_type);
     pdn->paa.pdn_type = atoi(paa_pdn_type);
-    // d_info(paa_pdn_type);
+    d_trace(-1, "PDN Type: %d\n", pdn->paa.pdn_type);
     
     switch (pdn->paa.pdn_type) {
         case SBI_PDN_TYPE_IPV4:
         {
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             core_inet_pton(AF_INET, j_pdn_paa_addr->valuestring, &addr);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             memcpy((void *)&pdn->paa.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             d_trace(10, "IPV4 address: %d", pdn->paa.addr);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             break;
         }
         case SBI_PDN_TYPE_IPV6:
         {
             char buf[INET6_ADDRSTRLEN];
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             core_inet_pton(AF_INET6, j_pdn_paa_addr6->valuestring, &addr);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             memcpy((void *)&pdn->paa.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             CORE_ADDR(&addr, buf);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             d_trace(10, "IPV6 address: %s", buf);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             break;
         }
         case SBI_PDN_TYPE_IPV4V6:
         {
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             core_inet_pton(AF_INET, j_pdn_paa_addr->valuestring, &addr);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             memcpy((void *)&pdn->paa.both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             core_inet_pton(AF_INET6, j_pdn_paa_addr6->valuestring, &addr);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             memcpy((void *)&pdn->paa.both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             break;
         }
         default:
@@ -442,15 +458,23 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     }
     
     // TODO: This len rename to Prefix Len
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     pdn->paa.len = atoi(paa_pdn_len);
 
     cJSON *j_pdn_ambr = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_AMBR);
     cJSON *j_pdn_ambr_uplink = cJSON_GetObjectItemCaseSensitive(j_pdn_ambr, JSONKEY_4G_PDN_AMBR_UPLINK);
     cJSON *j_pdn_ambr_downlink = cJSON_GetObjectItemCaseSensitive(j_pdn_ambr, JSONKEY_4G_PDN_AMBR_DOWMLINK);
-    pdn->ambr.uplink = atoi(j_pdn_ambr_uplink->valuestring);
-    pdn->ambr.downlink = atoi(j_pdn_ambr_downlink->valuestring);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+    if (j_pdn_ambr_uplink && j_pdn_ambr_downlink) {
+        pdn->ambr.uplink = atoi(j_pdn_ambr_uplink->valuestring);
+        d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+        pdn->ambr.downlink = atoi(j_pdn_ambr_downlink->valuestring);
+        d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+    }
     
+        d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     cJSON *j_pdn_pdnType = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_PDNTYPE);
+        d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     pdn->pdn_type = atoi(j_pdn_pdnType->valuestring);
 
 }
@@ -475,24 +499,31 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
 status_t JSONTRANSFORM_JsToSt_create_session_request(create_session_t *sess, cJSON *pJson)
 {
     /* imsi */
-    _add_imsi_to_struct(pJson, sess->imsi_bcd);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
     
     /* user location information */
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     _add_uld_to_struct(pJson, sess);
     
     // /* serving network */
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     _add_serving_network_to_struct(pJson, &sess->visited_plmn_id);
 
     /* radio access technology */
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     _add_radio_type_to_struct(pJson, sess->rat_type);
 
     /* protocol_configuration_options(nas) */
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     _add_pco_to_struct(pJson, &sess->ue_pco);
     
     /* APN */
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     _add_apn_to_struct(pJson, sess->apn);
 
     /* packet data network */
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     _add_pdn_to_struct(pJson, &sess->pdn);
 
     /* ebi */
@@ -503,6 +534,7 @@ status_t JSONTRANSFORM_JsToSt_create_session_request(create_session_t *sess, cJS
     sess->ebi = ebi;
 
     /* gummei */
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     _add_gummei_to_struct(pJson, &sess->guti);
 
     return CORE_OK;
@@ -583,7 +615,7 @@ void _add_enb_s1u_teid(cJSON *json_key, c_uint32_t *teid)
 status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBearer, cJSON *pJson)
 {
     /* imsi */
-    _add_imsi_to_struct(pJson, pModifyBearer->imsi_bcd);
+    _add_imsi_to_struct(pJson, pModifyBearer->imsi, &pModifyBearer->imsi_len);
     
     // c_uint8_t       uli_presence;
     _add_json_to_struct_ui8_by_key(pJson, &pModifyBearer->uli_presence, JSONKEY_4G_ULI_PRESENCE);
@@ -621,18 +653,25 @@ void _add_sgw_ipt_to_struct(cJSON* json_key, ip_t *pIP)
     cJSON *j_sgw_s1u_addr6 = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_SGW_S1U_IP_IPV6);
 
     if (j_sgw_s1u_addr4 && j_sgw_s1u_addr6) {
+        pIP->ipv6 = 1; pIP->ipv4 = 1;
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
         core_inet_pton(AF_INET, j_sgw_s1u_addr4->valuestring, &addr);
         memcpy((void *)&pIP->both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
         core_inet_pton(AF_INET6, j_sgw_s1u_addr6->valuestring, &addr);
         memcpy((void *)&pIP->both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
     }
     else if (j_sgw_s1u_addr4) {
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
         core_inet_pton(AF_INET, j_sgw_s1u_addr4->valuestring, &addr);
-        memcpy((void *)&pIP->both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+        pIP->ipv6 = 0; pIP->ipv4 = 1;
+        memcpy((void *)&pIP->addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
     }
     else if (j_sgw_s1u_addr6) {
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
         core_inet_pton(AF_INET6, j_sgw_s1u_addr6->valuestring, &addr);
-        memcpy((void *)&pIP->both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+        pIP->ipv6 = 1; pIP->ipv4 = 0;
+        memcpy((void *)&pIP->addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
     }
     else {
         d_error("error ip_t");
@@ -642,7 +681,7 @@ void _add_sgw_ipt_to_struct(cJSON* json_key, ip_t *pIP)
 status_t JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJSON *pJson)
 {
     /* imsi */
-    _add_imsi_to_struct(pJson, sess->imsi_bcd);
+    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
 
     /* sgw_s1u_teid */
     _add_json_to_struct_ui32_by_key(pJson, &sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
@@ -664,6 +703,7 @@ status_t JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJ
     sess->ebi = ebi;
 
     /* sgw_ip */
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     _add_sgw_ipt_to_struct(pJson, &sess->sgw_ip);
     
     return CORE_OK;
@@ -674,7 +714,9 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
     char ip4_buf[INET6_ADDRSTRLEN];
     char ip6_buf[INET6_ADDRSTRLEN];
     /* imsi */
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, sess->imsi_bcd);
+    char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
+    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
 
     /* ebi */
     add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
@@ -715,12 +757,16 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
         d_info("%d %s \n", __LINE__, __FUNCTION__);
         cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
     }
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
 
     /* APN */
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
     cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
 
     /* PDN Address Allocation */
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
     add_pdn_to_json(pJson , &sess->pdn);
     
+        d_info("%d %s \n", __LINE__, __FUNCTION__);
     return CORE_OK;
 }

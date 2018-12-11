@@ -1,6 +1,7 @@
 #include <cJSON/cJSON.h>
 
 #include "core_debug.h"
+#include "core_lib.h"
 #include "core_pkbuf.h"
 #include "3gpp_types.h"
 #include "mme_context.h"
@@ -83,11 +84,10 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     bearer = core_calloc(1, sizeof(mme_bearer_t));
 
     JSONTRANSFORM_JsToSt_create_session_request(&createSession, session);
-    memcpy(mme_ue->imsi_bcd, createSession.imsi_bcd, sizeof(createSession.imsi_bcd));
-    mme_ue->imsi_len = strlen(createSession.imsi_bcd)/2;
-    if (mme_ue->imsi_len %2 == 1) {
-        mme_ue->imsi_len += 1;
-    }
+
+    core_buffer_to_bcd(createSession.imsi, createSession.imsi_len, mme_ue->imsi_bcd);
+    memcpy(mme_ue->imsi, createSession.imsi, createSession.imsi_len);
+    mme_ue->imsi_len = createSession.imsi_len;
 
     if(strcmp(mme_ue->imsi_bcd, ori_mme_ue->imsi_bcd) != 0) {
         d_error("imsi_data Error");

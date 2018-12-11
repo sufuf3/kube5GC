@@ -431,6 +431,10 @@ status_t smf_n11_build_create_session_response(
 
     memcpy(&createSession.pdn, &sess->pdn, sizeof(sess->pdn));
 
+    // IMSI
+    memcpy(createSession.imsi, sess->imsi, sess->imsi_len);
+    createSession.imsi_len = sess->imsi_len;
+
     // PCO
     pco_len = smf_sbi_pco_build(pco_buf, (c_uint8_t *)&sess->pco_buf, sess->pco_len);
     d_assert(pco_len > 0, return CORE_ERROR, "pco build failed");

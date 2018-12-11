@@ -18,7 +18,8 @@ typedef struct _ue_pco_t {
 }ue_pco_t;
 
 typedef struct _create_session_t {
-    c_int8_t        imsi_bcd[MAX_IMSI_BCD_LEN+1];
+    c_uint8_t       imsi[MAX_IMSI_LEN];
+    c_int32_t       imsi_len;
     tai_t           tai;
     e_cgi_t         e_cgi;
     plmn_id_t       visited_plmn_id;
@@ -33,7 +34,8 @@ typedef struct _create_session_t {
 } create_session_t;
 
 typedef struct _modify_bearer_t {
-    c_int8_t        imsi_bcd[MAX_IMSI_BCD_LEN+1];
+    c_uint8_t       imsi[MAX_IMSI_LEN];
+    c_int32_t       imsi_len;
     c_uint8_t       uli_presence;
     tai_t           tai;
     e_cgi_t         e_cgi;

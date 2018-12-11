@@ -200,6 +200,7 @@ status_t amf_sbi_server_open()
 
 status_t amf_sbi_send_sm_context_create(pkbuf_t *pkbuf)
 {
+    d_info("AMF SMContextCreate send");
     status_t rv;
     rv = unixgram_sendto(smContextCreateSock, pkbuf, &smContextCreateRemoteAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Create Send Failed!");

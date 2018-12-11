@@ -917,7 +917,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     d_trace(10, "create Session Rsp");
                     amf_json_handler_create_session_response(&recvbuf, &createSession);
                     
-                    mme_ue = mme_ue_find_by_imsi((c_uint8_t *)createSession.imsi_bcd, strlen(createSession.imsi_bcd));
+                    mme_ue = mme_ue_find_by_imsi(createSession.imsi, createSession.imsi_len);
                     d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
 
                     amf_n11_handle_create_session_response(mme_ue, &createSession);

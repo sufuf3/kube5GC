@@ -29,7 +29,8 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     d_assert(mme_ue, return CORE_ERROR, "Null param");
 
     // d_info("createSession:%d", &createSession);
-    memcpy(createSession.imsi_bcd,  mme_ue->imsi_bcd, sizeof( mme_ue->imsi_bcd));
+    memcpy(createSession.imsi,  mme_ue->imsi, mme_ue->imsi_len);
+    createSession.imsi_len = mme_ue->imsi_len;
 #if 0
     int i = 0;
     for (i = 0; i<16; i++)
@@ -99,7 +100,8 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_
     d_assert(bearer, return CORE_ERROR, "Null param");
     
     // c_uint32_t      enb_s1u_teid;
-    memcpy(modifyBearer.imsi_bcd,  bearer->mme_ue->imsi_bcd, sizeof( bearer->mme_ue->imsi_bcd));
+    memcpy(modifyBearer.imsi, bearer->mme_ue->imsi, bearer->mme_ue->imsi_len);
+    modifyBearer.imsi_len = bearer->mme_ue->imsi_len; 
     //TODO: fix it how to get uli presence?
     memcpy(&modifyBearer.uli_presence, "\x01" , sizeof(c_uint8_t));
     memcpy(&modifyBearer.tai, &bearer->mme_ue->tai, sizeof(bearer->mme_ue->tai));

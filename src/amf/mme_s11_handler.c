@@ -687,10 +687,14 @@ void amf_n11_handle_create_session_response(
     pdn = sess->pdn;
     d_assert(pdn, return, "Null param");
 
-    memcpy(&pdn->paa, &pCreateSession->pdn.paa, pCreateSession->pdn.paa.len);
-
+    memcpy(&pdn->paa, &pCreateSession->pdn.paa, sizeof(pCreateSession->pdn.paa));
+    d_info("PAA PDN: %d", pCreateSession->pdn.paa.pdn_type);
+    d_info("PAA PDN: %d", bearer->sess->pdn->paa.pdn_type);
+    d_info("PAA PDN: %d", pdn->paa.pdn_type);
     /* PCO */
-    memcpy(&sess->pgw_pco, pCreateSession->ue_pco.buffer, pCreateSession->ue_pco.length);
+    sess->pgw_pco.data = core_calloc(pCreateSession->ue_pco.length, sizeof(c_uint8_t));
+    memcpy(sess->pgw_pco.data, pCreateSession->ue_pco.buffer, pCreateSession->ue_pco.length);
+    sess->pgw_pco.len = pCreateSession->ue_pco.length;
 
     /* Data Plane(UL) : SGW-S1U */
     bearer->sgw_s1u_teid = pCreateSession->sgw_s1u_teid;
@@ -700,7 +704,9 @@ void amf_n11_handle_create_session_response(
     d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
         bearer->enb_s1u_teid, bearer->sgw_s1u_teid);
 
-    memcpy(&bearer->sgw_s1u_ip, &pCreateSession->sgw_ip, IPV4V6_LEN);
+    memcpy(&bearer->sgw_s1u_ip, &pCreateSession->sgw_ip, sizeof(ip_t));
+    d_info("ipv4: %d, ipv6: %d", pCreateSession->sgw_ip.ipv4, pCreateSession->sgw_ip.ipv6);
+    d_info("ipv4: %d, ipv6: %d", bearer->sgw_s1u_ip.ipv4, bearer->sgw_s1u_ip.ipv6);
 
     d_info("create Session");
     if (FSM_CHECK(&mme_ue->sm, emm_state_initial_context_setup))
