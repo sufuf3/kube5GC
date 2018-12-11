@@ -100,7 +100,7 @@ func init() {
 func handleSMContextCreate() {
 	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts"
 	var buf []byte
-	buf = make([]byte, 1000)
+	buf = make([]byte, 4096)
 	for {
 		_, _, err2 := smContextCreateConn.ReadFromUnix(buf)
 		if err2 != nil {
@@ -126,11 +126,12 @@ func handleSMContextCreate() {
 }
 
 func handleSMContextUpdate() {
+	log.Println("AMF SM Context Update")
 	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/modify"
 	var buf []byte
-	buf = make([]byte, 1000)
+	buf = make([]byte, 4096)
 	for {
-		_, _, err2 := smContextCreateConn.ReadFromUnix(buf)
+		_, _, err2 := smContextUpdateConn.ReadFromUnix(buf)
 		if err2 != nil {
 			log.Fatal(err2)
 		}
@@ -144,7 +145,7 @@ func handleSMContextUpdate() {
 			log.Fatal(fmt.Errorf("error making request: %v", err))
 		}
 		body, _ := ioutil.ReadAll(resp.Body)
-		_, err = smContextCreateConn.Write(body)
+		_, err = smContextUpdateConn.Write(body)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -156,9 +157,9 @@ func handleSMContextUpdate() {
 func handleSMContextRelease() {
 	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/release"
 	var buf []byte
-	buf = make([]byte, 1000)
+	buf = make([]byte, 4096)
 	for {
-		_, _, err2 := smContextCreateConn.ReadFromUnix(buf)
+		_, _, err2 := smContextReleaseConn.ReadFromUnix(buf)
 		if err2 != nil {
 			log.Fatal(err2)
 		}
@@ -172,7 +173,7 @@ func handleSMContextRelease() {
 			log.Fatal(fmt.Errorf("error making request: %v", err))
 		}
 		body, _ := ioutil.ReadAll(resp.Body)
-		_, err = smContextCreateConn.Write(body)
+		_, err = smContextReleaseConn.Write(body)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -184,9 +185,9 @@ func handleSMContextRelease() {
 func handleSMContextRetrieve() {
 	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/retrieve"
 	var buf []byte
-	buf = make([]byte, 1000)
+	buf = make([]byte, 4096)
 	for {
-		_, _, err2 := smContextCreateConn.ReadFromUnix(buf)
+		_, _, err2 := smContextRetrieveConn.ReadFromUnix(buf)
 		if err2 != nil {
 			log.Fatal(err2)
 		}
@@ -200,7 +201,7 @@ func handleSMContextRetrieve() {
 			log.Fatal(fmt.Errorf("error making request: %v", err))
 		}
 		body, _ := ioutil.ReadAll(resp.Body)
-		_, err = smContextCreateConn.Write(body)
+		_, err = smContextRetrieveConn.Write(body)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -210,7 +211,6 @@ func handleSMContextRetrieve() {
 }
 
 func main() {
-	log.Println("Hello")
 	go handleSMContextCreate()
 	go handleSMContextUpdate()
 	go handleSMContextRelease()
