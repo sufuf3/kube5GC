@@ -118,7 +118,7 @@ typedef struct _smf_sess_t {
     gtp_xact_t      *s11_xact;
 
     /* PCO */
-    pco_t           pco;
+    uint8_t         pco_buf[MAX_PCO_LEN];
     uint32_t        pco_len;
 } smf_sess_t;
 

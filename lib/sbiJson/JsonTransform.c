@@ -112,14 +112,14 @@ void add_pdn_to_json(cJSON* json_key, pdn_t* _pdn){
 #endif
     char buf[CORE_ADDRSTRLEN], buf2[CORE_ADDRSTRLEN];
     
-    if (_pdn->pdn_type == SBI_PDN_TYPE_IPV4){
+    if (_pdn->paa.pdn_type == SBI_PDN_TYPE_IPV4){
         INET_NTOP(&_pdn->paa.addr, buf);
 #if JSON_DEBUG
         d_info("%s %d str _pdn->paa.addr,:%s\n", __LINE__, __FUNCTION__, buf);
 #endif
         cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_ADDR, buf);
     }
-    else if (_pdn->pdn_type == SBI_PDN_TYPE_IPV6){
+    else if (_pdn->paa.pdn_type == SBI_PDN_TYPE_IPV6){
         INET6_NTOP(&_pdn->paa.addr6, buf);
 #if JSON_DEBUG
         d_info("%d %s str _pdn->paa.addr6,:%s\n", __LINE__, __FUNCTION__, buf);
@@ -127,7 +127,7 @@ void add_pdn_to_json(cJSON* json_key, pdn_t* _pdn){
         add_uint8_to_json(paa, _pdn->paa.len, JSONKEY_4G_PDN_PAA_LEN);
         cJSON_AddStringToObject(paa, JSONKEY_4G_PDN_PAA_ADDR6, buf);
     }
-    else if (_pdn->pdn_type == SBI_PDN_TYPE_IPV4V6){
+    else if (_pdn->paa.pdn_type == SBI_PDN_TYPE_IPV4V6){
         INET_NTOP(&_pdn->paa.both.addr, buf);
 #if JSON_DEBUG
         d_info("%d %s str _pdn->paa.addr,:%s\n", __LINE__, __FUNCTION__, buf);
@@ -221,7 +221,9 @@ status_t JSONTRANSFORM_StToJs_create_session_request(create_session_t *sess, cJS
 #if JSON_DEBUG
         d_info("%d %s \n", __LINE__, __FUNCTION__);
 #endif
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, uint_to_buffer(conv, sess->ue_pco.buffer, sess->ue_pco.length));
+        core_hex_to_ascii_no_space(sess->ue_pco.buffer, sess->ue_pco.length, conv, sizeof(conv));
+        d_info(conv);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, conv);
     }
     
     /* APN */
@@ -375,11 +377,13 @@ void _add_radio_type_to_struct(cJSON* json_key, c_uint8_t *radioType) {
 void _add_pco_to_struct(cJSON* json_key, ue_pco_t *ue_pco) {
 
     cJSON *j_pco = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_PCO);
-    
-    ue_pco->length = strlen(j_pco->valuestring);
-    ue_pco->buffer = core_calloc(ue_pco->length +1 , sizeof(c_uint8_t));
+    d_info(j_pco->valuestring);
+    ue_pco->length = strlen(j_pco->valuestring) / 2;
+    ue_pco->buffer = core_calloc(ue_pco->length , sizeof(c_uint8_t));
     // strcpy(sess->ue_pco.buffer, cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_PCO) -> valuestring);
-    core_ascii_to_hex(j_pco->valuestring, ue_pco->length, ue_pco->buffer, (ue_pco->length)/2 );
+    core_ascii_to_hex(j_pco->valuestring, ue_pco->length * 2, ue_pco->buffer, ue_pco->length);
+    d_info("SMF PCO:");
+    d_print_hex(ue_pco->buffer, ue_pco->length);
 }
 
 void _add_apn_to_struct(cJSON* json_key, c_int8_t *apn) {
@@ -492,8 +496,12 @@ status_t JSONTRANSFORM_JsToSt_create_session_request(create_session_t *sess, cJS
     _add_pdn_to_struct(pJson, &sess->pdn);
 
     /* ebi */
-    _add_ebi_to_struct(pJson, &sess->ebi);
-    
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+    c_int16_t ebi;
+    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
+    ebi = atoi(j_ebi->valuestring);
+    sess->ebi = ebi;
+
     /* gummei */
     _add_gummei_to_struct(pJson, &sess->guti);
 

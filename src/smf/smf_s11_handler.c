@@ -106,9 +106,9 @@ void smf_n11_handle_create_session_request_by_JsonCreateSession(smf_sess_t *sess
 {
     d_trace(3, "[SMF] N11 Create Session Reqeust by_JsonCreateSession\n");
     status_t rv;
-
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     if (createSession->ue_pco.length != 0) {
-        memcpy(&sess->pco, &createSession->ue_pco.buffer, createSession->ue_pco.length);
+        memcpy(sess->pco_buf, createSession->ue_pco.buffer, createSession->ue_pco.length);
         sess->pco_len = createSession->ue_pco.length;
     } else {
         d_assert(createSession->ue_pco.length != 0, return, "NO PCO");

@@ -1084,8 +1084,7 @@ smf_sess_t* smf_sess_add(
     else
         d_assert(0, return NULL, "Unsupported PDN Type(%d)", pdn_type);
     
-    if ((pdn_type & GTP_PDN_TYPE_IPV4) == 1)
-        sess->smf_n4_seid = sess->index | ((c_uint64_t)sess->ipv4->addr[0] << 32);
+    sess->smf_n4_seid = sess->index;
     sess->sgw_s11_teid = sess->index;
     
     /* Generate Hash Key : IMSI + APN */
