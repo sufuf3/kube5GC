@@ -907,7 +907,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
         case AMF_EVT_N11_MESSAGE:
         {
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
-            create_session_t createSession = {0};
+            
 	        int msg_type = event_get_param2(e);
             mme_ue_t *mme_ue = NULL;
             switch (msg_type)
@@ -915,6 +915,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 case N11_SM_CONTEXT_CREATE:
                 {
                     d_trace(10, "create Session Rsp");
+                    create_session_t createSession = {0};
                     amf_json_handler_create_session_response(&recvbuf, &createSession);
                     
                     mme_ue = mme_ue_find_by_imsi(createSession.imsi, createSession.imsi_len);
@@ -935,6 +936,15 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 }   
                 case N11_SM_CONTEXT_UPDATE:
                 {    
+                    d_trace(10, "update Session Rsp");
+                    modify_bearer_t modifyBearer = {0};
+                    amf_json_handler_update_session_response(&recvbuf, &modifyBearer);
+                    
+                    mme_ue = mme_ue_find_by_imsi(modifyBearer.imsi, modifyBearer.imsi_len);
+                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+                    
+                    amf_n11_handle_modify_bearer_response(mme_ue, &modifyBearer);
+                    d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
                     break;
                 }
                 default :
