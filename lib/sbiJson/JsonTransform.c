@@ -779,3 +779,14 @@ status_t JSONTRANSFORM_JsToSt_update_session_response(modify_bearer_t *sess, cJS
 
     return CORE_OK;
 }
+
+
+status_t JSONTRANSFORM_StToJs_update_session_response(modify_bearer_t *sess, cJSON *pJson)
+{
+    /* imsi */
+    char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
+    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
+
+    return CORE_OK;
+}

@@ -283,13 +283,19 @@ void smf_n4_handle_session_establishment_response(
 void smf_n4_handle_session_modification_response(
         pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_modification_response_t *rsp)
 {
+
     d_trace(3, "[SMF] Session Modification Response\n");
-    
+#ifndef FIVE_G_CORE    
     if (!rsp->cause.presence)
     {
         d_error("session_modification_response error: no Cause");
         return;
     }
+#else
+    pkbuf_t *pkbuf = NULL;
+    smf_n11_build_create_session_response(&pkbuf, sess);
+    smf_sbi_send_sm_context_update(pkbuf);
+#endif
 }
 
 void smf_n4_handle_session_deletion_response(
