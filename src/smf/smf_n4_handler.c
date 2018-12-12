@@ -250,8 +250,33 @@ void smf_n4_handle_session_establishment_response(
     }
 #else
     pkbuf_t *pkbuf = NULL;
-    smf_n11_build_create_session_response(&pkbuf, sess);
-    smf_sbi_send_sm_context_create(pkbuf);
+    pfcp_f_seid_t *up_f_seid = NULL;
+    c_uint8_t cause;
+    
+    if (!rsp->cause.presence)
+    {
+        d_error("session_establishment_response error: no Cause");
+        return;
+    }
+    
+    if (!rsp->up_f_seid.presence)
+    {
+        d_error("session_establishment_response error: no UP F-SEID");
+        return;
+    }
+    
+    cause = *((c_uint8_t*)rsp->cause.data);
+    up_f_seid = rsp->up_f_seid.data;
+    
+    if (cause != PFCP_CAUSE_SUCCESS)
+    {
+        d_info("association_setup_response cause: %d", pfcp_cause_get_name(cause));
+    } else
+    {
+        sess->upf_n4_seid = be64toh(up_f_seid->seid);
+        smf_n11_build_create_session_response(&pkbuf, sess);
+        smf_sbi_send_sm_context_create(pkbuf);
+    }
 #endif
 }
 
