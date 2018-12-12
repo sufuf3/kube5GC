@@ -7,7 +7,7 @@
 #include "string.h"
 #include <arpa/inet.h>
 
-#define JSON_DEBUG 1
+#define JSON_DEBUG 0
 
 int _json = 10;
 
@@ -396,7 +396,6 @@ void _add_apn_to_struct(cJSON* json_key, c_int8_t *apn) {
 void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     c_sockaddr_t addr;
     char paa_pdn_type[1+1] = {0};
-    char paa_pdn_len[16]= {0};
 
     cJSON *j_pdn = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_PDN);
     cJSON *j_pdn_paa = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_PAA); // PDN Address Allocation 
@@ -405,7 +404,6 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     cJSON *j_pdn_paa_addr6 = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_ADDR6);
     // cJSON *j_pdn_paa_len = cJSON_GetObjectItemCaseSensitive(j_pdn_paa, JSONKEY_4G_PDN_PAA_LEN);
     bzero(paa_pdn_type, 1+1); 
-    bzero(paa_pdn_len, 16);
     
     // PDN Type
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
@@ -419,10 +417,10 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
         {
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             core_inet_pton(AF_INET, j_pdn_paa_addr->valuestring, &addr);
+            d_info("pdn addr: %s", j_pdn_paa_addr->valuestring);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-            memcpy((void *)&pdn->paa.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+            memcpy((void *)&pdn->paa.addr, (void *)&addr.sin.sin_addr, IPV4_LEN);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-            d_trace(10, "IPV4 address: %d", pdn->paa.addr);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             break;
         }
@@ -432,7 +430,7 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             core_inet_pton(AF_INET6, j_pdn_paa_addr6->valuestring, &addr);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-            memcpy((void *)&pdn->paa.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+            memcpy((void *)&pdn->paa.addr6, (void *)&addr.sin6.sin6_addr, IPV6_LEN);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             CORE_ADDR(&addr, buf);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
@@ -445,21 +443,17 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             core_inet_pton(AF_INET, j_pdn_paa_addr->valuestring, &addr);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-            memcpy((void *)&pdn->paa.both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
+            memcpy((void *)&pdn->paa.both.addr, (void *)&addr.sin.sin_addr, IPV4_LEN);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             core_inet_pton(AF_INET6, j_pdn_paa_addr6->valuestring, &addr);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-            memcpy((void *)&pdn->paa.both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
+            memcpy((void *)&pdn->paa.both.addr6, (void *)&addr.sin6.sin6_addr, IPV6_LEN);
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
             break;
         }
         default:
             d_error("Not support PDN Type");
     }
-    
-    // TODO: This len rename to Prefix Len
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    pdn->paa.len = atoi(paa_pdn_len);
 
     cJSON *j_pdn_ambr = cJSON_GetObjectItemCaseSensitive(j_pdn, JSONKEY_4G_PDN_AMBR);
     cJSON *j_pdn_ambr_uplink = cJSON_GetObjectItemCaseSensitive(j_pdn_ambr, JSONKEY_4G_PDN_AMBR_UPLINK);
