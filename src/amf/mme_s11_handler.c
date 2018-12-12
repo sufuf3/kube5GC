@@ -695,6 +695,7 @@ void amf_n11_handle_create_session_response(
     sess->pgw_pco.data = core_calloc(pCreateSession->ue_pco.length, sizeof(c_uint8_t));
     memcpy(sess->pgw_pco.data, pCreateSession->ue_pco.buffer, pCreateSession->ue_pco.length);
     sess->pgw_pco.len = pCreateSession->ue_pco.length;
+    sess->pgw_pco.presence = 1;
 
     /* Data Plane(UL) : SGW-S1U */
     bearer->sgw_s1u_teid = pCreateSession->sgw_s1u_teid;
