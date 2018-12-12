@@ -316,7 +316,11 @@ status_t smf_n4_build_session_modification_request(
     outer_hdr->gtpu_ipv6 = 0;
     outer_hdr->gtpu_ipv4 = 1;
     outer_hdr->addr = bearer->addr;
+#ifndef FIVE_G_CORE
     outer_hdr->teid = htonl(bearer->enb_s1u_teid);
+#else
+    outer_hdr->teid = bearer->enb_s1u_teid;
+#endif
     len += IPV4_LEN;
     req->update_far.update_forwarding_parameters.outer_header_creation.len = len;
     req->update_far.update_forwarding_parameters.outer_header_creation.data = outer_hdr;
