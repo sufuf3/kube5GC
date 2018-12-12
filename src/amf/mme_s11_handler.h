@@ -4,6 +4,7 @@
 #include "gtp/gtp_message.h"
 
 #include "mme_context.h"
+#include "JsonTransform.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +36,8 @@ CORE_DECLARE(void) mme_s11_handle_delete_indirect_data_forwarding_tunnel_respons
         gtp_xact_t *xact, mme_ue_t *mme_ue,
         gtp_delete_indirect_data_forwarding_tunnel_response_t *rsp);
 
+CORE_DECLARE(void)  amf_n11_handle_create_session_response(
+        mme_ue_t *mme_ue, create_session_t *pCreateSession);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -16,6 +16,8 @@
 #include "smf_n4_build.h"
 #include "smf_pfcp_path.h"
 #include "smf_s11_build.h"
+#include "smf_json_build.h"
+#include "smf_sbi_path.h"
 
 void test_session()
 {
@@ -205,7 +207,7 @@ void smf_n4_handle_session_establishment_response(
         pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_establishment_response_t *rsp)
 {
     d_trace(3, "[SMF] Session Establishment Response\n");
- 
+#ifndef FIVE_G_CORE
     status_t rv;
     pkbuf_t *pkbuf = NULL;
     gtp_header_t h;
@@ -236,7 +238,6 @@ void smf_n4_handle_session_establishment_response(
         memset(&h, 0, sizeof(gtp_header_t));
         h.type = GTP_CREATE_SESSION_RESPONSE_TYPE;
         h.teid = sess->mme_s11_teid;
-
         rv = smf_s11_build_create_session_response(
             &pkbuf, sess);
         d_assert(rv == CORE_OK, return, "gtp build error");
@@ -247,6 +248,11 @@ void smf_n4_handle_session_establishment_response(
         rv = gtp_xact_commit(sess->s11_xact);
         d_assert(rv == CORE_OK, return, "xact_commit error");
     }
+#else
+    pkbuf_t *pkbuf = NULL;
+    smf_n11_build_create_session_response(&pkbuf, sess);
+    smf_sbi_send_sm_context_create(pkbuf);
+#endif
 }
 
 void smf_n4_handle_session_modification_response(

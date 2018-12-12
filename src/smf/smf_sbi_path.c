@@ -36,6 +36,7 @@ static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
     event_set(&e, SMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_TYPE_SM_CONTEXT_CREATE);
+    d_info("SMContextCreateData: %s", pkbuf->payload);
     rv = smf_event_send(&e);
     if (rv != CORE_OK)
     {
@@ -49,6 +50,7 @@ static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
 
 static int _smf_sbi_message_smf_smContextUpdate(sock_id sock, void *data)
 {
+    d_info("SMF Recieve Sm Context Update");
     status_t rv;
     event_t e;
     pkbuf_t *pkbuf = NULL;
@@ -204,8 +206,10 @@ status_t smf_sbi_send_sm_context_create(pkbuf_t *pkbuf)
 
 status_t smf_sbi_send_sm_context_update(pkbuf_t *pkbuf)
 {
+    d_info("smf_sbi_send_sm_context_update");
     status_t rv;
     rv = unixgram_sendto(smContextUpdateSock, pkbuf, &smContextUpdateRemoteAddr);
+    d_info("smf_sbi_send_sm_context_update end");
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Update Send Failed!");
     return CORE_OK;
 }

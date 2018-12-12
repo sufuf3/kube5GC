@@ -32,6 +32,7 @@ extern "C"
 #define JSONKEY_4G_ULI_EUTRAL_ECGI_EUTRACELLID  "eutraCellId"
 #define JSONKEY_4G_ULI_PRESENCE                 "uliPresence"
 #define JSONKEY_4G_PCO                          "pco"
+#define JSONKEY_4G_PAA                          "paa"
 #define JSONKEY_4G_PDN                          "pdn"
 #define JSONKEY_4G_PDN_PDNTYPE                  "pdnType"
 #define JSONKEY_4G_PDN_PAA                      "paa"
@@ -53,9 +54,9 @@ extern "C"
 #define JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_ADDR6 "addr6"
 #define JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_IPV6 "ipv6"
 #define JSONKEY_4G_M_BEARER_CTX_ENB_S1U_IP_IPV4 "ipv4"
-
-
-
+#define JSONKEY_4G_SGW_S1U_IP_IPV4              "sgw_s1u_ipv4"
+#define JSONKEY_4G_SGW_S1U_IP_IPV6              "sgw_s1u_ipv6"
+#define JSONKEY_4G_SGW_S1U_TEID                 "sgw_s1u_teid"
 
 #define JSONKEY_5G_SUPI                         "supi"
 #define JSONKEY_5G_UnAuthenticatedSupi          "unauthenticatedSupi"

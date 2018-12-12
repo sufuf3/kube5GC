@@ -1,3 +1,4 @@
+#define TRACE_MODULE _amf_json_build
 #include <cJSON/cJSON.h>
 
 #include "core_debug.h"
@@ -8,6 +9,8 @@
 #include "sbiJson/JsonTransform.h"
 #include "amf_json_build.h"
 
+int _amf_json_build = 10;
+
 status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     
     pdn_t *pdn = NULL;
@@ -15,7 +18,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     mme_bearer_t *bearer = NULL;
     char *string = NULL;
     cJSON *session = cJSON_CreateObject();
-    creat_session_t createSession = {0};
+    create_session_t createSession = {0};
     c_uint32_t length = 0;
     d_assert(sess, return CORE_ERROR, "Null param");
     pdn = sess->pdn;
@@ -26,7 +29,8 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     d_assert(mme_ue, return CORE_ERROR, "Null param");
 
     // d_info("createSession:%d", &createSession);
-    memcpy(createSession.imsi_bcd,  mme_ue->imsi_bcd, sizeof( mme_ue->imsi_bcd));
+    memcpy(createSession.imsi,  mme_ue->imsi, mme_ue->imsi_len);
+    createSession.imsi_len = mme_ue->imsi_len;
 #if 0
     int i = 0;
     for (i = 0; i<16; i++)
@@ -39,11 +43,11 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     memcpy(&createSession.e_cgi, &mme_ue->e_cgi, sizeof( mme_ue->e_cgi));
     memcpy(&createSession.visited_plmn_id, &mme_ue->visited_plmn_id, sizeof( mme_ue->visited_plmn_id));
     if (sess->ue_pco.length && sess->ue_pco.buffer) {
-        createSession.ue_pco.buffer = malloc(sizeof(char)* sess->ue_pco.length);
-        memcpy(&createSession.ue_pco.length, &sess->ue_pco.length, sizeof( sess->ue_pco.length));
-        memcpy(&createSession.ue_pco.buffer, &sess->ue_pco.buffer, sizeof( sess->ue_pco.length));
+        createSession.ue_pco.length = sess->ue_pco.length;
+        memcpy(createSession.ue_pco.buffer, sess->ue_pco.buffer, sess->ue_pco.length);
+        d_print_hex(createSession.ue_pco.buffer, createSession.ue_pco.length);
     }
-    memcpy(&createSession.apn, &pdn->apn, sizeof( pdn->apn));
+    memcpy(createSession.apn, pdn->apn, sizeof(pdn->apn));
 
     c_uint8_t pdn_type;
     if (pdn->pdn_type == HSS_PDN_TYPE_IPV4 ||
@@ -66,7 +70,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     
     createSession.pdn.paa.pdn_type = pdn_type;
     // d_info("pdn->paa.pdn_type :%d\n", pdn->paa.pdn_type);
-    memcpy(&createSession.ebi, &bearer->ebi, sizeof(bearer->ebi));
+    createSession.ebi = bearer->ebi;
     /*TODO : ue timezone*/
     memcpy(&createSession.guti, &mme_ue->guti, sizeof(mme_ue->guti));
     
@@ -96,7 +100,8 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_
     d_assert(bearer, return CORE_ERROR, "Null param");
     
     // c_uint32_t      enb_s1u_teid;
-    memcpy(modifyBearer.imsi_bcd,  bearer->mme_ue->imsi_bcd, sizeof( bearer->mme_ue->imsi_bcd));
+    memcpy(modifyBearer.imsi, bearer->mme_ue->imsi, bearer->mme_ue->imsi_len);
+    modifyBearer.imsi_len = bearer->mme_ue->imsi_len; 
     //TODO: fix it how to get uli presence?
     memcpy(&modifyBearer.uli_presence, "\x01" , sizeof(c_uint8_t));
     memcpy(&modifyBearer.tai, &bearer->mme_ue->tai, sizeof(bearer->mme_ue->tai));
@@ -109,7 +114,7 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_
     memcpy(&modifyBearer.enb_s1u_ip, &bearer->enb_s1u_ip, sizeof(bearer->enb_s1u_ip));
     memcpy(&modifyBearer.enb_s1u_teid, &bearer->enb_s1u_teid, sizeof(bearer->enb_s1u_teid));
     memcpy(&modifyBearer.apn, &bearer->sess->pdn->apn, sizeof( bearer->sess->pdn->apn));
-
+    d_trace(5, "JSONTRANSFORM_StToJs_modify_bearer_request");
     JSONTRANSFORM_StToJs_modify_bearer_request(&modifyBearer, j_modifyBearerReq);
     string = cJSON_Print(j_modifyBearerReq);
     d_info(string);

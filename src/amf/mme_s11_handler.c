@@ -662,3 +662,64 @@ void mme_s11_handle_delete_indirect_data_forwarding_tunnel_response(
     rv = mme_ue_clear_indirect_tunnel(mme_ue);
     d_assert(rv == CORE_OK,, "mme_ue_clear_indirect_tunnel() failed");
 }
+
+void amf_n11_handle_create_session_response(
+        mme_ue_t *mme_ue, create_session_t *pCreateSession)
+{
+#if 1
+    status_t rv;
+
+    mme_bearer_t *bearer = NULL;
+    mme_sess_t *sess = NULL;
+    pdn_t *pdn = NULL;
+    
+    d_assert(mme_ue, return, "Null param");
+    d_assert(pCreateSession, return, "Null param");
+
+    d_trace(3, "[MME] Create Session Response\n");
+
+    d_assert(mme_ue, return, "Null param");
+
+    bearer = mme_bearer_find_by_ue_ebi(mme_ue, pCreateSession->ebi);
+    d_assert(bearer, return, "Null param");
+    sess = bearer->sess;
+    d_assert(sess, return, "Null param");
+    pdn = sess->pdn;
+    d_assert(pdn, return, "Null param");
+
+    memcpy(&pdn->paa, &pCreateSession->pdn.paa, sizeof(pCreateSession->pdn.paa));
+    d_info("PAA PDN: %d", pCreateSession->pdn.paa.pdn_type);
+    d_info("PAA PDN: %d", bearer->sess->pdn->paa.pdn_type);
+    d_info("PAA PDN: %d", pdn->paa.pdn_type);
+    /* PCO */
+    sess->pgw_pco.data = core_calloc(pCreateSession->ue_pco.length, sizeof(c_uint8_t));
+    memcpy(sess->pgw_pco.data, pCreateSession->ue_pco.buffer, pCreateSession->ue_pco.length);
+    sess->pgw_pco.len = pCreateSession->ue_pco.length;
+
+    /* Data Plane(UL) : SGW-S1U */
+    bearer->sgw_s1u_teid = pCreateSession->sgw_s1u_teid;
+
+    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+            mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
+    d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
+        bearer->enb_s1u_teid, bearer->sgw_s1u_teid);
+
+    memcpy(&bearer->sgw_s1u_ip, &pCreateSession->sgw_ip, sizeof(ip_t));
+    d_info("ipv4: %d, ipv6: %d", pCreateSession->sgw_ip.ipv4, pCreateSession->sgw_ip.ipv6);
+    d_info("ipv4: %d, ipv6: %d", bearer->sgw_s1u_ip.ipv4, bearer->sgw_s1u_ip.ipv6);
+
+    d_info("create Session");
+    if (FSM_CHECK(&mme_ue->sm, emm_state_initial_context_setup))
+    {
+        rv = nas_send_attach_accept(mme_ue);
+        d_assert(rv == CORE_OK, return, "nas_send_attach_accept failed");
+    }
+    else if (FSM_CHECK(&mme_ue->sm, emm_state_registered))
+    {
+        rv = nas_send_activate_default_bearer_context_request(bearer);
+        d_assert(rv == CORE_OK, return, "nas send failed");
+    }
+    else
+        d_assert(0,, "Invalid EMM state");
+#endif
+}
