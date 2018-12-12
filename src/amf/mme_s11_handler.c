@@ -688,9 +688,8 @@ void amf_n11_handle_create_session_response(
     d_assert(pdn, return, "Null param");
 
     memcpy(&pdn->paa, &pCreateSession->pdn.paa, sizeof(pCreateSession->pdn.paa));
-    d_info("PAA PDN: %d", pCreateSession->pdn.paa.pdn_type);
-    d_info("PAA PDN: %d", bearer->sess->pdn->paa.pdn_type);
-    d_info("PAA PDN: %d", pdn->paa.pdn_type);
+    d_info("PAA dst addr: %d", pdn->paa.addr);
+    
     /* PCO */
     sess->pgw_pco.data = core_calloc(pCreateSession->ue_pco.length, sizeof(c_uint8_t));
     memcpy(sess->pgw_pco.data, pCreateSession->ue_pco.buffer, pCreateSession->ue_pco.length);
