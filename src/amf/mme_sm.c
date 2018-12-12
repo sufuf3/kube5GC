@@ -940,7 +940,10 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     modify_bearer_t modifyBearer = {0};
                     amf_json_handler_update_session_response(&recvbuf, &modifyBearer);
                     
-                    // amf_n11_handle_create_session_response(mme_ue, &createSession);
+                    mme_ue = mme_ue_find_by_imsi(modifyBearer.imsi, modifyBearer.imsi_len);
+                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+                    
+                    amf_n11_handle_modify_bearer_response(mme_ue, &modifyBearer);
                     d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
                     break;
                 }

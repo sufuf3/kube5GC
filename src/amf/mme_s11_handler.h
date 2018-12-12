@@ -38,6 +38,8 @@ CORE_DECLARE(void) mme_s11_handle_delete_indirect_data_forwarding_tunnel_respons
 
 CORE_DECLARE(void)  amf_n11_handle_create_session_response(
         mme_ue_t *mme_ue, create_session_t *pCreateSession);
+
+CORE_DECLARE(void) amf_n11_handle_modify_bearer_response( mme_ue_t *mme_ue, modify_bearer_t *modifyBearer);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

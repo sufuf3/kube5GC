@@ -770,3 +770,12 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
         d_info("%d %s \n", __LINE__, __FUNCTION__);
     return CORE_OK;
 }
+         
+status_t JSONTRANSFORM_JsToSt_update_session_response(modify_bearer_t *sess, cJSON *pJson)
+{
+    /* imsi */
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
+
+    return CORE_OK;
+}

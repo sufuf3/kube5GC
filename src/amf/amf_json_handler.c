@@ -204,14 +204,14 @@ status_t amf_json_handler_create_session_response(pkbuf_t **pkbuf, create_sessio
 
 status_t amf_json_handler_update_session_response(pkbuf_t **pkbuf, modify_bearer_t *modifyBearer)
 {
-    // cJSON *session = cJSON_Parse((*pkbuf)->payload);
+    cJSON *session = cJSON_Parse((*pkbuf)->payload);
     // string = cJSON_Print(session);
     // d_info(string);
-    // d_assert(session, return CORE_ERROR, "Null param");
+    d_assert(session, return CORE_ERROR, "Null param");
 
-    // JSONTRANSFORM_JsToSt_create_session_response(pCreateRspSess, session);
+    JSONTRANSFORM_JsToSt_update_session_response(modifyBearer, session);
     
-    // cJSON_Delete(session);
+    cJSON_Delete(session);
     
 
     return CORE_OK;
