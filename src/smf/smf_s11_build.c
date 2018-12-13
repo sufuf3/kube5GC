@@ -492,3 +492,27 @@ status_t smf_n11_build_update_session_response(
 
     return CORE_OK;
 }
+
+CORE_DECLARE(status_t) smf_n11_build_delete_session_response(
+        pkbuf_t **pkbuf, smf_sess_t *sess)
+{
+    char *string = NULL;
+    cJSON *j_deleteSession = cJSON_CreateObject();
+    delete_session_t deleteSession = {0};
+     c_uint32_t length = 0;
+     // IMSI
+    memcpy(deleteSession.imsi, sess->imsi, sess->imsi_len);
+    deleteSession.imsi_len = sess->imsi_len;
+
+    JSONTRANSFORM_StToJs_delete_session_response(&deleteSession, j_deleteSession);
+    
+    string = cJSON_Print(j_deleteSession);
+    d_info(string);
+    length = strlen(string) + 1;
+    *pkbuf = pkbuf_alloc(0, length);
+    (*pkbuf)->len = length;
+    memcpy((*pkbuf)->payload, string, length -1);
+    free(string);
+    cJSON_Delete(j_deleteSession);
+    return CORE_OK;
+}
