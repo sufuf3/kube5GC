@@ -321,6 +321,18 @@ void smf_state_operational(fsm_t *s, event_t *e)
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
                     break;
                 }
+                case N11_TYPE_SM_CONTEXT_RELEASE:
+                {
+                    d_info("[SMF] Delete Session request");
+                    delete_session_t deleteSession= {0};
+                    smf_json_handler_delete_session(&recvbuf, &deleteSession);
+                    sess = smf_sess_find_by_imsi_apn(deleteSession.imsi, deleteSession.imsi_len, deleteSession.apn);
+                    d_assert(sess, goto release_n11_pkbuf, "No Session Context");
+
+                    smf_n11_handle_delete_session_request_by_JsonDeleteSession(sess, &deleteSession);
+                    d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    break;
+                }
                 default:
                 {
                     d_error("Not support N11 Message");

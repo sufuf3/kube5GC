@@ -48,6 +48,12 @@ typedef struct _modify_bearer_t {
     c_int8_t        apn[MAX_APN_LEN+1];
 } modify_bearer_t;
 
+typedef struct _delete_session_t {
+    c_uint8_t       imsi[MAX_IMSI_LEN];
+    c_int32_t       imsi_len;
+    c_int8_t        apn[MAX_APN_LEN+1];
+} delete_session_t;
+
 CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_create_session_request(create_session_t *sess, cJSON *pJson);
 CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_create_session_request(create_session_t *sess, cJSON *pJson);
 CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJSON *pJson);
@@ -56,6 +62,12 @@ CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_modify_bearer_request(modify_bearer_
 CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *sess, cJSON *pJson);
 CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_update_session_response(modify_bearer_t *sess, cJSON *pJson);
 CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_update_session_response(modify_bearer_t *sess, cJSON *pJson);
+
+// delete session
+CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_delete_session_request(delete_session_t *sess, cJSON *pJson);
+CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_delete_session_request(delete_session_t *sess, cJSON *pJson);
+CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_delete_session_response(delete_session_t *sess, cJSON *pJson);
+CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_delete_session_response(delete_session_t *sess, cJSON *pJson);
 #ifdef __cplusplus
 }
 #endif 

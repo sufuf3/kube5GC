@@ -316,6 +316,8 @@ void smf_n4_handle_session_deletion_response(
         d_info("association_setup_response cause: %d", pfcp_cause_get_name(cause));
     } else
     {
-        
+        pkbuf_t *pkbuf = NULL;
+        smf_n11_build_delete_session_response(&pkbuf, sess);
+        smf_sbi_send_sm_context_release(pkbuf);
     }
 }

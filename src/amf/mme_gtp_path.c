@@ -207,8 +207,10 @@ status_t mme_gtp_send_modify_bearer_request(
 #endif
 }
 
+// TODO: release session
 status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
 {
+#ifndef FIVE_G_CORE
     status_t rv;
     pkbuf_t *s11buf = NULL;
     gtp_header_t h;
@@ -235,6 +237,20 @@ status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
     return CORE_OK;
+#else
+    mme_ue_t *mme_ue = NULL;
+    pkbuf_t *pkbuf = NULL;
+    mme_ue = sess->mme_ue;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    
+    amf_json_build_delete_session(&pkbuf, sess);
+
+    amf_sbi_send_sm_context_release(pkbuf);
+
+    pkbuf_free(pkbuf);
+
+    return CORE_OK;
+#endif
 }
 
 status_t mme_gtp_send_delete_all_sessions(mme_ue_t *mme_ue)
@@ -373,11 +389,11 @@ status_t mme_gtp_send_delete_bearer_response(mme_bearer_t *bearer)
 
 status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
 {
+#ifndef FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
     gtp_xact_t *xact = NULL;
-
     d_assert(mme_ue, return CORE_ERROR, "Null param");
 
     memset(&h, 0, sizeof(gtp_header_t));
@@ -392,8 +408,19 @@ status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
 
     rv = gtp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
+    return CORE_OK;
+#else
+    pkbuf_t *pkbuf = NULL;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    
+    amf_json_build_delete_session(&pkbuf, mme_sess_find_by_ebi(mme_ue, mme_ue->ebi));
+
+    amf_sbi_send_sm_context_release(pkbuf);
+
+    pkbuf_free(pkbuf);
 
     return CORE_OK;
+#endif
 }
 
 status_t mme_gtp_send_create_indirect_data_forwarding_tunnel_request(

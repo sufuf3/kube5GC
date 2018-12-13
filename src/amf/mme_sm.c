@@ -928,6 +928,16 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     
                 case N11_SM_CONTEXT_RELEASE:
                 {
+                    d_trace(10, "[AMF] N11 Delete Session Response");
+                    delete_session_t deleteSession = {0};
+                    amf_json_handler_delete_session_response(&recvbuf, &deleteSession);
+                    
+                    mme_ue = mme_ue_find_by_imsi(deleteSession.imsi, deleteSession.imsi_len);
+                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+                    
+                    amf_n11_handle_delete_session_response(mme_ue, &deleteSession);
+                    d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
+
                     break;
                 }
                 case N11_SM_CONTEXT_RETRIEVE:
@@ -945,6 +955,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     
                     amf_n11_handle_modify_bearer_response(mme_ue, &modifyBearer);
                     d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
+                    d_info("AMF Update Session Done");
                     break;
                 }
                 default :

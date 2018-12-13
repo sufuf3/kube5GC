@@ -22,6 +22,9 @@ CORE_DECLARE(status_t) smf_n11_build_create_session_response(
         
 CORE_DECLARE(status_t) smf_n11_build_update_session_response(
         pkbuf_t **pkbuf, smf_sess_t *sess);
+
+CORE_DECLARE(status_t) smf_n11_build_delete_session_response(
+        pkbuf_t **pkbuf, smf_sess_t *sess);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

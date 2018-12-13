@@ -784,3 +784,43 @@ status_t JSONTRANSFORM_StToJs_update_session_response(modify_bearer_t *sess, cJS
 
     return CORE_OK;
 }
+
+status_t JSONTRANSFORM_JsToSt_delete_session_request(delete_session_t *sess, cJSON *pJson)
+{
+    /* imsi */
+    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
+
+    /* apn */
+    _add_apn_to_struct(pJson, sess->apn);
+
+    return CORE_OK;
+}
+
+status_t JSONTRANSFORM_StToJs_delete_session_request(delete_session_t *sess, cJSON *pJson)
+{
+    char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
+
+    /* imsi */
+    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
+
+    /* apn */
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
+    return CORE_OK;
+}
+
+status_t JSONTRANSFORM_JsToSt_delete_session_response(delete_session_t *sess, cJSON *pJson)
+{
+    /* imsi */
+    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
+    return CORE_OK;
+}
+
+status_t JSONTRANSFORM_StToJs_delete_session_response(delete_session_t *sess, cJSON *pJson)
+{
+    char imsi_bcd[MAX_IMSI_BCD_LEN + 1] = {0};
+    /* imsi */
+    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
+    return CORE_OK;
+}

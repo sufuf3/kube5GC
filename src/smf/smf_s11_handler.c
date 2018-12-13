@@ -145,3 +145,11 @@ void smf_n11_handle_update_session_request_by_JsonUpdateSession(smf_sess_t *sess
     d_assert(rv == CORE_OK, return, "gtp build error");
 
 }
+
+void smf_n11_handle_delete_session_request_by_JsonDeleteSession(
+    smf_sess_t *sess, delete_session_t *pDeleteSession)
+{
+    status_t rv;
+    rv = smf_pfcp_send_session_deletion_request(sess);
+    d_assert(rv == CORE_OK, , "pfcp session modification fail");
+}

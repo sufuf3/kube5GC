@@ -13,6 +13,8 @@ extern "C" {
 
 status_t smf_json_handler_create_session(pkbuf_t **pkbuf, create_session_t *createSession);
 status_t smf_json_handler_update_session(pkbuf_t **pkbuf, modify_bearer_t *modifyBearer);
+status_t smf_json_handler_delete_session(pkbuf_t **pkbuf, delete_session_t *deleteSession);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

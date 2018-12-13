@@ -216,3 +216,15 @@ status_t amf_json_handler_update_session_response(pkbuf_t **pkbuf, modify_bearer
 
     return CORE_OK;
 }
+
+status_t amf_json_handler_delete_session_response(pkbuf_t **pkbuf, delete_session_t *deleteSession)
+{
+    cJSON *session = cJSON_Parse((*pkbuf)->payload);
+    d_assert(session, return CORE_ERROR, "Null param");
+
+    JSONTRANSFORM_JsToSt_delete_session_response(deleteSession, session);
+    
+    cJSON_Delete(session);
+
+    return CORE_OK;
+}
