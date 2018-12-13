@@ -126,3 +126,32 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_
     cJSON_Delete(j_modifyBearerReq);
     return 0;
 }
+
+status_t amf_json_build_delete_session(pkbuf_t **pkbuf, mme_sess_t *sess)
+{
+    char *string = NULL;
+    cJSON *j_deleteSession = cJSON_CreateObject();
+    delete_session_t deleteSession = {0};
+    c_uint32_t length = 0;
+    
+    /* imsi */
+    memcpy(deleteSession.imsi, sess->mme_ue->imsi, sess->mme_ue->imsi_len);
+    deleteSession.imsi_len = sess->mme_ue->imsi_len;
+    d_info("AMF delete IMSI");
+    d_print_hex(deleteSession.imsi, deleteSession.imsi_len);
+    /* apn */
+    strcpy(deleteSession.apn, sess->pdn->apn);
+
+    d_trace(5, "JSONTRANSFORM_StToJs_modify_bearer_request");
+    JSONTRANSFORM_StToJs_delete_session_request(&deleteSession, j_deleteSession);
+    string = cJSON_Print(j_deleteSession);
+    d_trace(-1, "Delete Session JSON: %s", string);
+    
+    length = strlen(string) + 1;
+    *pkbuf = pkbuf_alloc(0, length);
+    (*pkbuf)->len = length;
+    memcpy((*pkbuf)->payload, string, length -1);
+    free(string);
+    cJSON_Delete(j_deleteSession);
+    return CORE_OK;
+}

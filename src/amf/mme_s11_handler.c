@@ -760,3 +760,80 @@ cleanup:
     GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH,);
     GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY,);
 }
+
+void amf_n11_handle_delete_session_response(mme_ue_t *mme_ue, delete_session_t *deleteSession)
+{
+    status_t rv;
+    mme_sess_t *sess = NULL;
+
+    d_assert(mme_ue, return, "Null param");
+
+    d_trace(3, "[AMF] Delete Session Response\n");
+
+    // TODO: delete more_sess
+    sess = mme_sess_first(mme_ue);
+    d_assert(sess, return, "Null param");
+
+    if (FSM_CHECK(&mme_ue->sm, emm_state_authentication))
+    {
+        if (mme_sess_count(mme_ue) == 1) /* Last Session */
+        {
+            mme_s6a_send_air(mme_ue, NULL);
+        }
+    }
+    else if (FSM_CHECK(&mme_ue->sm, emm_state_de_registered))
+    {
+        if (mme_sess_count(mme_ue) == 1) /* Last Session */
+        {
+            rv = nas_send_detach_accept(mme_ue);
+            d_assert(rv == CORE_OK,, "nas_send_detach_accept failed");
+        }
+    }
+    else if (FSM_CHECK(&mme_ue->sm, emm_state_registered))
+    {
+        mme_bearer_t *bearer = mme_default_bearer_in_sess(sess);
+        d_assert(bearer, goto cleanup, "Null param");
+
+        // release Invalid ESM state
+        if (FSM_CHECK(&bearer->sm, esm_state_pdn_will_disconnect))
+        {
+            rv = nas_send_deactivate_bearer_context_request(bearer);
+            d_assert(rv == CORE_OK,,
+                "nas_send_deactivate_bearer_context_request failed");
+            
+            /*
+             * mme_sess_remove() should not be called here.
+             *
+             * Session will be removed if Deactivate bearer context 
+             * accept is received */
+            CLEAR_SGW_S1U_PATH(sess);
+            return;
+        }
+        else
+            d_assert(0,, "Invalid ESM state");
+    }
+    else if (FSM_CHECK(&mme_ue->sm, emm_state_initial_context_setup) ||
+             FSM_CHECK(&mme_ue->sm, emm_state_exception))
+    {
+        if (mme_sess_count(mme_ue) == 1) /* Last Session */
+        {
+            enb_ue_t *enb_ue = NULL;
+
+            enb_ue = mme_ue->enb_ue;
+            d_assert(enb_ue, goto cleanup, );
+
+            rv = s1ap_send_ue_context_release_command(enb_ue,
+                S1AP_Cause_PR_nas, S1AP_CauseNas_normal_release,
+                S1AP_UE_CTX_REL_UE_CONTEXT_REMOVE, 0);
+            d_assert(rv == CORE_OK,, "s1ap send error");
+        }
+    }
+    else
+        d_assert(0,, "Invalid EMM state");
+
+cleanup:
+    if (mme_sess_count(mme_ue) == 1) /* Last Session */
+        CLEAR_SESSION_CONTEXT(mme_ue);
+
+    mme_sess_remove(sess);
+}

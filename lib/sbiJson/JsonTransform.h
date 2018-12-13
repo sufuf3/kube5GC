@@ -62,6 +62,12 @@ CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_modify_bearer_request(modify_bearer_
 CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *sess, cJSON *pJson);
 CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_update_session_response(modify_bearer_t *sess, cJSON *pJson);
 CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_update_session_response(modify_bearer_t *sess, cJSON *pJson);
+
+// delete session
+CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_delete_session_request(delete_session_t *sess, cJSON *pJson);
+CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_delete_session_request(delete_session_t *sess, cJSON *pJson);
+CORE_DECLARE(status_t) JSONTRANSFORM_JsToSt_delete_session_response(delete_session_t *sess, cJSON *pJson);
+CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_delete_session_response(delete_session_t *sess, cJSON *pJson);
 #ifdef __cplusplus
 }
 #endif 
