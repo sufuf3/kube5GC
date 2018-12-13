@@ -210,7 +210,7 @@ status_t mme_gtp_send_modify_bearer_request(
 // TODO: release session
 status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
 {
-#ifndef FIVE_G_CORE
+#if 1
     status_t rv;
     pkbuf_t *s11buf = NULL;
     gtp_header_t h;
