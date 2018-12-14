@@ -35,6 +35,10 @@
 #include "mme_fd_path.h"
 #include "mme_s6a_handler.h"
 #include "mme_path.h"
+#include "amf_sbi_path.h"
+
+#include "JsonTransform.h"
+#include "amf_json_handler.h"
 
 void mme_state_initial(fsm_t *s, event_t *e)
 {
@@ -85,7 +89,12 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 break;
             }
             /**************************************************/
-    
+            rv = amf_sbi_server_open();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't establish AMF-SBI path");
+                break;
+            }
             break;
         }
         case FSM_EXIT_SIG:
@@ -108,6 +117,12 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 break;
             }
             /**************************************************/
+            rv = amf_sbi_server_close();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't close SMF-SBI path");
+                break;
+            }
             break;
         }
         case MME_EVT_S1AP_LO_ACCEPT:
@@ -889,6 +904,70 @@ void mme_state_operational(fsm_t *s, event_t *e)
             break;
         }
         /******************************************************/
+        case AMF_EVT_N11_MESSAGE:
+        {
+            pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
+            
+	        int msg_type = event_get_param2(e);
+            mme_ue_t *mme_ue = NULL;
+            switch (msg_type)
+            {
+                case N11_SM_CONTEXT_CREATE:
+                {
+                    d_trace(10, "create Session Rsp");
+                    create_session_t createSession = {0};
+                    amf_json_handler_create_session_response(&recvbuf, &createSession);
+                    
+                    mme_ue = mme_ue_find_by_imsi(createSession.imsi, createSession.imsi_len);
+                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+
+                    amf_n11_handle_create_session_response(mme_ue, &createSession);
+                    d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
+                    break;
+                }
+                    
+                case N11_SM_CONTEXT_RELEASE:
+                {
+                    d_trace(10, "[AMF] N11 Delete Session Response");
+                    delete_session_t deleteSession = {0};
+                    amf_json_handler_delete_session_response(&recvbuf, &deleteSession);
+                    
+                    mme_ue = mme_ue_find_by_imsi(deleteSession.imsi, deleteSession.imsi_len);
+                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+                    
+                    amf_n11_handle_delete_session_response(mme_ue, &deleteSession);
+                    d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
+
+                    break;
+                }
+                case N11_SM_CONTEXT_RETRIEVE:
+                {
+                    break;
+                }   
+                case N11_SM_CONTEXT_UPDATE:
+                {    
+                    d_trace(10, "update Session Rsp");
+                    modify_bearer_t modifyBearer = {0};
+                    amf_json_handler_update_session_response(&recvbuf, &modifyBearer);
+                    
+                    mme_ue = mme_ue_find_by_imsi(modifyBearer.imsi, modifyBearer.imsi_len);
+                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+                    
+                    amf_n11_handle_modify_bearer_response(mme_ue, &modifyBearer);
+                    d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
+                    d_info("AMF Update Session Done");
+                    break;
+                }
+                default :
+                {
+                    d_error("Not support N11 Message");
+                }    
+            }
+
+        release_amf_n11_pkbuf:
+            pkbuf_free(recvbuf);
+            break;
+        }
         default:
         {
             d_error("No handler for event %s", mme_event_get_name(e));

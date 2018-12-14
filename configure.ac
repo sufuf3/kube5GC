@@ -372,6 +372,8 @@ if test "$ap_cv_atomic_builtins" = "yes"; then
     AC_DEFINE(HAVE_ATOMIC_BUILTINS, 1, [Define if compiler provides atomic builtins])
 fi
 
+AC_DEFINE(FIVE_G_CORE, 1, [This is 5GC])
+
 #######################################
 #### Checks for library functions. ####
 #######################################
@@ -436,11 +438,15 @@ AC_CONFIG_FILES([lib/fd/Makefile])
 AC_CONFIG_FILES([lib/gtp/Makefile])
 AC_CONFIG_FILES([lib/pfcp/Makefile])
 AC_CONFIG_FILES([lib/ipfw/Makefile])
+AC_CONFIG_FILES([lib/cJSON/Makefile])
+AC_CONFIG_FILES([lib/sbiJson/Makefile])
 AC_CONFIG_FILES([lib/Makefile])
 AC_CONFIG_FILES([src/app/Makefile])
 AC_CONFIG_FILES([src/amf/Makefile])
+AC_CONFIG_FILES([src/amf/http_server/Makefile])
 AC_CONFIG_FILES([src/hss/Makefile])
 AC_CONFIG_FILES([src/smf/Makefile])
+AC_CONFIG_FILES([src/smf/http_server/Makefile])
 AC_CONFIG_FILES([src/pcrf/Makefile])
 AC_CONFIG_FILES([src/upf/Makefile])
 AC_CONFIG_FILES([src/Makefile])
@@ -465,6 +471,7 @@ AC_CONFIG_FILES([support/logrotate/open5gc])
 AC_CONFIG_FILES([support/logrotate/Makefile])
 AC_CONFIG_FILES([support/newsyslog/open5gc.conf])
 AC_CONFIG_FILES([support/newsyslog/Makefile])
+AC_CONFIG_FILES([support/https/Makefile])
 AC_CONFIG_FILES([support/Makefile])
 AC_CONFIG_FILES([test/sample.conf])
 AC_CONFIG_FILES([test/sample-volte.conf])

@@ -7,6 +7,7 @@
 #include "smf_event.h"
 #include "smf_gtp_path.h"
 #include "smf_pfcp_path.h"
+#include "smf_sbi_path.h"
 #include "smf_n4_handler.h"
 #include "smf_s11_handler.h"
 #include "smf_gx_handler.h"
@@ -15,6 +16,8 @@
 #include "gtp/gtp_message.h"
 #include "pfcp/pfcp_message.h"
 
+#include "sbiJson/JsonTransform.h"
+#include "smf_json_handler.h"
 
 void smf_state_initial(fsm_t *s, event_t *e)
 {
@@ -55,7 +58,14 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 d_error("Can't establish N4-PFCP path");
                 break;
             }
+            rv = smf_sbi_server_open();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't establish SMF-SBI path");
+                break;
+            }
             break;
+
         }
         case FSM_EXIT_SIG:
         {
@@ -69,6 +79,12 @@ void smf_state_operational(fsm_t *s, event_t *e)
             if (rv != CORE_OK)
             {
                 d_error("Can't close N4-PFCP path");
+                break;
+            }
+            rv = smf_sbi_server_close();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't close SMF-SBI path");
                 break;
             }
             break;
@@ -221,7 +237,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 pkbuf_free(copybuf);
                 break;
             }
-                      
+
             d_assert(message->h.seid, pkbuf_free(recvbuf); pkbuf_free(copybuf); break,
                     "No Session seid");
             sess = smf_sess_find_by_seid(message->h.seid);
@@ -268,6 +284,63 @@ void smf_state_operational(fsm_t *s, event_t *e)
             {
                 d_error("Heartbeat fail, should delete association");
             }
+            break;
+        }
+        case SMF_EVT_N11_MESSAGE:
+        {
+            pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
+            int msgType = event_get_param2(e);
+            create_session_t createSession = {0};
+            smf_sess_t *sess = NULL;
+            d_info("N11 message enter");
+            switch (msgType)
+            {
+                case N11_TYPE_SM_CONTEXT_CREATE:
+                {
+                    d_trace(10, "Create Session OK");
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+                    smf_json_handler_create_session(&recvbuf, &createSession);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+                    sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
+    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
+                    smf_n11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
+                    d_trace(10, "Create Session Ended");
+                    d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    break;
+                }
+                case N11_TYPE_SM_CONTEXT_UPDATE:
+                {
+                    modify_bearer_t modifyBearer = {0};
+                    d_info("smf_json_handler_update_session");
+                    smf_json_handler_update_session(&recvbuf, &modifyBearer);
+                    d_info("update smf_sess_find_by_JsonUpdateSession");
+                    sess = smf_sess_find_by_JsonUpdateSession(&modifyBearer);
+                    d_info("update smf_n11_handle_update_session_request_by_JsonUpdateSession");
+                    smf_n11_handle_update_session_request_by_JsonUpdateSession(sess, &modifyBearer);
+                    d_info("update Ended");
+                    d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    break;
+                }
+                case N11_TYPE_SM_CONTEXT_RELEASE:
+                {
+                    d_info("[SMF] Delete Session request");
+                    delete_session_t deleteSession= {0};
+                    smf_json_handler_delete_session(&recvbuf, &deleteSession);
+                    sess = smf_sess_find_by_imsi_apn(deleteSession.imsi, deleteSession.imsi_len, deleteSession.apn);
+                    d_assert(sess, goto release_n11_pkbuf, "No Session Context");
+
+                    smf_n11_handle_delete_session_request_by_JsonDeleteSession(sess, &deleteSession);
+                    d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    break;
+                }
+                default:
+                {
+                    d_error("Not support N11 Message");
+                }
+            }
+
+        release_n11_pkbuf:
+            pkbuf_free(recvbuf);
             break;
         }
         case SMF_EVT_GX_MESSAGE:

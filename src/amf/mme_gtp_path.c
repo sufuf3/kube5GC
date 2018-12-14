@@ -6,10 +6,15 @@
 #include "gtp/gtp_path.h"
 #include "gtp/gtp_xact.h"
 
+#include "amf_sbi_path.h"
+
 #include "mme_event.h"
 #include "mme_gtp_path.h"
 #include "mme_s11_build.h"
+#include "amf_json_build.h"
+#include "amf_json_handler.h"
 #include "mme_sm.h"
+extern sock_id gAmf_smContextCreateSock;
 
 static int _gtpv2_c_recv_cb(sock_id sock, void *data)
 {
@@ -109,6 +114,7 @@ status_t mme_gtp_close()
 
 status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 {
+#ifndef FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
@@ -123,6 +129,7 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
     h.teid = mme_ue->sgw_s11_teid;
 
     rv = mme_s11_build_create_session_request(&pkbuf, h.type, sess);
+
     d_assert(rv == CORE_OK, return CORE_ERROR,
             "S11 build error");
 
@@ -134,11 +141,31 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 
     return CORE_OK;
 }
+#else
+    mme_ue_t *mme_ue = NULL;
+    pkbuf_t *pkbuf = NULL;
+    mme_ue = sess->mme_ue;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    
+    amf_json_build_create_session(&pkbuf, sess);
 
+    amf_sbi_send_sm_context_create(pkbuf);
+
+    pkbuf_free(pkbuf);
+#if 0 // TempDisable Test
+    amf_json_handle_create_session(&pkbuf, sess); 
+#endif
+
+    return CORE_OK;
+
+
+}
+#endif
 
 status_t mme_gtp_send_modify_bearer_request(
         mme_bearer_t *bearer, int uli_presence)
 {
+#ifndef FIVE_G_CORE
     status_t rv;
 
     gtp_xact_t *xact = NULL;
@@ -166,10 +193,24 @@ status_t mme_gtp_send_modify_bearer_request(
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
     return CORE_OK;
+#else
+    mme_ue_t *mme_ue = NULL;
+    pkbuf_t *pkbuf = NULL;
+    mme_ue = bearer->mme_ue;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf_json_build_modify_bearer(&pkbuf, bearer);
+    // d_info("send sbi sm context update start");
+    amf_sbi_send_sm_context_update(pkbuf);
+    // d_info("send sbi sm context update end");
+    pkbuf_free(pkbuf);
+    return CORE_OK;
+#endif
 }
 
+// TODO: release session
 status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
 {
+#if 1
     status_t rv;
     pkbuf_t *s11buf = NULL;
     gtp_header_t h;
@@ -196,6 +237,20 @@ status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
     return CORE_OK;
+#else
+    mme_ue_t *mme_ue = NULL;
+    pkbuf_t *pkbuf = NULL;
+    mme_ue = sess->mme_ue;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    
+    amf_json_build_delete_session(&pkbuf, sess);
+
+    amf_sbi_send_sm_context_release(pkbuf);
+
+    pkbuf_free(pkbuf);
+
+    return CORE_OK;
+#endif
 }
 
 status_t mme_gtp_send_delete_all_sessions(mme_ue_t *mme_ue)
@@ -334,11 +389,11 @@ status_t mme_gtp_send_delete_bearer_response(mme_bearer_t *bearer)
 
 status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
 {
+#ifndef FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
     gtp_xact_t *xact = NULL;
-
     d_assert(mme_ue, return CORE_ERROR, "Null param");
 
     memset(&h, 0, sizeof(gtp_header_t));
@@ -353,8 +408,19 @@ status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
 
     rv = gtp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
+    return CORE_OK;
+#else
+    pkbuf_t *pkbuf = NULL;
+    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    
+    amf_json_build_delete_session(&pkbuf, mme_sess_find_by_ebi(mme_ue, mme_ue->ebi));
+
+    amf_sbi_send_sm_context_release(pkbuf);
+
+    pkbuf_free(pkbuf);
 
     return CORE_OK;
+#endif
 }
 
 status_t mme_gtp_send_create_indirect_data_forwarding_tunnel_request(

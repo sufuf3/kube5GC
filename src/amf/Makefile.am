@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in.
 
+SUBDIRS = http_server
+
 noinst_LTLIBRARIES = libamf.la
 
 libamf_la_SOURCES = \
@@ -12,6 +14,7 @@ libamf_la_SOURCES = \
 	nas_conv.h nas_security.h nas_path.h \
 	emm_handler.h emm_build.h \
 	esm_handler.h esm_build.h \
+	amf_json_build.h amf_json_handler.h\
 	mme_gtp_path.h mme_s11_build.h mme_s11_handler.h \
 	mme_sm.h mme_path.h \
 	mme_kdf.c kasumi.c snow_3g.c zuc.c \
@@ -23,8 +26,11 @@ libamf_la_SOURCES = \
 	nas_conv.c nas_security.c nas_path.c \
 	emm_sm.c emm_handler.c emm_build.c \
 	esm_sm.c esm_handler.c esm_build.c \
+	amf_json_build.c amf_json_handler.c\
 	mme_gtp_path.c mme_s11_build.c mme_s11_handler.c \
 	mme_sm.c mme_path.c \
+	amf_sbi_path.h amf_sbi_path.c \
+	JsonTransform.h \
 	$(NULL)
 
 if USRSCTP
@@ -40,6 +46,8 @@ libamf_la_DEPENDENCIES = \
     $(top_srcdir)/lib/nas/libnas.la \
 	$(top_srcdir)/lib/fd/libfd.la \
     $(top_srcdir)/lib/gtp/libgtp.la \
+	$(top_srcdir)/lib/cJSON/libcJSON.la \
+	$(top_srcdir)/lib/sbiJson/libsbiJson.la \
     $(top_srcdir)/src/app/libapp.la \
 	$(NULL)
 
@@ -49,6 +57,8 @@ libamf_la_LIBADD = \
     $(top_srcdir)/lib/nas/libnas.la \
     $(top_srcdir)/lib/fd/libfd.la \
     $(top_srcdir)/lib/gtp/libgtp.la \
+	$(top_srcdir)/lib/cJSON/libcJSON.la \
+	$(top_srcdir)/lib/sbiJson/libsbiJson.la \
     $(top_srcdir)/src/app/libapp.la \
 	$(NULL)
 
@@ -59,6 +69,8 @@ AM_CPPFLAGS = \
     -I$(top_srcdir)/lib/s1ap/asn1c \
 	-I$(top_srcdir)/lib/ngap/asn1c \
 	-I$(top_srcdir)/lib/@FREEDIAMETER_DIR@/include \
+	-I$(top_srcdir)/lib/cJSON \
+	-I$(top_srcdir)/lib/sbiJson \
 	@MONGOC_CFLAGS@ \
 	$(NULL)
 

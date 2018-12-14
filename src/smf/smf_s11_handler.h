@@ -17,7 +17,9 @@ CORE_DECLARE(void) smf_s11_handle_delete_session_request(gtp_xact_t *s11_xact,
 CORE_DECLARE(void) smf_s11_handle_modify_bearer_request(gtp_xact_t *s11_xact,
         smf_sess_t *sess, gtp_modify_bearer_request_t *req);
 
-
+CORE_DECLARE(void) smf_n11_handle_create_session_request_by_JsonCreateSession(smf_sess_t *sess, create_session_t *createSession);
+CORE_DECLARE(void) smf_n11_handle_update_session_request_by_JsonUpdateSession(smf_sess_t *sess, modify_bearer_t *pModifyBearer);
+CORE_DECLARE(void) smf_n11_handle_delete_session_request_by_JsonDeleteSession(smf_sess_t *sess, delete_session_t *pDeleteSession);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

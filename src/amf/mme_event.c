@@ -68,7 +68,9 @@ char* mme_event_get_name(event_t *e)
         case MME_EVT_CHECK_OVERLOAD:
             return "MME_EVT_CHECK_OVERLOAD";
         /******************************************************/
-
+        
+        case AMF_EVT_N11_MESSAGE:
+            return "AMF_EVT_N11_MESSAGE";
         default: 
            break;
     }

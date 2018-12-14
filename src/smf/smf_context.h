@@ -18,6 +18,8 @@
 
 #include "fd/fd_lib.h"
 
+#include "JsonTransform.h"
+
 #define MAX_NUM_OF_SUBNET       16
 #define MAX_SMF_SESS_HASH_LEN   MAX_IMSI_LEN + MAX_APN_LEN + 1
 
@@ -59,6 +61,8 @@ typedef struct _smf_context_t {
     
     hash_t              *sess_hash;     /* Session Hash Table (IMSI + APN) */
 
+    pid_t               server_pid;
+    
     #define MAX_NUM_OF_DNS              2
     const char          *dns[MAX_NUM_OF_DNS];
     const char          *dns6[MAX_NUM_OF_DNS];
@@ -112,6 +116,10 @@ typedef struct _smf_sess_t {
     gtp_node_t      *mme_node;
     pfcp_node_t     *upf_node;
     gtp_xact_t      *s11_xact;
+
+    /* PCO */
+    uint8_t         pco_buf[MAX_PCO_LEN];
+    uint32_t        pco_len;
 } smf_sess_t;
 
 typedef struct _smf_bearer_t {
@@ -330,3 +338,7 @@ CORE_DECLARE(status_t)          smf_subnet_remove(smf_subnet_t *subnet);
 CORE_DECLARE(status_t)          smf_subnet_remove_all();
 CORE_DECLARE(smf_subnet_t*)     smf_subnet_first();
 CORE_DECLARE(smf_subnet_t*)     smf_subnet_next(smf_subnet_t *subnet);
+
+
+CORE_DECLARE(smf_sess_t*)       smf_sess_add_or_find_by_JsonCreateSession(create_session_t *createSession);
+CORE_DECLARE(smf_sess_t*)       smf_sess_find_by_JsonUpdateSession(modify_bearer_t *pModifyBearer);

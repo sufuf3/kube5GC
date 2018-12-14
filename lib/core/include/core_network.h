@@ -4,6 +4,10 @@
 #include "core_errno.h"
 #include "core_time.h"
 #include "core_list.h"
+#include "core_pkbuf.h"
+
+#include <sys/un.h>
+#include <netinet/in.h>
 
 #if HAVE_ARPA_INET_H
 #include <arpa/inet.h>
@@ -77,11 +81,13 @@ struct c_sockaddr_t {
      */
 #define c_sa_family sa.sa_family
 #define c_sa_port sin.sin_port
+#define sun_path sun.sun_path
     union {
         struct sockaddr_storage ss;
         struct sockaddr_in sin;
         struct sockaddr_in6 sin6;
         struct sockaddr sa;
+        struct sockaddr_un sun;
     };
 
     /* User Area
@@ -195,6 +201,19 @@ CORE_DECLARE(status_t) udp_connect(sock_id id, c_sockaddr_t *sa_list);
  */
 CORE_DECLARE(status_t) tcp_server(sock_id *new, c_sockaddr_t *sa_list);
 CORE_DECLARE(status_t) tcp_client(sock_id *new, c_sockaddr_t *sa_list);
+
+/*
+ * UNIX domain Socket (datagram)
+ */
+CORE_DECLARE(status_t) unixgram_socket(sock_id *new);
+CORE_DECLARE(status_t) unixgram_server(sock_id *new, 
+        c_sockaddr_t *l_addr);
+CORE_DECLARE(status_t) unixgram_client(sock_id *new, 
+        c_sockaddr_t *r_addr);
+CORE_DECLARE(status_t) unixgram_recvfrom(sock_id sock, 
+        pkbuf_t **pkbuf, c_sockaddr_t *from);
+CORE_DECLARE(status_t) unixgram_sendto(sock_id sock, 
+        pkbuf_t *pkbuf, c_sockaddr_t *to);
 
 /*
  * SCTP Socket
