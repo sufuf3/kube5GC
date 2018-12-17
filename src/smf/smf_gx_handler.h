@@ -12,11 +12,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 CORE_DECLARE(void) smf_gx_handle_cca_initial_request(
-        smf_sess_t *sess, gx_message_t *gx_message,
-        gtp_xact_t *xact, gtp_create_session_request_t *req);
+        smf_sess_t *sess, gx_message_t *gx_message);
 CORE_DECLARE(void) smf_gx_handle_cca_termination_request(
-        smf_sess_t *sess, gx_message_t *gx_message,
-        gtp_xact_t *xact, gtp_delete_session_request_t *req);
+        smf_sess_t *sess, gx_message_t *gx_message);
 CORE_DECLARE(void) smf_gx_handle_re_auth_request(
         smf_sess_t *sess, gx_message_t *gx_message);
 

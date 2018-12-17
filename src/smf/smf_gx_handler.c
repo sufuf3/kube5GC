@@ -4,41 +4,37 @@
 
 #include "smf_context.h"
 #include "fd/gx/gx_message.h"
-#include "smf_gtp_path.h"
+#include "smf_pfcp_path.h"
 #include "smf_ipfw.h"
 
 static status_t bearer_binding(smf_sess_t *sess, gx_message_t *gx_message);
 
 void smf_gx_handle_cca_initial_request(
-        smf_sess_t *sess, gx_message_t *gx_message,
-        gtp_xact_t *xact, gtp_create_session_request_t *req)
+        smf_sess_t *sess, gx_message_t *gx_message)
 {
-    gtp_header_t h;
-
+    status_t rv;
     d_assert(sess, return, "Null param");
     d_assert(gx_message, return, "Null param");
-    d_assert(xact, return, "Null param");
-    d_assert(req, return, "Null param");
 
     /* Send Create Session Request with Creating Default Bearer */
-    memset(&h, 0, sizeof(gtp_header_t));
-    //TODO: GTP_CREATE_SESSION_RESPONSE_TYPE;
+    rv = smf_pfcp_send_session_establishment_request(sess);
+    d_assert(rv == CORE_OK, return, "Send N4 PFCP Session Establistment Request Failed");
+
+    rv = bearer_binding(sess, gx_message);
+
 }
 
 void smf_gx_handle_cca_termination_request(
-        smf_sess_t *sess, gx_message_t *gx_message,
-        gtp_xact_t *xact, gtp_delete_session_request_t *req)
+        smf_sess_t *sess, gx_message_t *gx_message)
 {
-    d_assert(xact, return, "Null param");
+    status_t rv;
     d_assert(sess, return, "Null param");
     d_assert(gx_message, return, "Null param");
-    d_assert(req, return, "Null param");
 
+    smf_pfcp_send_session_deletion_request(sess);
+    
     /* Remove a smf session */
     smf_sess_remove(sess);
-
-    //TODO: GTP_DELETE_SESSION_RESPONSE_TYPE;
-    
 }
 
 void smf_gx_handle_re_auth_request(
