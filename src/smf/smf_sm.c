@@ -333,6 +333,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
 
                     smf_n11_handle_delete_session_request_by_JsonDeleteSession(sess, &deleteSession);
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    smf_gx_send_ccr(sess, GX_CC_REQUEST_TYPE_TERMINATION_REQUEST);
                     break;
                 }
                 default:

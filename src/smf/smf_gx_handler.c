@@ -31,10 +31,9 @@ void smf_gx_handle_cca_termination_request(
     d_assert(sess, return, "Null param");
     d_assert(gx_message, return, "Null param");
 
-    smf_pfcp_send_session_deletion_request(sess);
+    rv = smf_pfcp_send_session_deletion_request(sess);
+    d_assert(rv == CORE_OK, return, "Send N4 PFCP Session Deletion Request Failed");
     
-    /* Remove a smf session */
-    smf_sess_remove(sess);
 }
 
 void smf_gx_handle_re_auth_request(
