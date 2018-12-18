@@ -1,3 +1,4 @@
+#define TRACE_MODULE _smf_s11
 #include "gtp/gtp_conv.h"
 #include "smf_s11_build.h"
 
@@ -429,7 +430,12 @@ status_t smf_n11_build_create_session_response(
     bearer = smf_default_bearer_in_sess(sess);
     createSession.sgw_s1u_teid = bearer->sgw_s1u_teid;
 
+    // PDN
     memcpy(&createSession.pdn, &sess->pdn, sizeof(sess->pdn));
+
+    d_trace(-1, "PDN type: %d", sess->pdn.pdn_type);
+    d_trace(-1, "PDN PAA PDn Type: %d", sess->pdn.paa.pdn_type);
+
 
     // IMSI
     memcpy(createSession.imsi, sess->imsi, sess->imsi_len);
@@ -480,6 +486,8 @@ status_t smf_n11_build_update_session_response(
     modifyBearer.imsi_len = sess->imsi_len;
 
     modifyBearer.sm_context_update_type = sess->sm_context_update_type;
+    d_trace(-1, "smf_n11_build_update_session_response SM %d\n", modifyBearer.sm_context_update_type);
+    d_trace(-1, "smf_n11_build_update_session_response SM addr %d\n", sess);
 
     JSONTRANSFORM_StToJs_update_session_response(&modifyBearer, j_updateSession);
     

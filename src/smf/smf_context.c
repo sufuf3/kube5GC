@@ -1728,7 +1728,7 @@ smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(create_session_t *createSe
     {
         d_info("APN_type: %d", createSession->pdn.pdn_type);
         sess = smf_sess_add(createSession->imsi, createSession->imsi_len, apn,
-            createSession->pdn.pdn_type - 1,
+            createSession->pdn.paa.pdn_type,
             createSession->ebi);
         d_assert(sess, return NULL, "No Session Context");
     }

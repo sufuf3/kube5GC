@@ -102,7 +102,7 @@ void add_pdn_to_json(cJSON* json_key, pdn_t* _pdn){
     add_uint8_to_json(pdn, _pdn->pdn_type, JSONKEY_4G_PDN_PDNTYPE);
 
 #if JSON_DEBUG
-    d_info("%d %s pdn_type :%d\n", __LINE__, __FUNCTION__, _pdn->pdn_type);
+    d_info("%d %s pdn_type :%d\n", __LINE__, __FUNCTION__, _pdn->paa.pdn_type);
 #endif
     
     add_uint8_to_json(paa, _pdn->paa.pdn_type, JSONKEY_4G_PDN_PAA_PDNTYPE);

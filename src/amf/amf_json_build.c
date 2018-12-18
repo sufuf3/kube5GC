@@ -50,10 +50,12 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     memcpy(createSession.apn, pdn->apn, sizeof(pdn->apn));
 
     c_uint8_t pdn_type;
+    d_trace(-1, "Origin PDN Type: %d\n", pdn->pdn_type);
     if (pdn->pdn_type == HSS_PDN_TYPE_IPV4 ||
         pdn->pdn_type == HSS_PDN_TYPE_IPV6 ||
         pdn->pdn_type == HSS_PDN_TYPE_IPV4V6)
     {
+        d_trace(-1, "PDNNNNNNNNNNNNNN %d, %d\n", pdn->pdn_type + 1, sess->request_type.pdn_type);
         pdn_type = ((pdn->pdn_type + 1) & sess->request_type.pdn_type);
         d_assert(pdn_type != 0, return CORE_ERROR,
                 "PDN Configuration Error:(%d, %d)",
@@ -69,7 +71,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     memcpy(&createSession.pdn, pdn, sizeof(pdn_t));
     
     createSession.pdn.paa.pdn_type = pdn_type;
-    // d_info("pdn->paa.pdn_type :%d\n", pdn->paa.pdn_type);
+    d_trace(-1, "createSession.pdn.paa.pdn_type :%d\n", createSession.pdn.paa.pdn_type);
     createSession.ebi = bearer->ebi;
     /*TODO : ue timezone*/
     memcpy(&createSession.guti, &mme_ue->guti, sizeof(mme_ue->guti));

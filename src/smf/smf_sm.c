@@ -261,7 +261,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
                     break;
                 case PFCP_SESSION_MODIFICATION_RESPONSE_TYPE:
                     smf_n4_handle_session_modification_response(
-                        xact, sess,&message->pfcp_session_modification_response);
+                        xact, sess, &message->pfcp_session_modification_response);
                     break;
                 case PFCP_SESSION_DELETION_RESPONSE_TYPE:
                     smf_n4_handle_session_deletion_response(
@@ -299,11 +299,8 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 case N11_TYPE_SM_CONTEXT_CREATE:
                 {
                     d_trace(10, "Create Session OK");
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
                     smf_json_handler_create_session(&recvbuf, &createSession);
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
                     sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
                     smf_n11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
                     d_trace(10, "Create Session Ended");
                     smf_gx_send_ccr(sess, GX_CC_REQUEST_TYPE_INITIAL_REQUEST);

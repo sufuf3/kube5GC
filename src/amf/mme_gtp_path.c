@@ -114,6 +114,7 @@ status_t mme_gtp_close()
 
 status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 {
+    d_trace(-1, "mme_gtp_send_create_session_request");
 #ifndef FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
@@ -165,6 +166,7 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 status_t mme_gtp_send_modify_bearer_request(
         mme_bearer_t *bearer, int uli_presence)
 {
+    d_trace(-1, "mme_gtp_send_modify_bearer_request");
 #ifndef FIVE_G_CORE
     status_t rv;
 
@@ -210,7 +212,8 @@ status_t mme_gtp_send_modify_bearer_request(
 // TODO: release session
 status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
 {
-#if FIVE_G_CORE
+    d_trace(-1, "mme_gtp_send_delete_session_request");
+#ifndef FIVE_G_CORE
     status_t rv;
     pkbuf_t *s11buf = NULL;
     gtp_header_t h;
@@ -255,6 +258,7 @@ status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
 
 status_t mme_gtp_send_delete_all_sessions(mme_ue_t *mme_ue)
 {
+    d_trace(-1, "mme_gtp_send_delete_all_sessions");
     status_t rv;
     mme_sess_t *sess = NULL, *next_sess = NULL;
 
@@ -293,6 +297,7 @@ status_t mme_gtp_send_delete_all_sessions(mme_ue_t *mme_ue)
 
 status_t mme_gtp_send_create_bearer_response(mme_bearer_t *bearer)
 {
+    d_trace(-1, "mme_gtp_send_create_bearer_response");
     status_t rv;
 
     gtp_xact_t *xact = NULL;
@@ -325,6 +330,7 @@ status_t mme_gtp_send_create_bearer_response(mme_bearer_t *bearer)
 
 status_t mme_gtp_send_update_bearer_response(mme_bearer_t *bearer)
 {
+    d_trace(-1, "mme_gtp_send_update_bearer_response");
     status_t rv;
 
     gtp_xact_t *xact = NULL;
@@ -357,6 +363,8 @@ status_t mme_gtp_send_update_bearer_response(mme_bearer_t *bearer)
 
 status_t mme_gtp_send_delete_bearer_response(mme_bearer_t *bearer)
 {
+    d_trace(-1, "mme_gtp_send_delete_bearer_response");
+
     status_t rv;
 
     gtp_xact_t *xact = NULL;
@@ -389,6 +397,7 @@ status_t mme_gtp_send_delete_bearer_response(mme_bearer_t *bearer)
 
 status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
 {
+    d_trace(-1, "mme_gtp_send_release_access_bearers_request");
 #ifndef FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
@@ -430,6 +439,7 @@ status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
 status_t mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
         mme_ue_t *mme_ue)
 {
+    d_trace(-1, "mme_gtp_send_create_indirect_data_forwarding_tunnel_request");
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
@@ -457,6 +467,7 @@ status_t mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
 status_t mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(
         mme_ue_t *mme_ue)
 {
+    d_trace(-1, "mme_gtp_send_delete_indirect_data_forwarding_tunnel_request");
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;

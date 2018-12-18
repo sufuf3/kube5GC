@@ -708,6 +708,7 @@ void amf_n11_handle_create_session_response(
     d_info("ipv4: %d, ipv6: %d", pCreateSession->sgw_ip.ipv4, pCreateSession->sgw_ip.ipv6);
     d_info("ipv4: %d, ipv6: %d", bearer->sgw_s1u_ip.ipv4, bearer->sgw_s1u_ip.ipv6);
 
+    mme_ue->sgw_s11_teid = 1;
     d_info("create Session");
     if (FSM_CHECK(&mme_ue->sm, emm_state_initial_context_setup))
     {
