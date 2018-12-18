@@ -726,7 +726,7 @@ void amf_n11_handle_create_session_response(
 
 void amf_n11_handle_modify_bearer_response( mme_ue_t *mme_ue, modify_bearer_t *modifyBearer)
 {
-status_t rv;
+    status_t rv;
     enb_ue_t *source_ue = NULL, *target_ue = NULL;
 
     d_assert(mme_ue, return, "Null param");
@@ -736,29 +736,47 @@ status_t rv;
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
 
-    GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH,
-        rv = s1ap_send_path_switch_ack(mme_ue);
+    if (modifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_MODIFY)
+    {
+        GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH,
+            rv = s1ap_send_path_switch_ack(mme_ue);
+            d_assert(rv == CORE_OK,, "s1ap send error");
+        );
+
+        GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY,
+            target_ue = mme_ue->enb_ue;
+            d_assert(target_ue, return, "Null param");
+            source_ue = target_ue->source_ue;
+            d_assert(source_ue, return, "Null param");
+
+            rv = s1ap_send_ue_context_release_command(source_ue,
+                    S1AP_Cause_PR_radioNetwork,
+                    S1AP_CauseRadioNetwork_successful_handover,
+                    S1AP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL, 300);
+            d_assert(rv == CORE_OK,, "s1ap send error");
+        );
+
+        return;
+
+    cleanup:
+        GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH,);
+        GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY,);
+    }
+    else if (modifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS)
+    {
+        enb_ue_t* enb_ue = mme_ue->enb_ue;
+        rv = CLEAR_BEARER_CONTEXT(mme_ue);
+        d_assert(rv == CORE_OK,, "MME_BEARER_SET_INACTIVE failed");
+
+        rv = s1ap_send_ue_context_release_command(enb_ue,
+                S1AP_Cause_PR_nas, S1AP_CauseNas_normal_release,
+                S1AP_UE_CTX_REL_S1_NORMAL_RELEASE, 0);
         d_assert(rv == CORE_OK,, "s1ap send error");
-    );
-
-    GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY,
-        target_ue = mme_ue->enb_ue;
-        d_assert(target_ue, return, "Null param");
-        source_ue = target_ue->source_ue;
-        d_assert(source_ue, return, "Null param");
-
-        rv = s1ap_send_ue_context_release_command(source_ue,
-                S1AP_Cause_PR_radioNetwork,
-                S1AP_CauseRadioNetwork_successful_handover,
-                S1AP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL, 300);
-        d_assert(rv == CORE_OK,, "s1ap send error");
-    );
-
-    return;
-
-cleanup:
-    GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH,);
-    GTP_COUNTER_CHECK(mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY,);
+    }
+    else
+    {
+        d_error("Unknown SM Context Update type: %02X", modifyBearer->sm_context_update_type);
+    }
 }
 
 void amf_n11_handle_delete_session_response(mme_ue_t *mme_ue, delete_session_t *deleteSession)

@@ -198,7 +198,7 @@ status_t mme_gtp_send_modify_bearer_request(
     pkbuf_t *pkbuf = NULL;
     mme_ue = bearer->mme_ue;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
-    amf_json_build_modify_bearer(&pkbuf, bearer);
+    amf_json_build_modify_bearer(&pkbuf, bearer, SM_CONTEXT_UPDATE_TYPE_MODIFY);
     // d_info("send sbi sm context update start");
     amf_sbi_send_sm_context_update(pkbuf);
     // d_info("send sbi sm context update end");
@@ -410,17 +410,18 @@ status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
     return CORE_OK;
 #else
-    mme_ue_t *mme_ue = NULL;
+    mme_bearer_t *bearer = NULL;
     pkbuf_t *pkbuf = NULL;
-    mme_ue = bearer->mme_ue;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
+    
+    bearer = mme_bearer_find_by_ue_ebi(mme_ue, mme_ue->ebi);
+
     bearer->enb_s1u_teid = 0;
-    amf_json_build_modify_bearer(&pkbuf, bearer);
+    amf_json_build_modify_bearer(&pkbuf, bearer, SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS);
     // d_info("send sbi sm context update start");
     amf_sbi_send_sm_context_update(pkbuf);
     // d_info("send sbi sm context update end");
     pkbuf_free(pkbuf);
-    return CORE_OK;
 
     return CORE_OK;
 #endif

@@ -120,6 +120,9 @@ typedef struct _smf_sess_t {
     /* PCO */
     uint8_t         pco_buf[MAX_PCO_LEN];
     uint32_t        pco_len;
+
+    /* Last SM Context Update Type */
+    c_uint8_t       sm_context_update_type;
 } smf_sess_t;
 
 typedef struct _smf_bearer_t {

@@ -270,6 +270,9 @@ status_t JSONTRANSFORM_StToJs_modify_bearer_request(modify_bearer_t *sess, cJSON
     d_assert(sess, return CORE_ERROR, "Null param");
     d_assert(pJson, return CORE_ERROR, "Null param");
 
+    /* sm_context_update_type */
+    add_uint8_to_json(pJson, sess->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
+
     /* imsi */
     char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
     core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
@@ -608,6 +611,9 @@ void _add_enb_s1u_teid(cJSON *json_key, c_uint32_t *teid)
 
 status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBearer, cJSON *pJson)
 {
+    /* sm_context_update_type */
+    _add_json_to_struct_ui8_by_key(pJson, &pModifyBearer->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
+
     /* imsi */
     _add_imsi_to_struct(pJson, pModifyBearer->imsi, &pModifyBearer->imsi_len);
     
@@ -767,6 +773,9 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
          
 status_t JSONTRANSFORM_JsToSt_update_session_response(modify_bearer_t *sess, cJSON *pJson)
 {
+    /* sm_context_update_type */
+    _add_json_to_struct_ui8_by_key(pJson, &sess->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
+
     /* imsi */
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
     _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
@@ -777,6 +786,9 @@ status_t JSONTRANSFORM_JsToSt_update_session_response(modify_bearer_t *sess, cJS
 
 status_t JSONTRANSFORM_StToJs_update_session_response(modify_bearer_t *sess, cJSON *pJson)
 {
+    /* sm_context_update_type */
+    add_uint8_to_json(pJson, sess->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
+    
     /* imsi */
     char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
     core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);

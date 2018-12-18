@@ -479,6 +479,8 @@ status_t smf_n11_build_update_session_response(
     memcpy(modifyBearer.imsi, sess->imsi, sess->imsi_len);
     modifyBearer.imsi_len = sess->imsi_len;
 
+    modifyBearer.sm_context_update_type = sess->sm_context_update_type;
+
     JSONTRANSFORM_StToJs_update_session_response(&modifyBearer, j_updateSession);
     
     string = cJSON_Print(j_updateSession);

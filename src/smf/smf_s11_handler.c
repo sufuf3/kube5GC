@@ -118,7 +118,6 @@ void smf_n11_handle_update_session_request_by_JsonUpdateSession(smf_sess_t *sess
 {
     d_trace(3, "[SMF] N11 update Session Reqeust by_JsonUpdateSession\n");
     status_t rv;
-    pkbuf_t *pkbuf = NULL;
     smf_bearer_t *bearer = NULL;
 
     bearer = smf_bearer_find_by_ebi(sess, pModifyBearer->ebi);
@@ -136,9 +135,8 @@ void smf_n11_handle_update_session_request_by_JsonUpdateSession(smf_sess_t *sess
     rv = smf_pfcp_send_session_modification_request(sess);
     d_assert(rv == CORE_OK, , "pfcp session modification fail");
 
-    rv = smf_s11_build_modify_bearer_response(
-        &pkbuf, sess);
-    d_assert(rv == CORE_OK, return, "gtp build error");
+    d_trace(-1, "SM Context Update %d\n", pModifyBearer->sm_context_update_type);
+    sess->sm_context_update_type = pModifyBearer->sm_context_update_type;
 
 }
 
