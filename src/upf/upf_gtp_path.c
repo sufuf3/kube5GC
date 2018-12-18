@@ -369,7 +369,7 @@ static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
         return CORE_ERROR;//$ fixme!!!
     }
     
-    if(!far->sgw_s5u_teid)
+    if(!far->upf_n3_teid)
     {
         return CORE_ERROR;
     }
@@ -393,7 +393,7 @@ static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
     gtp_h->flags = 0x30;
     gtp_h->type = GTPU_MSGTYPE_GPDU;
     gtp_h->length = htons(sendbuf->len - GTPV1U_HEADER_LEN);
-    gtp_h->teid = htonl(far->sgw_s5u_teid);
+    gtp_h->teid = htonl(far->upf_n3_teid);
 
     /* Send to SGW */
     d_trace(50, "[UPF] SEND : ");
@@ -401,7 +401,7 @@ static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
 
     d_trace(3, "[UPF] SEND GPU-U to SGW[%s] : TEID[0x%x]\n",
         CORE_ADDR(sock_remote_addr(far->gnode->sock), buf),
-        far->sgw_s5u_teid);
+        far->upf_n3_teid);
     rv = gtp_send(far->gnode, sendbuf);
 
     return rv;
