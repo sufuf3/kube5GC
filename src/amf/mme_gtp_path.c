@@ -210,7 +210,7 @@ status_t mme_gtp_send_modify_bearer_request(
 // TODO: release session
 status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
 {
-#if 1
+#if FIVE_G_CORE
     status_t rv;
     pkbuf_t *s11buf = NULL;
     gtp_header_t h;
@@ -410,14 +410,17 @@ status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
     return CORE_OK;
 #else
+    mme_ue_t *mme_ue = NULL;
     pkbuf_t *pkbuf = NULL;
+    mme_ue = bearer->mme_ue;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
-    
-    amf_json_build_delete_session(&pkbuf, mme_sess_find_by_ebi(mme_ue, mme_ue->ebi));
-
-    amf_sbi_send_sm_context_release(pkbuf);
-
+    bearer->enb_s1u_teid = 0;
+    amf_json_build_modify_bearer(&pkbuf, bearer);
+    // d_info("send sbi sm context update start");
+    amf_sbi_send_sm_context_update(pkbuf);
+    // d_info("send sbi sm context update end");
     pkbuf_free(pkbuf);
+    return CORE_OK;
 
     return CORE_OK;
 #endif
