@@ -38,8 +38,8 @@ status_t app_initialize(const char *config_path, const char *log_path)
 
 
     /************************* PCRF Process **********************/
-    semaphore_create(&pcrf_sem1, 0); /* copied to PCRF/PGW/SGW/HSS process */
-    semaphore_create(&pcrf_sem2, 0); /* copied to PCRF/PGW/SGW/HSS process */
+    semaphore_create(&pcrf_sem1, 0); /* copied to PCRF/UPF/HSS process */
+    semaphore_create(&pcrf_sem2, 0); /* copied to PCRF/UPF/HSS process */
 
     if (context_self()->parameter.no_pcrf == 0)
     {
@@ -82,10 +82,10 @@ status_t app_initialize(const char *config_path, const char *log_path)
 
     /************************* UPF Process **********************/
 
-    semaphore_create(&upf_sem1, 0); /* copied to UPF/SGW/HSS process */
-    semaphore_create(&upf_sem2, 0); /* copied to UPF/SGW/HSS process */
+    semaphore_create(&upf_sem1, 0); /* copied to UPF/HSS process */
+    semaphore_create(&upf_sem2, 0); /* copied to UPF/HSS process */
 
-    if (context_self()->parameter.no_pgw == 0)
+    if (context_self()->parameter.no_upf == 0)
     {
         pid = fork();
         d_assert(pid >= 0, _exit(EXIT_FAILURE), "fork() failed");
@@ -133,7 +133,7 @@ status_t app_initialize(const char *config_path, const char *log_path)
     semaphore_create(&smf_sem1, 0); /* copied to SMF/HSS process */
     semaphore_create(&smf_sem2, 0); /* copied to SMF/HSS process */
 
-    if (context_self()->parameter.no_sgw == 0)
+    if (context_self()->parameter.no_upf == 0)
     {
         pid = fork();
         d_assert(pid >= 0, _exit(EXIT_FAILURE), "fork() failed");
@@ -255,7 +255,7 @@ void app_terminate(void)
     if (hss_sem1) semaphore_delete(hss_sem1);
     if (hss_sem2) semaphore_delete(hss_sem2);
 
-    if (context_self()->parameter.no_sgw == 0)
+    if (context_self()->parameter.no_smf == 0)
     {
         if (smf_sem2) semaphore_post(smf_sem2);
         if (smf_sem1) semaphore_wait(smf_sem1);
@@ -263,7 +263,7 @@ void app_terminate(void)
     if (smf_sem1) semaphore_delete(smf_sem1);
     if (smf_sem2) semaphore_delete(smf_sem2);
 
-    if (context_self()->parameter.no_pgw == 0)
+    if (context_self()->parameter.no_upf == 0)
     {
         if (upf_sem2) semaphore_post(upf_sem2);
         if (upf_sem1) semaphore_wait(upf_sem1);
