@@ -11,6 +11,7 @@
 #include "smf_n4_handler.h"
 #include "smf_s11_handler.h"
 #include "smf_gx_handler.h"
+#include "smf_fd_path.h"
 #include "smf_sm.h"
 
 #include "gtp/gtp_message.h"
@@ -305,6 +306,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
     d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
                     smf_n11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
                     d_trace(10, "Create Session Ended");
+                    smf_gx_send_ccr(sess, GX_CC_REQUEST_TYPE_INITIAL_REQUEST);
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
                     break;
                 }
@@ -331,6 +333,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
 
                     smf_n11_handle_delete_session_request_by_JsonDeleteSession(sess, &deleteSession);
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    smf_gx_send_ccr(sess, GX_CC_REQUEST_TYPE_TERMINATION_REQUEST);
                     break;
                 }
                 default:
@@ -362,19 +365,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
             {
                 case GX_CMD_CODE_CREDIT_CONTROL:
                 {
-                    index_t xact_index = event_get_param3(e);
-                    gtp_xact_t *xact = NULL;
-
-                    pkbuf_t *gtpbuf = (pkbuf_t *)event_get_param4(e);
-                    gtp_message_t *message = NULL;
-
-                    d_assert(xact_index, return, "Null param");
-                    xact = gtp_xact_find(xact_index);
-                    d_assert(xact, return, "Null param");
-
-                    d_assert(gtpbuf, return, "Null param");
-                    message = gtpbuf->payload;
-
                     if (gx_message->result_code != ER_DIAMETER_SUCCESS)
                     {
                         d_error("Diameter Error(%d)", gx_message->result_code);
@@ -385,15 +375,13 @@ void smf_state_operational(fsm_t *s, event_t *e)
                         case GX_CC_REQUEST_TYPE_INITIAL_REQUEST:
                         {
                             smf_gx_handle_cca_initial_request(
-                                    sess, gx_message, xact, 
-                                    &message->create_session_request);
+                                    sess, gx_message);
                             break;
                         }
                         case GX_CC_REQUEST_TYPE_TERMINATION_REQUEST:
                         {
                             smf_gx_handle_cca_termination_request(
-                                    sess, gx_message, xact,
-                                    &message->delete_session_request);
+                                    sess, gx_message);
                             break;
                         }
                         default:
@@ -403,7 +391,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
                         }
                     }
 
-                    pkbuf_free(gtpbuf);
                     break;
                 }
                 case GX_CMD_RE_AUTH:

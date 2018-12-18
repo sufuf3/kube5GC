@@ -5,8 +5,8 @@
 #include "core_thread.h"
 
 #include "gtp/gtp_xact.h"
-
 #include "pfcp/pfcp_xact.h"
+#include "smf_fd_path.h"
 
 #include "smf_context.h"
 #include "smf_event.h"
@@ -34,6 +34,9 @@ status_t smf_initialize()
     rv = smf_ue_pool_generate();
     if (rv != CORE_OK) return rv;
 
+    rv = smf_fd_init();
+    if (rv != CORE_OK) return CORE_ERROR;
+
     rv = thread_create(&smf_thread, NULL, smf_main, NULL);
     if (rv != CORE_OK) return rv;
 
@@ -52,6 +55,8 @@ void smf_terminate(void)
     
     pfcp_xact_final();
     
+    smf_fd_final();
+
     smf_context_final();
 }
 

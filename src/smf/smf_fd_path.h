@@ -14,8 +14,7 @@ typedef struct _gtp_xact_t gtp_xact_t;
 CORE_DECLARE(status_t) smf_fd_init(void);
 CORE_DECLARE(void) smf_fd_final(void);
 
-CORE_DECLARE(void) smf_gx_send_ccr(smf_sess_t *sess, gtp_xact_t *xact,
-        pkbuf_t *gtpbuf, c_uint32_t cc_request_type);
+CORE_DECLARE(void) smf_gx_send_ccr(smf_sess_t *sess, c_uint32_t cc_request_type);
 
 #ifdef __cplusplus
 }
