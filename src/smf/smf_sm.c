@@ -5,11 +5,10 @@
 
 #include "smf_context.h"
 #include "smf_event.h"
-#include "smf_gtp_path.h"
 #include "smf_pfcp_path.h"
 #include "smf_sbi_path.h"
 #include "smf_n4_handler.h"
-#include "smf_s11_handler.h"
+#include "smf_n11_handler.h"
 #include "smf_gx_handler.h"
 #include "smf_fd_path.h"
 #include "smf_sm.h"
@@ -47,12 +46,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
     {
         case FSM_ENTRY_SIG:
         {
-            rv = smf_gtp_open();
-            if (rv != CORE_OK)
-            {
-                d_error("Can't establish S11-GTP-C path");
-                break;
-            }
             rv = smf_pfcp_open();
             if (rv != CORE_OK)
             {
@@ -70,12 +63,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
         }
         case FSM_EXIT_SIG:
         {
-            rv = smf_gtp_close();
-            if (rv != CORE_OK)
-            {
-                d_error("Can't close S11-GTP-C path");
-                break;
-            }
             rv = smf_pfcp_close();
             if (rv != CORE_OK)
             {
@@ -88,81 +75,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 d_error("Can't close SMF-SBI path");
                 break;
             }
-            break;
-        }
-        case SMF_EVT_S11_MESSAGE:
-        {
-            status_t rv;
-            pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
-            pkbuf_t *copybuf = NULL;
-            gtp_message_t *s11_message = NULL;
-            c_uint16_t copybuf_len = 0;
-            gtp_xact_t *s11_xact = NULL;
-            smf_sess_t *sess = NULL;
-
-            copybuf_len = sizeof(gtp_message_t);
-            copybuf = pkbuf_alloc(0, copybuf_len);
-            d_assert(copybuf, break, "Null param");
-            s11_message = copybuf->payload;
-            d_assert(s11_message, break, "Null param");
-
-            rv = gtp_parse_msg(s11_message, recvbuf);
-            d_assert(rv == CORE_OK, goto release_s11_pkbuf;,);
-            
-            d_trace(8, "S11 Message: [type: %d, TEID: %08x]\n", 
-                    s11_message->h.type, s11_message->h.teid);
-
-            if (s11_message->h.teid) {
-                sess = smf_sess_find_by_teid(s11_message->h.teid);
-                d_assert(sess, goto release_s11_pkbuf;, "Session Context Not Found");
-            }
-            else {
-                sess = smf_sess_add_or_find_by_message(s11_message);
-                d_assert(sess, goto release_s11_pkbuf;, "Session Context Not Created");
-
-                gtp_node_t *mme = smf_mme_add_by_message(s11_message);
-                d_assert(mme, goto release_s11_pkbuf;, "MME Not Found");
-                sess->mme_node = mme;
-            }
-
-            smf_default_bearer_in_sess(sess)->gtp_pkbuf = copybuf;
-
-            rv = gtp_xact_receive(sess->mme_node, &s11_message->h, &s11_xact);
-            d_assert(rv == CORE_OK, goto release_s11_pkbuf;, "GTP Transaction Recive Error");
-
-            switch (s11_message->h.type)
-            {
-                case GTP_CREATE_SESSION_REQUEST_TYPE:
-                {
-                    smf_s11_handle_create_session_request(s11_xact, sess, &s11_message->create_session_request);
-                    break;
-                }
-                case GTP_DELETE_SESSION_REQUEST_TYPE:
-                {
-                    smf_s11_handle_delete_session_request(s11_xact, sess, &s11_message->delete_session_request);
-                    break;
-                }
-                case GTP_MODIFY_BEARER_REQUEST_TYPE:
-                {
-                    smf_s11_handle_modify_bearer_request(s11_xact, sess, &s11_message->modify_bearer_request);
-                    break;
-                }
-                default:
-                {
-                    d_error("No handler for event %s", smf_event_get_name(e));
-                    break;
-                }
-            }
-
-        release_s11_pkbuf:
-            pkbuf_free(recvbuf);
-            pkbuf_free(copybuf);
-            break;
-        }
-        case SMF_EVT_S11_T3_RESPONSE:
-        case SMF_EVT_S11_T3_HOLDING:
-        {
-            gtp_xact_timeout(event_get_param1(e), event_get(e));
             break;
         }
         case SMF_EVT_N4_MESSAGE:

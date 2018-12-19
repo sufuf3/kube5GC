@@ -13,8 +13,6 @@
 #include <yaml.h>
 #include "app/yaml_helper.h"
 
-#include "gtp/gtp_node.h"
-#include "gtp/gtp_path.h"
 #include "pfcp/pfcp_node.h"
 
 #include "smf_context.h"
@@ -49,11 +47,6 @@ status_t smf_context_init()
     index_init(&smf_urr_pool, MAX_POOL_OF_SESS);
     index_init(&smf_qer_pool, MAX_POOL_OF_SESS);
     
-    list_init(&self.gtpc_list);
-    list_init(&self.gtpc_list6);
-    list_init(&self.mme_s11_list);
-    gtp_node_init();
-    
     list_init(&self.pfcp_list);
     list_init(&self.pfcp_list6);
     list_init(&self.upf_n4_list);
@@ -87,11 +80,6 @@ status_t smf_context_final()
     index_final(&smf_urr_pool);
     index_final(&smf_qer_pool);
     
-    sock_remove_all_nodes(&self.gtpc_list);
-    sock_remove_all_nodes(&self.gtpc_list6);
-    gtp_remove_all_nodes(&self.mme_s11_list);
-    gtp_node_final();
-    
     sock_remove_all_nodes(&self.pfcp_list);
     sock_remove_all_nodes(&self.pfcp_list6);
     pfcp_node_final();
@@ -115,7 +103,6 @@ smf_context_t* smf_self()
 
 static status_t smf_context_prepare()
 {
-    self.gtpc_port = GTPV2_C_UDP_PORT;
     self.pfcp_port = PFCP_UDP_PORT;
 
     return CORE_OK;
@@ -123,13 +110,6 @@ static status_t smf_context_prepare()
 
 static status_t smf_context_validation()
 {
-    if (list_first(&self.gtpc_list) == NULL &&
-        list_first(&self.gtpc_list6) == NULL)
-    {
-        d_error("No smf.gtpc in '%s'",
-                context_self()->config.path);
-        return CORE_ERROR;
-    }
     if (list_first(&self.subnet_list) == NULL)
     {
         d_error("No smf.ue_pool in '%s'",
@@ -194,154 +174,7 @@ status_t smf_context_parse_config()
             while(yaml_iter_next(&smf_iter))
             {
                 const char *smf_key = yaml_iter_key(&smf_iter);
-                if (!strcmp(smf_key, "gtpc"))
-                {
-                    yaml_iter_t gtpc_array, gtpc_iter;
-                    yaml_iter_recurse(&smf_iter, &gtpc_array);
-                    do
-                    {
-                        int family = AF_UNSPEC;
-                        int i, num = 0;
-                        const char *hostname[MAX_NUM_OF_HOSTNAME];
-                        c_uint16_t port = self.gtpc_port;
-                        const char *dev = NULL;
-                        c_sockaddr_t *list = NULL;
-                        sock_node_t *node = NULL;
-
-                        if (yaml_iter_type(&gtpc_array) == YAML_MAPPING_NODE)
-                        {
-                            memcpy(&gtpc_iter, &gtpc_array,
-                                    sizeof(yaml_iter_t));
-                        }
-                        else if (yaml_iter_type(&gtpc_array) ==
-                            YAML_SEQUENCE_NODE)
-                        {
-                            if (!yaml_iter_next(&gtpc_array))
-                                break;
-                            yaml_iter_recurse(&gtpc_array, &gtpc_iter);
-                        }
-                        else if (yaml_iter_type(&gtpc_array) ==
-                            YAML_SCALAR_NODE)
-                        {
-                            break;
-                        }
-                        else
-                            d_assert(0, return CORE_ERROR,);
-
-                        while(yaml_iter_next(&gtpc_iter))
-                        {
-                            const char *gtpc_key =
-                                yaml_iter_key(&gtpc_iter);
-                            d_assert(gtpc_key,
-                                    return CORE_ERROR,);
-                            if (!strcmp(gtpc_key, "family"))
-                            {
-                                const char *v = yaml_iter_value(&gtpc_iter);
-                                if (v) family = atoi(v);
-                                if (family != AF_UNSPEC &&
-                                    family != AF_INET && family != AF_INET6)
-                                {
-                                    d_warn("Ignore family(%d) : AF_UNSPEC(%d), "
-                                        "AF_INET(%d), AF_INET6(%d) ", 
-                                        family, AF_UNSPEC, AF_INET, AF_INET6);
-                                    family = AF_UNSPEC;
-                                }
-                            }
-                            else if (!strcmp(gtpc_key, "addr") ||
-                                    !strcmp(gtpc_key, "name"))
-                            {
-                                yaml_iter_t hostname_iter;
-                                yaml_iter_recurse(&gtpc_iter, &hostname_iter);
-                                d_assert(yaml_iter_type(&hostname_iter) !=
-                                    YAML_MAPPING_NODE, return CORE_ERROR,);
-
-                                do
-                                {
-                                    if (yaml_iter_type(&hostname_iter) ==
-                                            YAML_SEQUENCE_NODE)
-                                    {
-                                        if (!yaml_iter_next(&hostname_iter))
-                                            break;
-                                    }
-
-                                    d_assert(num <= MAX_NUM_OF_HOSTNAME,
-                                            return CORE_ERROR,);
-                                    hostname[num++] = 
-                                        yaml_iter_value(&hostname_iter);
-                                } while(
-                                    yaml_iter_type(&hostname_iter) ==
-                                        YAML_SEQUENCE_NODE);
-                            }
-                            else if (!strcmp(gtpc_key, "port"))
-                            {
-                                const char *v = yaml_iter_value(&gtpc_iter);
-                                if (v)
-                                {
-                                    port = atoi(v);
-                                    self.gtpc_port = port;
-                                }
-                            }
-                            else if (!strcmp(gtpc_key, "dev"))
-                            {
-                                dev = yaml_iter_value(&gtpc_iter);
-                            }
-                            else
-                                d_warn("unknown key `%s`", gtpc_key);
-                        }
-
-                        list = NULL;
-                        for (i = 0; i < num; i++)
-                        {
-                            rv = core_addaddrinfo(&list,
-                                    family, hostname[i], port, 0);
-                            d_assert(rv == CORE_OK, return CORE_ERROR,);
-                        }
-
-                        if (list)
-                        {
-                            if (context_self()->parameter.no_ipv4 == 0)
-                            {
-                                rv = sock_add_node(&self.gtpc_list,
-                                        &node, list, AF_INET);
-                                d_assert(rv == CORE_OK, return CORE_ERROR,);
-                            }
-
-                            if (context_self()->parameter.no_ipv6 == 0)
-                            {
-                                rv = sock_add_node(&self.gtpc_list6,
-                                        &node, list, AF_INET6);
-                                d_assert(rv == CORE_OK, return CORE_ERROR,);
-                            }
-
-                            core_freeaddrinfo(list);
-                        }
-
-                        if (dev)
-                        {
-                            rv = sock_probe_node(
-                                    context_self()->parameter.no_ipv4 ?
-                                        NULL : &self.gtpc_list,
-                                    context_self()->parameter.no_ipv6 ?
-                                        NULL : &self.gtpc_list6,
-                                    dev, self.gtpc_port);
-                            d_assert(rv == CORE_OK, return CORE_ERROR,);
-                        }
-
-                    } while(yaml_iter_type(&gtpc_array) == YAML_SEQUENCE_NODE);
-
-                    if (list_first(&self.gtpc_list) == NULL &&
-                        list_first(&self.gtpc_list6) == NULL)
-                    {
-                        rv = sock_probe_node(
-                                context_self()->parameter.no_ipv4 ?
-                                    NULL : &self.gtpc_list,
-                                context_self()->parameter.no_ipv6 ?
-                                    NULL : &self.gtpc_list6,
-                                NULL, self.gtpc_port);
-                        d_assert(rv == CORE_OK, return CORE_ERROR,);
-                    }
-                }
-                else if (!strcmp(smf_key, "ue_pool"))
+                if (!strcmp(smf_key, "ue_pool"))
                 {
                     yaml_iter_t ue_pool_array, ue_pool_iter;
                     yaml_iter_recurse(&smf_iter, &ue_pool_array);
@@ -860,7 +693,6 @@ status_t smf_context_parse_config()
 status_t smf_context_setup_trace_module()
 {
     int app = context_self()->logger.trace.app;
-    int gtpv2 = context_self()->logger.trace.gtpv2;
     int pfcp = context_self()->logger.trace.pfcp;
 
     if (app)
@@ -869,24 +701,6 @@ status_t smf_context_setup_trace_module()
         d_trace_level(&_smf_context, app);
         extern int _smf_sm;
         d_trace_level(&_smf_sm, app);
-    }
-    
-    if (gtpv2)
-    {
-        extern int _smf_gtp_path;
-        d_trace_level(&_smf_gtp_path, gtpv2);
-
-        extern int _gtp_node;
-        d_trace_level(&_gtp_node, gtpv2);
-        extern int _gtp_message;
-        d_trace_level(&_gtp_message, gtpv2);
-        extern int _gtp_path;
-        d_trace_level(&_gtp_path, gtpv2);
-        extern int _gtp_xact;
-        d_trace_level(&_gtp_xact, gtpv2);
-
-        extern int _tlv_msg;
-        d_trace_level(&_tlv_msg, gtpv2);
     }
     
     if (pfcp)
@@ -907,38 +721,6 @@ status_t smf_context_setup_trace_module()
     return CORE_OK;
 }
 
-gtp_node_t *smf_mme_add_by_message(gtp_message_t *message)
-{
-    status_t rv;
-    gtp_node_t *mme = NULL;
-    gtp_f_teid_t *mme_s11_teid = NULL;
-    gtp_create_session_request_t *req = &message->create_session_request;
-
-    if (req->sender_f_teid_for_control_plane.presence == 0)
-    {
-        d_error("No Sender F-TEID");
-        return NULL;
-    }
-
-    mme_s11_teid = req->sender_f_teid_for_control_plane.data;
-    d_assert(mme_s11_teid, return NULL,);
-    mme = gtp_find_node(&smf_self()->mme_s11_list, mme_s11_teid);
-    if (!mme)
-    {
-        mme = gtp_add_node_with_teid(&smf_self()->mme_s11_list, mme_s11_teid,
-            smf_self()->gtpc_port,
-            context_self()->parameter.no_ipv4,
-            context_self()->parameter.no_ipv6,
-            context_self()->parameter.prefer_ipv4);
-        d_assert(mme, return NULL,);
-
-        rv = gtp_client(mme);
-        d_assert(rv == CORE_OK, return NULL,);
-    }
-
-    return mme;
-}
-
 static void *sess_hash_keygen(c_uint8_t *out, int *out_len,
         c_uint8_t *imsi, int imsi_len, c_int8_t *apn)
 {
@@ -947,65 +729,6 @@ static void *sess_hash_keygen(c_uint8_t *out, int *out_len,
     *out_len = imsi_len + strlen((char*)(out + imsi_len));
 
     return out;
-}
-
-smf_sess_t *smf_sess_add_or_find_by_message(gtp_message_t *message)
-{
-    smf_sess_t *sess = NULL;
-    c_int8_t apn[MAX_APN_LEN];
-
-    gtp_create_session_request_t *req = &message->create_session_request;
-
-    if (req->imsi.presence == 0)
-    {
-        d_error("No IMSI");
-        return NULL;
-    }
-    if (req->access_point_name.presence == 0)
-    {
-        d_error("No APN");
-        return NULL;
-    }
-    if (req->bearer_contexts_to_be_created.presence == 0)
-    {
-        d_error("No Bearer");
-        return NULL;
-    }
-    if (req->bearer_contexts_to_be_created.eps_bearer_id.presence == 0)
-    {
-        d_error("No EPS Bearer ID");
-        return NULL;
-    }
-    if (req->pdn_type.presence == 0)
-    {
-        d_error("No PDN Type");
-        return NULL;
-    }
-
-    apn_parse(apn, req->access_point_name.data, req->access_point_name.len);
-
-    d_trace(9, "smf_sess_add_by_message() [APN:%s, PDN:%d, EDI:%d]\n",
-            apn, req->pdn_type.u8,
-            req->bearer_contexts_to_be_created.eps_bearer_id.u8);
-
-    sess = smf_sess_find_by_imsi_apn(req->imsi.data, req->imsi.len, apn);
-    if (!sess)
-    {
-        d_print_hex(&req->imsi.data, req->imsi.len);
-        // "209AFAD4 297F0000"
-        d_print_hex(&apn, strlen(apn));
-        // "696E7465 726E6574"
-        d_print_hex(&req->bearer_contexts_to_be_created.eps_bearer_id.u8, 1);
-        // "05"
-        d_print_hex(&req->pdn_type.u8, 1);
-        // "03"
-        sess = smf_sess_add(req->imsi.data, req->imsi.len, apn,
-            req->pdn_type.u8,
-            req->bearer_contexts_to_be_created.eps_bearer_id.u8);
-        d_assert(sess, return NULL, "No Session Context");
-    }
-
-    return sess;
 }
 
 smf_sess_t* smf_sess_add(
@@ -1086,7 +809,6 @@ smf_sess_t* smf_sess_add(
         d_assert(0, return NULL, "Unsupported PDN Type(%d)", pdn_type);
     
     sess->smf_n4_seid = sess->index;
-    sess->sgw_s11_teid = sess->index;
     
     /* Generate Hash Key : IMSI + APN */
     sess_hash_keygen(sess->hash_keybuf, &sess->hash_keylen,
@@ -1117,9 +839,6 @@ smf_sess_t* smf_sess_add(
     dl_pdr->far->destination_interface = PFCP_FAR_DEST_INTF_ACCESS;
     d_trace(10, "SEID: [0x%016llx] DL PDR ID: [%d] DL FAR ID: [%d]\n",
                 sess->smf_n4_seid, dl_pdr->pdr_id, dl_pdr->far->far_id);
-    
-    d_trace(9, "smf_sess_add(): [SEID: %016llx, TEID: %08x]\n",
-            sess->smf_n4_seid, sess->sgw_s11_teid);
     
     return sess;
 }
