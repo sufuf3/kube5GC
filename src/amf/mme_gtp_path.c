@@ -15,7 +15,7 @@
 #include "amf_json_handler.h"
 #include "mme_sm.h"
 extern sock_id gAmf_smContextCreateSock;
-
+#if 0
 static int _gtpv2_c_recv_cb(sock_id sock, void *data)
 {
     status_t rv;
@@ -68,9 +68,10 @@ static c_sockaddr_t *gtp_addr_find_by_family(list_t *list, int family)
 
     return NULL;
 }
-
+#endif
 status_t mme_gtp_open()
 {
+#if 0
     status_t rv;
     gtp_node_t *gnode = NULL;
 
@@ -100,15 +101,16 @@ status_t mme_gtp_open()
         rv = gtp_client(gnode);
         d_assert(rv == CORE_OK, return CORE_ERROR,);
     }
-
+#endif
     return CORE_OK;
 }
 
 status_t mme_gtp_close()
 {
+#if 0
     sock_delete_list(&mme_self()->gtpc_list);
     sock_delete_list(&mme_self()->gtpc_list6);
-
+#endif
     return CORE_OK;
 }
 
@@ -297,6 +299,7 @@ status_t mme_gtp_send_delete_all_sessions(mme_ue_t *mme_ue)
 
 status_t mme_gtp_send_create_bearer_response(mme_bearer_t *bearer)
 {
+#if 0
     d_trace(-1, "mme_gtp_send_create_bearer_response");
     status_t rv;
 
@@ -324,12 +327,13 @@ status_t mme_gtp_send_create_bearer_response(mme_bearer_t *bearer)
 
     rv = gtp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
-
+#endif
     return CORE_OK;
 }
 
 status_t mme_gtp_send_update_bearer_response(mme_bearer_t *bearer)
 {
+#if 0
     d_trace(-1, "mme_gtp_send_update_bearer_response");
     status_t rv;
 
@@ -357,12 +361,13 @@ status_t mme_gtp_send_update_bearer_response(mme_bearer_t *bearer)
 
     rv = gtp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
-
+#endif
     return CORE_OK;
 }
 
 status_t mme_gtp_send_delete_bearer_response(mme_bearer_t *bearer)
 {
+#if 0
     d_trace(-1, "mme_gtp_send_delete_bearer_response");
 
     status_t rv;
@@ -391,7 +396,7 @@ status_t mme_gtp_send_delete_bearer_response(mme_bearer_t *bearer)
 
     rv = gtp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
-
+#endif
     return CORE_OK;
 }
 
@@ -439,6 +444,7 @@ status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
 status_t mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
         mme_ue_t *mme_ue)
 {
+#if 0
     d_trace(-1, "mme_gtp_send_create_indirect_data_forwarding_tunnel_request");
     status_t rv;
     gtp_header_t h;
@@ -460,13 +466,14 @@ status_t mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
 
     rv = gtp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
-
+#endif
     return CORE_OK;
 }
 
 status_t mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(
         mme_ue_t *mme_ue)
 {
+#if 0
     d_trace(-1, "mme_gtp_send_delete_indirect_data_forwarding_tunnel_request");
     status_t rv;
     gtp_header_t h;
@@ -487,6 +494,6 @@ status_t mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(
 
     rv = gtp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
-
+#endif
     return CORE_OK;
 }
