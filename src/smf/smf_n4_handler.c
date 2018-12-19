@@ -19,21 +19,6 @@
 #include "smf_json_build.h"
 #include "smf_sbi_path.h"
 
-void test_session()
-{
-    c_uint8_t imsi[MAX_IMSI_LEN + 1];
-    c_uint8_t pdn_type = GTP_PDN_TYPE_IPV4;
-    char imsi_bcd[MAX_IMSI_BCD_LEN + 1];
-    char apn[MAX_APN_LEN] = "internet";
-    int imsi_len;
-    strcpy(imsi_bcd, "10052364786");
-    core_bcd_to_buffer(imsi_bcd, imsi, &imsi_len);
-    smf_sess_t *sess = smf_sess_add(imsi, imsi_len, apn, pdn_type, 1);
-    smf_pfcp_send_session_establishment_request(sess);
-    smf_pfcp_send_session_modification_request(sess);
-    smf_pfcp_send_session_deletion_request(sess);
-}
-
 void smf_n4_handle_heartbeat_request(
         pfcp_xact_t *xact, pfcp_heartbeat_request_t *req)
 {
@@ -207,48 +192,6 @@ void smf_n4_handle_session_establishment_response(
         pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_establishment_response_t *rsp)
 {
     d_trace(3, "[SMF] Session Establishment Response\n");
-#ifndef FIVE_G_CORE
-    status_t rv;
-    pkbuf_t *pkbuf = NULL;
-    gtp_header_t h;
-    pfcp_f_seid_t *up_f_seid = NULL;
-    c_uint8_t cause;
-    
-    if (!rsp->cause.presence)
-    {
-        d_error("session_establishment_response error: no Cause");
-        return;
-    }
-    
-    if (!rsp->up_f_seid.presence)
-    {
-        d_error("session_establishment_response error: no UP F-SEID");
-        return;
-    }
-    
-    cause = *((c_uint8_t*)rsp->cause.data);
-    up_f_seid = rsp->up_f_seid.data;
-    
-    if (cause != PFCP_CAUSE_SUCCESS)
-    {
-        d_info("association_setup_response cause: %d", pfcp_cause_get_name(cause));
-    } else
-    {
-        sess->upf_n4_seid = be64toh(up_f_seid->seid);
-        memset(&h, 0, sizeof(gtp_header_t));
-        h.type = GTP_CREATE_SESSION_RESPONSE_TYPE;
-        h.teid = sess->mme_s11_teid;
-        rv = smf_s11_build_create_session_response(
-            &pkbuf, sess);
-        d_assert(rv == CORE_OK, return, "gtp build error");
-
-        rv = gtp_xact_update_tx(sess->s11_xact, &h, pkbuf);
-        d_assert(rv == CORE_OK, return, "gtp_xact_update_tx error");
-
-        rv = gtp_xact_commit(sess->s11_xact);
-        d_assert(rv == CORE_OK, return, "xact_commit error");
-    }
-#else
     pkbuf_t *pkbuf = NULL;
     pfcp_f_seid_t *up_f_seid = NULL;
     c_uint8_t cause;
@@ -277,7 +220,6 @@ void smf_n4_handle_session_establishment_response(
         smf_n11_build_create_session_response(&pkbuf, sess);
         smf_sbi_send_sm_context_create(pkbuf);
     }
-#endif
 }
 
 void smf_n4_handle_session_modification_response(
@@ -285,17 +227,9 @@ void smf_n4_handle_session_modification_response(
 {
 
     d_trace(3, "[SMF] Session Modification Response\n");
-#ifndef FIVE_G_CORE    
-    if (!rsp->cause.presence)
-    {
-        d_error("session_modification_response error: no Cause");
-        return;
-    }
-#else
     pkbuf_t *pkbuf = NULL;
     smf_n11_build_update_session_response(&pkbuf, sess);
     smf_sbi_send_sm_context_update(pkbuf);
-#endif
 }
 
 void smf_n4_handle_session_deletion_response(
