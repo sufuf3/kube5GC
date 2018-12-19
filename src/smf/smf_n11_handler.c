@@ -31,8 +31,6 @@ void smf_n11_handle_update_session_request_by_JsonUpdateSession(smf_sess_t *sess
     bearer->enb_s1u_teid = ntohl(pModifyBearer->enb_s1u_teid);
     bearer->addr = pModifyBearer->enb_s1u_ip.addr;
 
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-        sess->mme_s11_teid, sess->sgw_s11_teid);
     d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
         bearer->sgw_s1u_teid, bearer->enb_s1u_teid);
 

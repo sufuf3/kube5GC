@@ -49,7 +49,6 @@ typedef struct _smf_context_t {
     list_t              subnet_list;    /* SMF UE Subnet List */
     
     list_t              upf_n4_list;    /* UPF PFCP client List */
-    list_t              mme_s11_list;
     
     hash_t              *sess_hash;     /* Session Hash Table (IMSI + APN) */
 
@@ -74,9 +73,6 @@ typedef struct _smf_sess_t {
     
     c_uint64_t      smf_n4_seid;    /* SMF SEID is derived from INDEX */
     c_uint64_t      upf_n4_seid;    /* UPF SEID is received from UPF */
-    
-    c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is derived from INDEX */
-    c_uint32_t      mme_s11_teid;   /* MME-S11-TEID is received from MME */
     
     c_int8_t        *gx_sid;        /* Gx Session ID */
     
@@ -271,8 +267,6 @@ CORE_DECLARE(smf_context_t*)    smf_self(void);
 CORE_DECLARE(status_t)          smf_context_parse_config(void);
 CORE_DECLARE(status_t)          smf_context_setup_trace_module(void);
 
-CORE_DECLARE(smf_sess_t*)       smf_sess_add_or_find_by_message(
-                                    gtp_message_t *message);
 CORE_DECLARE(smf_sess_t*)       smf_sess_add(c_uint8_t *imsi, int imsi_len, 
                                     c_int8_t *apn, c_uint8_t pdn_type, 
                                     c_uint8_t ebi);
@@ -287,8 +281,6 @@ CORE_DECLARE(smf_sess_t*)       smf_sess_find_by_imsi_apn(
 CORE_DECLARE(smf_sess_t*)       smf_sess_this(hash_index_t *hi);
 CORE_DECLARE(hash_index_t*)     smf_sess_first();
 CORE_DECLARE(hash_index_t*)     smf_sess_next(hash_index_t *hi);
-
-CORE_DECLARE(gtp_node_t *)      smf_mme_add_by_message(gtp_message_t *message);
 
 CORE_DECLARE(smf_bearer_t*)     smf_bearer_add(smf_sess_t *sess);
 CORE_DECLARE(status_t)          smf_bearer_remove(smf_bearer_t *bearer);

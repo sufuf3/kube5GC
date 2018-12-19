@@ -162,7 +162,6 @@ status_t smf_n11_build_create_session_response(
     c_uint32_t length = 0;
     c_uint16_t pco_len;
     c_uint8_t pco_buf[MAX_PCO_LEN] = {0};
-    // gtp_message_t *message = smf_default_bearer_in_sess(sess)->gtp_pkbuf->payload;
 
     c_sockaddr_t *s1_u_enodeb_addr;
     gtp_f_teid_t s1_u_enodeb_f_teid;

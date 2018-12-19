@@ -47,9 +47,6 @@ status_t smf_context_init()
     index_init(&smf_urr_pool, MAX_POOL_OF_SESS);
     index_init(&smf_qer_pool, MAX_POOL_OF_SESS);
     
-    list_init(&self.mme_s11_list);
-    gtp_node_init();
-    
     list_init(&self.pfcp_list);
     list_init(&self.pfcp_list6);
     list_init(&self.upf_n4_list);
@@ -82,9 +79,6 @@ status_t smf_context_final()
     index_final(&smf_far_pool);
     index_final(&smf_urr_pool);
     index_final(&smf_qer_pool);
-    
-    gtp_remove_all_nodes(&self.mme_s11_list);
-    gtp_node_final();
     
     sock_remove_all_nodes(&self.pfcp_list);
     sock_remove_all_nodes(&self.pfcp_list6);
@@ -737,65 +731,6 @@ static void *sess_hash_keygen(c_uint8_t *out, int *out_len,
     return out;
 }
 
-smf_sess_t *smf_sess_add_or_find_by_message(gtp_message_t *message)
-{
-    smf_sess_t *sess = NULL;
-    c_int8_t apn[MAX_APN_LEN];
-
-    gtp_create_session_request_t *req = &message->create_session_request;
-
-    if (req->imsi.presence == 0)
-    {
-        d_error("No IMSI");
-        return NULL;
-    }
-    if (req->access_point_name.presence == 0)
-    {
-        d_error("No APN");
-        return NULL;
-    }
-    if (req->bearer_contexts_to_be_created.presence == 0)
-    {
-        d_error("No Bearer");
-        return NULL;
-    }
-    if (req->bearer_contexts_to_be_created.eps_bearer_id.presence == 0)
-    {
-        d_error("No EPS Bearer ID");
-        return NULL;
-    }
-    if (req->pdn_type.presence == 0)
-    {
-        d_error("No PDN Type");
-        return NULL;
-    }
-
-    apn_parse(apn, req->access_point_name.data, req->access_point_name.len);
-
-    d_trace(9, "smf_sess_add_by_message() [APN:%s, PDN:%d, EDI:%d]\n",
-            apn, req->pdn_type.u8,
-            req->bearer_contexts_to_be_created.eps_bearer_id.u8);
-
-    sess = smf_sess_find_by_imsi_apn(req->imsi.data, req->imsi.len, apn);
-    if (!sess)
-    {
-        d_print_hex(&req->imsi.data, req->imsi.len);
-        // "209AFAD4 297F0000"
-        d_print_hex(&apn, strlen(apn));
-        // "696E7465 726E6574"
-        d_print_hex(&req->bearer_contexts_to_be_created.eps_bearer_id.u8, 1);
-        // "05"
-        d_print_hex(&req->pdn_type.u8, 1);
-        // "03"
-        sess = smf_sess_add(req->imsi.data, req->imsi.len, apn,
-            req->pdn_type.u8,
-            req->bearer_contexts_to_be_created.eps_bearer_id.u8);
-        d_assert(sess, return NULL, "No Session Context");
-    }
-
-    return sess;
-}
-
 smf_sess_t* smf_sess_add(
         c_uint8_t *imsi, int imsi_len, c_int8_t *apn,
         c_uint8_t pdn_type, c_uint8_t ebi)
@@ -874,7 +809,6 @@ smf_sess_t* smf_sess_add(
         d_assert(0, return NULL, "Unsupported PDN Type(%d)", pdn_type);
     
     sess->smf_n4_seid = sess->index;
-    sess->sgw_s11_teid = sess->index;
     
     /* Generate Hash Key : IMSI + APN */
     sess_hash_keygen(sess->hash_keybuf, &sess->hash_keylen,
@@ -905,9 +839,6 @@ smf_sess_t* smf_sess_add(
     dl_pdr->far->destination_interface = PFCP_FAR_DEST_INTF_ACCESS;
     d_trace(10, "SEID: [0x%016llx] DL PDR ID: [%d] DL FAR ID: [%d]\n",
                 sess->smf_n4_seid, dl_pdr->pdr_id, dl_pdr->far->far_id);
-    
-    d_trace(9, "smf_sess_add(): [SEID: %016llx, TEID: %08x]\n",
-            sess->smf_n4_seid, sess->sgw_s11_teid);
     
     return sess;
 }
