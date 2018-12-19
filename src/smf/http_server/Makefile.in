@@ -8,9 +8,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 sysconfdir = @sysconfdir@
 
-.PHONY: all install clean
+.PHONY: all install clean go_depend
 
-all: $(BINARY)
+all: go_depend $(BINARY)
+
+go_depend:
+	go get -u "github.com/gorilla/mux"
+	go get -u "golang.org/x/net/http2"
 
 $(BINARY): main.go handler.go routers.go
 	$(GO) build -o $@ -ldflags "-X main.sysConfigPath=${sysconfdir} -X main.packageName=${PACKAGE}" $^
@@ -25,3 +29,5 @@ clean:
 install: $(BINARY) distdir
 	mkdir -p $(prefix)/http_server 
 	cp $(top_builddir)/http_server/$(BINARY) $(prefix)/http_server/
+
+maintainer-clean:
