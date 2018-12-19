@@ -8,7 +8,6 @@ libsmf_la_SOURCES = \
 	smf_context.h smf_context.c \
 	smf_sm.h smf_sm.c \
 	smf_event.h smf_event.c \
-	smf_gtp_path.h smf_gtp_path.c \
 	smf_pfcp_path.h smf_pfcp_path.c \
 	smf_fd_path.h smf_fd_path.c \
 	smf_n4_build.h smf_n4_build.c \

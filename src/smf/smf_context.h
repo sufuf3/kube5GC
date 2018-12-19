@@ -35,15 +35,7 @@ typedef struct _smf_context_t {
     fd_config_t         *fd_config;     /* SMF freeDiameter config */
 
     c_uint32_t          pfcp_port;      /* Default: SMF PFCP local port */
-    c_uint32_t          gtpc_port;      /* Default: SMF GTP-C local port */
     c_uint8_t           cp_function_features;
-
-    list_t              gtpc_list;      /* SMF GTP-C IPv4 Server List */
-    list_t              gtpc_list6;     /* SMF GTP-C IPv6 Server List */
-    sock_id             gtpc_sock;      /* SMF GTP-C IPv4 Socket */
-    sock_id             gtpc_sock6;     /* SMF GTP-C IPv6 Socket */
-    c_sockaddr_t        *gtpc_addr;     /* SMF GTP-C IPv4 Address */
-    c_sockaddr_t        *gtpc_addr6;    /* SMF GTP-C IPv6 Address */
 
     list_t              pfcp_list;      /* SMF PFCP IPv4 Server List */
     list_t              pfcp_list6;     /* SMF PFCP IPv6 Server List */

@@ -5,7 +5,6 @@
 
 #include "smf_context.h"
 #include "smf_event.h"
-#include "smf_gtp_path.h"
 #include "smf_pfcp_path.h"
 #include "smf_sbi_path.h"
 #include "smf_n4_handler.h"
@@ -47,12 +46,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
     {
         case FSM_ENTRY_SIG:
         {
-            rv = smf_gtp_open();
-            if (rv != CORE_OK)
-            {
-                d_error("Can't establish S11-GTP-C path");
-                break;
-            }
             rv = smf_pfcp_open();
             if (rv != CORE_OK)
             {
@@ -70,12 +63,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
         }
         case FSM_EXIT_SIG:
         {
-            rv = smf_gtp_close();
-            if (rv != CORE_OK)
-            {
-                d_error("Can't close S11-GTP-C path");
-                break;
-            }
             rv = smf_pfcp_close();
             if (rv != CORE_OK)
             {
