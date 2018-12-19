@@ -123,9 +123,8 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                     /* Check if Initial Context Setup Response or 
                      *          E-RAB Setup Response is received */
                     if (MME_HAVE_ENB_S1U_PATH(bearer))
-                    {
-                        rv = mme_gtp_send_create_bearer_response(bearer);
-                        d_assert(rv == CORE_OK,, "gtp send failed");
+                    {                    
+                        // TODO: SEND CREATE BEARER RESPONSE
                     }
 
                     FSM_TRAN(s, esm_state_active);
@@ -227,9 +226,9 @@ void esm_state_active(fsm_t *s, event_t *e)
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
                             mme_ue->imsi_bcd, sess->pti, bearer->ebi);
 
-                    rv = mme_gtp_send_update_bearer_response(bearer);
-                    d_assert(rv == CORE_OK, return,
-                            "mme_gtp_send_update_session_request error");
+                    // rv = mme_gtp_send_update_bearer_response(bearer);
+                    // d_assert(rv == CORE_OK, return,
+                    //         "mme_gtp_send_update_session_request error");
                     break;
                 }
                 case NAS_DEACTIVATE_EPS_BEARER_CONTEXT_ACCEPT:
@@ -238,9 +237,9 @@ void esm_state_active(fsm_t *s, event_t *e)
                             "context accept\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
                             mme_ue->imsi_bcd, sess->pti, bearer->ebi);
-                    rv = mme_gtp_send_delete_bearer_response(bearer);
-                    d_assert(rv == CORE_OK, return,
-                            "mme_gtp_send_delete_session_request error");
+                    // rv = mme_gtp_send_delete_bearer_response(bearer);
+                    // d_assert(rv == CORE_OK, return,
+                    //         "mme_gtp_send_delete_session_request error");
                     FSM_TRAN(s, esm_state_bearer_deactivated);
                     break;
                 }

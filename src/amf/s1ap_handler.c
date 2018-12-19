@@ -1664,8 +1664,7 @@ void s1ap_handle_e_rab_setup_response(
             }
             else
             {
-                rv = mme_gtp_send_create_bearer_response(bearer);
-                d_assert(rv == CORE_OK, return, "gtp send failed");
+                // TODO : SEND CREATE BEARER RESPONSE
             }
         }
     }
@@ -1769,8 +1768,7 @@ void s1ap_handle_e_rab_modify_response(
             }
             else
             {
-                rv = mme_gtp_send_update_bearer_response(bearer);
-                d_assert(rv == CORE_OK, return, "gtp send failed");
+                // TODO : SEND UPDATE BEARER RESPONSE
             }  
         }
     }
@@ -1997,9 +1995,7 @@ void s1ap_handle_ue_context_release_complete(
             d_assert(mme_ue,,);
             if (mme_ue_have_indirect_tunnel(mme_ue))
             {
-                rv = mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(mme_ue);
-                d_assert(rv == CORE_OK,, "mme_gtp_send_delete_indirect_data_"
-                    "forwarding_tunnel_request() failed");
+                // TODO : SEND DELETE INDIRECT DATA FORWARDINg TUNNEL REQUEST
             }
             else
             {
@@ -2873,9 +2869,7 @@ void s1ap_handle_handover_request_ack(mme_enb_t *enb, s1ap_message_t *message)
 
     if (mme_ue_have_indirect_tunnel(mme_ue) == 1)
     {
-        rv = mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
-                mme_ue);
-        d_assert(rv == CORE_OK, return, "gtp send failed");
+        // TODO : SEND CREATE INDIRECT DATA FORWARDING TUNNEL REQUEST
     }
     else
     {

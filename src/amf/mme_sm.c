@@ -69,12 +69,6 @@ void mme_state_operational(fsm_t *s, event_t *e)
     {
         case FSM_ENTRY_SIG:
         {
-            rv = mme_gtp_open();
-            if (rv != CORE_OK)
-            {
-                d_error("Can't establish S11-GTP path");
-                break;
-            }
             rv = s1ap_open();
             if (rv != CORE_OK)
             {
@@ -99,11 +93,6 @@ void mme_state_operational(fsm_t *s, event_t *e)
         }
         case FSM_EXIT_SIG:
         {
-            rv = mme_gtp_close();
-            if (rv != CORE_OK)
-            {
-                d_error("Can't close S11-GTP path");
-            }
             rv = s1ap_close();
             if (rv != CORE_OK)
             {
