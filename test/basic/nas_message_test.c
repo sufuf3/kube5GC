@@ -167,7 +167,7 @@ static void nas_message_test4(abts_case *tc, void *data)
 
 static void nas_message_test5(abts_case *tc, void *data)
 {
-    mme_ue_t ue;
+    amf4g_ue_t ue;
 
     ue.ul_count.i32 = 0x123456;
     ABTS_INT_EQUAL(tc, 0x1234, ue.ul_count.overflow);

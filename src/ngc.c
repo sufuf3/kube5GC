@@ -232,7 +232,7 @@ status_t app_initialize(const char *config_path, const char *log_path)
     if (rv != CORE_OK) return rv;
 
     d_trace(1, "AMF try to initialize\n");
-    rv = mme_initialize();
+    rv = amf4g_initialize();
     d_assert(rv == CORE_OK, return rv, "Failed to intialize AMF");
     d_trace(1, "AMF initialize...done\n");
 
@@ -244,7 +244,7 @@ void app_terminate(void)
     app_will_terminate();
 
     d_trace(1, "AMF try to terminate\n");
-    mme_terminate();
+    amf4g_terminate();
     d_trace(1, "AMF terminate...done\n");
 
     if (context_self()->parameter.no_hss == 0)

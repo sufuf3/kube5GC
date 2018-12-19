@@ -3,7 +3,7 @@
 
 #include "core_pkbuf.h"
 
-#include "mme_context.h"
+#include "amf4g_context.h"
 #include "s1ap/s1ap_message.h"
 
 #ifdef __cplusplus
@@ -16,7 +16,7 @@ CORE_DECLARE(status_t) s1ap_init(int sctp_streams, c_uint16_t port);
 CORE_DECLARE(status_t) s1ap_final();
 
 CORE_DECLARE(status_t) s1ap_send_mme_configuration_update(
-    mme_enb_t *target_enb);
+    amf4g_enb_t *target_enb);
 CORE_DECLARE(status_t) s1ap_send_mme_cp_relocation_indication(
         enb_ue_t *source_ue);
 
@@ -33,16 +33,16 @@ CORE_DECLARE(status_t) s1ap_send(sock_id sock,
 CORE_DECLARE(status_t) s1ap_recv(sock_id id, pkbuf_t *pkbuf);
 
 CORE_DECLARE(status_t) s1ap_send_to_enb(
-        mme_enb_t *enb, pkbuf_t *pkb, c_uint16_t stream_no);
+        amf4g_enb_t *enb, pkbuf_t *pkb, c_uint16_t stream_no);
 CORE_DECLARE(status_t) s1ap_send_to_enb_ue(enb_ue_t *enb_ue, pkbuf_t *pkbuf);
 CORE_DECLARE(status_t) s1ap_delayed_send_to_enb_ue(enb_ue_t *enb_ue,
         pkbuf_t *pkbuf, c_uint32_t duration);
 CORE_DECLARE(status_t) s1ap_send_to_nas(enb_ue_t *enb_ue,
         S1AP_ProcedureCode_t procedureCode, S1AP_NAS_PDU_t *nasPdu);
-CORE_DECLARE(status_t) s1ap_send_to_esm(mme_ue_t *mme_ue, pkbuf_t *esmbuf);
+CORE_DECLARE(status_t) s1ap_send_to_esm(amf4g_ue_t *amf4g_ue, pkbuf_t *esmbuf);
 
 CORE_DECLARE(status_t) s1ap_send_initial_context_setup_request(
-        mme_ue_t *mme_ue);
+        amf4g_ue_t *amf4g_ue);
 CORE_DECLARE(status_t) s1ap_send_ue_context_release_command(
     enb_ue_t *enb_ue, S1AP_Cause_PR group, long cause,
     c_uint8_t action, c_uint32_t delay);
@@ -51,29 +51,29 @@ CORE_DECLARE(status_t) s1ap_send_ue_context_modification_request(
 	enb_ue_t *enb_ue);
 
 CORE_DECLARE(status_t) s1ap_send_initial_context_setup_request(
-        mme_ue_t *mme_ue);
+        amf4g_ue_t *amf4g_ue);
 
 CORE_DECLARE(status_t) s1ap_send_ue_context_modification_confirm(
         enb_ue_t *enb_ue);
 
 CORE_DECLARE(status_t) s1ap_send_mme_configuration_transfer(
-        mme_enb_t *target_enb,
+        amf4g_enb_t *target_enb,
         S1AP_SONConfigurationTransfer_t *SONConfigurationTransfer);
 
 CORE_DECLARE(status_t) s1ap_send_mme_direct_information_transfer(
-	mme_enb_t *target_enb);
-CORE_DECLARE(status_t) s1ap_send_ERAB_release_command(mme_enb_t *enb,
+	amf4g_enb_t *target_enb);
+CORE_DECLARE(status_t) s1ap_send_ERAB_release_command(amf4g_enb_t *enb,
     c_uint32_t enb_ue_s1ap_id, c_uint32_t mme_ue_s1ap_id);
 
-CORE_DECLARE(status_t) s1ap_send_path_switch_ack(mme_ue_t *mme_ue);
+CORE_DECLARE(status_t) s1ap_send_path_switch_ack(amf4g_ue_t *amf4g_ue);
 
 CORE_DECLARE(status_t) s1ap_send_handover_command(enb_ue_t *source_ue);
 CORE_DECLARE(status_t) s1ap_send_handover_preparation_failure(
         enb_ue_t *source_ue, S1AP_Cause_t *cause);
 
 CORE_DECLARE(status_t) s1ap_send_handover_request(
-        mme_ue_t *mme_ue,
-        mme_enb_t *target_enb,
+        amf4g_ue_t *amf4g_ue,
+        amf4g_enb_t *target_enb,
         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
         S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
         S1AP_HandoverType_t *handovertype,
@@ -88,24 +88,24 @@ CORE_DECLARE(status_t) s1ap_send_mme_status_transfer(
         S1AP_ENB_StatusTransfer_TransparentContainer_t
             *enb_statustransfer_transparentContainer);
 CORE_DECLARE(status_t) s1ap_send_error_indication(
-        mme_enb_t *enb,
+        amf4g_enb_t *enb,
         S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
         S1AP_Cause_PR group, long cause);
 CORE_DECLARE(status_t) s1ap_send_s1_reset_ack(
-        mme_enb_t *enb,
+        amf4g_enb_t *enb,
         S1AP_UE_associatedLogicalS1_ConnectionListRes_t *partOfS1_Interface);
 CORE_DECLARE(status_t) s1ap_send_e_rab_modification_confirm(
         enb_ue_t *source_ue);
 
 CORE_DECLARE(status_t) s1ap_send_connection_establishment_indication(
-        mme_enb_t *enb,
+        amf4g_enb_t *enb,
         S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
-	mme_ue_t *mme_ue);
+	amf4g_ue_t *amf4g_ue);
 
 CORE_DECLARE(status_t) s1ap_send_ue_information_transfer(
-	mme_ue_t *mme_ue, 
+	amf4g_ue_t *amf4g_ue, 
 	S1AP_S_TMSI_t *S_TMSI);
 
 #ifdef __cplusplus

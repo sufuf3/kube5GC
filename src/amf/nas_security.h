@@ -5,7 +5,7 @@
 #include "core_aes.h"
 #include "core_aes_cmac.h"
 
-#include "mme_context.h"
+#include "amf4g_context.h"
 #include "snow_3g.h"
 #include "zuc.h"
 
@@ -33,8 +33,8 @@ typedef struct _nas_security_header_type_t {
 } __attribute__ ((packed)) nas_security_header_type_t;
 
 CORE_DECLARE(status_t) nas_security_encode(
-        pkbuf_t **pkbuf, mme_ue_t *mme_ue, nas_message_t *message);
-CORE_DECLARE(status_t) nas_security_decode(mme_ue_t *mme_ue, 
+        pkbuf_t **pkbuf, amf4g_ue_t *amf4g_ue, nas_message_t *message);
+CORE_DECLARE(status_t) nas_security_decode(amf4g_ue_t *amf4g_ue, 
         nas_security_header_type_t security_header_type, pkbuf_t *pkbuf);
 
 CORE_DECLARE(void) nas_mac_calculate(c_uint8_t algorithm_identity,

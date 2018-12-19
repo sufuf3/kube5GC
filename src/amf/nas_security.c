@@ -6,13 +6,13 @@
 #include "nas_security.h"
 
 status_t nas_security_encode(
-        pkbuf_t **pkbuf, mme_ue_t *mme_ue, nas_message_t *message)
+        pkbuf_t **pkbuf, amf4g_ue_t *amf4g_ue, nas_message_t *message)
 {
     int integrity_protected = 0;
     int new_security_context = 0;
     int ciphered = 0;
 
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
     d_assert(message, return CORE_ERROR, "Null param");
 
     switch(message->h.security_header_type)
@@ -43,13 +43,13 @@ status_t nas_security_encode(
 
     if (new_security_context)
     {
-        mme_ue->dl_count = 0;
-        mme_ue->ul_count.i32 = 0;
+        amf4g_ue->dl_count = 0;
+        amf4g_ue->ul_count.i32 = 0;
     }
 
-    if (mme_ue->selected_enc_algorithm == 0)
+    if (amf4g_ue->selected_enc_algorithm == 0)
         ciphered = 0;
-    if (mme_ue->selected_int_algorithm == 0)
+    if (amf4g_ue->selected_int_algorithm == 0)
         integrity_protected = 0;
 
     if (ciphered || integrity_protected)
@@ -60,7 +60,7 @@ status_t nas_security_encode(
         memset(&h, 0, sizeof(h));
         h.security_header_type = message->h.security_header_type;
         h.protocol_discriminator = message->h.protocol_discriminator;
-        h.sequence_number = (mme_ue->dl_count & 0xff);
+        h.sequence_number = (amf4g_ue->dl_count & 0xff);
 
         d_assert(nas_plain_encode(&new, message) == CORE_OK, 
                 return CORE_ERROR, "NAS encoding error");
@@ -68,8 +68,8 @@ status_t nas_security_encode(
         if (ciphered)
         {
             /* encrypt NAS message */
-            nas_encrypt(mme_ue->selected_enc_algorithm,
-                mme_ue->knas_enc, mme_ue->dl_count, NAS_SECURITY_BEARER,
+            nas_encrypt(amf4g_ue->selected_enc_algorithm,
+                amf4g_ue->knas_enc, amf4g_ue->dl_count, NAS_SECURITY_BEARER,
                 NAS_SECURITY_DOWNLINK_DIRECTION, new);
         }
 
@@ -83,14 +83,14 @@ status_t nas_security_encode(
             c_uint8_t mac[NAS_SECURITY_MAC_SIZE];
 
             /* calculate NAS MAC(message authentication code) */
-            nas_mac_calculate(mme_ue->selected_int_algorithm,
-                mme_ue->knas_int, mme_ue->dl_count, NAS_SECURITY_BEARER, 
+            nas_mac_calculate(amf4g_ue->selected_int_algorithm,
+                amf4g_ue->knas_int, amf4g_ue->dl_count, NAS_SECURITY_BEARER, 
                 NAS_SECURITY_DOWNLINK_DIRECTION, new, mac);
             memcpy(&h.message_authentication_code, mac, sizeof(mac));
         }
 
         /* increase dl_count */
-        mme_ue->dl_count = (mme_ue->dl_count + 1) & 0xffffff; /* Use 24bit */
+        amf4g_ue->dl_count = (amf4g_ue->dl_count + 1) & 0xffffff; /* Use 24bit */
 
         /* encode all security header */
         d_assert(CORE_OK == pkbuf_header(new, 5),
@@ -99,16 +99,16 @@ status_t nas_security_encode(
 
         *pkbuf = new;
 
-        mme_ue->security_context_available = 1;
+        amf4g_ue->security_context_available = 1;
     }
 
     return CORE_OK;
 }
 
-status_t nas_security_decode(mme_ue_t *mme_ue, 
+status_t nas_security_decode(amf4g_ue_t *amf4g_ue, 
     nas_security_header_type_t security_header_type, pkbuf_t *pkbuf)
 {
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
     d_assert(pkbuf, return CORE_ERROR, "Null param");
     d_assert(pkbuf->payload, return CORE_ERROR, "Null param");
 
@@ -123,7 +123,7 @@ status_t nas_security_decode(mme_ue_t *mme_ue,
         c_uint8_t sequence_number_high_3bit;
         c_uint8_t mac[NAS_SECURITY_MAC_SIZE];
 
-        if (mme_ue->selected_int_algorithm == 0)
+        if (amf4g_ue->selected_int_algorithm == 0)
         {
             d_warn("integrity algorithm is not defined");
             return CORE_ERROR;
@@ -133,22 +133,22 @@ status_t nas_security_decode(mme_ue_t *mme_ue,
         estimated_sequence_number = 
             ksi_and_sequence_number->sequence_number;
 
-        sequence_number_high_3bit = mme_ue->ul_count.sqn & 0xe0;
-        if ((mme_ue->ul_count.sqn & 0x1f) > estimated_sequence_number)
+        sequence_number_high_3bit = amf4g_ue->ul_count.sqn & 0xe0;
+        if ((amf4g_ue->ul_count.sqn & 0x1f) > estimated_sequence_number)
         {
             sequence_number_high_3bit += 0x20;
         }
         estimated_sequence_number += sequence_number_high_3bit;
 
-        if (mme_ue->ul_count.sqn > estimated_sequence_number)
-            mme_ue->ul_count.overflow++;
-        mme_ue->ul_count.sqn = estimated_sequence_number;
+        if (amf4g_ue->ul_count.sqn > estimated_sequence_number)
+            amf4g_ue->ul_count.overflow++;
+        amf4g_ue->ul_count.sqn = estimated_sequence_number;
 
         pkbuf->len = 2;
         memcpy(original_mac, pkbuf->payload + 2, SHORT_MAC_SIZE);
 
-        nas_mac_calculate(mme_ue->selected_int_algorithm,
-            mme_ue->knas_int, mme_ue->ul_count.i32, NAS_SECURITY_BEARER,
+        nas_mac_calculate(amf4g_ue->selected_int_algorithm,
+            amf4g_ue->knas_int, amf4g_ue->ul_count.i32, NAS_SECURITY_BEARER,
             NAS_SECURITY_UPLINK_DIRECTION, pkbuf, mac);
 
         pkbuf->len = original_pkbuf_len;
@@ -157,13 +157,13 @@ status_t nas_security_decode(mme_ue_t *mme_ue,
         if (memcmp(mac + 2, pkbuf->payload + 2, 2) != 0)
         {
             d_warn("NAS MAC verification failed");
-            mme_ue->mac_failed = 1;
+            amf4g_ue->mac_failed = 1;
         }
 
         return CORE_OK;
     }
 
-    if (!mme_ue->security_context_available)
+    if (!amf4g_ue->security_context_available)
     {
         security_header_type.integrity_protected = 0;
         security_header_type.new_security_context = 0;
@@ -172,12 +172,12 @@ status_t nas_security_decode(mme_ue_t *mme_ue,
 
     if (security_header_type.new_security_context)
     {
-        mme_ue->ul_count.i32 = 0;
+        amf4g_ue->ul_count.i32 = 0;
     }
 
-    if (mme_ue->selected_enc_algorithm == 0)
+    if (amf4g_ue->selected_enc_algorithm == 0)
         security_header_type.ciphered = 0;
-    if (mme_ue->selected_int_algorithm == 0)
+    if (amf4g_ue->selected_int_algorithm == 0)
         security_header_type.integrity_protected = 0;
 
     if (security_header_type.ciphered || 
@@ -195,9 +195,9 @@ status_t nas_security_decode(mme_ue_t *mme_ue,
             return CORE_ERROR, "pkbuf_header error");
 
         /* calculate ul_count */
-        if (mme_ue->ul_count.sqn > h->sequence_number)
-            mme_ue->ul_count.overflow++;
-        mme_ue->ul_count.sqn = h->sequence_number;
+        if (amf4g_ue->ul_count.sqn > h->sequence_number)
+            amf4g_ue->ul_count.overflow++;
+        amf4g_ue->ul_count.sqn = h->sequence_number;
 
         if (security_header_type.integrity_protected)
         {
@@ -206,8 +206,8 @@ status_t nas_security_decode(mme_ue_t *mme_ue,
             c_uint32_t original_mac = h->message_authentication_code;
 
             /* calculate NAS MAC(message authentication code) */
-            nas_mac_calculate(mme_ue->selected_int_algorithm,
-                mme_ue->knas_int, mme_ue->ul_count.i32, NAS_SECURITY_BEARER, 
+            nas_mac_calculate(amf4g_ue->selected_int_algorithm,
+                amf4g_ue->knas_int, amf4g_ue->ul_count.i32, NAS_SECURITY_BEARER, 
                 NAS_SECURITY_UPLINK_DIRECTION, pkbuf, mac);
             h->message_authentication_code = original_mac;
 
@@ -216,7 +216,7 @@ status_t nas_security_decode(mme_ue_t *mme_ue,
             {
                 d_warn("NAS MAC verification failed(0x%x != 0x%x)",
                         ntohl(h->message_authentication_code), ntohl(mac32));
-                mme_ue->mac_failed = 1;
+                amf4g_ue->mac_failed = 1;
             }
         }
 
@@ -227,8 +227,8 @@ status_t nas_security_decode(mme_ue_t *mme_ue,
         if (security_header_type.ciphered)
         {
             /* decrypt NAS message */
-            nas_encrypt(mme_ue->selected_enc_algorithm,
-                mme_ue->knas_enc, mme_ue->ul_count.i32, NAS_SECURITY_BEARER,
+            nas_encrypt(amf4g_ue->selected_enc_algorithm,
+                amf4g_ue->knas_enc, amf4g_ue->ul_count.i32, NAS_SECURITY_BEARER,
                 NAS_SECURITY_UPLINK_DIRECTION, pkbuf);
         }
     }

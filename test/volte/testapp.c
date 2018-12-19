@@ -145,7 +145,7 @@ status_t test_app_initialize(const char *config_path, const char *log_path)
             if (hss_sem2) semaphore_delete(hss_sem2);
 
             d_trace(1, "MME try to initialize\n");
-            rv = mme_initialize();
+            rv = amf4g_initialize();
             d_assert(rv == CORE_OK,, "Failed to intialize MME");
             d_trace(1, "MME initialize...done\n");
 
@@ -155,7 +155,7 @@ status_t test_app_initialize(const char *config_path, const char *log_path)
             if (rv == CORE_OK)
             {
                 d_trace(1, "MME try to terminate\n");
-                mme_terminate();
+                amf4g_terminate();
                 d_trace(1, "MME terminate...done\n");
             }
 

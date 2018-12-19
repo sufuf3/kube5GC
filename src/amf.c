@@ -24,7 +24,7 @@ status_t app_initialize(const char *config_path, const char *log_path)
     }
 
     d_trace(1, "MME try to initialize\n");
-    rv = mme_initialize();
+    rv = amf4g_initialize();
     if (rv != CORE_OK)
     {
         d_error("Failed to intialize MME");
@@ -43,7 +43,7 @@ void app_terminate(void)
     app_will_terminate();
 
     d_trace(1, "MME try to terminate\n");
-    mme_terminate();
+    amf4g_terminate();
     d_trace(1, "MME terminate...done\n");
 
     app_did_terminate();

@@ -1,4 +1,4 @@
-#define TRACE_MODULE _mme_context
+#define TRACE_MODULE _amf4g_context
 
 #include "core_debug.h"
 #include "core_pool.h"
@@ -20,10 +20,10 @@
 
 #include "app/context.h"
 #include "nas_conv.h"
-#include "mme_context.h"
-#include "mme_event.h"
+#include "amf4g_context.h"
+#include "amf4g_event.h"
 #include "s1ap_path.h"
-#include "mme_sm.h"
+#include "amf4g_sm.h"
 
 #define MAX_CELL_PER_ENB            8
 
@@ -36,15 +36,15 @@ index_declare(amf_ue_pool, amf_ue_t, MAX_POOL_OF_5G_UE);
 index_declare(ran_ue_pool, ran_ue_t, MAX_POOL_OF_5G_UE);
 /****************************************************/
 
-index_declare(mme_enb_pool, mme_enb_t, MAX_NUM_OF_ENB);
-index_declare(mme_ue_pool, mme_ue_t, MAX_POOL_OF_UE);
+index_declare(amf4g_enb_pool, amf4g_enb_t, MAX_NUM_OF_ENB);
+index_declare(amf4g_ue_pool, amf4g_ue_t, MAX_POOL_OF_UE);
 index_declare(enb_ue_pool, enb_ue_t, MAX_POOL_OF_UE);
-index_declare(mme_sess_pool, mme_sess_t, MAX_POOL_OF_SESS);
-index_declare(mme_bearer_pool, mme_bearer_t, MAX_POOL_OF_BEARER);
+index_declare(amf4g_sess_pool, amf4g_sess_t, MAX_POOL_OF_SESS);
+index_declare(amf4g_bearer_pool, amf4g_bearer_t, MAX_POOL_OF_BEARER);
 
 static int context_initialized = 0;
 
-status_t mme_context_init()
+status_t amf4g_context_init()
 {
     d_assert(context_initialized == 0, return CORE_ERROR,
             "MME context already has been context_initialized");
@@ -79,12 +79,12 @@ status_t mme_context_init()
     index_init(&ran_ue_pool, MAX_POOL_OF_5G_UE);
     /****************************************/
 
-    index_init(&mme_enb_pool, MAX_NUM_OF_ENB);
+    index_init(&amf4g_enb_pool, MAX_NUM_OF_ENB);
 
-    index_init(&mme_ue_pool, MAX_POOL_OF_UE);
+    index_init(&amf4g_ue_pool, MAX_POOL_OF_UE);
     index_init(&enb_ue_pool, MAX_POOL_OF_UE);
-    index_init(&mme_sess_pool, MAX_POOL_OF_SESS);
-    index_init(&mme_bearer_pool, MAX_POOL_OF_BEARER);
+    index_init(&amf4g_sess_pool, MAX_POOL_OF_SESS);
+    index_init(&amf4g_bearer_pool, MAX_POOL_OF_BEARER);
     pool_init(&self.m_tmsi, MAX_POOL_OF_UE);
 
     /****************add by HU***************/
@@ -118,14 +118,14 @@ status_t mme_context_init()
     return CORE_OK;
 }
 
-status_t mme_context_final()
+status_t amf4g_context_final()
 {
     d_assert(context_initialized == 1, return CORE_ERROR,
             "MME context already has been finalized");
 
     amf_ran_remove_all();
-    mme_enb_remove_all();
-    mme_ue_remove_all();
+    amf4g_enb_remove_all();
+    amf4g_ue_remove_all();
 
     if (pool_used(&self.m_tmsi))
     {
@@ -162,12 +162,12 @@ status_t mme_context_final()
     hash_destroy(self.guti_ue_hash);
 
     pool_final(&self.m_tmsi);
-    index_final(&mme_bearer_pool);
-    index_final(&mme_sess_pool);
-    index_final(&mme_ue_pool);
+    index_final(&amf4g_bearer_pool);
+    index_final(&amf4g_sess_pool);
+    index_final(&amf4g_ue_pool);
     index_final(&enb_ue_pool);
 
-    index_final(&mme_enb_pool);
+    index_final(&amf4g_enb_pool);
 
     /****************add by HU***************/
     index_final(&amf_ue_pool);
@@ -198,12 +198,12 @@ status_t mme_context_final()
     return CORE_OK;
 }
 
-amf_context_t* mme_self()
+amf_context_t* amf4g_self()
 {
     return &self;
 }
 
-static status_t mme_context_prepare()
+static status_t amf4g_context_prepare()
 {
     self.relative_capacity = 0xff;
 
@@ -218,28 +218,28 @@ static status_t mme_context_prepare()
     return CORE_OK;
 }
 
-static status_t mme_context_validation()
+static status_t amf4g_context_validation()
 {
     if (self.fd_conf_path == NULL &&
         (self.fd_config->cnf_diamid == NULL ||
         self.fd_config->cnf_diamrlm == NULL ||
         self.fd_config->cnf_addr == NULL))
     {
-        d_error("No mme.freeDiameter in '%s'", context_self()->config.path);
+        d_error("No amf4g.freeDiameter in '%s'", context_self()->config.path);
         return CORE_ERROR;
     }
 
     if (list_first(&self.s1ap_list) == NULL &&
         list_first(&self.s1ap_list6) == NULL)
     {
-        d_error("No mme.s1ap in '%s'", context_self()->config.path);
+        d_error("No amf4g.s1ap in '%s'", context_self()->config.path);
         return CORE_EAGAIN;
     }
 
     if (list_first(&self.gtpc_list) == NULL &&
         list_first(&self.gtpc_list6) == NULL)
     {
-        d_error("No mme.gtpc in '%s'", context_self()->config.path);
+        d_error("No amf4g.gtpc in '%s'", context_self()->config.path);
         return CORE_EAGAIN;
     }
 
@@ -257,50 +257,50 @@ static status_t mme_context_validation()
 
     if (self.max_num_of_served_gummei == 0)
     {
-        d_error("No mme.gummei in '%s'", context_self()->config.path);
+        d_error("No amf4g.gummei in '%s'", context_self()->config.path);
         return CORE_ERROR;
     }
 
     if (self.served_gummei[0].num_of_plmn_id == 0)
     {
-        d_error("No mme.gummei.plmn_id in '%s'", context_self()->config.path);
+        d_error("No amf4g.gummei.plmn_id in '%s'", context_self()->config.path);
         return CORE_ERROR;
     }
 
-    if (self.served_gummei[0].num_of_mme_gid == 0)
+    if (self.served_gummei[0].num_of_amf4g_gid == 0)
     {
-        d_error("No mme.gummei.mme_gid in '%s'", context_self()->config.path);
+        d_error("No amf4g.gummei.amf4g_gid in '%s'", context_self()->config.path);
         return CORE_ERROR;
     }
 
-    if (self.served_gummei[0].num_of_mme_code == 0)
+    if (self.served_gummei[0].num_of_amf4g_code == 0)
     {
-        d_error("No mme.gummei.mme_code in '%s'", context_self()->config.path);
+        d_error("No amf4g.gummei.amf4g_code in '%s'", context_self()->config.path);
         return CORE_ERROR;
     }
 
     if (self.num_of_served_tai == 0)
     {
-        d_error("No mme.tai in '%s'", context_self()->config.path);
+        d_error("No amf4g.tai in '%s'", context_self()->config.path);
         return CORE_ERROR;
     }
 
     if (self.served_tai[0].list0.tai[0].num == 0 &&
         self.served_tai[0].list2.num == 0)
     {
-        d_error("No mme.tai.plmn_id|tac in '%s'", context_self()->config.path);
+        d_error("No amf4g.tai.plmn_id|tac in '%s'", context_self()->config.path);
         return CORE_ERROR;
     }
 
     if (self.num_of_integrity_order == 0)
     {
-        d_error("No mme.security.integrity_order in '%s'",
+        d_error("No amf4g.security.integrity_order in '%s'",
                 context_self()->config.path);
         return CORE_ERROR;
     }
     if (self.num_of_ciphering_order == 0)
     {
-        d_error("no mme.security.ciphering_order in '%s'",
+        d_error("no amf4g.security.ciphering_order in '%s'",
                 context_self()->config.path);
         return CORE_ERROR;
     }
@@ -308,7 +308,7 @@ static status_t mme_context_validation()
     return CORE_OK;
 }
 
-status_t mme_context_parse_config()
+status_t amf4g_context_parse_config()
 {
     status_t rv;
     config_t *config = &context_self()->config;
@@ -319,7 +319,7 @@ status_t mme_context_parse_config()
     document = config->document;
     d_assert(document, return CORE_ERROR,);
 
-    rv = mme_context_prepare();
+    rv = amf4g_context_prepare();
     if (rv != CORE_OK) return rv;
 
     yaml_iter_init(&root_iter, document);
@@ -329,25 +329,25 @@ status_t mme_context_parse_config()
         d_assert(root_key, return CORE_ERROR,);
         if (!strcmp(root_key, "mme"))
         {
-            yaml_iter_t mme_iter;
-            yaml_iter_recurse(&root_iter, &mme_iter);
-            while(yaml_iter_next(&mme_iter))
+            yaml_iter_t amf4g_iter;
+            yaml_iter_recurse(&root_iter, &amf4g_iter);
+            while(yaml_iter_next(&amf4g_iter))
             {
-                const char *mme_key = yaml_iter_key(&mme_iter);
-                d_assert(mme_key, return CORE_ERROR,);
-                if (!strcmp(mme_key, "freeDiameter"))
+                const char *amf4g_key = yaml_iter_key(&amf4g_iter);
+                d_assert(amf4g_key, return CORE_ERROR,);
+                if (!strcmp(amf4g_key, "freeDiameter"))
                 {
                     yaml_node_t *node = 
-                        yaml_document_get_node(document, mme_iter.pair->value);
+                        yaml_document_get_node(document, amf4g_iter.pair->value);
                     d_assert(node, return CORE_ERROR,);
                     if (node->type == YAML_SCALAR_NODE)
                     {
-                        self.fd_conf_path = yaml_iter_value(&mme_iter);
+                        self.fd_conf_path = yaml_iter_value(&amf4g_iter);
                     }
                     else if (node->type == YAML_MAPPING_NODE)
                     {
                         yaml_iter_t fd_iter;
-                        yaml_iter_recurse(&mme_iter, &fd_iter);
+                        yaml_iter_recurse(&amf4g_iter, &fd_iter);
 
                         while(yaml_iter_next(&fd_iter))
                         {
@@ -521,15 +521,15 @@ status_t mme_context_parse_config()
                         }
                     }
                 }
-                else if (!strcmp(mme_key, "relative_capacity"))
+                else if (!strcmp(amf4g_key, "relative_capacity"))
                 {
-                    const char *v = yaml_iter_value(&mme_iter);
+                    const char *v = yaml_iter_value(&amf4g_iter);
                     if (v) self.relative_capacity = atoi(v);
                 }
-                else if (!strcmp(mme_key, "s1ap"))
+                else if (!strcmp(amf4g_key, "s1ap"))
                 {
                     yaml_iter_t s1ap_array, s1ap_iter;
-                    yaml_iter_recurse(&mme_iter, &s1ap_array);
+                    yaml_iter_recurse(&amf4g_iter, &s1ap_array);
                     do
                     {
                         int family = AF_UNSPEC;
@@ -687,10 +687,10 @@ status_t mme_context_parse_config()
                     #endif
                 }
                 #if 0
-                else if (!strcmp(mme_key, "ngap"))
+                else if (!strcmp(amf4g_key, "ngap"))
                 {
                     yaml_iter_t ngap_array, ngap_iter;
-                    yaml_iter_recurse(&mme_iter, &ngap_array);
+                    yaml_iter_recurse(&amf4g_iter, &ngap_array);
                     do
                     {
                         printf("ngap_yaml exist\n");
@@ -836,10 +836,10 @@ status_t mme_context_parse_config()
                     }
                 }
                 #endif
-                else if (!strcmp(mme_key, "gtpc"))
+                else if (!strcmp(amf4g_key, "gtpc"))
                 {
                     yaml_iter_t gtpc_array, gtpc_iter;
-                    yaml_iter_recurse(&mme_iter, &gtpc_array);
+                    yaml_iter_recurse(&amf4g_iter, &gtpc_array);
                     do
                     {
                         int family = AF_UNSPEC;
@@ -982,10 +982,10 @@ status_t mme_context_parse_config()
                         d_assert(rv == CORE_OK, return CORE_ERROR,);
                     }
                 }
-                else if (!strcmp(mme_key, "gummei"))
+                else if (!strcmp(amf4g_key, "gummei"))
                 {
                     yaml_iter_t gummei_array, gummei_iter;
-                    yaml_iter_recurse(&mme_iter, &gummei_array);
+                    yaml_iter_recurse(&amf4g_iter, &gummei_array);
                     do
                     {
                         served_gummei_t *gummei = NULL;
@@ -1089,72 +1089,72 @@ status_t mme_context_parse_config()
                             }
                             else if (!strcmp(gummei_key, "mme_gid"))
                             {
-                                yaml_iter_t mme_gid_iter;
-                                yaml_iter_recurse(&gummei_iter, &mme_gid_iter);
-                                d_assert(yaml_iter_type(&mme_gid_iter) !=
+                                yaml_iter_t amf4g_gid_iter;
+                                yaml_iter_recurse(&gummei_iter, &amf4g_gid_iter);
+                                d_assert(yaml_iter_type(&amf4g_gid_iter) !=
                                     YAML_MAPPING_NODE, return CORE_ERROR,);
 
                                 do
                                 {
-                                    c_uint16_t *mme_gid = NULL;
+                                    c_uint16_t *amf4g_gid = NULL;
                                     const char *v = NULL;
 
-                                    d_assert(gummei->num_of_mme_gid <=
+                                    d_assert(gummei->num_of_amf4g_gid <=
                                             GRP_PER_MME, return CORE_ERROR,);
-                                    mme_gid = &gummei->mme_gid[
-                                        gummei->num_of_mme_gid];
-                                    d_assert(mme_gid, return CORE_ERROR,);
+                                    amf4g_gid = &gummei->amf4g_gid[
+                                        gummei->num_of_amf4g_gid];
+                                    d_assert(amf4g_gid, return CORE_ERROR,);
 
-                                    if (yaml_iter_type(&mme_gid_iter) ==
+                                    if (yaml_iter_type(&amf4g_gid_iter) ==
                                             YAML_SEQUENCE_NODE)
                                     {
-                                        if (!yaml_iter_next(&mme_gid_iter))
+                                        if (!yaml_iter_next(&amf4g_gid_iter))
                                             break;
                                     }
 
-                                    v = yaml_iter_value(&mme_gid_iter);
+                                    v = yaml_iter_value(&amf4g_gid_iter);
                                     if (v) 
                                     {
-                                        *mme_gid = atoi(v);
-                                        gummei->num_of_mme_gid++;
+                                        *amf4g_gid = atoi(v);
+                                        gummei->num_of_amf4g_gid++;
                                     }
                                 } while(
-                                    yaml_iter_type(&mme_gid_iter) ==
+                                    yaml_iter_type(&amf4g_gid_iter) ==
                                         YAML_SEQUENCE_NODE);
                             }
                             else if (!strcmp(gummei_key, "mme_code"))
                             {
-                                yaml_iter_t mme_code_iter;
-                                yaml_iter_recurse(&gummei_iter, &mme_code_iter);
-                                d_assert(yaml_iter_type(&mme_code_iter) !=
+                                yaml_iter_t amf4g_code_iter;
+                                yaml_iter_recurse(&gummei_iter, &amf4g_code_iter);
+                                d_assert(yaml_iter_type(&amf4g_code_iter) !=
                                     YAML_MAPPING_NODE, return CORE_ERROR,);
 
                                 do
                                 {
-                                    c_uint8_t *mme_code = NULL;
+                                    c_uint8_t *amf4g_code = NULL;
                                     const char *v = NULL;
 
-                                    d_assert(gummei->num_of_mme_code <=
+                                    d_assert(gummei->num_of_amf4g_code <=
                                             CODE_PER_MME, return CORE_ERROR,);
-                                    mme_code = &gummei->mme_code[
-                                        gummei->num_of_mme_code];
-                                    d_assert(mme_code, return CORE_ERROR,);
+                                    amf4g_code = &gummei->amf4g_code[
+                                        gummei->num_of_amf4g_code];
+                                    d_assert(amf4g_code, return CORE_ERROR,);
 
-                                    if (yaml_iter_type(&mme_code_iter) ==
+                                    if (yaml_iter_type(&amf4g_code_iter) ==
                                             YAML_SEQUENCE_NODE)
                                     {
-                                        if (!yaml_iter_next(&mme_code_iter))
+                                        if (!yaml_iter_next(&amf4g_code_iter))
                                             break;
                                     }
 
-                                    v = yaml_iter_value(&mme_code_iter);
+                                    v = yaml_iter_value(&amf4g_code_iter);
                                     if (v) 
                                     {
-                                        *mme_code = atoi(v);
-                                        gummei->num_of_mme_code++;
+                                        *amf4g_code = atoi(v);
+                                        gummei->num_of_amf4g_code++;
                                     }
                                 } while(
-                                    yaml_iter_type(&mme_code_iter) ==
+                                    yaml_iter_type(&amf4g_code_iter) ==
                                         YAML_SEQUENCE_NODE);
                             }
                             else
@@ -1162,7 +1162,7 @@ status_t mme_context_parse_config()
                         }
 
                         if (gummei->num_of_plmn_id &&
-                            gummei->num_of_mme_gid && gummei->num_of_mme_code)
+                            gummei->num_of_amf4g_gid && gummei->num_of_amf4g_code)
                         {
                             self.max_num_of_served_gummei++;
                             self.max_num_of_served_guami++;
@@ -1170,17 +1170,17 @@ status_t mme_context_parse_config()
                         else
                         {
                             d_warn("Ignore gummei : "
-                                    "plmn_id(%d), mme_gid(%d), mme_code(%d)",
+                                    "plmn_id(%d), amf4g_gid(%d), amf4g_code(%d)",
                                 gummei->num_of_plmn_id,
-                                gummei->num_of_mme_gid, gummei->num_of_mme_code);
+                                gummei->num_of_amf4g_gid, gummei->num_of_amf4g_code);
                             gummei->num_of_plmn_id = 0;
-                            gummei->num_of_mme_gid = 0;
-                            gummei->num_of_mme_code = 0;
+                            gummei->num_of_amf4g_gid = 0;
+                            gummei->num_of_amf4g_code = 0;
                         }
                     } while(yaml_iter_type(&gummei_array) ==
                             YAML_SEQUENCE_NODE);
                 }
-                else if (!strcmp(mme_key, "tai"))
+                else if (!strcmp(amf4g_key, "tai"))
                 {
                     int num_of_list0 = 0;
                     tai0_list_t *list0 = NULL;
@@ -1194,7 +1194,7 @@ status_t mme_context_parse_config()
                     d_assert(list2, return CORE_ERROR,);
 
                     yaml_iter_t tai_array, tai_iter;
-                    yaml_iter_recurse(&mme_iter, &tai_array);
+                    yaml_iter_recurse(&amf4g_iter, &tai_array);
                     do
                     {
                         const char *mcc = NULL, *mnc = NULL;
@@ -1324,10 +1324,10 @@ status_t mme_context_parse_config()
                         self.num_of_served_tai++;
                     }
                 }
-                else if (!strcmp(mme_key, "security"))
+                else if (!strcmp(amf4g_key, "security"))
                 {
                     yaml_iter_t security_iter;
-                    yaml_iter_recurse(&mme_iter, &security_iter);
+                    yaml_iter_recurse(&amf4g_iter, &security_iter);
                     while(yaml_iter_next(&security_iter))
                     {
                         const char *security_key =
@@ -1441,10 +1441,10 @@ status_t mme_context_parse_config()
                         }
                     }
                 }
-                else if(!strcmp(mme_key, "network_name"))
+                else if(!strcmp(amf4g_key, "network_name"))
                 {
                     yaml_iter_t network_name_iter;
-                    yaml_iter_recurse(&mme_iter, &network_name_iter);
+                    yaml_iter_recurse(&amf4g_iter, &network_name_iter);
 
                     while(yaml_iter_next(&network_name_iter))
                     {
@@ -1493,21 +1493,21 @@ status_t mme_context_parse_config()
                     }
                 }
                 else
-                    d_warn("unknown key `%s`", mme_key);
+                    d_warn("unknown key `%s`", amf4g_key);
             }
         }
         else if (!strcmp(root_key, "sgw"))
         {
-            yaml_iter_t mme_iter;
-            yaml_iter_recurse(&root_iter, &mme_iter);
-            while(yaml_iter_next(&mme_iter))
+            yaml_iter_t amf4g_iter;
+            yaml_iter_recurse(&root_iter, &amf4g_iter);
+            while(yaml_iter_next(&amf4g_iter))
             {
-                const char *mme_key = yaml_iter_key(&mme_iter);
-                d_assert(mme_key, return CORE_ERROR,);
-                if (!strcmp(mme_key, "gtpc"))
+                const char *amf4g_key = yaml_iter_key(&amf4g_iter);
+                d_assert(amf4g_key, return CORE_ERROR,);
+                if (!strcmp(amf4g_key, "gtpc"))
                 {
                     yaml_iter_t gtpc_array, gtpc_iter;
-                    yaml_iter_recurse(&mme_iter, &gtpc_array);
+                    yaml_iter_recurse(&amf4g_iter, &gtpc_array);
                     do
                     {
                         gtp_node_t *sgw = NULL;
@@ -1612,16 +1612,16 @@ status_t mme_context_parse_config()
         }
         else if (!strcmp(root_key, "pgw"))
         {
-            yaml_iter_t mme_iter;
-            yaml_iter_recurse(&root_iter, &mme_iter);
-            while(yaml_iter_next(&mme_iter))
+            yaml_iter_t amf4g_iter;
+            yaml_iter_recurse(&root_iter, &amf4g_iter);
+            while(yaml_iter_next(&amf4g_iter))
             {
-                const char *mme_key = yaml_iter_key(&mme_iter);
-                d_assert(mme_key, return CORE_ERROR,);
-                if (!strcmp(mme_key, "gtpc"))
+                const char *amf4g_key = yaml_iter_key(&amf4g_iter);
+                d_assert(amf4g_key, return CORE_ERROR,);
+                if (!strcmp(amf4g_key, "gtpc"))
                 {
                     yaml_iter_t gtpc_array, gtpc_iter;
-                    yaml_iter_recurse(&mme_iter, &gtpc_array);
+                    yaml_iter_recurse(&amf4g_iter, &gtpc_array);
                     do
                     {
                         gtp_node_t *pgw = NULL;
@@ -1726,13 +1726,13 @@ status_t mme_context_parse_config()
         }
     }
 
-    rv = mme_context_validation();
+    rv = amf4g_context_validation();
     if (rv != CORE_OK) return rv;
 
     return CORE_OK;
 }
 
-status_t mme_context_setup_trace_module()
+status_t amf4g_context_setup_trace_module()
 {
     int app = context_self()->logger.trace.app;
     int s1ap = context_self()->logger.trace.s1ap;
@@ -1744,10 +1744,10 @@ status_t mme_context_setup_trace_module()
     int gtpv2 = context_self()->logger.trace.gtpv2;
     if (app)
     {
-        extern int _mme_context;
-        d_trace_level(&_mme_context, app);
-        extern int _mme_sm;
-        d_trace_level(&_mme_sm, app);
+        extern int _amf4g_context;
+        d_trace_level(&_amf4g_context, app);
+        extern int _amf4g_sm;
+        d_trace_level(&_amf4g_sm, app);
     }
 
     if (s1ap)
@@ -1796,8 +1796,8 @@ status_t mme_context_setup_trace_module()
 
     if (diameter)
     {
-        extern int _mme_fd_path;
-        d_trace_level(&_mme_fd_path, diameter);
+        extern int _amf4g_fd_path;
+        d_trace_level(&_amf4g_fd_path, diameter);
         extern int _fd_init;
         d_trace_level(&_fd_init, diameter);
         extern int _fd_logger;
@@ -1806,10 +1806,10 @@ status_t mme_context_setup_trace_module()
 
     if (gtpv2)
     {
-        extern int _mme_s11_handler;
-        d_trace_level(&_mme_s11_handler, gtpv2);
-        extern int _mme_gtp_path;
-        d_trace_level(&_mme_gtp_path, gtpv2);
+        extern int _amf4g_s11_handler;
+        d_trace_level(&_amf4g_s11_handler, gtpv2);
+        extern int _amf4g_gtp_path;
+        d_trace_level(&_amf4g_gtp_path, gtpv2);
 
         extern int _gtp_node;
         d_trace_level(&_gtp_node, gtpv2);
@@ -1837,20 +1837,20 @@ status_t mme_context_setup_trace_module()
     return CORE_OK;
 }
 
-mme_enb_t* mme_enb_add(sock_id sock, c_sockaddr_t *addr)
+amf4g_enb_t* amf4g_enb_add(sock_id sock, c_sockaddr_t *addr)
 {
-    mme_enb_t *enb = NULL;
+    amf4g_enb_t *enb = NULL;
     event_t e;
 
     d_assert(sock, return NULL,);
     d_assert(addr, return NULL,);
 
-    index_alloc(&mme_enb_pool, &enb);
+    index_alloc(&amf4g_enb_pool, &enb);
     d_assert(enb, return NULL, "Null param");
 
     enb->sock = sock;
     enb->addr = addr;
-    enb->sock_type = mme_enb_sock_type(enb->sock);
+    enb->sock_type = amf4g_enb_sock_type(enb->sock);
 
     enb->outbound_streams = context_self()->parameter.sctp_streams;
 
@@ -1866,7 +1866,7 @@ mme_enb_t* mme_enb_add(sock_id sock, c_sockaddr_t *addr)
     return enb;
 }
 
-status_t mme_enb_remove(mme_enb_t *enb)
+status_t amf4g_enb_remove(amf4g_enb_t *enb)
 {
     event_t e;
 
@@ -1886,59 +1886,59 @@ status_t mme_enb_remove(mme_enb_t *enb)
 
     CORE_FREE(enb->addr);
 
-    index_free(&mme_enb_pool, enb);
+    index_free(&amf4g_enb_pool, enb);
 
     return CORE_OK;
 }
 
-status_t mme_enb_remove_all()
+status_t amf4g_enb_remove_all()
 {
     hash_index_t *hi = NULL;
-    mme_enb_t *enb = NULL;
+    amf4g_enb_t *enb = NULL;
 
-    for (hi = mme_enb_first(); hi; hi = mme_enb_next(hi))
+    for (hi = amf4g_enb_first(); hi; hi = amf4g_enb_next(hi))
     {
-        enb = mme_enb_this(hi);
+        enb = amf4g_enb_this(hi);
 
         if (enb->sock_type == SOCK_STREAM)
             s1ap_delete(enb->sock);
 
-        mme_enb_remove(enb);
+        amf4g_enb_remove(enb);
     }
 
     return CORE_OK;
 }
 
-mme_enb_t* mme_enb_find(index_t index)
+amf4g_enb_t* amf4g_enb_find(index_t index)
 {
     d_assert(index, return NULL, "Invalid Index");
-    return index_find(&mme_enb_pool, index);
+    return index_find(&amf4g_enb_pool, index);
 }
 
-mme_enb_t* mme_enb_find_by_sock(sock_id sock)
+amf4g_enb_t* amf4g_enb_find_by_sock(sock_id sock)
 {
     d_assert(sock, return NULL,"Invalid param");
-    return (mme_enb_t *)hash_get(self.enb_sock_hash, &sock, sizeof(sock));
+    return (amf4g_enb_t *)hash_get(self.enb_sock_hash, &sock, sizeof(sock));
 
     return NULL;
 }
 
-mme_enb_t* mme_enb_find_by_addr(c_sockaddr_t *addr)
+amf4g_enb_t* amf4g_enb_find_by_addr(c_sockaddr_t *addr)
 {
     d_assert(addr, return NULL,"Invalid param");
-    return (mme_enb_t *)hash_get(self.enb_addr_hash,
+    return (amf4g_enb_t *)hash_get(self.enb_addr_hash,
             addr, sizeof(c_sockaddr_t));
 
     return NULL;
 }
 
-mme_enb_t* mme_enb_find_by_enb_id(c_uint32_t enb_id)
+amf4g_enb_t* amf4g_enb_find_by_enb_id(c_uint32_t enb_id)
 {
     d_assert(enb_id, return NULL,"Invalid param");
-    return (mme_enb_t *)hash_get(self.enb_id_hash, &enb_id, sizeof(enb_id));
+    return (amf4g_enb_t *)hash_get(self.enb_id_hash, &enb_id, sizeof(enb_id));
 }
 
-status_t mme_enb_set_enb_id(mme_enb_t *enb, c_uint32_t enb_id)
+status_t amf4g_enb_set_enb_id(amf4g_enb_t *enb, c_uint32_t enb_id)
 {
     d_assert(enb, return CORE_ERROR, "Invalid param");
     d_assert(enb_id, return CORE_ERROR, "Invalid param");
@@ -1949,35 +1949,35 @@ status_t mme_enb_set_enb_id(mme_enb_t *enb, c_uint32_t enb_id)
     return CORE_OK;
 }
 
-hash_index_t* mme_enb_first()
+hash_index_t* amf4g_enb_first()
 {
     d_assert(self.enb_sock_hash, return NULL, "Null param");
     return hash_first(self.enb_sock_hash);
 }
 
-hash_index_t* mme_enb_next(hash_index_t *hi)
+hash_index_t* amf4g_enb_next(hash_index_t *hi)
 {
     return hash_next(hi);
 }
 
-mme_enb_t *mme_enb_this(hash_index_t *hi)
+amf4g_enb_t *amf4g_enb_this(hash_index_t *hi)
 {
     d_assert(hi, return NULL, "Null param");
     return hash_this_val(hi);
 }
 
-int mme_enb_sock_type(sock_id sock)
+int amf4g_enb_sock_type(sock_id sock)
 {
     sock_node_t *snode = NULL;
 
     d_assert(sock, return SOCK_STREAM,);
 
-    for (snode = list_first(&mme_self()->s1ap_list);
+    for (snode = list_first(&amf4g_self()->s1ap_list);
             snode; snode = list_next(snode))
     {
         if (snode->sock == sock) return SOCK_SEQPACKET;
     }
-    for (snode = list_first(&mme_self()->s1ap_list6);
+    for (snode = list_first(&amf4g_self()->s1ap_list6);
             snode; snode = list_next(snode))
     {
         if (snode->sock == sock) return SOCK_SEQPACKET;
@@ -2178,12 +2178,12 @@ int amf_ran_sock_type(sock_id sock)
 
     d_assert(sock, return SOCK_STREAM,);
 
-    for (snode = list_first(&mme_self()->ngap_list);
+    for (snode = list_first(&amf4g_self()->ngap_list);
             snode; snode = list_next(snode))
     {
         if (snode->sock == sock) return SOCK_SEQPACKET;
     }
-    for (snode = list_first(&mme_self()->ngap_list6);
+    for (snode = list_first(&amf4g_self()->ngap_list6);
             snode; snode = list_next(snode))
     {
         if (snode->sock == sock) return SOCK_SEQPACKET;
@@ -2331,7 +2331,7 @@ ran_ue_t* ran_ue_next_in_ran(ran_ue_t *ran_ue)
 /*************************************************************/
 
 /** enb_ue_context handling function */
-enb_ue_t* enb_ue_add(mme_enb_t *enb)
+enb_ue_t* enb_ue_add(amf4g_enb_t *enb)
 {
     enb_ue_t *enb_ue = NULL;
 
@@ -2389,7 +2389,7 @@ status_t enb_ue_remove(enb_ue_t *enb_ue)
     return CORE_OK;
 }
 
-status_t enb_ue_remove_in_enb(mme_enb_t *enb)
+status_t enb_ue_remove_in_enb(amf4g_enb_t *enb)
 {
     enb_ue_t *enb_ue = NULL, *next_enb_ue = NULL;
     
@@ -2406,7 +2406,7 @@ status_t enb_ue_remove_in_enb(mme_enb_t *enb)
     return CORE_OK;
 }
 
-status_t enb_ue_switch_to_enb(enb_ue_t *enb_ue, mme_enb_t *new_enb)
+status_t enb_ue_switch_to_enb(enb_ue_t *enb_ue, amf4g_enb_t *new_enb)
 {
     d_assert(enb_ue, return CORE_ERROR, "Null param");
     d_assert(enb_ue->enb, return CORE_ERROR, "Null param");
@@ -2431,7 +2431,7 @@ enb_ue_t* enb_ue_find(index_t index)
 }
 
 enb_ue_t* enb_ue_find_by_enb_ue_s1ap_id(
-        mme_enb_t *enb, c_uint32_t enb_ue_s1ap_id)
+        amf4g_enb_t *enb, c_uint32_t enb_ue_s1ap_id)
 {
     enb_ue_t *enb_ue = NULL;
     
@@ -2454,7 +2454,7 @@ enb_ue_t* enb_ue_find_by_mme_ue_s1ap_id(c_uint32_t mme_ue_s1ap_id)
             &mme_ue_s1ap_id, sizeof(mme_ue_s1ap_id));
 }
 
-enb_ue_t* enb_ue_first_in_enb(mme_enb_t *enb)
+enb_ue_t* enb_ue_first_in_enb(amf4g_enb_t *enb)
 {
     return list_first(&enb->enb_ue_list);
 }
@@ -2464,62 +2464,62 @@ enb_ue_t* enb_ue_next_in_enb(enb_ue_t *enb_ue)
     return list_next(enb_ue);
 }
 
-static status_t mme_ue_new_guti(mme_ue_t *mme_ue)
+static status_t amf4g_ue_new_guti(amf4g_ue_t *amf4g_ue)
 {
     served_gummei_t *served_gummei = NULL;
 
-    d_assert(mme_ue, return CORE_ERROR, "Invalid param");
-    d_assert(mme_self()->max_num_of_served_gummei > 0,
+    d_assert(amf4g_ue, return CORE_ERROR, "Invalid param");
+    d_assert(amf4g_self()->max_num_of_served_gummei > 0,
             return CORE_ERROR, "Invalid param");
 
-    served_gummei = &mme_self()->served_gummei[0];
+    served_gummei = &amf4g_self()->served_gummei[0];
 
     d_assert(served_gummei->num_of_plmn_id > 0,
             return CORE_ERROR, "Invalid param");
-    d_assert(served_gummei->num_of_mme_gid > 0,
+    d_assert(served_gummei->num_of_amf4g_gid > 0,
             return CORE_ERROR, "Invalid param");
-    d_assert(served_gummei->num_of_mme_code > 0,
+    d_assert(served_gummei->num_of_amf4g_code > 0,
             return CORE_ERROR, "Invalid param");
 
-    if (mme_ue->m_tmsi)
+    if (amf4g_ue->m_tmsi)
     {
         /* MME has a VALID GUIT
          * As such, we need to remove previous GUTI in hash table */
-        hash_set(self.guti_ue_hash, &mme_ue->guti, sizeof(guti_t), NULL);
-        d_assert(mme_m_tmsi_free(mme_ue->m_tmsi) == CORE_OK,,);
+        hash_set(self.guti_ue_hash, &amf4g_ue->guti, sizeof(guti_t), NULL);
+        d_assert(amf4g_m_tmsi_free(amf4g_ue->m_tmsi) == CORE_OK,,);
     }
 
-    memset(&mme_ue->guti, 0, sizeof(guti_t));
+    memset(&amf4g_ue->guti, 0, sizeof(guti_t));
 
-    /* Use the first configured plmn_id and mme group id */
-    memcpy(&mme_ue->guti.plmn_id, &served_gummei->plmn_id[0], PLMN_ID_LEN);
-    mme_ue->guti.mme_gid = served_gummei->mme_gid[0];
-    mme_ue->guti.mme_code = served_gummei->mme_code[0];
+    /* Use the first configured plmn_id and amf4g group id */
+    memcpy(&amf4g_ue->guti.plmn_id, &served_gummei->plmn_id[0], PLMN_ID_LEN);
+    amf4g_ue->guti.mme_gid = served_gummei->amf4g_gid[0];
+    amf4g_ue->guti.mme_code = served_gummei->amf4g_code[0];
 
-    mme_ue->m_tmsi = mme_m_tmsi_alloc();
-    d_assert(mme_ue->m_tmsi, return CORE_ERROR,);
-    mme_ue->guti.m_tmsi = *(mme_ue->m_tmsi);
-    hash_set(self.guti_ue_hash, &mme_ue->guti, sizeof(guti_t), mme_ue);
+    amf4g_ue->m_tmsi = amf4g_m_tmsi_alloc();
+    d_assert(amf4g_ue->m_tmsi, return CORE_ERROR,);
+    amf4g_ue->guti.m_tmsi = *(amf4g_ue->m_tmsi);
+    hash_set(self.guti_ue_hash, &amf4g_ue->guti, sizeof(guti_t), amf4g_ue);
 
     return CORE_OK;
 }
 
-mme_ue_t* mme_ue_add(enb_ue_t *enb_ue)
+amf4g_ue_t* amf4g_ue_add(enb_ue_t *enb_ue)
 {
-    mme_enb_t *enb = NULL;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_enb_t *enb = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
     event_t e;
 
     d_assert(enb_ue, return NULL,);
     enb = enb_ue->enb;
     d_assert(enb, return NULL,);
 
-    index_alloc(&mme_ue_pool, &mme_ue);
-    d_assert(mme_ue, return NULL, "Null param");
+    index_alloc(&amf4g_ue_pool, &amf4g_ue);
+    d_assert(amf4g_ue, return NULL, "Null param");
 
-    list_init(&mme_ue->sess_list);
+    list_init(&amf4g_ue->sess_list);
 
-    mme_ue->mme_s11_teid = mme_ue->index;
+    amf4g_ue->amf4g_s11_teid = amf4g_ue->index;
 
     /*
      * SCTP output stream identification
@@ -2527,111 +2527,111 @@ mme_ue_t* mme_ue_add(enb_ue_t *enb_ue)
      *   0 : Non UE signalling
      *   1-29 : UE specific association 
      */
-    mme_ue->ostream_id = NEXT_ID(self.ostream_id, 1, enb->outbound_streams-1);
+    amf4g_ue->ostream_id = NEXT_ID(self.ostream_id, 1, enb->outbound_streams-1);
 
     /* Create New GUTI */
-    mme_ue_new_guti(mme_ue);
+    amf4g_ue_new_guti(amf4g_ue);
 
     /* Setup SGW with round-robin manner */
-    if (mme_self()->sgw == NULL)
-        mme_self()->sgw = list_first(&mme_self()->sgw_list);
+    if (amf4g_self()->sgw == NULL)
+        amf4g_self()->sgw = list_first(&amf4g_self()->sgw_list);
 
-    SETUP_GTP_NODE(mme_ue, mme_self()->sgw);
+    SETUP_GTP_NODE(amf4g_ue, amf4g_self()->sgw);
 
-    mme_self()->sgw = list_next(mme_self()->sgw);
+    amf4g_self()->sgw = list_next(amf4g_self()->sgw);
 
     /* Create paging retry timer */
-    mme_ue->t3413 = timer_create(&self.tm_service, MME_EVT_EMM_T3413,
+    amf4g_ue->t3413 = timer_create(&self.tm_service, MME_EVT_EMM_T3413,
             self.t3413_value * 1000);
-    d_assert(mme_ue->t3413, return NULL, "Null param");
-    timer_set_param1(mme_ue->t3413, mme_ue->index);
+    d_assert(amf4g_ue->t3413, return NULL, "Null param");
+    timer_set_param1(amf4g_ue->t3413, amf4g_ue->index);
 
-    event_set_param1(&e, (c_uintptr_t)mme_ue->index);
-    fsm_create(&mme_ue->sm, emm_state_initial, emm_state_final);
-    fsm_init(&mme_ue->sm, &e);
+    event_set_param1(&e, (c_uintptr_t)amf4g_ue->index);
+    fsm_create(&amf4g_ue->sm, emm_state_initial, emm_state_final);
+    fsm_init(&amf4g_ue->sm, &e);
 
-    return mme_ue;
+    return amf4g_ue;
 }
 
-status_t mme_ue_remove(mme_ue_t *mme_ue)
+status_t amf4g_ue_remove(amf4g_ue_t *amf4g_ue)
 {
     status_t rv;
     event_t e;
 
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
-    event_set_param1(&e, (c_uintptr_t)mme_ue->index);
-    fsm_final(&mme_ue->sm, &e);
-    fsm_clear(&mme_ue->sm);
+    event_set_param1(&e, (c_uintptr_t)amf4g_ue->index);
+    fsm_final(&amf4g_ue->sm, &e);
+    fsm_clear(&amf4g_ue->sm);
 
     /* Clear hash table */
-    if (mme_ue->m_tmsi)
+    if (amf4g_ue->m_tmsi)
     {
-        hash_set(self.guti_ue_hash, &mme_ue->guti, sizeof(guti_t), NULL);
-        d_assert(mme_m_tmsi_free(mme_ue->m_tmsi) == CORE_OK,,);
+        hash_set(self.guti_ue_hash, &amf4g_ue->guti, sizeof(guti_t), NULL);
+        d_assert(amf4g_m_tmsi_free(amf4g_ue->m_tmsi) == CORE_OK,,);
     }
-    if (mme_ue->imsi_len != 0)
-        hash_set(self.imsi_ue_hash, mme_ue->imsi, mme_ue->imsi_len, NULL);
+    if (amf4g_ue->imsi_len != 0)
+        hash_set(self.imsi_ue_hash, amf4g_ue->imsi, amf4g_ue->imsi_len, NULL);
     
     /* Clear the saved PDN Connectivity Request */
-    NAS_CLEAR_DATA(&mme_ue->pdn_connectivity_request);
+    NAS_CLEAR_DATA(&amf4g_ue->pdn_connectivity_request);
 
     /* Clear Paging info : stop t3413, last_paing_msg */
-    CLEAR_PAGING_INFO(mme_ue);
+    CLEAR_PAGING_INFO(amf4g_ue);
 
     /* Free UeRadioCapability */
 #if 0
-    if (mme_ue->radio_capa)
+    if (amf4g_ue->radio_capa)
     {
         S1AP_UERadioCapability_t *radio_capa = 
-            (S1AP_UERadioCapability_t *)mme_ue->radio_capa;
+            (S1AP_UERadioCapability_t *)amf4g_ue->radio_capa;
 
         if (radio_capa->buf)
             CORE_FREE(radio_capa->buf);
-        CORE_FREE(mme_ue->radio_capa);
+        CORE_FREE(amf4g_ue->radio_capa);
     }
 #else
-    S1AP_CLEAR_DATA(&mme_ue->ueRadioCapability);
+    S1AP_CLEAR_DATA(&amf4g_ue->ueRadioCapability);
 #endif
 
     /* Clear Transparent Container */
-    S1AP_CLEAR_DATA(&mme_ue->container);
+    S1AP_CLEAR_DATA(&amf4g_ue->container);
 
     /* Delete All Timers */
-    tm_delete(mme_ue->t3413);
+    tm_delete(amf4g_ue->t3413);
 
-    rv = mme_ue_deassociate(mme_ue);
+    rv = amf4g_ue_deassociate(amf4g_ue);
     d_assert(rv == CORE_OK,,);
 
-    mme_sess_remove_all(mme_ue);
-    mme_pdn_remove_all(mme_ue);
+    amf4g_sess_remove_all(amf4g_ue);
+    amf4g_pdn_remove_all(amf4g_ue);
 
-    index_free(&mme_ue_pool, mme_ue);
+    index_free(&amf4g_ue_pool, amf4g_ue);
 
     return CORE_OK;
 }
 
-status_t mme_ue_remove_all()
+status_t amf4g_ue_remove_all()
 {
     hash_index_t *hi = NULL;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
-    for (hi = mme_ue_first(); hi; hi = mme_ue_next(hi))
+    for (hi = amf4g_ue_first(); hi; hi = amf4g_ue_next(hi))
     {
-        mme_ue = mme_ue_this(hi);
-        mme_ue_remove(mme_ue);
+        amf4g_ue = amf4g_ue_this(hi);
+        amf4g_ue_remove(amf4g_ue);
     }
 
     return CORE_OK;
 }
 
-mme_ue_t* mme_ue_find(index_t index)
+amf4g_ue_t* amf4g_ue_find(index_t index)
 {
     d_assert(index, return NULL, "Invalid Index");
-    return index_find(&mme_ue_pool, index);
+    return index_find(&amf4g_ue_pool, index);
 }
 
-mme_ue_t* mme_ue_find_by_imsi_bcd(c_int8_t *imsi_bcd)
+amf4g_ue_t* amf4g_ue_find_by_imsi_bcd(c_int8_t *imsi_bcd)
 {
     c_uint8_t imsi[MAX_IMSI_LEN];
     int imsi_len = 0;
@@ -2640,48 +2640,48 @@ mme_ue_t* mme_ue_find_by_imsi_bcd(c_int8_t *imsi_bcd)
 
     core_bcd_to_buffer(imsi_bcd, imsi, &imsi_len);
 
-    return mme_ue_find_by_imsi(imsi, imsi_len);
+    return amf4g_ue_find_by_imsi(imsi, imsi_len);
 }
 
-mme_ue_t* mme_ue_find_by_imsi(c_uint8_t *imsi, int imsi_len)
+amf4g_ue_t* amf4g_ue_find_by_imsi(c_uint8_t *imsi, int imsi_len)
 {
     d_assert(imsi && imsi_len, return NULL,"Invalid param");
 
-    return (mme_ue_t *)hash_get(self.imsi_ue_hash, imsi, imsi_len);
+    return (amf4g_ue_t *)hash_get(self.imsi_ue_hash, imsi, imsi_len);
 }
 
-mme_ue_t* mme_ue_find_by_guti(guti_t *guti)
+amf4g_ue_t* amf4g_ue_find_by_guti(guti_t *guti)
 {
     d_assert(guti, return NULL,"Invalid param");
 
-    return (mme_ue_t *)hash_get(self.guti_ue_hash, guti, sizeof(guti_t));
+    return (amf4g_ue_t *)hash_get(self.guti_ue_hash, guti, sizeof(guti_t));
 }
 
-mme_ue_t* mme_ue_find_by_teid(c_uint32_t teid)
+amf4g_ue_t* amf4g_ue_find_by_teid(c_uint32_t teid)
 {
-    return mme_ue_find(teid);
+    return amf4g_ue_find(teid);
 }
 
-hash_index_t *mme_ue_first()
+hash_index_t *amf4g_ue_first()
 {
     d_assert(self.imsi_ue_hash, return NULL, "Null param");
     return hash_first(self.imsi_ue_hash);
 }
 
-hash_index_t *mme_ue_next(hash_index_t *hi)
+hash_index_t *amf4g_ue_next(hash_index_t *hi)
 {
     return hash_next(hi);
 }
 
-mme_ue_t *mme_ue_this(hash_index_t *hi)
+amf4g_ue_t *amf4g_ue_this(hash_index_t *hi)
 {
     d_assert(hi, return NULL, "Null param");
     return hash_this_val(hi);
 }
 
-mme_ue_t* mme_ue_find_by_message(nas_message_t *message)
+amf4g_ue_t* amf4g_ue_find_by_message(nas_message_t *message)
 {
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     switch(message->emm.h.message_type)
     {
@@ -2704,8 +2704,8 @@ mme_ue_t* mme_ue_find_by_message(nas_message_t *message)
                         imsi_bcd);
 
 
-                    mme_ue = mme_ue_find_by_imsi_bcd(imsi_bcd);
-                    if (mme_ue)
+                    amf4g_ue = amf4g_ue_find_by_imsi_bcd(imsi_bcd);
+                    if (amf4g_ue)
                     {
                         d_trace(9, "known UE by IMSI[%s]\n", imsi_bcd);
                     }
@@ -2726,8 +2726,8 @@ mme_ue_t* mme_ue_find_by_message(nas_message_t *message)
                     guti.mme_code = nas_guti->mme_code;
                     guti.m_tmsi = nas_guti->m_tmsi;
 
-                    mme_ue = mme_ue_find_by_guti(&guti);
-                    if (mme_ue)
+                    amf4g_ue = amf4g_ue_find_by_guti(&guti);
+                    if (amf4g_ue)
                     {
                         d_trace(9, "Known UE by GUTI[G:%d,C:%d,M_TMSI:0x%x]\n",
                                 guti.mme_gid,
@@ -2778,8 +2778,8 @@ mme_ue_t* mme_ue_find_by_message(nas_message_t *message)
                     guti.mme_code = nas_guti->mme_code;
                     guti.m_tmsi = nas_guti->m_tmsi;
 
-                    mme_ue = mme_ue_find_by_guti(&guti);
-                    if (mme_ue)
+                    amf4g_ue = amf4g_ue_find_by_guti(&guti);
+                    if (amf4g_ue)
                     {
                         d_trace(9, "Known UE by GUTI[G:%d,C:%d,M_TMSI:0x%x]\n",
                                 guti.mme_gid,
@@ -2810,31 +2810,31 @@ mme_ue_t* mme_ue_find_by_message(nas_message_t *message)
         }
     }
 
-    return mme_ue;
+    return amf4g_ue;
 }
 
-status_t mme_ue_set_imsi(mme_ue_t *mme_ue, c_int8_t *imsi_bcd)
+status_t amf4g_ue_set_imsi(amf4g_ue_t *amf4g_ue, c_int8_t *imsi_bcd)
 {
-    d_assert(mme_ue && imsi_bcd, return CORE_ERROR, "Invalid param");
+    d_assert(amf4g_ue && imsi_bcd, return CORE_ERROR, "Invalid param");
 
-    core_cpystrn(mme_ue->imsi_bcd, imsi_bcd, MAX_IMSI_BCD_LEN+1);
-    core_bcd_to_buffer(mme_ue->imsi_bcd, mme_ue->imsi, &mme_ue->imsi_len);
+    core_cpystrn(amf4g_ue->imsi_bcd, imsi_bcd, MAX_IMSI_BCD_LEN+1);
+    core_bcd_to_buffer(amf4g_ue->imsi_bcd, amf4g_ue->imsi, &amf4g_ue->imsi_len);
 
-    hash_set(self.imsi_ue_hash, mme_ue->imsi, mme_ue->imsi_len, mme_ue);
+    hash_set(self.imsi_ue_hash, amf4g_ue->imsi, amf4g_ue->imsi_len, amf4g_ue);
 
-    mme_ue->guti_present = 1;
+    amf4g_ue->guti_present = 1;
 
     return CORE_OK;
 }
 
-int mme_ue_have_indirect_tunnel(mme_ue_t *mme_ue)
+int amf4g_ue_have_indirect_tunnel(amf4g_ue_t *amf4g_ue)
 {
-    mme_sess_t *sess = NULL;
+    amf4g_sess_t *sess = NULL;
 
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while(sess)
     {
-        mme_bearer_t *bearer = mme_bearer_first(sess);
+        amf4g_bearer_t *bearer = amf4g_bearer_first(sess);
         while(bearer)
         {
             if (MME_HAVE_ENB_DL_INDIRECT_TUNNEL(bearer) ||
@@ -2845,43 +2845,43 @@ int mme_ue_have_indirect_tunnel(mme_ue_t *mme_ue)
                 return 1;
             }
 
-            bearer = mme_bearer_next(bearer);
+            bearer = amf4g_bearer_next(bearer);
         }
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
     }
 
     return 0;
 }
 
-status_t mme_ue_clear_indirect_tunnel(mme_ue_t *mme_ue)
+status_t amf4g_ue_clear_indirect_tunnel(amf4g_ue_t *amf4g_ue)
 {
-    mme_sess_t *sess = NULL;
+    amf4g_sess_t *sess = NULL;
 
-    d_assert(mme_ue, return CORE_ERROR,);
+    d_assert(amf4g_ue, return CORE_ERROR,);
 
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while(sess)
     {
-        mme_bearer_t *bearer = mme_bearer_first(sess);
+        amf4g_bearer_t *bearer = amf4g_bearer_first(sess);
         while(bearer)
         {
             CLEAR_INDIRECT_TUNNEL(bearer);
 
-            bearer = mme_bearer_next(bearer);
+            bearer = amf4g_bearer_next(bearer);
         }
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
     }
 
     return CORE_OK;
 }
 
-status_t mme_ue_associate_enb_ue(mme_ue_t *mme_ue, enb_ue_t *enb_ue)
+status_t amf4g_ue_associate_enb_ue(amf4g_ue_t *amf4g_ue, enb_ue_t *enb_ue)
 {
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
     d_assert(enb_ue, return CORE_ERROR, "Null param");
 
-    mme_ue->enb_ue = enb_ue;
-    enb_ue->mme_ue = mme_ue;
+    amf4g_ue->enb_ue = enb_ue;
+    enb_ue->amf4g_ue = amf4g_ue;
 
     return CORE_OK;
 }
@@ -2889,7 +2889,7 @@ status_t mme_ue_associate_enb_ue(mme_ue_t *mme_ue, enb_ue_t *enb_ue)
 status_t enb_ue_deassociate(enb_ue_t *enb_ue)
 {
     d_assert(enb_ue, return CORE_ERROR, "Null param");
-    enb_ue->mme_ue = NULL;
+    enb_ue->amf4g_ue = NULL;
     
     return CORE_OK;
 }
@@ -2902,10 +2902,10 @@ status_t ran_ue_deassociate(ran_ue_t *ran_ue)
     return CORE_OK;
 }
 /**************************************************************/
-status_t mme_ue_deassociate(mme_ue_t *mme_ue)
+status_t amf4g_ue_deassociate(amf4g_ue_t *amf4g_ue)
 {
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
-    mme_ue->enb_ue = NULL;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
+    amf4g_ue->enb_ue = NULL;
     
     return CORE_OK;
 }
@@ -2913,14 +2913,14 @@ status_t mme_ue_deassociate(mme_ue_t *mme_ue)
 status_t source_ue_associate_target_ue(
         enb_ue_t *source_ue, enb_ue_t *target_ue)
 {
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     d_assert(source_ue, return CORE_ERROR, "Null param");
     d_assert(target_ue, return CORE_ERROR, "Null param");
-    mme_ue = source_ue->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = source_ue->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
-    target_ue->mme_ue = mme_ue;
+    target_ue->amf4g_ue = amf4g_ue;
     target_ue->source_ue = source_ue;
     source_ue->target_ue = target_ue;
 
@@ -2956,60 +2956,60 @@ status_t source_ue_deassociate_target_ue(enb_ue_t *enb_ue)
 
     return CORE_OK;
 }
-mme_sess_t *mme_sess_add(mme_ue_t *mme_ue, c_uint8_t pti)
+amf4g_sess_t *amf4g_sess_add(amf4g_ue_t *amf4g_ue, c_uint8_t pti)
 {
-    mme_sess_t *sess = NULL;
-    mme_bearer_t *bearer = NULL;
+    amf4g_sess_t *sess = NULL;
+    amf4g_bearer_t *bearer = NULL;
 
-    d_assert(mme_ue, return NULL, "Null param");
+    d_assert(amf4g_ue, return NULL, "Null param");
     d_assert(pti != NAS_PROCEDURE_TRANSACTION_IDENTITY_UNASSIGNED,
             return NULL, "Invalid PTI(%d)", pti);
 
 
-    index_alloc(&mme_sess_pool, &sess);
+    index_alloc(&amf4g_sess_pool, &sess);
     d_assert(sess, return NULL, "Null param");
 
     list_init(&sess->bearer_list);
 
-    sess->mme_ue = mme_ue;
+    sess->amf4g_ue = amf4g_ue;
     sess->pti = pti;
 
-    bearer = mme_bearer_add(sess);
-    d_assert(bearer, mme_sess_remove(sess); return NULL, 
+    bearer = amf4g_bearer_add(sess);
+    d_assert(bearer, amf4g_sess_remove(sess); return NULL, 
             "Can't add default bearer context");
 
-    list_append(&mme_ue->sess_list, sess);
+    list_append(&amf4g_ue->sess_list, sess);
 
     return sess;
 }
 
-status_t mme_sess_remove(mme_sess_t *sess)
+status_t amf4g_sess_remove(amf4g_sess_t *sess)
 {
     d_assert(sess, return CORE_ERROR, "Null param");
-    d_assert(sess->mme_ue, return CORE_ERROR, "Null param");
+    d_assert(sess->amf4g_ue, return CORE_ERROR, "Null param");
     
-    list_remove(&sess->mme_ue->sess_list, sess);
+    list_remove(&sess->amf4g_ue->sess_list, sess);
 
-    mme_bearer_remove_all(sess);
+    amf4g_bearer_remove_all(sess);
 
     NAS_CLEAR_DATA(&sess->ue_pco);
     TLV_CLEAR_DATA(&sess->pgw_pco);
 
-    index_free(&mme_sess_pool, sess);
+    index_free(&amf4g_sess_pool, sess);
 
     return CORE_OK;
 }
 
-status_t mme_sess_remove_all(mme_ue_t *mme_ue)
+status_t amf4g_sess_remove_all(amf4g_ue_t *amf4g_ue)
 {
-    mme_sess_t *sess = NULL, *next_sess = NULL;
+    amf4g_sess_t *sess = NULL, *next_sess = NULL;
     
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while (sess)
     {
-        next_sess = mme_sess_next(sess);
+        next_sess = amf4g_sess_next(sess);
 
-        mme_sess_remove(sess);
+        amf4g_sess_remove(sess);
 
         sess = next_sess;
     }
@@ -3017,97 +3017,97 @@ status_t mme_sess_remove_all(mme_ue_t *mme_ue)
     return CORE_OK;
 }
 
-mme_sess_t* mme_sess_find(index_t index)
+amf4g_sess_t* amf4g_sess_find(index_t index)
 {
     d_assert(index, return NULL, "Invalid Index");
-    return index_find(&mme_sess_pool, index);
+    return index_find(&amf4g_sess_pool, index);
 }
 
-mme_sess_t* mme_sess_find_by_pti(mme_ue_t *mme_ue, c_uint8_t pti)
+amf4g_sess_t* amf4g_sess_find_by_pti(amf4g_ue_t *amf4g_ue, c_uint8_t pti)
 {
-    mme_sess_t *sess = NULL;
+    amf4g_sess_t *sess = NULL;
 
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while(sess)
     {
         if (pti == sess->pti)
             return sess;
 
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
     }
 
     return NULL;
 }
 
-mme_sess_t* mme_sess_find_by_ebi(mme_ue_t *mme_ue, c_uint8_t ebi)
+amf4g_sess_t* amf4g_sess_find_by_ebi(amf4g_ue_t *amf4g_ue, c_uint8_t ebi)
 {
-    mme_bearer_t *bearer = NULL;
+    amf4g_bearer_t *bearer = NULL;
 
-    bearer = mme_bearer_find_by_ue_ebi(mme_ue, ebi);
+    bearer = amf4g_bearer_find_by_ue_ebi(amf4g_ue, ebi);
     if (bearer)
         return bearer->sess;
 
     return NULL;
 }
 
-mme_sess_t* mme_sess_find_by_apn(mme_ue_t *mme_ue, c_int8_t *apn)
+amf4g_sess_t* amf4g_sess_find_by_apn(amf4g_ue_t *amf4g_ue, c_int8_t *apn)
 {
-    mme_sess_t *sess = NULL;
+    amf4g_sess_t *sess = NULL;
 
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while(sess)
     {
         if (sess->pdn && strcmp(sess->pdn->apn, apn) == 0)
             return sess;
 
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
     }
 
     return NULL;
 }
 
-mme_sess_t* mme_sess_first(mme_ue_t *mme_ue)
+amf4g_sess_t* amf4g_sess_first(amf4g_ue_t *amf4g_ue)
 {
-    return list_first(&mme_ue->sess_list);
+    return list_first(&amf4g_ue->sess_list);
 }
 
-mme_sess_t* mme_sess_next(mme_sess_t *sess)
+amf4g_sess_t* amf4g_sess_next(amf4g_sess_t *sess)
 {
     return list_next(sess);
 }
 
-unsigned int  mme_sess_count(mme_ue_t *mme_ue)
+unsigned int  amf4g_sess_count(amf4g_ue_t *amf4g_ue)
 {
     unsigned int count = 0;
-    mme_sess_t *sess = NULL;
+    amf4g_sess_t *sess = NULL;
 
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while(sess)
     {
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
         count++;
     }
 
     return count;
 }
 
-mme_bearer_t* mme_bearer_add(mme_sess_t *sess)
+amf4g_bearer_t* amf4g_bearer_add(amf4g_sess_t *sess)
 {
     event_t e;
 
-    mme_bearer_t *bearer = NULL;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_bearer_t *bearer = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     d_assert(sess, return NULL, "Null param");
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return NULL, "Null param");
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return NULL, "Null param");
 
-    index_alloc(&mme_bearer_pool, &bearer);
+    index_alloc(&amf4g_bearer_pool, &bearer);
     d_assert(bearer, return NULL, "Null param");
 
-    bearer->ebi = NEXT_ID(mme_ue->ebi, MIN_EPS_BEARER_ID, MAX_EPS_BEARER_ID);
+    bearer->ebi = NEXT_ID(amf4g_ue->ebi, MIN_EPS_BEARER_ID, MAX_EPS_BEARER_ID);
 
-    bearer->mme_ue = mme_ue;
+    bearer->amf4g_ue = amf4g_ue;
     bearer->sess = sess;
 
     list_append(&sess->bearer_list, bearer);
@@ -3119,7 +3119,7 @@ mme_bearer_t* mme_bearer_add(mme_sess_t *sess)
     return bearer;
 }
 
-status_t mme_bearer_remove(mme_bearer_t *bearer)
+status_t amf4g_bearer_remove(amf4g_bearer_t *bearer)
 {
     event_t e;
 
@@ -3134,23 +3134,23 @@ status_t mme_bearer_remove(mme_bearer_t *bearer)
 
     TLV_CLEAR_DATA(&bearer->tft);
     
-    index_free(&mme_bearer_pool, bearer);
+    index_free(&amf4g_bearer_pool, bearer);
 
     return CORE_OK;
 }
 
-status_t mme_bearer_remove_all(mme_sess_t *sess)
+status_t amf4g_bearer_remove_all(amf4g_sess_t *sess)
 {
-    mme_bearer_t *bearer = NULL, *next_bearer = NULL;
+    amf4g_bearer_t *bearer = NULL, *next_bearer = NULL;
 
     d_assert(sess, return CORE_ERROR, "Null param");
     
-    bearer = mme_bearer_first(sess);
+    bearer = amf4g_bearer_first(sess);
     while (bearer)
     {
-        next_bearer = mme_bearer_next(bearer);
+        next_bearer = amf4g_bearer_next(bearer);
 
-        mme_bearer_remove(bearer);
+        amf4g_bearer_remove(bearer);
 
         bearer = next_bearer;
     }
@@ -3158,69 +3158,69 @@ status_t mme_bearer_remove_all(mme_sess_t *sess)
     return CORE_OK;
 }
 
-mme_bearer_t* mme_bearer_find(index_t index)
+amf4g_bearer_t* amf4g_bearer_find(index_t index)
 {
     d_assert(index, return NULL, "Invalid Index");
-    return index_find(&mme_bearer_pool, index);
+    return index_find(&amf4g_bearer_pool, index);
 }
 
-mme_bearer_t* mme_bearer_find_by_sess_ebi(mme_sess_t *sess, c_uint8_t ebi)
+amf4g_bearer_t* amf4g_bearer_find_by_sess_ebi(amf4g_sess_t *sess, c_uint8_t ebi)
 {
-    mme_bearer_t *bearer = NULL;
+    amf4g_bearer_t *bearer = NULL;
 
-    bearer = mme_bearer_first(sess);
+    bearer = amf4g_bearer_first(sess);
     while(bearer)
     {
         if (ebi == bearer->ebi)
             return bearer;
 
-        bearer = mme_bearer_next(bearer);
+        bearer = amf4g_bearer_next(bearer);
     }
 
     return NULL;
 }
 
-mme_bearer_t* mme_bearer_find_by_ue_ebi(mme_ue_t *mme_ue, c_uint8_t ebi)
+amf4g_bearer_t* amf4g_bearer_find_by_ue_ebi(amf4g_ue_t *amf4g_ue, c_uint8_t ebi)
 {
-    mme_sess_t *sess = NULL;
-    mme_bearer_t *bearer = NULL;
+    amf4g_sess_t *sess = NULL;
+    amf4g_bearer_t *bearer = NULL;
     
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while (sess)
     {
-        bearer = mme_bearer_find_by_sess_ebi(sess, ebi);
+        bearer = amf4g_bearer_find_by_sess_ebi(sess, ebi);
         if (bearer)
         {
             return bearer;
         }
 
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
     }
 
     return NULL;
 }
 
-mme_bearer_t* mme_bearer_find_or_add_by_message(
-        mme_ue_t *mme_ue, nas_message_t *message)
+amf4g_bearer_t* amf4g_bearer_find_or_add_by_message(
+        amf4g_ue_t *amf4g_ue, nas_message_t *message)
 {
     c_uint8_t pti = NAS_PROCEDURE_TRANSACTION_IDENTITY_UNASSIGNED;
     c_uint8_t ebi = NAS_EPS_BEARER_IDENTITY_UNASSIGNED;
 
-    mme_bearer_t *bearer = NULL;
-    mme_sess_t *sess = NULL;
+    amf4g_bearer_t *bearer = NULL;
+    amf4g_sess_t *sess = NULL;
 
-    d_assert(mme_ue, return NULL,);
+    d_assert(amf4g_ue, return NULL,);
     d_assert(message, return NULL,);
 
     pti = message->esm.h.procedure_transaction_identity;
     ebi = message->esm.h.eps_bearer_identity;
 
-    d_trace(9, "mme_bearer_find_or_add_by_message() [PTI:%d, EBI:%d]\n",
+    d_trace(9, "amf4g_bearer_find_or_add_by_message() [PTI:%d, EBI:%d]\n",
             pti, ebi);
 
     if (ebi != NAS_EPS_BEARER_IDENTITY_UNASSIGNED)
     {
-        bearer = mme_bearer_find_by_ue_ebi(mme_ue, ebi);
+        bearer = amf4g_bearer_find_by_ue_ebi(amf4g_ue, ebi);
         d_assert(bearer, return NULL, "No Bearer : [EBI:%d]", ebi);
         return bearer;
     }
@@ -3234,13 +3234,13 @@ mme_bearer_t* mme_bearer_find_or_add_by_message(
             &message->esm.pdn_connectivity_request;
         if (pdn_connectivity_request->presencemask &
                 NAS_PDN_CONNECTIVITY_REQUEST_ACCESS_POINT_NAME_PRESENT)
-            sess = mme_sess_find_by_apn(mme_ue,
+            sess = amf4g_sess_find_by_apn(amf4g_ue,
                     pdn_connectivity_request->access_point_name.apn);
         else
-            sess = mme_sess_first(mme_ue);
+            sess = amf4g_sess_first(amf4g_ue);
 
         if (!sess)
-            sess = mme_sess_add(mme_ue, pti);
+            sess = amf4g_sess_add(amf4g_ue, pti);
         else
             sess->pti = pti;
 
@@ -3253,7 +3253,7 @@ mme_bearer_t* mme_bearer_find_or_add_by_message(
         nas_linked_eps_bearer_identity_t *linked_eps_bearer_identity =
             &pdn_disconnect_request->linked_eps_bearer_identity;
 
-        bearer = mme_bearer_find_by_ue_ebi(mme_ue,
+        bearer = amf4g_bearer_find_by_ue_ebi(amf4g_ue,
                 linked_eps_bearer_identity->eps_bearer_identity);
         d_assert(bearer, return NULL,
                 "No Bearer : [Linked-EBI:%d, PTI:%d, EBI:%d]",
@@ -3267,52 +3267,52 @@ mme_bearer_t* mme_bearer_find_or_add_by_message(
     }
     else
     {
-        sess = mme_sess_find_by_pti(mme_ue, pti);
+        sess = amf4g_sess_find_by_pti(amf4g_ue, pti);
         d_assert(sess, return NULL, "No Session : [PTI:%d]", pti);
     }
 
-    bearer = mme_default_bearer_in_sess(sess);
+    bearer = amf4g_default_bearer_in_sess(sess);
     d_assert(bearer, return NULL, "No Bearer : [EBI:%d]", ebi);
     return bearer;
 }
 
-mme_bearer_t* mme_default_bearer_in_sess(mme_sess_t *sess)
+amf4g_bearer_t* amf4g_default_bearer_in_sess(amf4g_sess_t *sess)
 {
-    return mme_bearer_first(sess);
+    return amf4g_bearer_first(sess);
 }
 
-mme_bearer_t* mme_linked_bearer(mme_bearer_t *bearer)
+amf4g_bearer_t* amf4g_linked_bearer(amf4g_bearer_t *bearer)
 {
-    mme_sess_t *sess = NULL;
+    amf4g_sess_t *sess = NULL;
 
     d_assert(bearer, return NULL, "Null param");
     sess = bearer->sess;
     d_assert(sess, return NULL, "Null param");
 
-    return mme_default_bearer_in_sess(sess);
+    return amf4g_default_bearer_in_sess(sess);
 }
 
-mme_bearer_t* mme_bearer_first(mme_sess_t *sess)
+amf4g_bearer_t* amf4g_bearer_first(amf4g_sess_t *sess)
 {
     d_assert(sess, return NULL, "Null param");
 
     return list_first(&sess->bearer_list);
 }
 
-mme_bearer_t* mme_bearer_next(mme_bearer_t *bearer)
+amf4g_bearer_t* amf4g_bearer_next(amf4g_bearer_t *bearer)
 {
     return list_next(bearer);
 }
 
-int mme_bearer_is_inactive(mme_ue_t *mme_ue)
+int amf4g_bearer_is_inactive(amf4g_ue_t *amf4g_ue)
 {
-    mme_sess_t *sess = NULL;
-    d_assert(mme_ue, return 1,);
+    amf4g_sess_t *sess = NULL;
+    d_assert(amf4g_ue, return 1,);
 
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while(sess)
     {
-        mme_bearer_t *bearer = mme_bearer_first(sess);
+        amf4g_bearer_t *bearer = amf4g_bearer_first(sess);
         while(bearer)
         {
             if (MME_HAVE_ENB_S1U_PATH(bearer))
@@ -3320,41 +3320,41 @@ int mme_bearer_is_inactive(mme_ue_t *mme_ue)
                 return 0;
             }
 
-            bearer = mme_bearer_next(bearer);
+            bearer = amf4g_bearer_next(bearer);
         }
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
     }
 
     return 1;
 }
 
-status_t mme_bearer_set_inactive(mme_ue_t *mme_ue)
+status_t amf4g_bearer_set_inactive(amf4g_ue_t *amf4g_ue)
 {
-    mme_sess_t *sess = NULL;
-    d_assert(mme_ue, return CORE_ERROR,);
+    amf4g_sess_t *sess = NULL;
+    d_assert(amf4g_ue, return CORE_ERROR,);
 
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while(sess)
     {
-        mme_bearer_t *bearer = mme_bearer_first(sess);
+        amf4g_bearer_t *bearer = amf4g_bearer_first(sess);
         while(bearer)
         {
             CLEAR_ENB_S1U_PATH(bearer);
 
-            bearer = mme_bearer_next(bearer);
+            bearer = amf4g_bearer_next(bearer);
         }
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
     }
 
     return CORE_OK;
 }
 
-status_t mme_pdn_remove_all(mme_ue_t *mme_ue)
+status_t amf4g_pdn_remove_all(amf4g_ue_t *amf4g_ue)
 {
     s6a_subscription_data_t *subscription_data = NULL;
 
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
-    subscription_data = &mme_ue->subscription_data;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
+    subscription_data = &amf4g_ue->subscription_data;
     d_assert(subscription_data, return CORE_ERROR, "Null param");
 
     subscription_data->num_of_pdn = 0;
@@ -3362,14 +3362,14 @@ status_t mme_pdn_remove_all(mme_ue_t *mme_ue)
     return CORE_OK;
 }
 
-pdn_t* mme_pdn_find_by_apn(mme_ue_t *mme_ue, c_int8_t *apn)
+pdn_t* amf4g_pdn_find_by_apn(amf4g_ue_t *amf4g_ue, c_int8_t *apn)
 {
     s6a_subscription_data_t *subscription_data = NULL;
     pdn_t *pdn = NULL;
     int i = 0;
     
-    d_assert(mme_ue, return NULL, "Null param");
-    subscription_data = &mme_ue->subscription_data;
+    d_assert(amf4g_ue, return NULL, "Null param");
+    subscription_data = &amf4g_ue->subscription_data;
     d_assert(subscription_data, return NULL, "Null param");
 
     for (i = 0; i < subscription_data->num_of_pdn; i++)
@@ -3382,14 +3382,14 @@ pdn_t* mme_pdn_find_by_apn(mme_ue_t *mme_ue, c_int8_t *apn)
     return NULL;
 }
 
-pdn_t* mme_default_pdn(mme_ue_t *mme_ue)
+pdn_t* amf4g_default_pdn(amf4g_ue_t *amf4g_ue)
 {
     s6a_subscription_data_t *subscription_data = NULL;
     pdn_t *pdn = NULL;
     int i = 0;
     
-    d_assert(mme_ue, return NULL, "Null param");
-    subscription_data = &mme_ue->subscription_data;
+    d_assert(amf4g_ue, return NULL, "Null param");
+    subscription_data = &amf4g_ue->subscription_data;
     d_assert(subscription_data, return NULL, "Null param");
 
     for (i = 0; i < subscription_data->num_of_pdn; i++)
@@ -3455,7 +3455,7 @@ int amf_find_served_tai(tai_t *tai)
     return -1;
 }
 
-int mme_find_served_tai(tai_t *tai)
+int amf4g_find_served_tai(tai_t *tai)
 {
     int i = 0, j = 0, k = 0;
 
@@ -3508,7 +3508,7 @@ int mme_find_served_tai(tai_t *tai)
     return -1;
 }
 
-status_t mme_m_tmsi_pool_generate()
+status_t amf4g_m_tmsi_pool_generate()
 {
     status_t rv;
     int i, j;
@@ -3517,7 +3517,7 @@ status_t mme_m_tmsi_pool_generate()
     d_trace(9, "M-TMSI Pool try to generate...\n");
     for (i = 0; index < MAX_POOL_OF_UE; i++)
     {
-        mme_m_tmsi_t *m_tmsi = NULL;
+        amf4g_m_tmsi_t *m_tmsi = NULL;
         int conflict = 0;
 
         m_tmsi = &self.m_tmsi.pool[index];
@@ -3548,9 +3548,9 @@ status_t mme_m_tmsi_pool_generate()
     return CORE_OK;
 }
 
-mme_m_tmsi_t *mme_m_tmsi_alloc()
+amf4g_m_tmsi_t *amf4g_m_tmsi_alloc()
 {
-    mme_m_tmsi_t *m_tmsi = NULL;
+    amf4g_m_tmsi_t *m_tmsi = NULL;
 
     pool_alloc_node(&self.m_tmsi, &m_tmsi);
     d_assert(m_tmsi, return NULL,);
@@ -3558,7 +3558,7 @@ mme_m_tmsi_t *mme_m_tmsi_alloc()
     return m_tmsi;
 }
 
-status_t mme_m_tmsi_free(mme_m_tmsi_t *m_tmsi)
+status_t amf4g_m_tmsi_free(amf4g_m_tmsi_t *m_tmsi)
 {
     d_assert(m_tmsi, return CORE_ERROR,);
     pool_free_node(&self.m_tmsi, m_tmsi);
@@ -3567,7 +3567,7 @@ status_t mme_m_tmsi_free(mme_m_tmsi_t *m_tmsi)
 }
 
 /******************** Added by Chi ********************/
-status_t mme_overload_checking_init()
+status_t amf4g_overload_checking_init()
 {
     c_uint32_t duration = 10 * 1000;
 
@@ -3603,48 +3603,48 @@ status_t amf_ue_remove(amf_ue_t *amf_ue)
     fsm_clear(&amf_ue->sm);
 #if 0 //TODO: clean function.
     /* Clear hash table */
-    if (mme_ue->m_tmsi)
+    if (amf4g_ue->m_tmsi)
     {
-        hash_set(self.guti_ue_hash, &mme_ue->guti, sizeof(guti_t), NULL);
-        d_assert(mme_m_tmsi_free(mme_ue->m_tmsi) == CORE_OK,,);
+        hash_set(self.guti_ue_hash, &amf4g_ue->guti, sizeof(guti_t), NULL);
+        d_assert(amf4g_m_tmsi_free(amf4g_ue->m_tmsi) == CORE_OK,,);
     }
-    if (mme_ue->imsi_len != 0)
-        hash_set(self.imsi_ue_hash, mme_ue->imsi, mme_ue->imsi_len, NULL);
+    if (amf4g_ue->imsi_len != 0)
+        hash_set(self.imsi_ue_hash, amf4g_ue->imsi, amf4g_ue->imsi_len, NULL);
     
     /* Clear the saved PDN Connectivity Request */
-    NAS_CLEAR_DATA(&mme_ue->pdn_connectivity_request);
+    NAS_CLEAR_DATA(&amf4g_ue->pdn_connectivity_request);
 
     /* Clear Paging info : stop t3413, last_paing_msg */
-    CLEAR_PAGING_INFO(mme_ue);
+    CLEAR_PAGING_INFO(amf4g_ue);
 
     /* Free UeRadioCapability */
 #if 0
-    if (mme_ue->radio_capa)
+    if (amf4g_ue->radio_capa)
     {
         S1AP_UERadioCapability_t *radio_capa = 
-            (S1AP_UERadioCapability_t *)mme_ue->radio_capa;
+            (S1AP_UERadioCapability_t *)amf4g_ue->radio_capa;
 
         if (radio_capa->buf)
             CORE_FREE(radio_capa->buf);
-        CORE_FREE(mme_ue->radio_capa);
+        CORE_FREE(amf4g_ue->radio_capa);
     }
 #else
-    S1AP_CLEAR_DATA(&mme_ue->ueRadioCapability);
+    S1AP_CLEAR_DATA(&amf4g_ue->ueRadioCapability);
 #endif
 
     /* Clear Transparent Container */
-    S1AP_CLEAR_DATA(&mme_ue->container);
+    S1AP_CLEAR_DATA(&amf4g_ue->container);
 
     /* Delete All Timers */
-    tm_delete(mme_ue->t3413);
+    tm_delete(amf4g_ue->t3413);
 
-    rv = mme_ue_deassociate(mme_ue);
+    rv = amf4g_ue_deassociate(amf4g_ue);
     d_assert(rv == CORE_OK,,);
 
-    mme_sess_remove_all(mme_ue);
-    mme_pdn_remove_all(mme_ue);
+    amf4g_sess_remove_all(amf4g_ue);
+    amf4g_pdn_remove_all(amf4g_ue);
 
-    index_free(&mme_ue_pool, mme_ue);
+    index_free(&amf4g_ue_pool, amf4g_ue);
 #endif
     return CORE_OK;
 }

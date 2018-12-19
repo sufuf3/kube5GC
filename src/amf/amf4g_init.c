@@ -1,4 +1,4 @@
-#define TRACE_MODULE _mme_init
+#define TRACE_MODULE _amf4g_init
 
 #include "core_debug.h"
 #include "core_thread.h"
@@ -8,12 +8,12 @@
 #include "gtp/gtp_xact.h"
 
 #include "app/context.h"
-#include "mme_event.h"
+#include "amf4g_event.h"
 
-#include "mme_fd_path.h"
+#include "amf4g_fd_path.h"
 #include "s1ap_path.h"
 
-#include "mme_sm.h"
+#include "amf4g_sm.h"
 
 static thread_id sm_thread;
 static void *THREAD_FUNC sm_main(thread_id id, void *data);
@@ -23,23 +23,23 @@ static void *THREAD_FUNC net_main(thread_id id, void *data);
 
 static int initialized = 0;
 
-status_t mme_initialize()
+status_t amf4g_initialize()
 {
     status_t rv;
 
-    rv = mme_context_init();
+    rv = amf4g_context_init();
     if (rv != CORE_OK) return rv;
 
-    rv = mme_context_parse_config();
+    rv = amf4g_context_parse_config();
     if (rv != CORE_OK) return rv;
 
-    rv = mme_context_setup_trace_module();
+    rv = amf4g_context_setup_trace_module();
     if (rv != CORE_OK) return rv;
 
-    rv = mme_m_tmsi_pool_generate();
+    rv = amf4g_m_tmsi_pool_generate();
     if (rv != CORE_OK) return rv;
 
-    rv = mme_fd_init();
+    rv = amf4g_fd_init();
     if (rv != CORE_OK) return CORE_ERROR;
 
 #define USRSCTP_LOCAL_UDP_PORT 9899
@@ -58,16 +58,16 @@ status_t mme_initialize()
     return CORE_OK;
 }
 
-void mme_terminate(void)
+void amf4g_terminate(void)
 {
     if (!initialized) return;
 
     thread_delete(net_thread);
     thread_delete(sm_thread);
 
-    mme_fd_final();
+    amf4g_fd_final();
 
-    mme_context_final();
+    amf4g_context_final();
 
     s1ap_final();
 
@@ -77,24 +77,24 @@ void mme_terminate(void)
 static void *THREAD_FUNC sm_main(thread_id id, void *data)
 {
     event_t event;
-    fsm_t mme_sm;
+    fsm_t amf4g_sm;
     c_time_t prev_tm, now_tm;
     status_t rv;
 
     memset(&event, 0, sizeof(event_t));
 
-    mme_self()->queue_id = event_create(MSGQ_O_BLOCK);
-    d_assert(mme_self()->queue_id, return NULL, 
+    amf4g_self()->queue_id = event_create(MSGQ_O_BLOCK);
+    d_assert(amf4g_self()->queue_id, return NULL, 
             "MME event queue creation failed");
-    tm_service_init(&mme_self()->tm_service);
-    gtp_xact_init(&mme_self()->tm_service,
+    tm_service_init(&amf4g_self()->tm_service);
+    gtp_xact_init(&amf4g_self()->tm_service,
             MME_EVT_S11_T3_RESPONSE, MME_EVT_S11_T3_HOLDING);
 
-    fsm_create(&mme_sm, mme_state_initial, mme_state_final);
-    fsm_init(&mme_sm, 0);
+    fsm_create(&amf4g_sm, amf4g_state_initial, amf4g_state_final);
+    fsm_init(&amf4g_sm, 0);
 
     /******************** Added by Chi ********************/
-    mme_overload_checking_init();
+    amf4g_overload_checking_init();
     /******************************************************/
 
     prev_tm = time_now();
@@ -102,7 +102,7 @@ static void *THREAD_FUNC sm_main(thread_id id, void *data)
 #define EVENT_LOOP_TIMEOUT 50   /* 50ms */
     while ((!thread_should_stop()))
     {
-        rv = event_timedrecv(mme_self()->queue_id, &event, EVENT_LOOP_TIMEOUT);
+        rv = event_timedrecv(amf4g_self()->queue_id, &event, EVENT_LOOP_TIMEOUT);
 
         d_assert(rv != CORE_ERROR, continue,
                 "While receiving a event message, error occurs");
@@ -113,7 +113,7 @@ static void *THREAD_FUNC sm_main(thread_id id, void *data)
         if (now_tm - prev_tm > EVENT_LOOP_TIMEOUT * 1000)
         {
             tm_execute_tm_service(
-                    &mme_self()->tm_service, mme_self()->queue_id);
+                    &amf4g_self()->tm_service, amf4g_self()->queue_id);
 
             prev_tm = now_tm;
         }
@@ -123,13 +123,13 @@ static void *THREAD_FUNC sm_main(thread_id id, void *data)
             continue;
         }
 
-        fsm_dispatch(&mme_sm, (fsm_event_t*)&event);
+        fsm_dispatch(&amf4g_sm, (fsm_event_t*)&event);
     }
 
-    fsm_final(&mme_sm, 0);
-    fsm_clear(&mme_sm);
+    fsm_final(&amf4g_sm, 0);
+    fsm_clear(&amf4g_sm);
 
-    event_delete(mme_self()->queue_id);
+    event_delete(amf4g_self()->queue_id);
 
     return NULL;
 }

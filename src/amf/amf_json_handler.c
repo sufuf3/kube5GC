@@ -4,7 +4,7 @@
 #include "core_lib.h"
 #include "core_pkbuf.h"
 #include "3gpp_types.h"
-#include "mme_context.h"
+#include "amf4g_context.h"
 #include "amf_json_handler.h"
 #include "sbiJson/JsonTransform.h"
 
@@ -56,67 +56,67 @@ bool compare_plmnid(plmn_id_t id1, plmn_id_t id2){
 
 }
 
-status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
+status_t amf_json_handle_create_session(pkbuf_t **pkbuf, amf4g_sess_t *pSess) {
     
     create_session_t createSession = {0}; 
-    mme_ue_t *mme_ue = NULL;
-    mme_ue_t *ori_mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_ue_t *ori_amf4g_ue = NULL;
     pdn_t *ori_pdn = NULL;
     pdn_t *pdn = NULL;
-    mme_bearer_t *bearer = NULL;
-    mme_bearer_t *ori_bearer = NULL;
+    amf4g_bearer_t *bearer = NULL;
+    amf4g_bearer_t *ori_bearer = NULL;
     // char *string = NULL;
     d_assert(pSess, return CORE_ERROR, "Null param");
     d_assert(pkbuf, return CORE_ERROR, "Null param");
-    ori_mme_ue = pSess->mme_ue;
-    d_assert(ori_mme_ue, return CORE_ERROR, "Null param");
+    ori_amf4g_ue = pSess->amf4g_ue;
+    d_assert(ori_amf4g_ue, return CORE_ERROR, "Null param");
     d_assert(pSess, return CORE_ERROR, "Null param");
     ori_pdn = pSess->pdn;
-    ori_bearer = mme_default_bearer_in_sess(pSess);
+    ori_bearer = amf4g_default_bearer_in_sess(pSess);
     d_assert(ori_bearer, return CORE_ERROR, "Null param");
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
     // string = cJSON_Print(session);
     // d_info(string);
     d_assert(session, return CORE_ERROR, "Null param");
 
-    mme_ue = core_calloc(1, sizeof(mme_ue_t));
+    amf4g_ue = core_calloc(1, sizeof(amf4g_ue_t));
     pdn = core_calloc(1, sizeof(pdn_t));
-    bearer = core_calloc(1, sizeof(mme_bearer_t));
+    bearer = core_calloc(1, sizeof(amf4g_bearer_t));
 
     JSONTRANSFORM_JsToSt_create_session_request(&createSession, session);
 
-    core_buffer_to_bcd(createSession.imsi, createSession.imsi_len, mme_ue->imsi_bcd);
-    memcpy(mme_ue->imsi, createSession.imsi, createSession.imsi_len);
-    mme_ue->imsi_len = createSession.imsi_len;
+    core_buffer_to_bcd(createSession.imsi, createSession.imsi_len, amf4g_ue->imsi_bcd);
+    memcpy(amf4g_ue->imsi, createSession.imsi, createSession.imsi_len);
+    amf4g_ue->imsi_len = createSession.imsi_len;
 
-    if(strcmp(mme_ue->imsi_bcd, ori_mme_ue->imsi_bcd) != 0) {
+    if(strcmp(amf4g_ue->imsi_bcd, ori_amf4g_ue->imsi_bcd) != 0) {
         d_error("imsi_data Error");
     }
     
-    if(mme_ue->imsi_len != ori_mme_ue->imsi_len) {
-        d_error("imsi_len Error %d %d", mme_ue->imsi_len, ori_mme_ue->imsi_len);    
+    if(amf4g_ue->imsi_len != ori_amf4g_ue->imsi_len) {
+        d_error("imsi_len Error %d %d", amf4g_ue->imsi_len, ori_amf4g_ue->imsi_len);    
     }
     /* tai */
-    memcpy(&mme_ue->tai.tac, &createSession.tai.tac, sizeof(createSession.tai.tac));
-    memcpy(&mme_ue->tai.plmn_id, &createSession.tai.plmn_id, sizeof(createSession.tai.plmn_id));
+    memcpy(&amf4g_ue->tai.tac, &createSession.tai.tac, sizeof(createSession.tai.tac));
+    memcpy(&amf4g_ue->tai.plmn_id, &createSession.tai.plmn_id, sizeof(createSession.tai.plmn_id));
     /* e-cgi */
-    memcpy(&mme_ue->e_cgi.cell_id, &createSession.e_cgi.cell_id, sizeof(createSession.e_cgi.cell_id));
-    memcpy(&mme_ue->e_cgi.plmn_id, &createSession.e_cgi.plmn_id, sizeof(createSession.e_cgi.plmn_id));
-    if(!compare_plmnid(mme_ue->tai.plmn_id, ori_mme_ue->tai.plmn_id)){
+    memcpy(&amf4g_ue->e_cgi.cell_id, &createSession.e_cgi.cell_id, sizeof(createSession.e_cgi.cell_id));
+    memcpy(&amf4g_ue->e_cgi.plmn_id, &createSession.e_cgi.plmn_id, sizeof(createSession.e_cgi.plmn_id));
+    if(!compare_plmnid(amf4g_ue->tai.plmn_id, ori_amf4g_ue->tai.plmn_id)){
         d_error("tai.plmn_id Error");
     }        
-    if(mme_ue->tai.tac != ori_mme_ue->tai.tac) {
+    if(amf4g_ue->tai.tac != ori_amf4g_ue->tai.tac) {
         d_error("tai.tac Error");
     }
-    if(!compare_plmnid(mme_ue->e_cgi.plmn_id, ori_mme_ue->e_cgi.plmn_id)) {
+    if(!compare_plmnid(amf4g_ue->e_cgi.plmn_id, ori_amf4g_ue->e_cgi.plmn_id)) {
         d_error("e_cgi.plmn_id Error");
     }     
-    if(mme_ue->e_cgi.cell_id != ori_mme_ue->e_cgi.cell_id) {
+    if(amf4g_ue->e_cgi.cell_id != ori_amf4g_ue->e_cgi.cell_id) {
         d_error("e_cgi.cell_id Error");
     }
     /*visited plmn id */
-    memcpy(&mme_ue->visited_plmn_id, &createSession.visited_plmn_id, sizeof(createSession.visited_plmn_id));    
-    if(!compare_plmnid(mme_ue->visited_plmn_id, ori_mme_ue->visited_plmn_id)){
+    memcpy(&amf4g_ue->visited_plmn_id, &createSession.visited_plmn_id, sizeof(createSession.visited_plmn_id));    
+    if(!compare_plmnid(amf4g_ue->visited_plmn_id, ori_amf4g_ue->visited_plmn_id)){
         d_error("visited_plmn_id Error");
     }
 
@@ -170,15 +170,15 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, mme_sess_t *pSess) {
     /*TODO : ue timezone*/
     
     /* gummei */
-    memcpy(&mme_ue->guti, &createSession.guti, sizeof(createSession.guti));
-    if(!compare_plmnid(mme_ue->guti.plmn_id, ori_mme_ue->guti.plmn_id))
+    memcpy(&amf4g_ue->guti, &createSession.guti, sizeof(createSession.guti));
+    if(!compare_plmnid(amf4g_ue->guti.plmn_id, ori_amf4g_ue->guti.plmn_id))
         d_error("guti.plmn_id Error");
-    if(mme_ue->guti.mme_gid != ori_mme_ue->guti.mme_gid)
-        d_error("mme_gid Error");
-    if(mme_ue->guti.mme_code != ori_mme_ue->guti.mme_code)
-        d_error("mme_code Error");
+    if(amf4g_ue->guti.mme_gid != ori_amf4g_ue->guti.mme_gid)
+        d_error("amf4g_gid Error");
+    if(amf4g_ue->guti.mme_code != ori_amf4g_ue->guti.mme_code)
+        d_error("amf4g_code Error");
 
-    CORE_FREE(mme_ue);
+    CORE_FREE(amf4g_ue);
     CORE_FREE(bearer);
     CORE_FREE(pdn);
     

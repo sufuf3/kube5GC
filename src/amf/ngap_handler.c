@@ -358,10 +358,10 @@ void ngap_handle_initial_context_setup_failure(amf_ran_t *ran, ngap_message_t *m
     else
     {
         //d_trace(5, "    NOT EMM-Registered\n");
-        //d_assert(mme_ue,,);
-        //rv = mme_send_delete_session_or_ue_context_release(mme_ue, enb_ue);
+        //d_assert(amf4g_ue,,);
+        //rv = amf4g_send_delete_session_or_ue_context_release(amf4g_ue, enb_ue);
         //d_assert(rv == CORE_OK,,
-        //        "mme_send_delete_session_or_ue_context_release() failed");
+        //        "amf4g_send_delete_session_or_ue_context_release() failed");
     }
 }
 
@@ -1027,8 +1027,8 @@ void ngap_handle_ue_context_release_complete(amf_ran_t *ran, ngap_message_t *mes
             if (amf_ue_have_indirect_tunnel(amf_ue))
             {
                 //TODO:
-                // rv = mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(mme_ue);
-                // d_assert(rv == CORE_OK,, "mme_gtp_send_delete_indirect_data_"
+                // rv = amf4g_gtp_send_delete_indirect_data_forwarding_tunnel_request(amf4g_ue);
+                // d_assert(rv == CORE_OK,, "amf4g_gtp_send_delete_indirect_data_"
                 //     "forwarding_tunnel_request() failed");
             }
             else
@@ -1186,14 +1186,14 @@ void ngap_handle_handover_required(amf_ran_t *ran, ngap_message_t *message)
     amf_ue = source_ue->amf_ue;
     d_assert(amf_ue, return,);
 #if 0 // TODO: fix it   
-    if (SECURITY_CONTEXT_IS_VALID(mme_ue))
+    if (SECURITY_CONTEXT_IS_VALID(amf4g_ue))
 #else 
     if (0)
 #endif
     {
 #if 0 // TODO: fix it
-        mme_ue->nhcc++;
-        mme_kdf_nh(mme_ue->kasme, mme_ue->nh, mme_ue->nh);
+        amf4g_ue->nhcc++;
+        amf4g_kdf_nh(amf4g_ue->kasme, amf4g_ue->nh, amf4g_ue->nh);
 #endif 
     }
     else
@@ -1323,10 +1323,10 @@ void ngap_handle_handover_request_acknowledge(amf_ran_t *ran, ngap_message_t *me
     NGAP_STORE_DATA(&amf_ue->container, TargetToSource_TransparentContainer);
 
 #if 0
-    if (mme_ue_have_indirect_tunnel(mme_ue) == 1)
+    if (amf4g_ue_have_indirect_tunnel(amf4g_ue) == 1)
     {
-        rv = mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
-                mme_ue);
+        rv = amf4g_gtp_send_create_indirect_data_forwarding_tunnel_request(
+                amf4g_ue);
         d_assert(rv == CORE_OK, return, "gtp send failed");
     }
     else
@@ -1539,36 +1539,36 @@ void ngap_handle_handover_notification(amf_ran_t *ran, ngap_message_t *message)
     target_ue->nas.e_cgi.cell_id = (ntohl(target_ue->nas.e_cgi.cell_id) >> 4);
 
     d_trace(5, "    OLD TAI[PLMN_ID:0x%x,TAC:%d]\n",
-            mme_ue->tai.plmn_id, mme_ue->tai.tac);
+            amf4g_ue->tai.plmn_id, amf4g_ue->tai.tac);
     d_trace(5, "    OLD E_CGI[PLMN_ID:0x%x,CELL_ID:%d]\n",
-            mme_ue->e_cgi.plmn_id, mme_ue->e_cgi.cell_id);
+            amf4g_ue->e_cgi.plmn_id, amf4g_ue->e_cgi.cell_id);
     d_trace(5, "    TAI[PLMN_ID:0x%x,TAC:%d]\n",
             target_ue->nas.tai.plmn_id, target_ue->nas.tai.tac);
     d_trace(5, "    E_CGI[PLMN_ID:0x%x,CELL_ID:%d]\n",
             target_ue->nas.e_cgi.plmn_id, target_ue->nas.e_cgi.cell_id);
 
     /* Copy TAI and ECGI from enb_ue */
-    memcpy(&mme_ue->tai, &target_ue->nas.tai, sizeof(tai_t));
-    memcpy(&mme_ue->e_cgi, &target_ue->nas.e_cgi, sizeof(e_cgi_t));
+    memcpy(&amf4g_ue->tai, &target_ue->nas.tai, sizeof(tai_t));
+    memcpy(&amf4g_ue->e_cgi, &target_ue->nas.e_cgi, sizeof(e_cgi_t));
 
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while(sess)
     {
-        bearer = mme_bearer_first(sess);
+        bearer = amf4g_bearer_first(sess);
         while(bearer)
         {
             bearer->enb_s1u_teid = bearer->target_s1u_teid;
             memcpy(&bearer->enb_s1u_ip, &bearer->target_s1u_ip, sizeof(ip_t));
 
             GTP_COUNTER_INCREMENT(
-                    mme_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY);
+                    amf4g_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY);
 
-            rv = mme_gtp_send_modify_bearer_request(bearer, 1);
+            rv = amf4g_gtp_send_modify_bearer_request(bearer, 1);
             d_assert(rv == CORE_OK, return, "gtp send failed");
 
-            bearer = mme_bearer_next(bearer);
+            bearer = amf4g_bearer_next(bearer);
         }
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
     }
 #endif
             break;
@@ -1870,18 +1870,18 @@ void ngap_handle_ue_context_release_request(amf_ran_t *ran, ngap_message_t *mess
         if (FSM_CHECK(&amf_ue->sm, emm_state_registered))
         {
             d_trace(5, "    EMM-Registered\n");
-            rv = mme_send_release_access_bearer_or_ue_context_release(
-                    mme_ue, enb_ue);
-            d_assert(rv == CORE_OK,, "mme_send_release_access_bearer_or_"
+            rv = amf4g_send_release_access_bearer_or_ue_context_release(
+                    amf4g_ue, enb_ue);
+            d_assert(rv == CORE_OK,, "amf4g_send_release_access_bearer_or_"
                     "ue_context_release() failed");
         }
         else
 
         {
             d_trace(5, "    NOT EMM-Registered\n");
-            rv = mme_send_delete_session_or_ue_context_release(mme_ue, enb_ue);
+            rv = amf4g_send_delete_session_or_ue_context_release(amf4g_ue, enb_ue);
             d_assert(rv == CORE_OK,,
-                    "mme_send_delete_session_or_ue_context_release() failed");
+                    "amf4g_send_delete_session_or_ue_context_release() failed");
         }
 #endif
     }
@@ -2054,10 +2054,10 @@ void ngap_handle_path_switch_request(amf_ran_t *ran, ngap_message_t *message)
     amf_ue = ran_ue->amf_ue;
     d_assert(amf_ue, return, "NULL param");
 #if 0
-    if (SECURITY_CONTEXT_IS_VALID(mme_ue))
+    if (SECURITY_CONTEXT_IS_VALID(amf4g_ue))
     {
-        mme_ue->nhcc++;
-        mme_kdf_nh(mme_ue->kasme, mme_ue->nh, mme_ue->nh);
+        amf4g_ue->nhcc++;
+        amf4g_kdf_nh(amf4g_ue->kasme, amf4g_ue->nh, amf4g_ue->nh);
     }
     else
     {
@@ -2086,27 +2086,27 @@ memcpy(&enb_ue->nas.tai.plmn_id, pLMNidentity->buf,
     enb_ue->nas.e_cgi.cell_id = (ntohl(enb_ue->nas.e_cgi.cell_id) >> 4);
 
     d_trace(5, "    OLD TAI[PLMN_ID:0x%x,TAC:%d]\n",
-            mme_ue->tai.plmn_id, mme_ue->tai.tac);
+            amf4g_ue->tai.plmn_id, amf4g_ue->tai.tac);
     d_trace(5, "    OLD E_CGI[PLMN_ID:0x%x,CELL_ID:%d]\n",
-            mme_ue->e_cgi.plmn_id, mme_ue->e_cgi.cell_id);
+            amf4g_ue->e_cgi.plmn_id, amf4g_ue->e_cgi.cell_id);
     d_trace(5, "    TAI[PLMN_ID:0x%x,TAC:%d]\n",
             enb_ue->nas.tai.plmn_id, enb_ue->nas.tai.tac);
     d_trace(5, "    E_CGI[PLMN_ID:0x%x,CELL_ID:%d]\n",
             enb_ue->nas.e_cgi.plmn_id, enb_ue->nas.e_cgi.cell_id);
 
     /* Copy TAI and ECGI from enb_ue */
-    memcpy(&mme_ue->tai, &enb_ue->nas.tai, sizeof(tai_t));
-    memcpy(&mme_ue->e_cgi, &enb_ue->nas.e_cgi, sizeof(e_cgi_t));
+    memcpy(&amf4g_ue->tai, &enb_ue->nas.tai, sizeof(tai_t));
+    memcpy(&amf4g_ue->e_cgi, &enb_ue->nas.e_cgi, sizeof(e_cgi_t));
 
     memcpy(&eea, encryptionAlgorithms->buf, sizeof(eea));
     eea = ntohs(eea);
-    mme_ue->ue_network_capability.eea = eea >> 9;
-    mme_ue->ue_network_capability.eea0 = 1;
+    amf4g_ue->ue_network_capability.eea = eea >> 9;
+    amf4g_ue->ue_network_capability.eea0 = 1;
 
     memcpy(&eia, integrityProtectionAlgorithms->buf, sizeof(eia));
     eia = ntohs(eia);
-    mme_ue->ue_network_capability.eia = eia >> 9;
-    mme_ue->ue_network_capability.eia0 = 0;
+    amf4g_ue->ue_network_capability.eia = eia >> 9;
+    amf4g_ue->ue_network_capability.eia0 = 0;
 #endif
 }
 
@@ -2300,7 +2300,7 @@ void ngap_handle_ran_configuration_update(amf_ran_t *ran, ngap_message_t *messag
         if (served_tai_index < 0)
         {
             d_warn("eNB Configuration update failure:");
-            d_warn("    Cannot find Served TAI. Check 'mme.tai' configuration");
+            d_warn("    Cannot find Served TAI. Check 'amf4g.tai' configuration");
             group = NGAP_Cause_PR_misc;
             cause = NGAP_CauseMisc_unknown_PLMN;
         }

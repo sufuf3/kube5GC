@@ -63,7 +63,7 @@ extern "C" {
 /******************************************************/
 
 typedef struct _enb_ue_t enb_ue_t;
-typedef struct _mme_ue_t mme_ue_t;
+typedef struct _amf4g_ue_t amf4g_ue_t;
 typedef struct _ran_ue_t ran_ue_t;
 typedef struct _amf_ue_t amf_ue_t;
 
@@ -72,7 +72,7 @@ typedef struct _gtp_xact_t gtp_xact_t;
 
 typedef struct _fd_config_t fd_config_t;
 
-typedef c_uint32_t mme_m_tmsi_t;
+typedef c_uint32_t amf4g_m_tmsi_t;
 typedef c_uint32_t amf_5g_tmsi_t;
 
 typedef struct _ran_id_t{
@@ -88,10 +88,10 @@ typedef struct _served_gummei {
     c_uint32_t      num_of_plmn_id;
     plmn_id_t       plmn_id[MAX_PLMN_ID];
 
-    c_uint32_t      num_of_mme_gid;
-    c_uint16_t      mme_gid[GRP_PER_MME];
-    c_uint32_t      num_of_mme_code;
-    c_uint8_t       mme_code[CODE_PER_MME];
+    c_uint32_t      num_of_amf4g_gid;
+    c_uint16_t      amf4g_gid[GRP_PER_MME];
+    c_uint32_t      num_of_amf4g_code;
+    c_uint8_t       amf4g_code[CODE_PER_MME];
 } served_gummei_t;
 
 typedef struct _served_guami_t {
@@ -129,7 +129,7 @@ typedef struct _supported_ta_t{
 } supported_ta_t;
 
 
-typedef struct _mme_context_t {
+typedef struct _amf4g_context_t {
     const char      *fd_conf_path;  /* MME freeDiameter conf path */
     fd_config_t     *fd_config;     /* MME freeDiameter config */
 
@@ -200,7 +200,7 @@ typedef struct _mme_context_t {
         int head, tail;
         int size, avail;
         mutex_id mut;
-        mme_m_tmsi_t *free[MAX_POOL_OF_SESS], pool[MAX_POOL_OF_SESS];
+        amf4g_m_tmsi_t *free[MAX_POOL_OF_SESS], pool[MAX_POOL_OF_SESS];
     } m_tmsi;
 
     hash_t          *enb_sock_hash;         /* hash table for ENB Socket */
@@ -223,7 +223,7 @@ typedef struct _mme_context_t {
     bool overload_started;
     /******************************************************/
     
-} mme_context_t;
+} amf4g_context_t;
 
 
 /****************************add by AMF team***********************************/
@@ -330,7 +330,7 @@ typedef struct _amf_context_t {
         int head, tail;
         int size, avail;
         mutex_id mut;
-        mme_m_tmsi_t *free[MAX_POOL_OF_SESS], pool[MAX_POOL_OF_SESS];
+        amf4g_m_tmsi_t *free[MAX_POOL_OF_SESS], pool[MAX_POOL_OF_SESS];
     } m_tmsi;
 
     hash_t          *enb_sock_hash;         /* hash table for ENB Socket */
@@ -406,7 +406,7 @@ struct _ran_ue_t {
     /* Use amf_ue->tai, amf_ue->nr_cgi.
      * Do not access ran_ue->nas.tai ran_ue->nas.nr_cgi.
      * 
-     * Save TAI and ECGI. And then, this will copy 'mme_ue_t' context later */
+     * Save TAI and ECGI. And then, this will copy 'amf4g_ue_t' context later */
     struct {
         tai_t        tai;
         union {
@@ -434,7 +434,7 @@ struct _ran_ue_t {
      * NAS(amf_ue_t) context is associated with last created NG(ran_ue_t)
      * context, and older NG(ran_ue_t) context might not be freed.
      *
-     * If NAS(mme_ue_t) has already been associated with
+     * If NAS(amf4g_ue_t) has already been associated with
      * older NG(ran_ue_t) context, the holding timer(30secs) is started.
      * Newly associated NG(ran_ue_t) context holding timer is stopped.
      *
@@ -518,7 +518,7 @@ struct _amf_ue_t {
 
 /************************************************************************/
 
-typedef struct _mme_enb_t {
+typedef struct _amf4g_enb_t {
     index_t         index;  /* An index of this node */
     fsm_t           sm;     /* A state machine */
 
@@ -534,7 +534,7 @@ typedef struct _mme_enb_t {
 
     list_t          enb_ue_list;
 
-} mme_enb_t;
+} amf4g_enb_t;
 
 struct _enb_ue_t {
     lnode_t         node;   /* A node of list_t */
@@ -550,10 +550,10 @@ struct _enb_ue_t {
     enb_ue_t        *source_ue;
     enb_ue_t        *target_ue;
 
-    /* Use mme_ue->tai, mme_ue->e_cgi.
+    /* Use amf4g_ue->tai, amf4g_ue->e_cgi.
      * Do not access enb_ue->nas.tai enb_ue->nas.e_cgi.
      * 
-     * Save TAI and ECGI. And then, this will copy 'mme_ue_t' context later */
+     * Save TAI and ECGI. And then, this will copy 'amf4g_ue_t' context later */
     struct {
         tai_t       tai;
         e_cgi_t     e_cgi;
@@ -574,10 +574,10 @@ struct _enb_ue_t {
      * When eNodeB sends Attach Request, TAU Request, Service Request repeatly,
      * S1(enb_ue_t) context is repeatly created. 
      *
-     * NAS(mme_ue_t) context is associated with last created S1(enb_ue_t)
+     * NAS(amf4g_ue_t) context is associated with last created S1(enb_ue_t)
      * context, and older S1(enb_ue_t) context might not be freed.
      *
-     * If NAS(mme_ue_t) has already been associated with
+     * If NAS(amf4g_ue_t) has already been associated with
      * older S1(enb_ue_t) context, the holding timer(30secs) is started.
      * Newly associated S1(enb_ue_t) context holding timer is stopped.
      *
@@ -587,12 +587,12 @@ struct _enb_ue_t {
     tm_block_id     holding_timer;
 
     /* Related Context */
-    mme_enb_t       *enb;
-    mme_ue_t        *mme_ue;
+    amf4g_enb_t       *enb;
+    amf4g_ue_t        *amf4g_ue;
 
 }; 
 
-struct _mme_ue_t {
+struct _amf4g_ue_t {
     index_t         index;  /* An index of this node */
     fsm_t           sm;     /* A state machine */
 
@@ -619,11 +619,11 @@ struct _mme_ue_t {
     int             imsi_len;
     c_int8_t        imsi_bcd[MAX_IMSI_BCD_LEN+1];
 
-    mme_m_tmsi_t    *m_tmsi;
+    amf4g_m_tmsi_t    *m_tmsi;
     guti_t          guti;
     int             guti_present;
 
-    c_uint32_t      mme_s11_teid;   /* MME-S11-TEID is derived from INDEX */
+    c_uint32_t      amf4g_s11_teid;   /* MME-S11-TEID is derived from INDEX */
     c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is received from SGW */
 
     c_uint16_t      ostream_id;     /* SCTP output stream identification */
@@ -779,14 +779,14 @@ struct _mme_ue_t {
 };
 
 #define MME_HAVE_SGW_S1U_PATH(__sESS) \
-    ((__sESS) && (mme_bearer_first(__sESS)) && \
-    ((mme_default_bearer_in_sess(__sESS)->sgw_s1u_teid)))
+    ((__sESS) && (amf4g_bearer_first(__sESS)) && \
+    ((amf4g_default_bearer_in_sess(__sESS)->sgw_s1u_teid)))
 
 #define CLEAR_SGW_S1U_PATH(__sESS) \
     do { \
-        mme_bearer_t *__bEARER = NULL; \
+        amf4g_bearer_t *__bEARER = NULL; \
         d_assert((__sESS), break, "Null param"); \
-        __bEARER = mme_default_bearer_in_sess(__sESS); \
+        __bEARER = amf4g_default_bearer_in_sess(__sESS); \
         __bEARER->sgw_s1u_teid = 0; \
     } while(0)
 
@@ -799,7 +799,7 @@ struct _mme_ue_t {
         (__mME)->sgw_s11_teid = 0; \
     } while(0)
 
-typedef struct _mme_sess_t {
+typedef struct _amf4g_sess_t {
     lnode_t         node;       /* A node of list_t */
     index_t         index;      /* An index of this node */
 
@@ -808,15 +808,15 @@ typedef struct _mme_sess_t {
     /* PDN Connectivity Request */
     nas_request_type_t request_type; 
 
-    /* mme_bearer_first(sess) : Default Bearer Context */
+    /* amf4g_bearer_first(sess) : Default Bearer Context */
     list_t          bearer_list;
 
     /* Related Context */
-    mme_ue_t        *mme_ue;
+    amf4g_ue_t        *amf4g_ue;
 
 #define MME_UE_HAVE_APN(__mME) \
-    ((__mME) && (mme_sess_first(__mME)) && \
-    ((mme_sess_first(__mME))->pdn))
+    ((__mME) && (amf4g_sess_first(__mME)) && \
+    ((amf4g_sess_first(__mME))->pdn))
     pdn_t           *pdn;
 
     /* Save Protocol Configuration Options from UE */
@@ -827,12 +827,12 @@ typedef struct _mme_sess_t {
 
     /* Save Protocol Configuration Options from PGW */
     tlv_octet_t     pgw_pco;
-} mme_sess_t;
+} amf4g_sess_t;
 
 #define BEARER_CONTEXT_IS_ACTIVE(__mME)  \
-    (mme_bearer_is_inactive(__mME) == 0)
+    (amf4g_bearer_is_inactive(__mME) == 0)
 #define CLEAR_BEARER_CONTEXT(__mME)   \
-    mme_bearer_set_inactive(__mME)
+    amf4g_bearer_set_inactive(__mME)
 
 #define MME_HAVE_ENB_S1U_PATH(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_s1u_teid))
@@ -858,7 +858,7 @@ typedef struct _mme_sess_t {
         (__bEARER)->sgw_dl_teid = 0; \
         (__bEARER)->sgw_ul_teid = 0; \
     } while(0)
-typedef struct _mme_bearer_t {
+typedef struct _amf4g_bearer_t {
     lnode_t         node;           /* A node of list_t */
     index_t         index;          /* An index of this node */
     fsm_t           sm;             /* State Machine */
@@ -887,45 +887,45 @@ typedef struct _mme_bearer_t {
     tlv_octet_t     tft;   /* Saved TFT */
 
     /* Related Context */
-    mme_ue_t        *mme_ue;
-    mme_sess_t      *sess;
+    amf4g_ue_t        *amf4g_ue;
+    amf4g_sess_t      *sess;
     gtp_xact_t      *xact;
-} mme_bearer_t;
+} amf4g_bearer_t;
 
-CORE_DECLARE(status_t)      mme_context_init(void);
-CORE_DECLARE(status_t)      mme_context_final(void);
-//CORE_DECLARE(mme_context_t*) mme_self(void);
-CORE_DECLARE(amf_context_t*) mme_self(void);
+CORE_DECLARE(status_t)      amf4g_context_init(void);
+CORE_DECLARE(status_t)      amf4g_context_final(void);
+//CORE_DECLARE(amf4g_context_t*) amf4g_self(void);
+CORE_DECLARE(amf_context_t*) amf4g_self(void);
 
-CORE_DECLARE(status_t)      mme_context_parse_config(void);
-CORE_DECLARE(status_t)      mme_context_setup_trace_module(void);
+CORE_DECLARE(status_t)      amf4g_context_parse_config(void);
+CORE_DECLARE(status_t)      amf4g_context_setup_trace_module(void);
 
-CORE_DECLARE(mme_enb_t*)    mme_enb_add(sock_id sock, c_sockaddr_t *addr);
-CORE_DECLARE(status_t)      mme_enb_remove(mme_enb_t *enb);
-CORE_DECLARE(status_t)      mme_enb_remove_all(void);
-CORE_DECLARE(mme_enb_t*)    mme_enb_find(index_t index);
-CORE_DECLARE(mme_enb_t*)    mme_enb_find_by_sock(sock_id sock);
-CORE_DECLARE(mme_enb_t*)    mme_enb_find_by_addr(c_sockaddr_t *addr);
-CORE_DECLARE(mme_enb_t*)    mme_enb_find_by_enb_id(c_uint32_t enb_id);
-CORE_DECLARE(status_t)      mme_enb_set_enb_id(
-        mme_enb_t *enb, c_uint32_t enb_id);
-CORE_DECLARE(hash_index_t *) mme_enb_first();
-CORE_DECLARE(hash_index_t *) mme_enb_next(hash_index_t *hi);
-CORE_DECLARE(mme_enb_t *)    mme_enb_this(hash_index_t *hi);
-CORE_DECLARE(int)           mme_enb_sock_type(sock_id sock);
+CORE_DECLARE(amf4g_enb_t*)    amf4g_enb_add(sock_id sock, c_sockaddr_t *addr);
+CORE_DECLARE(status_t)      amf4g_enb_remove(amf4g_enb_t *enb);
+CORE_DECLARE(status_t)      amf4g_enb_remove_all(void);
+CORE_DECLARE(amf4g_enb_t*)    amf4g_enb_find(index_t index);
+CORE_DECLARE(amf4g_enb_t*)    amf4g_enb_find_by_sock(sock_id sock);
+CORE_DECLARE(amf4g_enb_t*)    amf4g_enb_find_by_addr(c_sockaddr_t *addr);
+CORE_DECLARE(amf4g_enb_t*)    amf4g_enb_find_by_enb_id(c_uint32_t enb_id);
+CORE_DECLARE(status_t)      amf4g_enb_set_enb_id(
+        amf4g_enb_t *enb, c_uint32_t enb_id);
+CORE_DECLARE(hash_index_t *) amf4g_enb_first();
+CORE_DECLARE(hash_index_t *) amf4g_enb_next(hash_index_t *hi);
+CORE_DECLARE(amf4g_enb_t *)    amf4g_enb_this(hash_index_t *hi);
+CORE_DECLARE(int)           amf4g_enb_sock_type(sock_id sock);
 
-CORE_DECLARE(enb_ue_t*)     enb_ue_add(mme_enb_t *enb);
+CORE_DECLARE(enb_ue_t*)     enb_ue_add(amf4g_enb_t *enb);
 CORE_DECLARE(unsigned int)  enb_ue_count();
 CORE_DECLARE(status_t)      enb_ue_remove(enb_ue_t *enb_ue);
-CORE_DECLARE(status_t)      enb_ue_remove_in_enb(mme_enb_t *enb);
+CORE_DECLARE(status_t)      enb_ue_remove_in_enb(amf4g_enb_t *enb);
 CORE_DECLARE(status_t)      enb_ue_switch_to_enb(enb_ue_t *enb_ue, 
-                                mme_enb_t *new_enb);
+                                amf4g_enb_t *new_enb);
 CORE_DECLARE(enb_ue_t*)     enb_ue_find(index_t index);
-CORE_DECLARE(enb_ue_t*)     enb_ue_find_by_enb_ue_s1ap_id(mme_enb_t *enb, 
+CORE_DECLARE(enb_ue_t*)     enb_ue_find_by_enb_ue_s1ap_id(amf4g_enb_t *enb, 
                                 c_uint32_t enb_ue_s1ap_id);
 CORE_DECLARE(enb_ue_t*)     enb_ue_find_by_mme_ue_s1ap_id(
                                 c_uint32_t mme_ue_s1ap_id);
-CORE_DECLARE(enb_ue_t*)     enb_ue_first_in_enb(mme_enb_t *enb);
+CORE_DECLARE(enb_ue_t*)     enb_ue_first_in_enb(amf4g_enb_t *enb);
 CORE_DECLARE(enb_ue_t*)     enb_ue_next_in_enb(enb_ue_t *enb_ue);
 
 /*************************add by HU***************************/
@@ -962,22 +962,22 @@ CORE_DECLARE(ran_ue_t*)     ran_ue_first_in_ran(amf_ran_t *ran);
 CORE_DECLARE(ran_ue_t*)     ran_ue_next_in_ran(ran_ue_t *ran_ue);
 /*************************************************************/
 
-CORE_DECLARE(mme_ue_t*)     mme_ue_add(enb_ue_t *enb_ue);
-CORE_DECLARE(status_t)      mme_ue_remove(mme_ue_t *mme_ue);
-CORE_DECLARE(status_t)      mme_ue_remove_all();
+CORE_DECLARE(amf4g_ue_t*)     amf4g_ue_add(enb_ue_t *enb_ue);
+CORE_DECLARE(status_t)      amf4g_ue_remove(amf4g_ue_t *amf4g_ue);
+CORE_DECLARE(status_t)      amf4g_ue_remove_all();
 
-CORE_DECLARE(mme_ue_t*)     mme_ue_find(index_t index);
-CORE_DECLARE(mme_ue_t*)     mme_ue_find_by_imsi(c_uint8_t *imsi, int imsi_len);
-CORE_DECLARE(mme_ue_t*)     mme_ue_find_by_imsi_bcd(c_int8_t *imsi_bcd);
-CORE_DECLARE(mme_ue_t*)     mme_ue_find_by_guti(guti_t *guti);
-CORE_DECLARE(mme_ue_t*)     mme_ue_find_by_teid(c_uint32_t teid);
+CORE_DECLARE(amf4g_ue_t*)     amf4g_ue_find(index_t index);
+CORE_DECLARE(amf4g_ue_t*)     amf4g_ue_find_by_imsi(c_uint8_t *imsi, int imsi_len);
+CORE_DECLARE(amf4g_ue_t*)     amf4g_ue_find_by_imsi_bcd(c_int8_t *imsi_bcd);
+CORE_DECLARE(amf4g_ue_t*)     amf4g_ue_find_by_guti(guti_t *guti);
+CORE_DECLARE(amf4g_ue_t*)     amf4g_ue_find_by_teid(c_uint32_t teid);
 
-CORE_DECLARE(mme_ue_t*)     mme_ue_find_by_message(nas_message_t *message);
-CORE_DECLARE(status_t)      mme_ue_set_imsi(
-                                mme_ue_t *mme_ue, c_int8_t *imsi_bcd);
+CORE_DECLARE(amf4g_ue_t*)     amf4g_ue_find_by_message(nas_message_t *message);
+CORE_DECLARE(status_t)      amf4g_ue_set_imsi(
+                                amf4g_ue_t *amf4g_ue, c_int8_t *imsi_bcd);
 
-CORE_DECLARE(int)           mme_ue_have_indirect_tunnel(mme_ue_t *mme_ue);
-CORE_DECLARE(status_t)      mme_ue_clear_indirect_tunnel(mme_ue_t *mme_ue);
+CORE_DECLARE(int)           amf4g_ue_have_indirect_tunnel(amf4g_ue_t *amf4g_ue);
+CORE_DECLARE(status_t)      amf4g_ue_clear_indirect_tunnel(amf4g_ue_t *amf4g_ue);
 
 /* 
  * o RECV Initial UE-Message : S-TMSI
@@ -1027,69 +1027,69 @@ CORE_DECLARE(status_t)      mme_ue_clear_indirect_tunnel(mme_ue_t *mme_ue);
  * ### ENB_UE_REMOVE() ####
  *   - Delete Indirect Data Forwarding Tunnel Request/Response
  */
-CORE_DECLARE(status_t)      mme_ue_associate_enb_ue(
-                                mme_ue_t *mme_ue, enb_ue_t *enb_ue);
+CORE_DECLARE(status_t)      amf4g_ue_associate_enb_ue(
+                                amf4g_ue_t *amf4g_ue, enb_ue_t *enb_ue);
 /*************************add by HU***************************/
 CORE_DECLARE(status_t)      ran_ue_deassociate(ran_ue_t *ran_ue);
 /*************************************************************/
 
 CORE_DECLARE(status_t)      enb_ue_deassociate(enb_ue_t *enb_ue);
-CORE_DECLARE(status_t)      mme_ue_deassociate(mme_ue_t *mme_ue);
+CORE_DECLARE(status_t)      amf4g_ue_deassociate(amf4g_ue_t *amf4g_ue);
 CORE_DECLARE(status_t)      source_ue_associate_target_ue(
                                 enb_ue_t *source_ue, enb_ue_t *target_ue);
 CORE_DECLARE(status_t)      source_ue_deassociate_target_ue(enb_ue_t *enb_ue);
 
-CORE_DECLARE(hash_index_t *) mme_ue_first();
-CORE_DECLARE(hash_index_t *) mme_ue_next(hash_index_t *hi);
-CORE_DECLARE(mme_ue_t *)    mme_ue_this(hash_index_t *hi);
+CORE_DECLARE(hash_index_t *) amf4g_ue_first();
+CORE_DECLARE(hash_index_t *) amf4g_ue_next(hash_index_t *hi);
+CORE_DECLARE(amf4g_ue_t *)    amf4g_ue_this(hash_index_t *hi);
 
-CORE_DECLARE(mme_sess_t*)   mme_sess_add(mme_ue_t *mme_ue, c_uint8_t pti);
-CORE_DECLARE(status_t )     mme_sess_remove(mme_sess_t *sess);
-CORE_DECLARE(status_t )     mme_sess_remove_all(mme_ue_t *mme_ue);
-CORE_DECLARE(mme_sess_t*)   mme_sess_find(index_t index);
-CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_pti(
-                                mme_ue_t *mme_ue, c_uint8_t pti);
-CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_ebi(
-                                mme_ue_t *mme_ue, c_uint8_t ebi);
-CORE_DECLARE(mme_sess_t*)   mme_sess_find_by_apn(
-                                mme_ue_t *mme_ue, c_int8_t *apn);
-CORE_DECLARE(mme_sess_t*)   mme_sess_first(mme_ue_t *mme_ue);
-CORE_DECLARE(mme_sess_t*)   mme_sess_next(mme_sess_t *sess);
-CORE_DECLARE(unsigned int)  mme_sess_count(mme_ue_t *mme_ue);
+CORE_DECLARE(amf4g_sess_t*)   amf4g_sess_add(amf4g_ue_t *amf4g_ue, c_uint8_t pti);
+CORE_DECLARE(status_t )     amf4g_sess_remove(amf4g_sess_t *sess);
+CORE_DECLARE(status_t )     amf4g_sess_remove_all(amf4g_ue_t *amf4g_ue);
+CORE_DECLARE(amf4g_sess_t*)   amf4g_sess_find(index_t index);
+CORE_DECLARE(amf4g_sess_t*)   amf4g_sess_find_by_pti(
+                                amf4g_ue_t *amf4g_ue, c_uint8_t pti);
+CORE_DECLARE(amf4g_sess_t*)   amf4g_sess_find_by_ebi(
+                                amf4g_ue_t *amf4g_ue, c_uint8_t ebi);
+CORE_DECLARE(amf4g_sess_t*)   amf4g_sess_find_by_apn(
+                                amf4g_ue_t *amf4g_ue, c_int8_t *apn);
+CORE_DECLARE(amf4g_sess_t*)   amf4g_sess_first(amf4g_ue_t *amf4g_ue);
+CORE_DECLARE(amf4g_sess_t*)   amf4g_sess_next(amf4g_sess_t *sess);
+CORE_DECLARE(unsigned int)  amf4g_sess_count(amf4g_ue_t *amf4g_ue);
 
-CORE_DECLARE(mme_bearer_t*) mme_bearer_add(mme_sess_t *sess);
-CORE_DECLARE(status_t)      mme_bearer_remove(mme_bearer_t *bearer);
-CORE_DECLARE(status_t)      mme_bearer_remove_all(mme_sess_t *sess);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_find(index_t index);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_sess_ebi(
-                                mme_sess_t *sess, c_uint8_t ebi);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_find_by_ue_ebi(
-                                mme_ue_t *mme_ue, c_uint8_t ebi);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_find_or_add_by_message(
-                                mme_ue_t *mme_ue, nas_message_t *message);
-CORE_DECLARE(mme_bearer_t*) mme_default_bearer_in_sess(mme_sess_t *sess);
-CORE_DECLARE(mme_bearer_t*) mme_linked_bearer(mme_bearer_t *bearer);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_first(mme_sess_t *sess);
-CORE_DECLARE(mme_bearer_t*) mme_bearer_next(mme_bearer_t *bearer);
+CORE_DECLARE(amf4g_bearer_t*) amf4g_bearer_add(amf4g_sess_t *sess);
+CORE_DECLARE(status_t)      amf4g_bearer_remove(amf4g_bearer_t *bearer);
+CORE_DECLARE(status_t)      amf4g_bearer_remove_all(amf4g_sess_t *sess);
+CORE_DECLARE(amf4g_bearer_t*) amf4g_bearer_find(index_t index);
+CORE_DECLARE(amf4g_bearer_t*) amf4g_bearer_find_by_sess_ebi(
+                                amf4g_sess_t *sess, c_uint8_t ebi);
+CORE_DECLARE(amf4g_bearer_t*) amf4g_bearer_find_by_ue_ebi(
+                                amf4g_ue_t *amf4g_ue, c_uint8_t ebi);
+CORE_DECLARE(amf4g_bearer_t*) amf4g_bearer_find_or_add_by_message(
+                                amf4g_ue_t *amf4g_ue, nas_message_t *message);
+CORE_DECLARE(amf4g_bearer_t*) amf4g_default_bearer_in_sess(amf4g_sess_t *sess);
+CORE_DECLARE(amf4g_bearer_t*) amf4g_linked_bearer(amf4g_bearer_t *bearer);
+CORE_DECLARE(amf4g_bearer_t*) amf4g_bearer_first(amf4g_sess_t *sess);
+CORE_DECLARE(amf4g_bearer_t*) amf4g_bearer_next(amf4g_bearer_t *bearer);
 
-CORE_DECLARE(int)           mme_bearer_is_inactive(mme_ue_t *mme_ue);
-CORE_DECLARE(status_t)      mme_bearer_set_inactive(mme_ue_t *mme_ue);
+CORE_DECLARE(int)           amf4g_bearer_is_inactive(amf4g_ue_t *amf4g_ue);
+CORE_DECLARE(status_t)      amf4g_bearer_set_inactive(amf4g_ue_t *amf4g_ue);
 
-CORE_DECLARE(pdn_t*)        mme_pdn_add(mme_ue_t *mme_ue, c_int8_t *apn);
-CORE_DECLARE(status_t)      mme_pdn_remove_all(mme_ue_t *mme_ue);
-CORE_DECLARE(pdn_t*)        mme_pdn_find_by_apn(
-                                mme_ue_t *mme_ue, c_int8_t *apn);
-CORE_DECLARE(pdn_t*)        mme_default_pdn(mme_ue_t *mme_ue);
+CORE_DECLARE(pdn_t*)        amf4g_pdn_add(amf4g_ue_t *amf4g_ue, c_int8_t *apn);
+CORE_DECLARE(status_t)      amf4g_pdn_remove_all(amf4g_ue_t *amf4g_ue);
+CORE_DECLARE(pdn_t*)        amf4g_pdn_find_by_apn(
+                                amf4g_ue_t *amf4g_ue, c_int8_t *apn);
+CORE_DECLARE(pdn_t*)        amf4g_default_pdn(amf4g_ue_t *amf4g_ue);
 
-CORE_DECLARE(int)           mme_find_served_tai(tai_t *tai);
+CORE_DECLARE(int)           amf4g_find_served_tai(tai_t *tai);
 CORE_DECLARE(int)           amf_find_served_tai(tai_t *tai);
 
-CORE_DECLARE(status_t)     mme_m_tmsi_pool_generate();
-CORE_DECLARE(mme_m_tmsi_t *) mme_m_tmsi_alloc();
-CORE_DECLARE(status_t)      mme_m_tmsi_free(mme_m_tmsi_t *tmsi);
+CORE_DECLARE(status_t)     amf4g_m_tmsi_pool_generate();
+CORE_DECLARE(amf4g_m_tmsi_t *) amf4g_m_tmsi_alloc();
+CORE_DECLARE(status_t)      amf4g_m_tmsi_free(amf4g_m_tmsi_t *tmsi);
 
 /******************** Added by Chi ********************/
-CORE_DECLARE(status_t)      mme_overload_checking_init(void);
+CORE_DECLARE(status_t)      amf4g_overload_checking_init(void);
 /******************************************************/
 
 /******************** Added by Dobie ********************/

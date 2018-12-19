@@ -1,8 +1,8 @@
-#define TRACE_MODULE _mme_kdf
+#define TRACE_MODULE _amf4g_kdf
 
 #include "core_sha2_hmac.h"
 
-void mme_kdf_nas(c_uint8_t algorithm_type_distinguishers,
+void amf4g_kdf_nas(c_uint8_t algorithm_type_distinguishers,
     c_uint8_t algorithm_identity, c_uint8_t *kasme, c_uint8_t *knas)
 {
     c_uint8_t s[7];
@@ -22,7 +22,7 @@ void mme_kdf_nas(c_uint8_t algorithm_type_distinguishers,
     memcpy(knas, out+16, 16);
 }
 
-void mme_kdf_enb(c_uint8_t *kasme, c_uint32_t ul_count, c_uint8_t *kenb)
+void amf4g_kdf_enb(c_uint8_t *kasme, c_uint32_t ul_count, c_uint8_t *kenb)
 {
     c_uint8_t s[7];
 
@@ -37,7 +37,7 @@ void mme_kdf_enb(c_uint8_t *kasme, c_uint32_t ul_count, c_uint8_t *kenb)
     hmac_sha256(kasme, 32, s, 7, kenb, 32);
 }
 
-void mme_kdf_nh(c_uint8_t *kasme, c_uint8_t *sync_input, c_uint8_t *kenb)
+void amf4g_kdf_nh(c_uint8_t *kasme, c_uint8_t *sync_input, c_uint8_t *kenb)
 {
     c_uint8_t s[35];
 

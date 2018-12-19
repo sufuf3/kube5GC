@@ -1,4 +1,4 @@
-#define TRACE_MODULE _mme_fd_path
+#define TRACE_MODULE _amf4g_fd_path
 
 #include "core_debug.h"
 #include "core_pool.h"
@@ -8,28 +8,28 @@
 #include "fd/s6a/s6a_dict.h"
 #include "fd/s6a/s6a_message.h"
 
-#include "mme_event.h"
-#include "mme_fd_path.h"
+#include "amf4g_event.h"
+#include "amf4g_fd_path.h"
 
-static struct session_handler *mme_s6a_reg = NULL;
+static struct session_handler *amf4g_s6a_reg = NULL;
 
 struct sess_state {
-    mme_ue_t *mme_ue;
+    amf4g_ue_t *amf4g_ue;
     struct timespec ts; /* Time of sending the message */
 };
 
-pool_declare(mme_s6a_sess_pool, struct sess_state, MAX_POOL_OF_DIAMETER_SESS);
+pool_declare(amf4g_s6a_sess_pool, struct sess_state, MAX_POOL_OF_DIAMETER_SESS);
 
-static void mme_s6a_aia_cb(void *data, struct msg **msg);
-static void mme_s6a_ula_cb(void *data, struct msg **msg);
+static void amf4g_s6a_aia_cb(void *data, struct msg **msg);
+static void amf4g_s6a_ula_cb(void *data, struct msg **msg);
 
 static void state_cleanup(struct sess_state *sess_data, os0_t sid, void *opaque)
 {
-    pool_free_node(&mme_s6a_sess_pool, sess_data);
+    pool_free_node(&amf4g_s6a_sess_pool, sess_data);
 }
 
 /* MME Sends Authentication Information Request to HSS */
-void mme_s6a_send_air(mme_ue_t *mme_ue,
+void amf4g_s6a_send_air(amf4g_ue_t *amf4g_ue,
     nas_authentication_failure_parameter_t *authentication_failure_parameter)
 {
     int ret;
@@ -43,18 +43,18 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
 
     c_uint8_t resync[AUTS_LEN + RAND_LEN];
 
-    d_assert(mme_ue, return, "Null param");
+    d_assert(amf4g_ue, return, "Null param");
 
     d_trace(3, "[MME] Authentication-Information-Request\n");
 
     /* Clear Security Context */
-    CLEAR_SECURITY_CONTEXT(mme_ue);
+    CLEAR_SECURITY_CONTEXT(amf4g_ue);
     
     /* Create the random value to store with the session */
-    pool_alloc_node(&mme_s6a_sess_pool, &sess_data);
+    pool_alloc_node(&amf4g_s6a_sess_pool, &sess_data);
     d_assert(sess_data, return,);
     
-    sess_data->mme_ue = mme_ue;
+    sess_data->amf4g_ue = amf4g_ue;
     
     /* Create the request */
     ret = fd_msg_new(s6a_cmd_air, MSGFL_ALLOC_ETEID, &req);
@@ -94,8 +94,8 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
     /* Set the User-Name AVP */
     ret = fd_msg_avp_new(fd_user_name, 0, &avp);
     d_assert(ret == 0, return,);
-    val.os.data = (c_uint8_t *)mme_ue->imsi_bcd;
-    val.os.len  = strlen(mme_ue->imsi_bcd);
+    val.os.data = (c_uint8_t *)amf4g_ue->imsi_bcd;
+    val.os.len  = strlen(amf4g_ue->imsi_bcd);
     ret = fd_msg_avp_setvalue(avp, &val);
     d_assert(ret == 0, return,);
     ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
@@ -124,7 +124,7 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
     {
         ret = fd_msg_avp_new(s6a_re_synchronization_info, 0, &avpch);
         d_assert(ret == 0, return,);
-        memcpy(resync, mme_ue->rand, RAND_LEN);
+        memcpy(resync, amf4g_ue->rand, RAND_LEN);
         memcpy(resync+RAND_LEN,
                 authentication_failure_parameter->auts, AUTS_LEN);
         val.os.len = RAND_LEN+AUTS_LEN;
@@ -141,7 +141,7 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
     /* Set the Visited-PLMN-Id AVP */
     ret = fd_msg_avp_new(s6a_visited_plmn_id, 0, &avp);
     d_assert(ret == 0, return,);
-    val.os.data = (c_uint8_t *)&mme_ue->visited_plmn_id;
+    val.os.data = (c_uint8_t *)&amf4g_ue->visited_plmn_id;
     val.os.len  = PLMN_ID_LEN;
     ret = fd_msg_avp_setvalue(avp, &val);
     d_assert(ret == 0, return,);
@@ -160,12 +160,12 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
     svg = sess_data;
     
     /* Store this value in the session */
-    ret = fd_sess_state_store(mme_s6a_reg, session, &sess_data);
+    ret = fd_sess_state_store(amf4g_s6a_reg, session, &sess_data);
     d_assert(ret == 0, return,);
     d_assert(sess_data == 0, return,);
     
     /* Send the request */
-    ret = fd_msg_send(&req, mme_s6a_aia_cb, svg);
+    ret = fd_msg_send(&req, amf4g_s6a_aia_cb, svg);
     d_assert(ret == 0,,);
 
     /* Increment the counter */
@@ -175,7 +175,7 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
 }
 
 /* MME received Authentication Information Answer from HSS */
-static void mme_s6a_aia_cb(void *data, struct msg **msg)
+static void amf4g_s6a_aia_cb(void *data, struct msg **msg)
 {
     int ret;
     
@@ -190,7 +190,7 @@ static void mme_s6a_aia_cb(void *data, struct msg **msg)
     int new;
 
     event_t e;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
     pkbuf_t *s6abuf = NULL;
     s6a_message_t *s6a_message = NULL;
     s6a_aia_message_t *aia_message = NULL;
@@ -207,12 +207,12 @@ static void mme_s6a_aia_cb(void *data, struct msg **msg)
     d_assert(ret == 0, return,);
     d_assert(new == 0, return, );
     
-    ret = fd_sess_state_retrieve(mme_s6a_reg, session, &sess_data);
+    ret = fd_sess_state_retrieve(amf4g_s6a_reg, session, &sess_data);
     d_assert(ret == 0, return,);
     d_assert(sess_data && (void *)sess_data == data, return, );
 
-    mme_ue = sess_data->mme_ue;
-    d_assert(mme_ue, return, );
+    amf4g_ue = sess_data->amf4g_ue;
+    d_assert(amf4g_ue, return, );
 
     s6abuf_len = sizeof(s6a_message_t);
     d_assert(s6abuf_len < 8192, return, "Not supported size:%d", s6abuf_len);
@@ -391,9 +391,9 @@ out:
     if (!error)
     {
         event_set(&e, MME_EVT_S6A_MESSAGE);
-        event_set_param1(&e, (c_uintptr_t)mme_ue->index);
+        event_set_param1(&e, (c_uintptr_t)amf4g_ue->index);
         event_set_param2(&e, (c_uintptr_t)s6abuf);
-        mme_event_send(&e);
+        amf4g_event_send(&e);
     }
 
     /* Free the message */
@@ -444,7 +444,7 @@ out:
 }
 
 /* MME Sends Update Location Request to HSS */
-void mme_s6a_send_ulr(mme_ue_t *mme_ue)
+void amf4g_s6a_send_ulr(amf4g_ue_t *amf4g_ue)
 {
     int ret;
 
@@ -454,15 +454,15 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
     struct sess_state *sess_data = NULL, *svg;
     struct session *session = NULL;
 
-    d_assert(mme_ue, return, "Null Param");
+    d_assert(amf4g_ue, return, "Null Param");
 
     d_trace(3, "[MME] Update-Location-Request\n");
     
     /* Create the random value to store with the session */
-    pool_alloc_node(&mme_s6a_sess_pool, &sess_data);
+    pool_alloc_node(&amf4g_s6a_sess_pool, &sess_data);
     d_assert(sess_data, return,);
     
-    sess_data->mme_ue = mme_ue;
+    sess_data->amf4g_ue = amf4g_ue;
     
     /* Create the request */
     ret = fd_msg_new(s6a_cmd_ulr, MSGFL_ALLOC_ETEID, &req);
@@ -502,8 +502,8 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
     /* Set the User-Name AVP */
     ret = fd_msg_avp_new(fd_user_name, 0, &avp);
     d_assert(ret == 0, return,);
-    val.os.data = (c_uint8_t *)mme_ue->imsi_bcd;
-    val.os.len  = strlen(mme_ue->imsi_bcd);
+    val.os.data = (c_uint8_t *)amf4g_ue->imsi_bcd;
+    val.os.len  = strlen(amf4g_ue->imsi_bcd);
     ret = fd_msg_avp_setvalue(avp, &val);
     d_assert(ret == 0, return,);
     ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
@@ -530,7 +530,7 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
     /* Set the Visited-PLMN-Id */
     ret = fd_msg_avp_new(s6a_visited_plmn_id, 0, &avp);
     d_assert(ret == 0, return,);
-    val.os.data = (c_uint8_t *)&mme_ue->visited_plmn_id;
+    val.os.data = (c_uint8_t *)&amf4g_ue->visited_plmn_id;
     val.os.len  = PLMN_ID_LEN;
     ret = fd_msg_avp_setvalue(avp, &val);
     d_assert(ret == 0, return,);
@@ -558,12 +558,12 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
     svg = sess_data;
     
     /* Store this value in the session */
-    ret = fd_sess_state_store(mme_s6a_reg, session, &sess_data); 
+    ret = fd_sess_state_store(amf4g_s6a_reg, session, &sess_data); 
     d_assert(ret == 0, return,);
     d_assert(sess_data == 0, return,);
     
     /* Send the request */
-    ret = fd_msg_send(&req, mme_s6a_ula_cb, svg);
+    ret = fd_msg_send(&req, amf4g_s6a_ula_cb, svg);
     d_assert(ret == 0,,);
 
     /* Increment the counter */
@@ -573,7 +573,7 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
 }
 
 /* MME received Update Location Answer from HSS */
-static void mme_s6a_ula_cb(void *data, struct msg **msg)
+static void amf4g_s6a_ula_cb(void *data, struct msg **msg)
 {
     int ret;
 
@@ -588,7 +588,7 @@ static void mme_s6a_ula_cb(void *data, struct msg **msg)
     int new;
 
     event_t e;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
     pkbuf_t *s6abuf = NULL;
     s6a_message_t *s6a_message = NULL;
     s6a_ula_message_t *ula_message = NULL;
@@ -605,12 +605,12 @@ static void mme_s6a_ula_cb(void *data, struct msg **msg)
     d_assert(ret == 0, return,);
     d_assert(new == 0, return, );
     
-    ret = fd_sess_state_retrieve(mme_s6a_reg, session, &sess_data);
+    ret = fd_sess_state_retrieve(amf4g_s6a_reg, session, &sess_data);
     d_assert(ret == 0, return,);
     d_assert(sess_data && (void *)sess_data == data, return, );
 
-    mme_ue = sess_data->mme_ue;
-    d_assert(mme_ue, return, );
+    amf4g_ue = sess_data->amf4g_ue;
+    d_assert(amf4g_ue, return, );
 
     s6abuf_len = sizeof(s6a_message_t);
     d_assert(s6abuf_len < 8192, return, "Not supported size:%d", s6abuf_len);
@@ -1036,9 +1036,9 @@ static void mme_s6a_ula_cb(void *data, struct msg **msg)
     if (!error)
     {
         event_set(&e, MME_EVT_S6A_MESSAGE);
-        event_set_param1(&e, (c_uintptr_t)mme_ue->index);
+        event_set_param1(&e, (c_uintptr_t)amf4g_ue->index);
         event_set_param2(&e, (c_uintptr_t)s6abuf);
-        mme_event_send(&e);
+        amf4g_event_send(&e);
     }
 
     /* Free the message */
@@ -1089,14 +1089,14 @@ static void mme_s6a_ula_cb(void *data, struct msg **msg)
 }
 
 
-status_t mme_fd_init(void)
+status_t amf4g_fd_init(void)
 {
     int ret;
 
-    pool_init(&mme_s6a_sess_pool, MAX_POOL_OF_DIAMETER_SESS);
+    pool_init(&amf4g_s6a_sess_pool, MAX_POOL_OF_DIAMETER_SESS);
 
     ret = fd_init(FD_MODE_CLIENT,
-                mme_self()->fd_conf_path, mme_self()->fd_config);
+                amf4g_self()->fd_conf_path, amf4g_self()->fd_config);
     d_assert(ret == CORE_OK, return CORE_ERROR,);
 
 	/* Install objects definitions for this application */
@@ -1104,7 +1104,7 @@ status_t mme_fd_init(void)
     d_assert(ret == CORE_OK, return CORE_ERROR,);
 
     /* Create handler for sessions */
-	ret = fd_sess_handler_create(&mme_s6a_reg, &state_cleanup,
+	ret = fd_sess_handler_create(&amf4g_s6a_reg, &state_cleanup,
                 NULL, NULL);
     d_assert(ret == CORE_OK, return CORE_ERROR,);
 
@@ -1115,20 +1115,20 @@ status_t mme_fd_init(void)
 	return 0;
 }
 
-void mme_fd_final(void)
+void amf4g_fd_final(void)
 {
     int ret;
 
-	ret = fd_sess_handler_destroy(&mme_s6a_reg, NULL);
+	ret = fd_sess_handler_destroy(&amf4g_s6a_reg, NULL);
     d_assert(ret == CORE_OK,,);
 
     fd_final();
 
-    if (pool_used(&mme_s6a_sess_pool))
-        d_error("%d not freed in mme_s6a_sess_pool[%d] of GX-SM",
-                pool_used(&mme_s6a_sess_pool), pool_size(&mme_s6a_sess_pool));
-    d_trace(9, "%d not freed in mme_s6a_sess_pool[%d] of GX-SM\n",
-            pool_used(&mme_s6a_sess_pool), pool_size(&mme_s6a_sess_pool));
+    if (pool_used(&amf4g_s6a_sess_pool))
+        d_error("%d not freed in amf4g_s6a_sess_pool[%d] of GX-SM",
+                pool_used(&amf4g_s6a_sess_pool), pool_size(&amf4g_s6a_sess_pool));
+    d_trace(9, "%d not freed in amf4g_s6a_sess_pool[%d] of GX-SM\n",
+            pool_used(&amf4g_s6a_sess_pool), pool_size(&amf4g_s6a_sess_pool));
 
-    pool_final(&mme_s6a_sess_pool);
+    pool_final(&amf4g_s6a_sess_pool);
 }

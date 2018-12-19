@@ -3,8 +3,8 @@
 #include "core_network.h"
 
 #include "amf_sbi_path.h"
-#include "mme_event.h"
-#include "mme_sm.h"
+#include "amf4g_event.h"
+#include "amf4g_sm.h"
 
 #include <unistd.h>
 #include <signal.h>
@@ -39,10 +39,10 @@ static int _amf_sbi_message_amf_smContextCreate(sock_id sock, void *data)
     event_set_param2(&e, N11_SM_CONTEXT_CREATE);
     d_trace(-1, "[AMF] Recv SM Context Create\n");
     d_trace(-1, "Payload: %s\n", pkbuf->payload);
-    rv = mme_event_send(&e);
+    rv = amf4g_event_send(&e);
     if (rv != CORE_OK)
     {
-        d_error("mme_event_send error");
+        d_error("amf4g_event_send error");
 	pkbuf_free(pkbuf);
 	return 0;
     }
@@ -64,10 +64,10 @@ static int _amf_sbi_message_amf_smContextUpdate(sock_id sock, void *data)
     event_set_param2(&e, N11_SM_CONTEXT_UPDATE);
     d_trace(-1, "[AMF] Recv SM Context Update\n");
     d_trace(-1, "Payload: %s\n", pkbuf->payload);
-    rv = mme_event_send(&e);
+    rv = amf4g_event_send(&e);
     if (rv != CORE_OK)
     {
-        d_error("mme_event_send error");
+        d_error("amf4g_event_send error");
 	pkbuf_free(pkbuf);
 	return 0;
     }
@@ -90,10 +90,10 @@ static int _amf_sbi_message_amf_smContextRelease(sock_id sock, void *data)
     event_set_param2(&e, N11_SM_CONTEXT_RELEASE);
     d_trace(-1, "[AMF] Recv SM Context Release\n");
     d_trace(-1, "Payload: %s\n", pkbuf->payload);
-    rv = mme_event_send(&e);
+    rv = amf4g_event_send(&e);
     if (rv != CORE_OK)
     {
-        d_error("mme_event_send error");
+        d_error("amf4g_event_send error");
 	pkbuf_free(pkbuf);
 	return 0;
     }
@@ -115,10 +115,10 @@ static int _amf_sbi_message_amf_smContextRetrieve(sock_id sock, void *data)
     event_set(&e, AMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_SM_CONTEXT_RETRIEVE);
-    rv = mme_event_send(&e);
+    rv = amf4g_event_send(&e);
     if (rv != CORE_OK)
     {
-        d_error("mme_event_send error");
+        d_error("amf4g_event_send error");
 	pkbuf_free(pkbuf);
 	return 0;
     }
@@ -149,7 +149,7 @@ void amf_start_server()
         }
     } else if (rv > 0)
     {
-        mme_self()->server_pid = rv;
+        amf4g_self()->server_pid = rv;
     }
 }
 
@@ -236,6 +236,6 @@ status_t amf_sbi_send_sm_context_retrieve(pkbuf_t *pkbuf)
 
 status_t amf_sbi_server_close()
 {
-    kill(mme_self()->server_pid, SIGINT);
+    kill(amf4g_self()->server_pid, SIGINT);
     return CORE_OK;
 }
