@@ -280,7 +280,7 @@ static void attach_test1(abts_case *tc, void *data)
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     pkbuf_free(recvbuf);
 
-#if 0
+#if 1
     rv = testgtpu_build_ping(&sendbuf, "cafe::2", "cafe::1");
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = testgtpu_enb_send(sendbuf);
@@ -1095,14 +1095,12 @@ static void attach_test3(abts_case *tc, void *data)
     
 
     /* Send UE Context Release Request */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
     rv = tests1ap_build_ue_context_release_request(&sendbuf, msgindex);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     /* Receive UE Context Release Command */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
     recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1113,14 +1111,14 @@ static void attach_test3(abts_case *tc, void *data)
     pkbuf_free(recvbuf);
 
     /* Send UE Context Release Complete */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     rv = tests1ap_build_ue_context_release_complete(&sendbuf, msgindex);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     /* Send Service Request */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     core_sleep(time_from_msec(300));
 
     rv = tests1ap_build_service_request(&sendbuf, 0x000400, 4, 0xd4b8, m_tmsi);
@@ -1129,14 +1127,14 @@ static void attach_test3(abts_case *tc, void *data)
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     /* Receive Initial Context Setup Request */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     pkbuf_free(recvbuf);
 
     /* Send UE Capability Info Indication */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     rv = tests1ap_build_ue_capability_info_indication(&sendbuf, msgindex+1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
@@ -1145,7 +1143,7 @@ static void attach_test3(abts_case *tc, void *data)
     core_sleep(time_from_msec(300));
 
     /* Send Initial Context Setup Response */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     rv = tests1ap_build_initial_context_setup_response(&sendbuf,
             33554633, 4, 5, 1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1155,7 +1153,7 @@ static void attach_test3(abts_case *tc, void *data)
     core_sleep(time_from_msec(300));
 
     /* Send TAU Request */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     rv = tests1ap_build_tau_request(&sendbuf, 0,
             0, 0x003600, 1, m_tmsi, 7, 0xe73ce7c, mme_ue->knas_int);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1163,14 +1161,14 @@ static void attach_test3(abts_case *tc, void *data)
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     /* Receive TAU Accept */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     pkbuf_free(recvbuf);
 
     /* Send Initial Context Setup Response */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     rv = tests1ap_build_initial_context_setup_response(&sendbuf,
             33554634, 54, 5, 1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1182,7 +1180,7 @@ static void attach_test3(abts_case *tc, void *data)
     
 
     ///////////// YEEEEEEEEEEEE
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     rv = tests1ap_build_e_rab_modification_indication(&sendbuf, mme_ue->enb_ue->mme_ue_s1ap_id, mme_ue->enb_ue->enb_ue_s1ap_id);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
@@ -1198,7 +1196,7 @@ static void attach_test3(abts_case *tc, void *data)
 
 
     /* Send TAU Request */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     rv = tests1ap_build_tau_request(&sendbuf, 0,
             0, 0x002600, 0, m_tmsi, 8, 0x972dc6f8, mme_ue->knas_int);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1206,21 +1204,21 @@ static void attach_test3(abts_case *tc, void *data)
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     /* Receive TAU Accept */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     pkbuf_free(recvbuf);
 
     /* Receive UE Context Release Command */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     pkbuf_free(recvbuf);
 
     /* Send UE Context Release Complete */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     rv = tests1ap_build_ue_context_release_complete(&sendbuf, msgindex+1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
@@ -1272,7 +1270,7 @@ static void attach_test3(abts_case *tc, void *data)
 
 
 out:
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     doc = BCON_NEW("imsi", BCON_UTF8("001010123456797"));
     ABTS_PTR_NOTNULL(tc, doc);
     ABTS_TRUE(tc, mongoc_collection_remove(collection,
@@ -1282,7 +1280,7 @@ out:
     mongoc_collection_destroy(collection);
 
     /* eNB disonncect from MME */
-    d_error("%s:%d\n\n", __FILE__, __LINE__);
+    
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
