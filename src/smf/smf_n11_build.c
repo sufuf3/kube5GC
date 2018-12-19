@@ -1,6 +1,6 @@
-#define TRACE_MODULE _smf_s11
+#define TRACE_MODULE _smf_n11
 #include "gtp/gtp_conv.h"
-#include "smf_s11_build.h"
+#include "smf_n11_build.h"
 
 static c_int16_t smf_pco_build(c_uint8_t *pco_buf, tlv_pco_t *tlv_pco)
 {

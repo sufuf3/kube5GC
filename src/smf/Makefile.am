@@ -14,10 +14,9 @@ libsmf_la_SOURCES = \
 	smf_n4_build.h smf_n4_build.c \
 	smf_n4_handler.h smf_n4_handler.c \
 	smf_gx_handler.h smf_gx_handler.c \
-	smf_s11_handler.h smf_s11_handler.c \
-	smf_s11_build.h smf_s11_build.c \
+	smf_n11_handler.h smf_n11_handler.c \
+	smf_n11_build.h smf_n11_build.c \
 	smf_sbi_path.h smf_sbi_path.c \
-	smf_sbi_build.h smf_sbi_build.c \
 	smf_ipfw.h smf_ipfw.c \
 	smf_init.c \
 	smf_json_build.h smf_json_build.c \

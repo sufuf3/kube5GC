@@ -1,5 +1,5 @@
-#ifndef __SMF_S11_HANDLER_H__
-#define __SMF_S11_HANDLER_H__
+#ifndef __SMF_N11_HANDLER_H__
+#define __SMF_N11_HANDLER_H__
 
 #include "gtp/gtp_message.h"
 #include "gtp/gtp_xact.h"
@@ -24,5 +24,5 @@ CORE_DECLARE(void) smf_n11_handle_delete_session_request_by_JsonDeleteSession(sm
 }
 #endif /* __cplusplus */
 
-#endif /* __SMF_N4_HANDLER_H__ */
+#endif /* __SMF_N11_HANDLER_H__ */
 

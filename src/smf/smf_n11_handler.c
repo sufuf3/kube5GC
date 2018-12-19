@@ -1,9 +1,9 @@
-#define TRACE_MODULE _smf_s11_handler
+#define TRACE_MODULE _smf_n11_handler
 
 #include "core.h"
 
-#include "smf_s11_handler.h"
-#include "smf_s11_build.h"
+#include "smf_n11_handler.h"
+#include "smf_n11_build.h"
 #include "smf_pfcp_path.h"
 
 void smf_s11_handle_create_session_request(gtp_xact_t *s11_xact,

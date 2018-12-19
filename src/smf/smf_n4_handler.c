@@ -15,7 +15,7 @@
 #include "smf_n4_handler.h"
 #include "smf_n4_build.h"
 #include "smf_pfcp_path.h"
-#include "smf_s11_build.h"
+#include "smf_n11_build.h"
 #include "smf_json_build.h"
 #include "smf_sbi_path.h"
 
