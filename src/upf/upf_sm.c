@@ -153,6 +153,7 @@ void upf_state_operational(fsm_t *s, event_t *e)
             else
             {
                 sess = upf_sess_find_by_seid(message->h.seid);
+                 d_trace(-1, "upf_sess_smf_seid : %lu, upf_sess_upf_seid: %lu", sess->smf_seid,  sess->upf_seid);
             }
             //sess = upf_sess_find_by_seid(message->h.seid);
             //if (!sess && message->h.type==PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE)

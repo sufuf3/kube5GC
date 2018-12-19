@@ -57,6 +57,7 @@ extern "C"
 #define JSONKEY_4G_SGW_S1U_IP_IPV4              "sgw_s1u_ipv4"
 #define JSONKEY_4G_SGW_S1U_IP_IPV6              "sgw_s1u_ipv6"
 #define JSONKEY_4G_SGW_S1U_TEID                 "sgw_s1u_teid"
+#define JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE       "sm_context_update_type"
 
 #define JSONKEY_5G_SUPI                         "supi"
 #define JSONKEY_5G_UnAuthenticatedSupi          "unauthenticatedSupi"

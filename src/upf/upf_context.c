@@ -864,7 +864,6 @@ upf_sess_t *upf_sess_add_by_message(pfcp_message_t *message)
 {
     upf_sess_t *sess = NULL;
     //c_int8_t apn[MAX_APN_LEN];
-    pfcp_f_seid_t *upf_seid;
 
     pfcp_session_establishment_request_t *req = &message->pfcp_session_establishment_request;
 
@@ -924,9 +923,8 @@ upf_sess_t *upf_sess_add_by_message(pfcp_message_t *message)
     }
 
     /* CP F-SEID */
-    upf_seid = (pfcp_f_seid_t *)req->cp_f_seid.data;
-    sess->upf_seid = upf_seid->seid;
-  
+    sess->upf_seid = sess->index;
+    d_trace(-1, "upf_establishment_upf_seid : %lu", sess->upf_seid);
     return sess;
 }
 

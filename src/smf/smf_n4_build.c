@@ -286,6 +286,7 @@ status_t smf_n4_build_session_modification_request(
     memset(&pfcp_message, 0, sizeof(pfcp_message_t));
     
     /* Set CP F-SEID, mandatory */
+    d_trace(-1, "smf_n4_seid : %lu", sess->smf_n4_seid);
     req->cp_f_seid.presence = 1;
     req->cp_f_seid.data = &smf_f_seid;
     smf_f_seid.seid = htobe64(sess->smf_n4_seid);

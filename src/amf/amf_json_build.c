@@ -50,10 +50,12 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     memcpy(createSession.apn, pdn->apn, sizeof(pdn->apn));
 
     c_uint8_t pdn_type;
+    d_trace(-1, "Origin PDN Type: %d\n", pdn->pdn_type);
     if (pdn->pdn_type == HSS_PDN_TYPE_IPV4 ||
         pdn->pdn_type == HSS_PDN_TYPE_IPV6 ||
         pdn->pdn_type == HSS_PDN_TYPE_IPV4V6)
     {
+        d_trace(-1, "PDNNNNNNNNNNNNNN %d, %d\n", pdn->pdn_type + 1, sess->request_type.pdn_type);
         pdn_type = ((pdn->pdn_type + 1) & sess->request_type.pdn_type);
         d_assert(pdn_type != 0, return CORE_ERROR,
                 "PDN Configuration Error:(%d, %d)",
@@ -69,7 +71,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     memcpy(&createSession.pdn, pdn, sizeof(pdn_t));
     
     createSession.pdn.paa.pdn_type = pdn_type;
-    // d_info("pdn->paa.pdn_type :%d\n", pdn->paa.pdn_type);
+    d_trace(-1, "createSession.pdn.paa.pdn_type :%d\n", createSession.pdn.paa.pdn_type);
     createSession.ebi = bearer->ebi;
     /*TODO : ue timezone*/
     memcpy(&createSession.guti, &mme_ue->guti, sizeof(mme_ue->guti));
@@ -90,7 +92,7 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, mme_sess_t *sess) {
     return CORE_OK;
 }
 
-CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_t *bearer)
+CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_t *bearer, c_uint8_t sm_context_update_type)
 {
     char *string = NULL;
     cJSON *j_modifyBearerReq = cJSON_CreateObject();
@@ -114,6 +116,7 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, mme_bearer_
     memcpy(&modifyBearer.enb_s1u_ip, &bearer->enb_s1u_ip, sizeof(bearer->enb_s1u_ip));
     memcpy(&modifyBearer.enb_s1u_teid, &bearer->enb_s1u_teid, sizeof(bearer->enb_s1u_teid));
     memcpy(&modifyBearer.apn, &bearer->sess->pdn->apn, sizeof( bearer->sess->pdn->apn));
+    modifyBearer.sm_context_update_type = sm_context_update_type;
     d_trace(5, "JSONTRANSFORM_StToJs_modify_bearer_request");
     JSONTRANSFORM_StToJs_modify_bearer_request(&modifyBearer, j_modifyBearerReq);
     string = cJSON_Print(j_modifyBearerReq);

@@ -114,6 +114,7 @@ status_t mme_gtp_close()
 
 status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 {
+    d_trace(-1, "mme_gtp_send_create_session_request");
 #ifndef FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
@@ -165,6 +166,7 @@ status_t mme_gtp_send_create_session_request(mme_sess_t *sess)
 status_t mme_gtp_send_modify_bearer_request(
         mme_bearer_t *bearer, int uli_presence)
 {
+    d_trace(-1, "mme_gtp_send_modify_bearer_request");
 #ifndef FIVE_G_CORE
     status_t rv;
 
@@ -198,7 +200,7 @@ status_t mme_gtp_send_modify_bearer_request(
     pkbuf_t *pkbuf = NULL;
     mme_ue = bearer->mme_ue;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
-    amf_json_build_modify_bearer(&pkbuf, bearer);
+    amf_json_build_modify_bearer(&pkbuf, bearer, SM_CONTEXT_UPDATE_TYPE_MODIFY);
     // d_info("send sbi sm context update start");
     amf_sbi_send_sm_context_update(pkbuf);
     // d_info("send sbi sm context update end");
@@ -210,7 +212,8 @@ status_t mme_gtp_send_modify_bearer_request(
 // TODO: release session
 status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
 {
-#if 1
+    d_trace(-1, "mme_gtp_send_delete_session_request");
+#ifndef FIVE_G_CORE
     status_t rv;
     pkbuf_t *s11buf = NULL;
     gtp_header_t h;
@@ -255,6 +258,7 @@ status_t mme_gtp_send_delete_session_request(mme_sess_t *sess)
 
 status_t mme_gtp_send_delete_all_sessions(mme_ue_t *mme_ue)
 {
+    d_trace(-1, "mme_gtp_send_delete_all_sessions");
     status_t rv;
     mme_sess_t *sess = NULL, *next_sess = NULL;
 
@@ -293,6 +297,7 @@ status_t mme_gtp_send_delete_all_sessions(mme_ue_t *mme_ue)
 
 status_t mme_gtp_send_create_bearer_response(mme_bearer_t *bearer)
 {
+    d_trace(-1, "mme_gtp_send_create_bearer_response");
     status_t rv;
 
     gtp_xact_t *xact = NULL;
@@ -325,6 +330,7 @@ status_t mme_gtp_send_create_bearer_response(mme_bearer_t *bearer)
 
 status_t mme_gtp_send_update_bearer_response(mme_bearer_t *bearer)
 {
+    d_trace(-1, "mme_gtp_send_update_bearer_response");
     status_t rv;
 
     gtp_xact_t *xact = NULL;
@@ -357,6 +363,8 @@ status_t mme_gtp_send_update_bearer_response(mme_bearer_t *bearer)
 
 status_t mme_gtp_send_delete_bearer_response(mme_bearer_t *bearer)
 {
+    d_trace(-1, "mme_gtp_send_delete_bearer_response");
+
     status_t rv;
 
     gtp_xact_t *xact = NULL;
@@ -389,6 +397,7 @@ status_t mme_gtp_send_delete_bearer_response(mme_bearer_t *bearer)
 
 status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
 {
+    d_trace(-1, "mme_gtp_send_release_access_bearers_request");
 #ifndef FIVE_G_CORE
     status_t rv;
     gtp_header_t h;
@@ -410,13 +419,17 @@ status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
     return CORE_OK;
 #else
+    mme_bearer_t *bearer = NULL;
     pkbuf_t *pkbuf = NULL;
     d_assert(mme_ue, return CORE_ERROR, "Null param");
     
-    amf_json_build_delete_session(&pkbuf, mme_sess_find_by_ebi(mme_ue, mme_ue->ebi));
+    bearer = mme_bearer_find_by_ue_ebi(mme_ue, mme_ue->ebi);
 
-    amf_sbi_send_sm_context_release(pkbuf);
-
+    bearer->enb_s1u_teid = 0;
+    amf_json_build_modify_bearer(&pkbuf, bearer, SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS);
+    // d_info("send sbi sm context update start");
+    amf_sbi_send_sm_context_update(pkbuf);
+    // d_info("send sbi sm context update end");
     pkbuf_free(pkbuf);
 
     return CORE_OK;
@@ -426,6 +439,7 @@ status_t mme_gtp_send_release_access_bearers_request(mme_ue_t *mme_ue)
 status_t mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
         mme_ue_t *mme_ue)
 {
+    d_trace(-1, "mme_gtp_send_create_indirect_data_forwarding_tunnel_request");
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
@@ -453,6 +467,7 @@ status_t mme_gtp_send_create_indirect_data_forwarding_tunnel_request(
 status_t mme_gtp_send_delete_indirect_data_forwarding_tunnel_request(
         mme_ue_t *mme_ue)
 {
+    d_trace(-1, "mme_gtp_send_delete_indirect_data_forwarding_tunnel_request");
     status_t rv;
     gtp_header_t h;
     pkbuf_t *pkbuf = NULL;
