@@ -266,7 +266,7 @@ status_t smf_pfcp_send_session_deletion_request(smf_sess_t *sess)
 
     memset(&h, 0, sizeof(pfcp_header_t));
     h.type = PFCP_SESSION_DELETION_REQUEST_TYPE;
-    h.seid = sess->smf_n4_seid;
+    h.seid = sess->upf_n4_seid;
 
     rv = smf_n4_build_session_deletion_request(&pkbuf, sess);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build error");
