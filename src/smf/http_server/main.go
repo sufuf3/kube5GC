@@ -11,6 +11,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -31,7 +32,7 @@ var (
 )
 
 func init() {
-
+	fmt.Errorf("1111")
 	flag.StringVar(&ip, "ip", "localhost", "ip address of sbi server")
 	flag.UintVar(&port, "port", 8080, "port")
 	flag.StringVar(&certFile, "cert", sysConfigPath+"/"+packageName+"/https/smf.cert", "TLS certificate")

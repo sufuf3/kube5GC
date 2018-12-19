@@ -25,3 +25,5 @@ clean:
 install: $(BINARY) distdir
 	mkdir -p $(prefix)/http_server 
 	cp $(top_builddir)/http_server/$(BINARY) $(prefix)/http_server/
+
+maintainer-clean:
