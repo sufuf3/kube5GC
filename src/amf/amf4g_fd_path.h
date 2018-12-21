@@ -1,5 +1,5 @@
-#ifndef __MME_FD_PATH_H__
-#define __MME_FD_PATH_H__
+#ifndef __AMF4G_FD_PATH_H__
+#define __AMF4G_FD_PATH_H__
 
 #include "core_errno.h"
 
@@ -22,5 +22,5 @@ CORE_DECLARE(void) amf4g_s6a_send_ulr(amf4g_ue_t *amf4g_ue);
 }
 #endif /* __cplusplus */
 
-#endif /* __MME_FD_PATH_H__ */
+#endif /* __AMF4G_FD_PATH_H__ */
 

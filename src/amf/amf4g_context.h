@@ -1,5 +1,5 @@
-#ifndef __MME_CONTEXT__
-#define __MME_CONTEXT__
+#ifndef __AMF4G_CONTEXT__
+#define __AMF4G_CONTEXT__
 
 /******************** Added by Chi ********************/
 #include <stdbool.h>
@@ -1104,4 +1104,4 @@ CORE_DECLARE(status_t)      amf_ue_associate_ran_ue(amf_ue_t *amf_ue, ran_ue_t *
 }
 #endif /* __cplusplus */
 
-#endif /* __MME_CONTEXT__ */
+#endif /* __AMF4G_CONTEXT__ */

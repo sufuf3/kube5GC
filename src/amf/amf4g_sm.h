@@ -1,5 +1,5 @@
-#ifndef __MME_SM_H__
-#define __MME_SM_H__
+#ifndef __AMF4G_SM_H__
+#define __AMF4G_SM_H__
 
 #include "core_param.h"
 #include "core_fsm.h"

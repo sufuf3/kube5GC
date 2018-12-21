@@ -1,5 +1,5 @@
-#ifndef __MME_S6A_HANDLER_H__
-#define __MME_S6A_HANDLER_H__
+#ifndef __AMF4G_S6A_HANDLER_H__
+#define __AMF4G_S6A_HANDLER_H__
 
 #include "fd/s6a/s6a_message.h"
 #include "amf4g_context.h"
@@ -17,4 +17,4 @@ CORE_DECLARE(void) amf4g_s6a_handle_ula(
 }
 #endif /* __cplusplus */
 
-#endif /* __MME_S6A_HANDLER_H__ */
+#endif /* __AMF4G_S6A_HANDLER_H__ */

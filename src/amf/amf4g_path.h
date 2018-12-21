@@ -1,5 +1,5 @@
-#ifndef __MME_PATH_H__
-#define __MME_PATH_H__
+#ifndef __AMF4G_PATH_H__
+#define __AMF4G_PATH_H__
 
 #include "core_errno.h"
 
@@ -19,4 +19,4 @@ CORE_DECLARE(status_t) amf4g_send_release_access_bearer_or_ue_context_release(
 }
 #endif /* __cplusplus */
 
-#endif /* __MME_PATH_H__ */
+#endif /* __AMF4G_PATH_H__ */

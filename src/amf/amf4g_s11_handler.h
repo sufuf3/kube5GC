@@ -1,5 +1,5 @@
-#ifndef __MME_S11_HANDLER_H__
-#define __MME_S11_HANDLER_H__
+#ifndef __AMF4G_S11_HANDLER_H__
+#define __AMF4G_S11_HANDLER_H__
 
 #include "gtp/gtp_message.h"
 
@@ -45,4 +45,4 @@ CORE_DECLARE(void) amf_n11_handle_delete_session_response(amf4g_ue_t *amf4g_ue, 
 }
 #endif /* __cplusplus */
 
-#endif /* __MME_S11_HANDLER_H__ */
+#endif /* __AMF4G_S11_HANDLER_H__ */

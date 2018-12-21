@@ -1,5 +1,5 @@
-#ifndef __MME_S11_BUILD_H__
-#define __MME_S11_BUILD_H__
+#ifndef __AMF4G_S11_BUILD_H__
+#define __AMF4G_S11_BUILD_H__
 
 #include "gtp/gtp_message.h"
 
@@ -31,4 +31,4 @@ CORE_DECLARE(status_t)
 }
 #endif /* __cplusplus */
 
-#endif /* __MME_S11_BUILD_H__ */
+#endif /* __AMF4G_S11_BUILD_H__ */

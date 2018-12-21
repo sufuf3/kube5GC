@@ -1,5 +1,5 @@
-#ifndef __MME_S11_PATH_H__
-#define __MME_S11_PATH_H__
+#ifndef __AMF4G_S11_PATH_H__
+#define __AMF4G_S11_PATH_H__
 
 #include "core_pkbuf.h"
 
@@ -20,4 +20,4 @@ CORE_DECLARE(status_t) amf4g_gtp_send_release_access_bearers_request(amf4g_ue_t 
 }
 #endif /* __cplusplus */
 
-#endif /* __MME_S11_PATH_H__ */
+#endif /* __AMF4G_S11_PATH_H__ */

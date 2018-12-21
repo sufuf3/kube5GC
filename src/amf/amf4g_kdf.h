@@ -1,5 +1,5 @@
-#ifndef __MME_KDF_H__
-#define __MME_KDF_H__
+#ifndef __AMF4G_KDF_H__
+#define __AMF4G_KDF_H__
 
 #include "core.h"
 
@@ -25,4 +25,4 @@ CORE_DECLARE(void) amf4g_kdf_enb(
 CORE_DECLARE(void) amf4g_kdf_nh(
         c_uint8_t *kasme, c_uint8_t *sync_input, c_uint8_t *kenb);
 
-#endif /* __MME_KDF_H__ */
+#endif /* __AMF4G_KDF_H__ */

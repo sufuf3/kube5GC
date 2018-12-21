@@ -1,5 +1,5 @@
-#ifndef __MME_EVENT_H__
-#define __MME_EVENT_H__
+#ifndef __AMF4G_EVENT_H__
+#define __AMF4G_EVENT_H__
 
 #include "core_event.h"
 #include "core_fsm.h"
@@ -58,4 +58,4 @@ CORE_DECLARE(char*) amf4g_event_get_name(event_t *e);
 }
 #endif /* __cplusplus */
 
-#endif /* __MME_EVENT_H__ */
+#endif /* __AMF4G_EVENT_H__ */
