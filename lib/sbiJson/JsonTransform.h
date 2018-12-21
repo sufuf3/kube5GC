@@ -55,6 +55,7 @@ typedef struct _delete_session_t {
     c_uint8_t       imsi[MAX_IMSI_LEN];
     c_int32_t       imsi_len;
     c_int8_t        apn[MAX_APN_LEN+1];
+    c_uint8_t       ebi;
 } delete_session_t;
 
 CORE_DECLARE(status_t) JSONTRANSFORM_StToJs_create_session_request(create_session_t *sess, cJSON *pJson);

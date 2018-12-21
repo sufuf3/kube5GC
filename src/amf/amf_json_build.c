@@ -144,6 +144,8 @@ status_t amf_json_build_delete_session(pkbuf_t **pkbuf, amf4g_sess_t *sess)
     d_print_hex(deleteSession.imsi, deleteSession.imsi_len);
     /* apn */
     strcpy(deleteSession.apn, sess->pdn->apn);
+    /* ebi */
+    deleteSession.ebi = amf4g_default_bearer_in_sess(sess)->ebi;
 
     d_trace(5, "JSONTRANSFORM_StToJs_modify_bearer_request");
     JSONTRANSFORM_StToJs_delete_session_request(&deleteSession, j_deleteSession);
