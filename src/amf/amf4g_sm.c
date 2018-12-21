@@ -1,4 +1,4 @@
-#define TRACE_MODULE _mme_sm
+#define TRACE_MODULE _amf4g_sm
 
 #include <math.h>
 
@@ -12,11 +12,11 @@
 
 /******************** Added by Chi ********************/
 #include "app/util.h"
-#include "mme_context.h"
+#include "amf4g_context.h"
 /******************************************************/
 
-#include "mme_event.h"
-#include "mme_sm.h"
+#include "amf4g_event.h"
+#include "amf4g_sm.h"
 #include "s1ap_handler.h"
 #include "s1ap_path.h"
 /******************** Added by HU ********************/
@@ -30,38 +30,38 @@
 #include "nas_path.h"
 #include "emm_handler.h"
 #include "esm_handler.h"
-#include "mme_gtp_path.h"
-#include "mme_s11_handler.h"
-#include "mme_fd_path.h"
-#include "mme_s6a_handler.h"
-#include "mme_path.h"
+#include "amf4g_gtp_path.h"
+#include "amf4g_s11_handler.h"
+#include "amf4g_fd_path.h"
+#include "amf4g_s6a_handler.h"
+#include "amf4g_path.h"
 #include "amf_sbi_path.h"
 
 #include "JsonTransform.h"
 #include "amf_json_handler.h"
 
-void mme_state_initial(fsm_t *s, event_t *e)
+void amf4g_state_initial(fsm_t *s, event_t *e)
 {
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     d_assert(s, return, "Null param");
 
-    FSM_TRAN(s, &mme_state_operational);
+    FSM_TRAN(s, &amf4g_state_operational);
 }
 
-void mme_state_final(fsm_t *s, event_t *e)
+void amf4g_state_final(fsm_t *s, event_t *e)
 {
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     d_assert(s, return, "Null param");
 }
 
-void mme_state_operational(fsm_t *s, event_t *e)
+void amf4g_state_operational(fsm_t *s, event_t *e)
 {
     status_t rv;
     char buf[CORE_ADDRSTRLEN];
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     d_assert(s, return, "Null param");
 
@@ -120,12 +120,12 @@ void mme_state_operational(fsm_t *s, event_t *e)
             d_assert(sock, break,);
             c_sockaddr_t *addr = (c_sockaddr_t *)event_get_param2(e);
             d_assert(addr, break,);
-            mme_enb_t *enb = NULL;
+            amf4g_enb_t *enb = NULL;
 
             d_trace(1, "eNB-S1 accepted[%s] in master_sm module\n", 
                 CORE_ADDR(addr, buf));
                     
-            enb = mme_enb_find_by_addr(addr);
+            enb = amf4g_enb_find_by_addr(addr);
             if (!enb)
             {
 #if USE_USRSCTP != 1
@@ -134,7 +134,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 rv = sock_register(sock, s1ap_recv_handler, NULL);
                 d_assert(rv == CORE_OK, break, "register s1ap_recv_cb failed");
 #endif
-                enb = mme_enb_add(sock, addr);
+                enb = amf4g_enb_add(sock, addr);
                 d_assert(enb, break, "Null param");
             }
             else
@@ -149,7 +149,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
         }
         case MME_EVT_S1AP_LO_SCTP_COMM_UP:
         {
-            mme_enb_t *enb = NULL;
+            amf4g_enb_t *enb = NULL;
             sock_id sock = 0;
             c_sockaddr_t *addr = NULL;
             c_uint16_t outbound_streams = 0;
@@ -161,7 +161,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
 
             outbound_streams = (c_uint16_t)event_get_param4(e);
 
-            enb = mme_enb_find_by_addr(addr);
+            enb = amf4g_enb_find_by_addr(addr);
             if (!enb)
             {
 #if USE_USRSCTP != 1
@@ -170,7 +170,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 rv = sock_register(sock, s1ap_recv_handler, NULL);
                 d_assert(rv == CORE_OK, break, "register s1ap_recv_cb failed");
 #endif
-                enb = mme_enb_add(sock, addr);
+                enb = amf4g_enb_add(sock, addr);
                 d_assert(enb, break, "Null param");
             }
             else
@@ -188,7 +188,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
         }
         case MME_EVT_S1AP_LO_CONNREFUSED:
         {
-            mme_enb_t *enb = NULL;
+            amf4g_enb_t *enb = NULL;
             sock_id sock = 0;
             c_sockaddr_t *addr = NULL;
 
@@ -197,13 +197,13 @@ void mme_state_operational(fsm_t *s, event_t *e)
             addr = (c_sockaddr_t *)event_get_param2(e);
             d_assert(addr, break, "Null param");
 
-            enb = mme_enb_find_by_addr(addr);
+            enb = amf4g_enb_find_by_addr(addr);
             CORE_FREE(addr);
 
             if (enb)
             {
                 d_trace(1, "eNB-S1[%x] connection refused!!!\n", enb->enb_id);
-                mme_enb_remove(enb);
+                amf4g_enb_remove(enb);
             }
             else
             {
@@ -215,7 +215,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
         case MME_EVT_S1AP_MESSAGE:
         {
             s1ap_message_t message;
-            mme_enb_t *enb = NULL;
+            amf4g_enb_t *enb = NULL;
             sock_id sock = 0;
             c_sockaddr_t *addr = NULL;
             pkbuf_t *pkbuf = NULL;
@@ -229,7 +229,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
             pkbuf = (pkbuf_t *)event_get_param3(e);
             d_assert(pkbuf, break, "Null param");
 
-            enb = mme_enb_find_by_addr(addr);
+            enb = amf4g_enb_find_by_addr(addr);
             CORE_FREE(addr);
 
             d_assert(enb, pkbuf_free(pkbuf); break, "No eNB context");
@@ -467,7 +467,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
             nas_message_t message;
             pkbuf_t *pkbuf = NULL;
             enb_ue_t *enb_ue = NULL;
-            mme_ue_t *mme_ue = NULL;
+            amf4g_ue_t *amf4g_ue = NULL;
 
             enb_ue = enb_ue_find(event_get_param1(e));
             d_assert(enb_ue, break, "No ENB UE context");
@@ -476,14 +476,14 @@ void mme_state_operational(fsm_t *s, event_t *e)
             d_assert(nas_emm_decode(&message, pkbuf) == CORE_OK,
                     pkbuf_free(pkbuf); break, "Can't decode NAS_EMM");
 
-            mme_ue = enb_ue->mme_ue;
-            if (!mme_ue)
+            amf4g_ue = enb_ue->amf4g_ue;
+            if (!amf4g_ue)
             {
-                mme_ue = mme_ue_find_by_message(&message);
-                if (!mme_ue)
+                amf4g_ue = amf4g_ue_find_by_message(&message);
+                if (!amf4g_ue)
                 {
-                    mme_ue = mme_ue_add(enb_ue);
-                    d_assert(mme_ue, pkbuf_free(pkbuf); break, "Null param");
+                    amf4g_ue = amf4g_ue_add(enb_ue);
+                    d_assert(amf4g_ue, pkbuf_free(pkbuf); break, "Null param");
                 }
                 else
                 {
@@ -502,23 +502,23 @@ void mme_state_operational(fsm_t *s, event_t *e)
                          * not to decrypt NAS message */
                         h.ciphered = 0;
                         d_assert(
-                            nas_security_decode(mme_ue, h, pkbuf) == CORE_OK,
+                            nas_security_decode(amf4g_ue, h, pkbuf) == CORE_OK,
                             pkbuf_free(pkbuf); return, 
                             "nas_security_decode failed");
                     }
                 }
 
-                /* If NAS(mme_ue_t) has already been associated with
+                /* If NAS(amf4g_ue_t) has already been associated with
                  * older S1(enb_ue_t) context */
-                if (ECM_CONNECTED(mme_ue))
+                if (ECM_CONNECTED(amf4g_ue))
                 {
 #if 1 /* IMPLICIT_S1_RELEASE */
                    /* Implcit S1 release */
                     d_trace(5, "Implicit S1 release\n");
                     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
-                          mme_ue->enb_ue->enb_ue_s1ap_id,
-                          mme_ue->enb_ue->mme_ue_s1ap_id);
-                    rv = enb_ue_remove(mme_ue->enb_ue);
+                          amf4g_ue->enb_ue->enb_ue_s1ap_id,
+                          amf4g_ue->enb_ue->mme_ue_s1ap_id);
+                    rv = enb_ue_remove(amf4g_ue->enb_ue);
                     d_assert(rv == CORE_OK,,);
 
 #else /* S1_HOLDING_TIMER */
@@ -529,33 +529,33 @@ void mme_state_operational(fsm_t *s, event_t *e)
                      * is stopped. */
                     d_trace(5, "Start S1 Holding Timer\n");
                     d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
-                            mme_ue->enb_ue->enb_ue_s1ap_id, 
-                            mme_ue->enb_ue->mme_ue_s1ap_id);
-                    tm_start(mme_ue->enb_ue->holding_timer);
+                            amf4g_ue->enb_ue->enb_ue_s1ap_id, 
+                            amf4g_ue->enb_ue->mme_ue_s1ap_id);
+                    tm_start(amf4g_ue->enb_ue->holding_timer);
 
                     /* De-associate S1 with NAS/EMM */
-                    rv = enb_ue_deassociate(mme_ue->enb_ue);
+                    rv = enb_ue_deassociate(amf4g_ue->enb_ue);
                     d_assert(rv == CORE_OK,,);
 #endif
                 }
                 tm_stop(enb_ue->holding_timer);
-                mme_ue_associate_enb_ue(mme_ue, enb_ue);
+                amf4g_ue_associate_enb_ue(amf4g_ue, enb_ue);
             }
 
-            d_assert(mme_ue, pkbuf_free(pkbuf); break, "No MME UE context");
-            d_assert(FSM_STATE(&mme_ue->sm), pkbuf_free(pkbuf); break, 
+            d_assert(amf4g_ue, pkbuf_free(pkbuf); break, "No MME UE context");
+            d_assert(FSM_STATE(&amf4g_ue->sm), pkbuf_free(pkbuf); break, 
                     "No EMM State Machine");
 
-            event_set_param1(e, (c_uintptr_t)mme_ue->index);
+            event_set_param1(e, (c_uintptr_t)amf4g_ue->index);
             event_set_param5(e, (c_uintptr_t)&message);
 
-            fsm_dispatch(&mme_ue->sm, (fsm_event_t*)e);
-            if (FSM_CHECK(&mme_ue->sm, emm_state_exception))
+            fsm_dispatch(&amf4g_ue->sm, (fsm_event_t*)e);
+            if (FSM_CHECK(&amf4g_ue->sm, emm_state_exception))
             {
-                rv = mme_send_delete_session_or_ue_context_release(
-                        mme_ue, enb_ue);
+                rv = amf4g_send_delete_session_or_ue_context_release(
+                        amf4g_ue, enb_ue);
                 d_assert(rv == CORE_OK,,
-                        "mme_send_delete_session_or_ue_context_release() failed");
+                        "amf4g_send_delete_session_or_ue_context_release() failed");
             }
 
             pkbuf_free(pkbuf);
@@ -563,36 +563,36 @@ void mme_state_operational(fsm_t *s, event_t *e)
         }
         case MME_EVT_EMM_T3413:
         {
-            mme_ue_t *mme_ue = mme_ue_find(event_get_param1(e));
-            d_assert(mme_ue, break, "No UE context");
-            d_assert(FSM_STATE(&mme_ue->sm), break, "No EMM State Machine");
+            amf4g_ue_t *amf4g_ue = amf4g_ue_find(event_get_param1(e));
+            d_assert(amf4g_ue, break, "No UE context");
+            d_assert(FSM_STATE(&amf4g_ue->sm), break, "No EMM State Machine");
 
-            fsm_dispatch(&mme_ue->sm, (fsm_event_t*)e);
+            fsm_dispatch(&amf4g_ue->sm, (fsm_event_t*)e);
 
             break;
         }
         case MME_EVT_ESM_MESSAGE:
         {
             nas_message_t message;
-            mme_ue_t *mme_ue = NULL;
-            mme_bearer_t *bearer = NULL;
-            mme_bearer_t *default_bearer = NULL;
-            mme_sess_t *sess = NULL;
+            amf4g_ue_t *amf4g_ue = NULL;
+            amf4g_bearer_t *bearer = NULL;
+            amf4g_bearer_t *default_bearer = NULL;
+            amf4g_sess_t *sess = NULL;
             pkbuf_t *pkbuf = NULL;
 
-            mme_ue = mme_ue_find(event_get_param1(e));
-            d_assert(mme_ue, break, "No UE context");
+            amf4g_ue = amf4g_ue_find(event_get_param1(e));
+            d_assert(amf4g_ue, break, "No UE context");
 
             pkbuf = (pkbuf_t *)event_get_param2(e);
             d_assert(pkbuf, break, "Null param");
             d_assert(nas_esm_decode(&message, pkbuf) == CORE_OK,
                     pkbuf_free(pkbuf); break, "Can't decode NAS_ESM");
 
-            bearer = mme_bearer_find_or_add_by_message(mme_ue, &message);
+            bearer = amf4g_bearer_find_or_add_by_message(amf4g_ue, &message);
             d_assert(bearer, pkbuf_free(pkbuf); break, "No Bearer context");
             sess = bearer->sess;
             d_assert(sess, pkbuf_free(pkbuf); break, "Null param");
-            default_bearer = mme_default_bearer_in_sess(sess);
+            default_bearer = amf4g_default_bearer_in_sess(sess);
             d_assert(default_bearer, pkbuf_free(pkbuf); break, "Null param");
 
             event_set_param1(e, (c_uintptr_t)bearer->index);
@@ -606,13 +606,13 @@ void mme_state_operational(fsm_t *s, event_t *e)
                 {
                     /* if the bearer is a default bearer,
                      * remove all session context linked the default bearer */
-                    mme_sess_remove(sess);
+                    amf4g_sess_remove(sess);
                 }
                 else
                 {
                     /* if the bearer is not a default bearer,
                      * just remove the bearer context */
-                    mme_bearer_remove(bearer);
+                    amf4g_bearer_remove(bearer);
                 }
             }
             else if (FSM_CHECK(&bearer->sm, esm_state_pdn_did_disconnect))
@@ -621,7 +621,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
                         pkbuf_free(pkbuf); break,
                         "Bearer[%d] is not Default Bearer",
                         default_bearer->ebi, bearer->ebi);
-                mme_sess_remove(sess);
+                amf4g_sess_remove(sess);
             }
 
             pkbuf_free(pkbuf);
@@ -630,11 +630,11 @@ void mme_state_operational(fsm_t *s, event_t *e)
         case MME_EVT_S6A_MESSAGE:
         {
             status_t rv;
-            mme_ue_t *mme_ue = mme_ue_find(event_get_param1(e));
+            amf4g_ue_t *amf4g_ue = amf4g_ue_find(event_get_param1(e));
             pkbuf_t *s6abuf = (pkbuf_t *)event_get_param2(e);
             s6a_message_t *s6a_message = NULL;
 
-            d_assert(mme_ue, return, "Null param");
+            d_assert(amf4g_ue, return, "Null param");
             d_assert(s6abuf, return, "Null param");
             s6a_message = s6abuf->payload;
             d_assert(s6a_message, return, "Null param");
@@ -643,14 +643,14 @@ void mme_state_operational(fsm_t *s, event_t *e)
             {
                 enb_ue_t *enb_ue = NULL;
 
-                rv = nas_send_attach_reject(mme_ue,
+                rv = nas_send_attach_reject(amf4g_ue,
                     EMM_CAUSE_IMSI_UNKNOWN_IN_HSS,
                     ESM_CAUSE_PROTOCOL_ERROR_UNSPECIFIED);
                 d_assert(rv == CORE_OK,,
                         "nas_send_attach_reject failed");
                 d_warn("EMM_CAUSE : IMSI Unknown in HSS");
 
-                enb_ue = mme_ue->enb_ue;
+                enb_ue = amf4g_ue->enb_ue;
                 d_assert(enb_ue, break, "No ENB UE context");
 
                 rv = s1ap_send_ue_context_release_command(enb_ue,
@@ -666,51 +666,51 @@ void mme_state_operational(fsm_t *s, event_t *e)
             {
                 case S6A_CMD_CODE_AUTHENTICATION_INFORMATION:
                 {
-                    mme_s6a_handle_aia(mme_ue, &s6a_message->aia_message);
+                    amf4g_s6a_handle_aia(amf4g_ue, &s6a_message->aia_message);
                     break;
                 }
                 case S6A_CMD_CODE_UPDATE_LOCATION:
                 {
-                    mme_s6a_handle_ula(mme_ue, &s6a_message->ula_message);
+                    amf4g_s6a_handle_ula(amf4g_ue, &s6a_message->ula_message);
 
-                    if (FSM_CHECK(&mme_ue->sm, emm_state_initial_context_setup))
+                    if (FSM_CHECK(&amf4g_ue->sm, emm_state_initial_context_setup))
                     {
-                        if (mme_ue->nas_eps.type == MME_EPS_TYPE_ATTACH_REQUEST)
+                        if (amf4g_ue->nas_eps.type == MME_EPS_TYPE_ATTACH_REQUEST)
                         {
-                            rv = nas_send_emm_to_esm(mme_ue,
-                                    &mme_ue->pdn_connectivity_request);
+                            rv = nas_send_emm_to_esm(amf4g_ue,
+                                    &amf4g_ue->pdn_connectivity_request);
                             d_assert(rv == CORE_OK,,
                                     "nas_send_emm_to_esm() failed");
                         }
                         else
                             d_assert(0,, "Invalid Type[%d]",
-                                    mme_ue->nas_eps.type);
+                                    amf4g_ue->nas_eps.type);
                     }
-                    else if (FSM_CHECK(&mme_ue->sm, emm_state_registered))
+                    else if (FSM_CHECK(&amf4g_ue->sm, emm_state_registered))
                     {
-                        if (mme_ue->nas_eps.type == MME_EPS_TYPE_TAU_REQUEST)
+                        if (amf4g_ue->nas_eps.type == MME_EPS_TYPE_TAU_REQUEST)
                         {
-                            rv = nas_send_tau_accept(mme_ue,
+                            rv = nas_send_tau_accept(amf4g_ue,
                                     S1AP_ProcedureCode_id_InitialContextSetup);
                             d_assert(rv == CORE_OK,,
                                     "nas_send_tau_accept() failed");
                         }
-                        else if (mme_ue->nas_eps.type ==
+                        else if (amf4g_ue->nas_eps.type ==
                             MME_EPS_TYPE_SERVICE_REQUEST)
                         {
                             rv = s1ap_send_initial_context_setup_request(
-                                    mme_ue);
+                                    amf4g_ue);
                             d_assert(rv == CORE_OK,,
                                 "s1ap_send_initial_context_setup_request()"
                                 "failed");
                         }
                         else
                             d_assert(0,, "Invalid EPS-Type[%d]",
-                                    mme_ue->nas_eps.type);
+                                    amf4g_ue->nas_eps.type);
                     }
                     else
                         d_assert(0,, "Invaild EMM state for EPS-Type[%d]",
-                                    mme_ue->nas_eps.type);
+                                    amf4g_ue->nas_eps.type);
                     break;
                 }
                 default:
@@ -728,17 +728,17 @@ void mme_state_operational(fsm_t *s, event_t *e)
             pkbuf_t *pkbuf = (pkbuf_t *)event_get_param1(e);
             gtp_xact_t *xact = NULL;
             gtp_message_t message;
-            mme_ue_t *mme_ue = NULL;
+            amf4g_ue_t *amf4g_ue = NULL;
 
             d_assert(pkbuf, break, "Null param");
             rv = gtp_parse_msg(&message, pkbuf);
             d_assert(rv == CORE_OK, pkbuf_free(pkbuf); break, "parse error");
 
-            mme_ue = mme_ue_find_by_teid(message.h.teid);
-            d_assert(mme_ue, pkbuf_free(pkbuf); break, 
+            amf4g_ue = amf4g_ue_find_by_teid(message.h.teid);
+            d_assert(amf4g_ue, pkbuf_free(pkbuf); break, 
                     "No UE Context(TEID:%d)", message.h.teid);
 
-            rv = gtp_xact_receive(mme_ue->gnode, &message.h, &xact);
+            rv = gtp_xact_receive(amf4g_ue->gnode, &message.h, &xact);
             if (rv != CORE_OK)
             {
                 pkbuf_free(pkbuf);
@@ -748,36 +748,36 @@ void mme_state_operational(fsm_t *s, event_t *e)
             switch(message.h.type)
             {
                 case GTP_CREATE_SESSION_RESPONSE_TYPE:
-                    mme_s11_handle_create_session_response(
-                        xact, mme_ue, &message.create_session_response);
+                    amf4g_s11_handle_create_session_response(
+                        xact, amf4g_ue, &message.create_session_response);
                     break;
                 case GTP_MODIFY_BEARER_RESPONSE_TYPE:
-                    mme_s11_handle_modify_bearer_response(
-                        xact, mme_ue, &message.modify_bearer_response);
+                    amf4g_s11_handle_modify_bearer_response(
+                        xact, amf4g_ue, &message.modify_bearer_response);
                     break;
                 case GTP_DELETE_SESSION_RESPONSE_TYPE:
-                    mme_s11_handle_delete_session_response(
-                        xact, mme_ue, &message.delete_session_response);
+                    amf4g_s11_handle_delete_session_response(
+                        xact, amf4g_ue, &message.delete_session_response);
                     break;
                 case GTP_CREATE_BEARER_REQUEST_TYPE:
-                    mme_s11_handle_create_bearer_request(
-                        xact, mme_ue, &message.create_bearer_request);
+                    amf4g_s11_handle_create_bearer_request(
+                        xact, amf4g_ue, &message.create_bearer_request);
                     break;
                 case GTP_UPDATE_BEARER_REQUEST_TYPE:
-                    mme_s11_handle_update_bearer_request(
-                        xact, mme_ue, &message.update_bearer_request);
+                    amf4g_s11_handle_update_bearer_request(
+                        xact, amf4g_ue, &message.update_bearer_request);
                     break;
                 case GTP_DELETE_BEARER_REQUEST_TYPE:
-                    mme_s11_handle_delete_bearer_request(
-                        xact, mme_ue, &message.delete_bearer_request);
+                    amf4g_s11_handle_delete_bearer_request(
+                        xact, amf4g_ue, &message.delete_bearer_request);
                     break;
                 case GTP_RELEASE_ACCESS_BEARERS_RESPONSE_TYPE:
-                    mme_s11_handle_release_access_bearers_response(
-                        xact, mme_ue, &message.release_access_bearers_response);
+                    amf4g_s11_handle_release_access_bearers_response(
+                        xact, amf4g_ue, &message.release_access_bearers_response);
                     break;
                 case GTP_DOWNLINK_DATA_NOTIFICATION_TYPE:
-                    mme_s11_handle_downlink_data_notification(
-                        xact, mme_ue, &message.downlink_data_notification);
+                    amf4g_s11_handle_downlink_data_notification(
+                        xact, amf4g_ue, &message.downlink_data_notification);
 
 /*
  * 5.3.4.2 in Spec 23.401
@@ -793,21 +793,21 @@ void mme_state_operational(fsm_t *s, event_t *e)
  * If the MME receives a Downlink Data Notification after step 2 and 
  * before step 9, the MME shall not send S1 interface paging messages
  */
-                    if (ECM_IDLE(mme_ue))
+                    if (ECM_IDLE(amf4g_ue))
                     {
-                        s1ap_handle_paging(mme_ue);
+                        s1ap_handle_paging(amf4g_ue);
                         /* Start T3413 */
-                        tm_start(mme_ue->t3413);
+                        tm_start(amf4g_ue->t3413);
                     }
                     break;
                 case GTP_CREATE_INDIRECT_DATA_FORWARDING_TUNNEL_RESPONSE_TYPE:
-                    mme_s11_handle_create_indirect_data_forwarding_tunnel_response(
-                        xact, mme_ue,
+                    amf4g_s11_handle_create_indirect_data_forwarding_tunnel_response(
+                        xact, amf4g_ue,
                         &message.create_indirect_data_forwarding_tunnel_response);
                     break;
                 case GTP_DELETE_INDIRECT_DATA_FORWARDING_TUNNEL_RESPONSE_TYPE:
-                    mme_s11_handle_delete_indirect_data_forwarding_tunnel_response(
-                        xact, mme_ue,
+                    amf4g_s11_handle_delete_indirect_data_forwarding_tunnel_response(
+                        xact, amf4g_ue,
                         &message.delete_indirect_data_forwarding_tunnel_response);
                     break;
                 default:
@@ -834,7 +834,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
             d_assert(timer, return, "Null timer");
             d_assert(load_avg >= 0, return, "Negative cpu load average");
 
-            hash_t *enbs = mme_self()->enb_id_hash;
+            hash_t *enbs = amf4g_self()->enb_id_hash;
             int n_enb = hash_count(enbs);
             int n_enb_to_send = 0;
             pkbuf_t *s1apbuf = NULL;
@@ -844,7 +844,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
 
             if (load_per_core > OVERLOAD_THRESHOLD)
             {
-                if (!mme_self()->overload_started)
+                if (!amf4g_self()->overload_started)
                 {
                     d_trace(1, "MME overload_start (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
                         load_per_core, OVERLOAD_THRESHOLD);
@@ -852,12 +852,12 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     s1ap_build_overload_start(&s1apbuf);
                     n_enb_to_send = ceil(n_enb * OVERLOAD_NOTIFY_ENB_RATIO);
 
-                    mme_self()->overload_started = true;
+                    amf4g_self()->overload_started = true;
                 }
             }
             else
             {
-                if (mme_self()->overload_started)
+                if (amf4g_self()->overload_started)
                 {
                     d_trace(1, "MME overload_stop (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
                         load_per_core, OVERLOAD_THRESHOLD);
@@ -865,17 +865,17 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     s1ap_build_overload_stop(&s1apbuf);
                     n_enb_to_send = n_enb;
 
-                    mme_self()->overload_started = false;
+                    amf4g_self()->overload_started = false;
                 }
             }
 
             if (s1apbuf != NULL && n_enb_to_send > 0)
             {
                 // Send message to randomly selected eNBs which connected to this MME
-                mme_enb_t **selected_enb = (mme_enb_t **) malloc(n_enb_to_send * sizeof(mme_enb_t *));
+                amf4g_enb_t **selected_enb = (amf4g_enb_t **) malloc(n_enb_to_send * sizeof(amf4g_enb_t *));
                 d_assert(ht_rand_select_non_dup(enbs, n_enb_to_send, (void **) selected_enb) == CORE_OK, break, "Unable to select target eNBs");
 
-                mme_enb_t *enb;
+                amf4g_enb_t *enb;
                 int i = 0;
                 for (i = 0; i < n_enb_to_send; i++)
                 {                        
@@ -898,7 +898,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
             
 	        int msg_type = event_get_param2(e);
-            mme_ue_t *mme_ue = NULL;
+            amf4g_ue_t *amf4g_ue = NULL;
             switch (msg_type)
             {
                 case N11_SM_CONTEXT_CREATE:
@@ -907,10 +907,10 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     create_session_t createSession = {0};
                     amf_json_handler_create_session_response(&recvbuf, &createSession);
                     
-                    mme_ue = mme_ue_find_by_imsi(createSession.imsi, createSession.imsi_len);
-                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+                    amf4g_ue = amf4g_ue_find_by_imsi(createSession.imsi, createSession.imsi_len);
+                    d_assert(amf4g_ue, goto release_amf_n11_pkbuf, "No UE Context");
 
-                    amf_n11_handle_create_session_response(mme_ue, &createSession);
+                    amf_n11_handle_create_session_response(amf4g_ue, &createSession);
                     d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
                     break;
                 }
@@ -921,10 +921,10 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     delete_session_t deleteSession = {0};
                     amf_json_handler_delete_session_response(&recvbuf, &deleteSession);
                     
-                    mme_ue = mme_ue_find_by_imsi(deleteSession.imsi, deleteSession.imsi_len);
-                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+                    amf4g_ue = amf4g_ue_find_by_imsi(deleteSession.imsi, deleteSession.imsi_len);
+                    d_assert(amf4g_ue, goto release_amf_n11_pkbuf, "No UE Context");
                     
-                    amf_n11_handle_delete_session_response(mme_ue, &deleteSession);
+                    amf_n11_handle_delete_session_response(amf4g_ue, &deleteSession);
                     d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
 
                     break;
@@ -939,10 +939,10 @@ void mme_state_operational(fsm_t *s, event_t *e)
                     modify_bearer_t modifyBearer = {0};
                     amf_json_handler_update_session_response(&recvbuf, &modifyBearer);
                     
-                    mme_ue = mme_ue_find_by_imsi(modifyBearer.imsi, modifyBearer.imsi_len);
-                    d_assert(mme_ue, goto release_amf_n11_pkbuf, "No UE Context");
+                    amf4g_ue = amf4g_ue_find_by_imsi(modifyBearer.imsi, modifyBearer.imsi_len);
+                    d_assert(amf4g_ue, goto release_amf_n11_pkbuf, "No UE Context");
                     
-                    amf_n11_handle_modify_bearer_response(mme_ue, &modifyBearer);
+                    amf_n11_handle_modify_bearer_response(amf4g_ue, &modifyBearer);
                     d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
                     d_info("AMF Update Session Done");
                     break;
@@ -959,7 +959,7 @@ void mme_state_operational(fsm_t *s, event_t *e)
         }
         default:
         {
-            d_error("No handler for event %s", mme_event_get_name(e));
+            d_error("No handler for event %s", amf4g_event_get_name(e));
             break;
         }
     }

@@ -1862,7 +1862,7 @@ status_t tests1ap_build_path_switch_request(
     S1AP_UESecurityCapabilities_t *UESecurityCapabilities = NULL;
 
     enb_ue_t *enb_ue = NULL;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -1938,8 +1938,8 @@ status_t tests1ap_build_path_switch_request(
 
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(mme_ue_s1ap_id);
     d_assert(enb_ue, return CORE_ERROR,);
-    mme_ue = enb_ue->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR,);
+    amf4g_ue = enb_ue->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR,);
 
     for (i = 0; i < num_of_bearer; i++)
     {
@@ -1978,21 +1978,21 @@ status_t tests1ap_build_path_switch_request(
     }
 
     s1ap_buffer_to_OCTET_STRING(
-            &mme_ue->e_cgi.plmn_id, PLMN_ID_LEN, &EUTRAN_CGI->pLMNidentity);
+            &amf4g_ue->e_cgi.plmn_id, PLMN_ID_LEN, &EUTRAN_CGI->pLMNidentity);
     EUTRAN_CGI->cell_ID.size = 4;
     EUTRAN_CGI->cell_ID.buf =  core_calloc(
          EUTRAN_CGI->cell_ID.size, sizeof(c_uint8_t));
     d_assert(EUTRAN_CGI->cell_ID.buf, return CORE_ERROR,);
-    EUTRAN_CGI->cell_ID.buf[0] = (mme_ue->e_cgi.cell_id >> 24);
-    EUTRAN_CGI->cell_ID.buf[1] = (mme_ue->e_cgi.cell_id >> 16);
-    EUTRAN_CGI->cell_ID.buf[2] = (mme_ue->e_cgi.cell_id >> 8);
-    EUTRAN_CGI->cell_ID.buf[3] = (mme_ue->e_cgi.cell_id);
+    EUTRAN_CGI->cell_ID.buf[0] = (amf4g_ue->e_cgi.cell_id >> 24);
+    EUTRAN_CGI->cell_ID.buf[1] = (amf4g_ue->e_cgi.cell_id >> 16);
+    EUTRAN_CGI->cell_ID.buf[2] = (amf4g_ue->e_cgi.cell_id >> 8);
+    EUTRAN_CGI->cell_ID.buf[3] = (amf4g_ue->e_cgi.cell_id);
     EUTRAN_CGI->cell_ID.bits_unused = 4;
 
     s1ap_uint16_to_OCTET_STRING(
-            mme_ue->tai.tac, &TAI->tAC);
+            amf4g_ue->tai.tac, &TAI->tAC);
     s1ap_buffer_to_OCTET_STRING(
-            &mme_ue->tai.plmn_id, PLMN_ID_LEN, &TAI->pLMNidentity);
+            &amf4g_ue->tai.plmn_id, PLMN_ID_LEN, &TAI->pLMNidentity);
 
     UESecurityCapabilities->encryptionAlgorithms.size = 2;
     UESecurityCapabilities->encryptionAlgorithms.buf = 
@@ -2000,7 +2000,7 @@ status_t tests1ap_build_path_switch_request(
                     sizeof(c_uint8_t));
     UESecurityCapabilities->encryptionAlgorithms.bits_unused = 0;
     UESecurityCapabilities->encryptionAlgorithms.buf[0] = 
-        (mme_ue->ue_network_capability.eea << 1);
+        (amf4g_ue->ue_network_capability.eea << 1);
 
     UESecurityCapabilities->integrityProtectionAlgorithms.size = 2;
     UESecurityCapabilities->integrityProtectionAlgorithms.buf =
@@ -2008,7 +2008,7 @@ status_t tests1ap_build_path_switch_request(
                         integrityProtectionAlgorithms.size, sizeof(c_uint8_t));
     UESecurityCapabilities->integrityProtectionAlgorithms.bits_unused = 0;
     UESecurityCapabilities->integrityProtectionAlgorithms.buf[0] =
-        (mme_ue->ue_network_capability.eia << 1);
+        (amf4g_ue->ue_network_capability.eia << 1);
 
     rv = s1ap_encode_pdu(pkbuf, &pdu);
     s1ap_free_pdu(&pdu);
@@ -2622,22 +2622,22 @@ status_t testgtpu_enb_send(pkbuf_t *sendbuf)
     status_t rv;
     sock_id sock = 0;
     hash_index_t *hi = NULL;
-    mme_ue_t *mme_ue = NULL;
-    mme_sess_t *sess = NULL;
-    mme_bearer_t *bearer = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_sess_t *sess = NULL;
+    amf4g_bearer_t *bearer = NULL;
 
     c_sockaddr_t sgw;
     ssize_t sent;
 
     if (test_only_control_plane) return 0;
 
-    hi = mme_ue_first();
+    hi = amf4g_ue_first();
     d_assert(hi, return -1,);
-    mme_ue = mme_ue_this(hi);
-    d_assert(mme_ue, return -1,);
-    sess = mme_sess_first(mme_ue);
+    amf4g_ue = amf4g_ue_this(hi);
+    d_assert(amf4g_ue, return -1,);
+    sess = amf4g_sess_first(amf4g_ue);
     d_assert(sess, return -1,);
-    bearer = mme_bearer_first(sess);
+    bearer = amf4g_bearer_first(sess);
     d_assert(bearer, return -1,);
 
     memset(&sgw, 0, sizeof(c_sockaddr_t));

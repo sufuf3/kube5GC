@@ -1,10 +1,10 @@
-#define TRACE_MODULE _mme_event
+#define TRACE_MODULE _amf4g_event
 
 #include "core_debug.h"
 
-#include "mme_event.h"
+#include "amf4g_event.h"
 
-char* mme_event_get_name(event_t *e)
+char* amf4g_event_get_name(event_t *e)
 {
     if (e == NULL)
         return FSM_NAME_INIT_SIG;

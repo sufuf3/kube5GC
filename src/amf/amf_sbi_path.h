@@ -1,7 +1,7 @@
 #ifndef __AMF_SBI_PATH_H__
 #define __AMF_SBI_PATH_H__
 
-#include "mme_context.h"
+#include "amf4g_context.h"
 
 #ifdef __cplusplus
 extern "C" {

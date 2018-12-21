@@ -1,26 +1,26 @@
-#define TRACE_MODULE _mme_path
+#define TRACE_MODULE _amf4g_path
 
 #include "s1ap_path.h"
 #include "nas_path.h"
-#include "mme_gtp_path.h"
-#include "mme_path.h"
+#include "amf4g_gtp_path.h"
+#include "amf4g_path.h"
 
-status_t mme_send_delete_session_or_detach(mme_ue_t *mme_ue)
+status_t amf4g_send_delete_session_or_detach(amf4g_ue_t *amf4g_ue)
 {
     
     status_t rv;
-    d_assert(mme_ue, return CORE_ERROR,);
+    d_assert(amf4g_ue, return CORE_ERROR,);
 
-    if (SESSION_CONTEXT_IS_AVAILABLE(mme_ue))
+    if (SESSION_CONTEXT_IS_AVAILABLE(amf4g_ue))
     {
-        rv = mme_gtp_send_delete_all_sessions(mme_ue);
+        rv = amf4g_gtp_send_delete_all_sessions(amf4g_ue);
         d_assert(rv == CORE_OK,,
-            "mme_gtp_send_delete_all_sessions failed");
+            "amf4g_gtp_send_delete_all_sessions failed");
     }
     else
     {
         
-        rv = nas_send_detach_accept(mme_ue);
+        rv = nas_send_detach_accept(amf4g_ue);
         d_assert(rv == CORE_OK,,
             "nas_send_detach_accept failed");
     }
@@ -28,18 +28,18 @@ status_t mme_send_delete_session_or_detach(mme_ue_t *mme_ue)
     return rv;
 }
 
-status_t mme_send_delete_session_or_ue_context_release(
-        mme_ue_t *mme_ue, enb_ue_t *enb_ue)
+status_t amf4g_send_delete_session_or_ue_context_release(
+        amf4g_ue_t *amf4g_ue, enb_ue_t *enb_ue)
 {
     status_t rv;
 
     d_assert(enb_ue, return CORE_ERROR,);
 
-    if (SESSION_CONTEXT_IS_AVAILABLE(mme_ue))
+    if (SESSION_CONTEXT_IS_AVAILABLE(amf4g_ue))
     {
-        rv = mme_gtp_send_delete_all_sessions(mme_ue);
+        rv = amf4g_gtp_send_delete_all_sessions(amf4g_ue);
         d_assert(rv == CORE_OK,,
-            "mme_gtp_send_delete_all_sessions failed");
+            "amf4g_gtp_send_delete_all_sessions failed");
     }
     else
     {
@@ -52,16 +52,16 @@ status_t mme_send_delete_session_or_ue_context_release(
     return rv;
 }
 
-status_t mme_send_release_access_bearer_or_ue_context_release(
-        mme_ue_t *mme_ue, enb_ue_t *enb_ue)
+status_t amf4g_send_release_access_bearer_or_ue_context_release(
+        amf4g_ue_t *amf4g_ue, enb_ue_t *enb_ue)
 {
     status_t rv;
 
     d_assert(enb_ue, return CORE_ERROR,);
 
-    if (BEARER_CONTEXT_IS_ACTIVE(mme_ue))
+    if (BEARER_CONTEXT_IS_ACTIVE(amf4g_ue))
     {
-        rv = mme_gtp_send_release_access_bearers_request(mme_ue);
+        rv = amf4g_gtp_send_release_access_bearers_request(amf4g_ue);
         d_assert(rv == CORE_OK,, "gtp send failed");
     }
     else

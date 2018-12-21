@@ -5,7 +5,7 @@
 #include <mongoc.h>
 
 #include "app/context.h"
-#include "amf/mme_context.h"
+#include "amf/amf4g_context.h"
 #include "amf/s1ap_build.h"
 #include "s1ap/s1ap_message.h"
 
@@ -27,7 +27,7 @@ static void attach_test1(abts_case *tc, void *data)
     int i;
     int msgindex = 0;
     enb_ue_t *enb_ue = NULL;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
     c_uint32_t m_tmsi = 0;
 
     c_uint8_t tmp[MAX_SDU_LEN];
@@ -149,7 +149,7 @@ static void attach_test1(abts_case *tc, void *data)
      * Send Initial-UE Message + Attach Request + PDN Connectivity        */
     core_sleep(time_from_msec(300));
 
-    mme_self()->mme_ue_s1ap_id = 16777372;
+    amf4g_self()->mme_ue_s1ap_id = 16777372;
     rv = tests1ap_build_initial_ue_msg(&sendbuf, msgindex);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
@@ -296,9 +296,9 @@ static void attach_test1(abts_case *tc, void *data)
     /* Retreive M-TMSI */
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(16777373);
     d_assert(enb_ue, goto out,);
-    mme_ue = enb_ue->mme_ue;
-    d_assert(mme_ue, goto out,);
-    m_tmsi = mme_ue->guti.m_tmsi;
+    amf4g_ue = enb_ue->amf4g_ue;
+    d_assert(amf4g_ue, goto out,);
+    m_tmsi = amf4g_ue->guti.m_tmsi;
 
     /*****************************************************************
      * Attach Request : Known GUTI, Integrity Protected, MAC Matched
@@ -312,7 +312,7 @@ static void attach_test1(abts_case *tc, void *data)
     /* Update NAS MAC */
     void snow_3g_f9(c_uint8_t* key, c_uint32_t count, c_uint32_t fresh,
             c_uint32_t dir, c_uint8_t *data, c_uint64_t length, c_uint8_t *out);
-    snow_3g_f9(mme_ue->knas_int, 7, 0, 0,
+    snow_3g_f9(amf4g_ue->knas_int, 7, 0, 0,
             sendbuf->payload + 24, (109 << 3), sendbuf->payload+20);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
@@ -654,7 +654,7 @@ static void attach_test2(abts_case *tc, void *data)
      * Send Initial-UE Message + Attach Request + PDN Connectivity  */
     core_sleep(time_from_msec(300));
 
-    mme_self()->mme_ue_s1ap_id = 0;
+    amf4g_self()->mme_ue_s1ap_id = 0;
     rv = tests1ap_build_initial_ue_msg(&sendbuf, msgindex);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
@@ -861,7 +861,7 @@ static void attach_test3(abts_case *tc, void *data)
     int i;
     int msgindex = 6;
     enb_ue_t *enb_ue = NULL;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
     c_uint32_t m_tmsi = 0;
 
     c_uint8_t tmp[MAX_SDU_LEN];
@@ -989,7 +989,7 @@ static void attach_test3(abts_case *tc, void *data)
      * Send Initial-UE Message + Attach Request + PDN Connectivity  */
     core_sleep(time_from_msec(300));
 
-    mme_self()->mme_ue_s1ap_id = 33554631;
+    amf4g_self()->mme_ue_s1ap_id = 33554631;
     rv = tests1ap_build_initial_ue_msg(&sendbuf, msgindex);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
@@ -1081,9 +1081,9 @@ static void attach_test3(abts_case *tc, void *data)
     /* Retreive M-TMSI */
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(33554632);
     d_assert(enb_ue, goto out,);
-    mme_ue = enb_ue->mme_ue;
-    d_assert(mme_ue, goto out,);
-    m_tmsi = mme_ue->guti.m_tmsi;
+    amf4g_ue = enb_ue->amf4g_ue;
+    d_assert(amf4g_ue, goto out,);
+    m_tmsi = amf4g_ue->guti.m_tmsi;
 
     /******************** Added by Hu ********************/
     /* Send eNB CP relocation indication */
@@ -1155,7 +1155,7 @@ static void attach_test3(abts_case *tc, void *data)
     /* Send TAU Request */
     
     rv = tests1ap_build_tau_request(&sendbuf, 0,
-            0, 0x003600, 1, m_tmsi, 7, 0xe73ce7c, mme_ue->knas_int);
+            0, 0x003600, 1, m_tmsi, 7, 0xe73ce7c, amf4g_ue->knas_int);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1181,7 +1181,7 @@ static void attach_test3(abts_case *tc, void *data)
 
     ///////////// YEEEEEEEEEEEE
     
-    rv = tests1ap_build_e_rab_modification_indication(&sendbuf, mme_ue->enb_ue->mme_ue_s1ap_id, mme_ue->enb_ue->enb_ue_s1ap_id);
+    rv = tests1ap_build_e_rab_modification_indication(&sendbuf, amf4g_ue->enb_ue->mme_ue_s1ap_id, amf4g_ue->enb_ue->enb_ue_s1ap_id);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1198,7 +1198,7 @@ static void attach_test3(abts_case *tc, void *data)
     /* Send TAU Request */
     
     rv = tests1ap_build_tau_request(&sendbuf, 0,
-            0, 0x002600, 0, m_tmsi, 8, 0x972dc6f8, mme_ue->knas_int);
+            0, 0x002600, 0, m_tmsi, 8, 0x972dc6f8, amf4g_ue->knas_int);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1248,7 +1248,7 @@ static void attach_test3(abts_case *tc, void *data)
         rv = tests1ap_enb_send(sock, sendbuf);
         ABTS_INT_EQUAL(tc, CORE_OK, rv);*/
     /*S1AP_M_TMSI_t *a = NULL;
-    served_gummei_t *served_gummei = &mme_self()->served_gummei[0];
+    served_gummei_t *served_gummei = &amf4g_self()->served_gummei[0];
     S1AP_MME_Code_t *MME_Code = (S1AP_MME_Code_t *)core_calloc(1, sizeof(S1AP_MME_Code_t));
     s1ap_uint8_to_OCTET_STRING(served_gummei->mme_code[j], MME_Code);
     s1ap_uint32_to_OCTET_STRING(m_TMSI, a);*/
@@ -1401,7 +1401,7 @@ static void attach_test4(abts_case *tc, void *data)
      * Send Initial-UE Message + Attach Request + PDN Connectivity        */
     core_sleep(time_from_msec(300));
 
-    mme_self()->mme_ue_s1ap_id = 0;
+    amf4g_self()->mme_ue_s1ap_id = 0;
     rv = tests1ap_build_initial_ue_msg(&sendbuf, msgindex);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
@@ -1497,7 +1497,7 @@ static void attach_test5(abts_case *tc, void *data)
     int i;
     int msgindex = 12;
     enb_ue_t *enb_ue = NULL;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
     c_uint32_t m_tmsi = 0;
 
     mongoc_collection_t *collection = NULL;
@@ -1588,7 +1588,7 @@ static void attach_test5(abts_case *tc, void *data)
     core_sleep(time_from_msec(300));
 
     /* Send Service request */
-    mme_self()->mme_ue_s1ap_id = 0;
+    amf4g_self()->mme_ue_s1ap_id = 0;
     rv = tests1ap_build_service_request(&sendbuf,
             0x40072c, 17, 0x9551, 0x12345678);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1695,9 +1695,9 @@ static void attach_test5(abts_case *tc, void *data)
     /* Retreive M-TMSI */
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(2);
     d_assert(enb_ue, goto out,);
-    mme_ue = enb_ue->mme_ue;
-    d_assert(mme_ue, goto out,);
-    m_tmsi = mme_ue->guti.m_tmsi;
+    amf4g_ue = enb_ue->amf4g_ue;
+    d_assert(amf4g_ue, goto out,);
+    m_tmsi = amf4g_ue->guti.m_tmsi;
 
     
 

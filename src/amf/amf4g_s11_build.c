@@ -1,4 +1,4 @@
-#define TRACE_MODULE _mme_s11_build
+#define TRACE_MODULE _amf4g_s11_build
 
 #include "core_debug.h"
 #include "3gpp_types.h"
@@ -8,23 +8,23 @@
 #include "gtp/gtp_message.h"
 #include "gtp/gtp_node.h"
 
-#include "mme_context.h"
+#include "amf4g_context.h"
 
-#include "mme_s11_build.h"
+#include "amf4g_s11_build.h"
 
-status_t mme_s11_build_create_session_request(
-        pkbuf_t **pkbuf, c_uint8_t type, mme_sess_t *sess)
+status_t amf4g_s11_build_create_session_request(
+        pkbuf_t **pkbuf, c_uint8_t type, amf4g_sess_t *sess)
 {
     status_t rv;
     pdn_t *pdn = NULL;
-    mme_ue_t *mme_ue = NULL;
-    mme_bearer_t *bearer = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_bearer_t *bearer = NULL;
     gtp_message_t gtp_message;
     gtp_create_session_request_t *req = &gtp_message.create_session_request;
 
     gtp_uli_t uli;
     char uli_buf[GTP_MAX_ULI_LEN];
-    gtp_f_teid_t mme_s11_teid, pgw_s5c_teid;
+    gtp_f_teid_t amf4g_s11_teid, pgw_s5c_teid;
     int len;
     gtp_ambr_t ambr;
     gtp_bearer_qos_t bearer_qos;
@@ -36,48 +36,48 @@ status_t mme_s11_build_create_session_request(
     d_assert(sess, return CORE_ERROR, "Null param");
     pdn = sess->pdn;
     d_assert(pdn, return CORE_ERROR, "Null param");
-    bearer = mme_default_bearer_in_sess(sess);
+    bearer = amf4g_default_bearer_in_sess(sess);
     d_assert(bearer, return CORE_ERROR, "Null param");
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     d_trace(3, "[MME] Create Session Request\n");
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
+            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
     memset(&gtp_message, 0, sizeof(gtp_message_t));
 
-    d_assert(mme_ue->imsi_len, return CORE_ERROR, "Null param");
+    d_assert(amf4g_ue->imsi_len, return CORE_ERROR, "Null param");
     req->imsi.presence = 1;
-    req->imsi.data = mme_ue->imsi;
-    req->imsi.len = mme_ue->imsi_len;
+    req->imsi.data = amf4g_ue->imsi;
+    req->imsi.len = amf4g_ue->imsi_len;
 
     memset(&uli, 0, sizeof(gtp_uli_t));
     uli.flags.e_cgi = 1;
     uli.flags.tai = 1;
-    memcpy(&uli.tai.plmn_id, &mme_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
-    uli.tai.tac = mme_ue->tai.tac;
-    memcpy(&uli.e_cgi.plmn_id, &mme_ue->e_cgi.plmn_id, 
+    memcpy(&uli.tai.plmn_id, &amf4g_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
+    uli.tai.tac = amf4g_ue->tai.tac;
+    memcpy(&uli.e_cgi.plmn_id, &amf4g_ue->e_cgi.plmn_id, 
             sizeof(uli.e_cgi.plmn_id));
-    uli.e_cgi.cell_id = mme_ue->e_cgi.cell_id;
+    uli.e_cgi.cell_id = amf4g_ue->e_cgi.cell_id;
     req->user_location_information.presence = 1;
     gtp_build_uli(&req->user_location_information, &uli, 
             uli_buf, GTP_MAX_ULI_LEN);
 
     req->serving_network.presence = 1;
-    req->serving_network.data = &mme_ue->visited_plmn_id;
-    req->serving_network.len = sizeof(mme_ue->visited_plmn_id);
+    req->serving_network.data = &amf4g_ue->visited_plmn_id;
+    req->serving_network.len = sizeof(amf4g_ue->visited_plmn_id);
 
     req->rat_type.presence = 1;
     req->rat_type.u8 = GTP_RAT_TYPE_EUTRAN;
 
-    memset(&mme_s11_teid, 0, sizeof(gtp_f_teid_t));
-    mme_s11_teid.interface_type = GTP_F_TEID_S11_MME_GTP_C;
-    mme_s11_teid.teid = htonl(mme_ue->mme_s11_teid);
+    memset(&amf4g_s11_teid, 0, sizeof(gtp_f_teid_t));
+    amf4g_s11_teid.interface_type = GTP_F_TEID_S11_MME_GTP_C;
+    amf4g_s11_teid.teid = htonl(amf4g_ue->amf4g_s11_teid);
     rv = gtp_sockaddr_to_f_teid(
-            mme_self()->gtpc_addr, mme_self()->gtpc_addr6, &mme_s11_teid, &len);
+            amf4g_self()->gtpc_addr, amf4g_self()->gtpc_addr6, &amf4g_s11_teid, &len);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
     req->sender_f_teid_for_control_plane.presence = 1;
-    req->sender_f_teid_for_control_plane.data = &mme_s11_teid;
+    req->sender_f_teid_for_control_plane.data = &amf4g_s11_teid;
     req->sender_f_teid_for_control_plane.len = len;
 
     memset(&pgw_s5c_teid, 0, sizeof(gtp_f_teid_t));
@@ -116,7 +116,7 @@ status_t mme_s11_build_create_session_request(
     else
     {
         rv = gtp_sockaddr_to_f_teid(
-            mme_self()->pgw_addr, mme_self()->pgw_addr6, &pgw_s5c_teid, &len);
+            amf4g_self()->pgw_addr, amf4g_self()->pgw_addr6, &pgw_s5c_teid, &len);
         d_assert(rv == CORE_OK, return CORE_ERROR,);
         req->pgw_s5_s8_address_for_control_plane_or_pmip.presence = 1;
         req->pgw_s5_s8_address_for_control_plane_or_pmip.data = &pgw_s5c_teid;
@@ -228,8 +228,8 @@ status_t mme_s11_build_create_session_request(
     return CORE_OK;
 }
 
-status_t mme_s11_build_modify_bearer_request(pkbuf_t **pkbuf,
-        c_uint8_t type, mme_bearer_t *bearer, int uli_presence)
+status_t amf4g_s11_build_modify_bearer_request(pkbuf_t **pkbuf,
+        c_uint8_t type, amf4g_bearer_t *bearer, int uli_presence)
 {
     status_t rv;
     gtp_message_t gtp_message;
@@ -240,15 +240,15 @@ status_t mme_s11_build_modify_bearer_request(pkbuf_t **pkbuf,
     gtp_uli_t uli;
     char uli_buf[GTP_MAX_ULI_LEN];
 
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     d_assert(bearer, return CORE_ERROR, "Null param");
-    mme_ue = bearer->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = bearer->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     d_trace(3, "[MME] Modifty Bearer Request\n");
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
+            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
     d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
         bearer->enb_s1u_teid, bearer->sgw_s1u_teid);
 
@@ -275,11 +275,11 @@ status_t mme_s11_build_modify_bearer_request(pkbuf_t **pkbuf,
         memset(&uli, 0, sizeof(gtp_uli_t));
         uli.flags.e_cgi = 1;
         uli.flags.tai = 1;
-        memcpy(&uli.tai.plmn_id, &mme_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
-        uli.tai.tac = mme_ue->tai.tac;
-        memcpy(&uli.e_cgi.plmn_id, &mme_ue->e_cgi.plmn_id, 
+        memcpy(&uli.tai.plmn_id, &amf4g_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
+        uli.tai.tac = amf4g_ue->tai.tac;
+        memcpy(&uli.e_cgi.plmn_id, &amf4g_ue->e_cgi.plmn_id, 
                 sizeof(uli.e_cgi.plmn_id));
-        uli.e_cgi.cell_id = mme_ue->e_cgi.cell_id;
+        uli.e_cgi.cell_id = amf4g_ue->e_cgi.cell_id;
         req->user_location_information.presence = 1;
         gtp_build_uli(&req->user_location_information, &uli, 
                 uli_buf, GTP_MAX_ULI_LEN);
@@ -292,8 +292,8 @@ status_t mme_s11_build_modify_bearer_request(pkbuf_t **pkbuf,
     return CORE_OK;
 }
 
-status_t mme_s11_build_delete_session_request(
-        pkbuf_t **pkbuf, c_uint8_t type, mme_sess_t *sess)
+status_t amf4g_s11_build_delete_session_request(
+        pkbuf_t **pkbuf, c_uint8_t type, amf4g_sess_t *sess)
 {
     status_t rv;
     gtp_message_t gtp_message;
@@ -303,18 +303,18 @@ status_t mme_s11_build_delete_session_request(
     char uli_buf[GTP_MAX_ULI_LEN];
     gtp_indication_t indication;
 
-    mme_bearer_t *bearer = NULL;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_bearer_t *bearer = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     d_assert(sess, return CORE_ERROR, "Null param");
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
-    bearer = mme_default_bearer_in_sess(sess);
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
+    bearer = amf4g_default_bearer_in_sess(sess);
     d_assert(bearer, return CORE_ERROR, "Null param");
 
     d_trace(3, "[MME] Delete Session Request\n");
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
+            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     memset(&gtp_message, 0, sizeof(gtp_message_t));
 
@@ -325,10 +325,10 @@ status_t mme_s11_build_delete_session_request(
     memset(&uli, 0, sizeof(gtp_uli_t));
     uli.flags.e_cgi = 1;
     uli.flags.tai = 1;
-    memcpy(&uli.tai.plmn_id, &mme_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
-    uli.tai.tac = mme_ue->tai.tac;
-    memcpy(&uli.e_cgi.plmn_id, &mme_ue->e_cgi.plmn_id, sizeof(uli.tai.plmn_id));
-    uli.e_cgi.cell_id = mme_ue->e_cgi.cell_id;
+    memcpy(&uli.tai.plmn_id, &amf4g_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
+    uli.tai.tac = amf4g_ue->tai.tac;
+    memcpy(&uli.e_cgi.plmn_id, &amf4g_ue->e_cgi.plmn_id, sizeof(uli.tai.plmn_id));
+    uli.e_cgi.cell_id = amf4g_ue->e_cgi.cell_id;
     req->user_location_information.presence = 1;
     gtp_build_uli(&req->user_location_information, &uli,
             uli_buf, GTP_MAX_ULI_LEN);
@@ -346,8 +346,8 @@ status_t mme_s11_build_delete_session_request(
     return CORE_OK;
 }
 
-status_t mme_s11_build_create_bearer_response(
-        pkbuf_t **pkbuf, c_uint8_t type, mme_bearer_t *bearer)
+status_t amf4g_s11_build_create_bearer_response(
+        pkbuf_t **pkbuf, c_uint8_t type, amf4g_bearer_t *bearer)
 {
     status_t rv;
     gtp_message_t gtp_message;
@@ -361,15 +361,15 @@ status_t mme_s11_build_create_bearer_response(
     gtp_ue_timezone_t ue_timezone;
     time_exp_t time_exp;
 
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     d_assert(bearer, return CORE_ERROR, "Null param");
-    mme_ue = bearer->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = bearer->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
     
     d_trace(3, "[MME] Create Bearer Response\n");
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
+            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     memset(&gtp_message, 0, sizeof(gtp_message_t));
 
@@ -414,11 +414,11 @@ status_t mme_s11_build_create_bearer_response(
     memset(&uli, 0, sizeof(gtp_uli_t));
     uli.flags.e_cgi = 1;
     uli.flags.tai = 1;
-    memcpy(&uli.tai.plmn_id, &mme_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
-    uli.tai.tac = mme_ue->tai.tac;
-    memcpy(&uli.e_cgi.plmn_id, &mme_ue->e_cgi.plmn_id, 
+    memcpy(&uli.tai.plmn_id, &amf4g_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
+    uli.tai.tac = amf4g_ue->tai.tac;
+    memcpy(&uli.e_cgi.plmn_id, &amf4g_ue->e_cgi.plmn_id, 
             sizeof(uli.e_cgi.plmn_id));
-    uli.e_cgi.cell_id = mme_ue->e_cgi.cell_id;
+    uli.e_cgi.cell_id = amf4g_ue->e_cgi.cell_id;
     rsp->user_location_information.presence = 1;
     gtp_build_uli(&rsp->user_location_information, &uli, 
             uli_buf, GTP_MAX_ULI_LEN);
@@ -445,8 +445,8 @@ status_t mme_s11_build_create_bearer_response(
     return CORE_OK;
 }
 
-status_t mme_s11_build_update_bearer_response(
-        pkbuf_t **pkbuf, c_uint8_t type, mme_bearer_t *bearer)
+status_t amf4g_s11_build_update_bearer_response(
+        pkbuf_t **pkbuf, c_uint8_t type, amf4g_bearer_t *bearer)
 {
     status_t rv;
     gtp_message_t gtp_message;
@@ -458,15 +458,15 @@ status_t mme_s11_build_update_bearer_response(
     gtp_ue_timezone_t ue_timezone;
     time_exp_t time_exp;
 
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     d_assert(bearer, return CORE_ERROR, "Null param");
-    mme_ue = bearer->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = bearer->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     d_trace(3, "[MME] Update Bearer Response\n");
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
+            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     memset(&gtp_message, 0, sizeof(gtp_message_t));
 
@@ -491,11 +491,11 @@ status_t mme_s11_build_update_bearer_response(
     memset(&uli, 0, sizeof(gtp_uli_t));
     uli.flags.e_cgi = 1;
     uli.flags.tai = 1;
-    memcpy(&uli.tai.plmn_id, &mme_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
-    uli.tai.tac = mme_ue->tai.tac;
-    memcpy(&uli.e_cgi.plmn_id, &mme_ue->e_cgi.plmn_id, 
+    memcpy(&uli.tai.plmn_id, &amf4g_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
+    uli.tai.tac = amf4g_ue->tai.tac;
+    memcpy(&uli.e_cgi.plmn_id, &amf4g_ue->e_cgi.plmn_id, 
             sizeof(uli.e_cgi.plmn_id));
-    uli.e_cgi.cell_id = mme_ue->e_cgi.cell_id;
+    uli.e_cgi.cell_id = amf4g_ue->e_cgi.cell_id;
     rsp->user_location_information.presence = 1;
     gtp_build_uli(&rsp->user_location_information, &uli, 
             uli_buf, GTP_MAX_ULI_LEN);
@@ -522,8 +522,8 @@ status_t mme_s11_build_update_bearer_response(
     return CORE_OK;
 }
 
-status_t mme_s11_build_delete_bearer_response(
-        pkbuf_t **pkbuf, c_uint8_t type, mme_bearer_t *bearer)
+status_t amf4g_s11_build_delete_bearer_response(
+        pkbuf_t **pkbuf, c_uint8_t type, amf4g_bearer_t *bearer)
 {
     status_t rv;
     gtp_message_t gtp_message;
@@ -535,15 +535,15 @@ status_t mme_s11_build_delete_bearer_response(
     gtp_ue_timezone_t ue_timezone;
     time_exp_t time_exp;
 
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     d_assert(bearer, return CORE_ERROR, "Null param");
-    mme_ue = bearer->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = bearer->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     d_trace(3, "[MME] Delete Bearer Response\n");
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
+            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     memset(&gtp_message, 0, sizeof(gtp_message_t));
 
@@ -568,11 +568,11 @@ status_t mme_s11_build_delete_bearer_response(
     memset(&uli, 0, sizeof(gtp_uli_t));
     uli.flags.e_cgi = 1;
     uli.flags.tai = 1;
-    memcpy(&uli.tai.plmn_id, &mme_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
-    uli.tai.tac = mme_ue->tai.tac;
-    memcpy(&uli.e_cgi.plmn_id, &mme_ue->e_cgi.plmn_id, 
+    memcpy(&uli.tai.plmn_id, &amf4g_ue->tai.plmn_id, sizeof(uli.tai.plmn_id));
+    uli.tai.tac = amf4g_ue->tai.tac;
+    memcpy(&uli.e_cgi.plmn_id, &amf4g_ue->e_cgi.plmn_id, 
             sizeof(uli.e_cgi.plmn_id));
-    uli.e_cgi.cell_id = mme_ue->e_cgi.cell_id;
+    uli.e_cgi.cell_id = amf4g_ue->e_cgi.cell_id;
     rsp->user_location_information.presence = 1;
     gtp_build_uli(&rsp->user_location_information, &uli, 
             uli_buf, GTP_MAX_ULI_LEN);
@@ -599,7 +599,7 @@ status_t mme_s11_build_delete_bearer_response(
     return CORE_OK;
 }
 
-status_t mme_s11_build_release_access_bearers_request(
+status_t amf4g_s11_build_release_access_bearers_request(
         pkbuf_t **pkbuf, c_uint8_t type)
 {
     status_t rv;
@@ -620,7 +620,7 @@ status_t mme_s11_build_release_access_bearers_request(
     return CORE_OK;
 }
 
-status_t mme_s11_build_downlink_data_notification_ack(
+status_t amf4g_s11_build_downlink_data_notification_ack(
         pkbuf_t **pkbuf, c_uint8_t type)
 {
     status_t rv;
@@ -648,14 +648,14 @@ status_t mme_s11_build_downlink_data_notification_ack(
     return CORE_OK;
 }
 
-status_t mme_s11_build_create_indirect_data_forwarding_tunnel_request(
-        pkbuf_t **pkbuf, c_uint8_t type, mme_ue_t *mme_ue)
+status_t amf4g_s11_build_create_indirect_data_forwarding_tunnel_request(
+        pkbuf_t **pkbuf, c_uint8_t type, amf4g_ue_t *amf4g_ue)
 {
     status_t rv;
     int i;
     
-    mme_sess_t *sess = NULL;
-    mme_bearer_t *bearer = NULL;
+    amf4g_sess_t *sess = NULL;
+    amf4g_bearer_t *bearer = NULL;
 
     gtp_message_t gtp_message;
     gtp_create_indirect_data_forwarding_tunnel_request_t *req =
@@ -666,20 +666,20 @@ status_t mme_s11_build_create_indirect_data_forwarding_tunnel_request(
     gtp_f_teid_t ul_teid[GTP_MAX_NUM_OF_INDIRECT_TUNNEL];
     int len;
 
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     d_trace(3, "[MME] Create Indirect Data Forwarding Tunnel Request\n");
     d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            mme_ue->mme_s11_teid, mme_ue->sgw_s11_teid);
+            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     gtp_bearers_in_create_indirect_tunnel_request(&bearers, req);
     memset(&gtp_message, 0, sizeof(gtp_message_t));
 
     i = 0;
-    sess = mme_sess_first(mme_ue);
+    sess = amf4g_sess_first(amf4g_ue);
     while (sess != NULL)
     {
-        bearer = mme_bearer_first(sess);
+        bearer = amf4g_bearer_first(sess);
         while(bearer != NULL)
         {
             if (MME_HAVE_ENB_DL_INDIRECT_TUNNEL(bearer))
@@ -719,9 +719,9 @@ status_t mme_s11_build_create_indirect_data_forwarding_tunnel_request(
                 i++;
             }
 
-            bearer = mme_bearer_next(bearer);
+            bearer = amf4g_bearer_next(bearer);
         }
-        sess = mme_sess_next(sess);
+        sess = amf4g_sess_next(sess);
     }
 
     gtp_message.h.type = type;

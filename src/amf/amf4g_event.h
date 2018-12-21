@@ -1,5 +1,5 @@
-#ifndef __MME_EVENT_H__
-#define __MME_EVENT_H__
+#ifndef __AMF4G_EVENT_H__
+#define __AMF4G_EVENT_H__
 
 #include "core_event.h"
 #include "core_fsm.h"
@@ -50,12 +50,12 @@ typedef enum {
 
 } event_e;
 
-#define mme_event_send(__ptr_e) event_send(mme_self()->queue_id, (__ptr_e))
+#define amf4g_event_send(__ptr_e) event_send(amf4g_self()->queue_id, (__ptr_e))
 
-CORE_DECLARE(char*) mme_event_get_name(event_t *e);
+CORE_DECLARE(char*) amf4g_event_get_name(event_t *e);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif /* __MME_EVENT_H__ */
+#endif /* __AMF4G_EVENT_H__ */

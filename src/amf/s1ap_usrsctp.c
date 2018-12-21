@@ -3,7 +3,7 @@
 #include "core_debug.h"
 #include "core_thread.h"
 
-#include "mme_event.h"
+#include "amf4g_event.h"
 
 #include "s1ap_path.h"
 
@@ -433,7 +433,7 @@ static int s1ap_usrsctp_recv_handler(struct socket *sock,
                             event_set(&e, MME_EVT_S1AP_LO_CONNREFUSED);
                             event_set_param1(&e, (c_uintptr_t)sock);
                             event_set_param2(&e, (c_uintptr_t)addr);
-                            if (mme_event_send(&e) != CORE_OK)
+                            if (amf4g_event_send(&e) != CORE_OK)
                             {
                                 CORE_FREE(addr);
                             }
@@ -453,7 +453,7 @@ static int s1ap_usrsctp_recv_handler(struct socket *sock,
                                 not->sn_assoc_change.sac_inbound_streams);
                             event_set_param4(&e, (c_uintptr_t)
                                 not->sn_assoc_change.sac_outbound_streams);
-                            if (mme_event_send(&e) != CORE_OK)
+                            if (amf4g_event_send(&e) != CORE_OK)
                             {
                                 CORE_FREE(addr);
                             }
@@ -474,7 +474,7 @@ static int s1ap_usrsctp_recv_handler(struct socket *sock,
                         event_set(&e, MME_EVT_S1AP_LO_CONNREFUSED);
                         event_set_param1(&e, (c_uintptr_t)sock);
                         event_set_param2(&e, (c_uintptr_t)addr);
-                        if (mme_event_send(&e) != CORE_OK)
+                        if (amf4g_event_send(&e) != CORE_OK)
                         {
                             CORE_FREE(addr);
                         }
@@ -533,7 +533,7 @@ static int s1ap_usrsctp_recv_handler(struct socket *sock,
             event_set_param1(&e, (c_uintptr_t)sock);
             event_set_param2(&e, (c_uintptr_t)addr);
             event_set_param3(&e, (c_uintptr_t)pkbuf);
-            if (mme_event_send(&e) != CORE_OK)
+            if (amf4g_event_send(&e) != CORE_OK)
             {
                 pkbuf_free(pkbuf);
                 CORE_FREE(addr);

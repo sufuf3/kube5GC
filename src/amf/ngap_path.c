@@ -3,7 +3,7 @@
 #include "core_debug.h"
 #include "core_thread.h"
 
-#include "mme_event.h"
+#include "amf4g_event.h"
 
 #include "nas_security.h"
 #include "nas_path.h"
@@ -24,9 +24,9 @@ status_t ngap_open(void)
     int type = SOCK_SEQPACKET;
 #endif
 
-    rv = ngap_server_list(&mme_self()->ngap_list, type);
+    rv = ngap_server_list(&amf4g_self()->ngap_list, type);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
-    rv = ngap_server_list(&mme_self()->ngap_list6, type);
+    rv = ngap_server_list(&amf4g_self()->ngap_list6, type);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
     return CORE_OK;
@@ -34,8 +34,8 @@ status_t ngap_open(void)
 
 status_t ngap_close()
 {
-    ngap_delete_list(&mme_self()->ngap_list);
-    ngap_delete_list(&mme_self()->ngap_list6);
+    ngap_delete_list(&amf4g_self()->ngap_list);
+    ngap_delete_list(&amf4g_self()->ngap_list6);
 
     return CORE_OK;
 }
@@ -118,7 +118,7 @@ status_t ngap_delayed_send_to_ran_ue(
     if (duration)
     {
         timer = timer_create(
-                &mme_self()->tm_service, AMF_EVT_NGAP_DELAYED_SEND, duration);
+                &amf4g_self()->tm_service, AMF_EVT_NGAP_DELAYED_SEND, duration);
         d_assert(timer, return CORE_ERROR,);
 
         timer_set_param1(timer, (c_uintptr_t)ran_ue->index);

@@ -60,7 +60,7 @@ status_t ngap_build_setup_rsp(pkbuf_t **pkbuf)
     ie->criticality = NGAP_Criticality_ignore;
     ie->value.present = NGAP_NGSetupResponseIEs__value_PR_RelativeAMFCapacity;
     RelativeAMFCapacity = &ie->value.choice.RelativeAMFCapacity;
-    *RelativeAMFCapacity = mme_self()->relative_capacity;
+    *RelativeAMFCapacity = amf4g_self()->relative_capacity;
 
     ie = core_calloc(1, sizeof(NGAP_NGSetupResponseIEs_t));
     ASN_SEQUENCE_ADD(&NGSetupResponse->protocolIEs, ie);
@@ -70,12 +70,12 @@ status_t ngap_build_setup_rsp(pkbuf_t **pkbuf)
     PLMNSupportList = &ie->value.choice.PLMNSupportList;
 
     //TODO: fix it
-    for (i = 0; i < 1/*mme_self()->max_num_of_served_guami*/; i++)
+    for (i = 0; i < 1/*amf4g_self()->max_num_of_served_guami*/; i++)
     {   
         NGAP_ServedGUAMIItem_t *ServedGUAMIItem = NULL;
         ServedGUAMIItem = core_calloc(1, sizeof(NGAP_ServedGUAMIItem_t));
          //TODO: fix it
-        // served_guami_t *served_guami = &mme_self()->served_guami[i];
+        // served_guami_t *served_guami = &amf4g_self()->served_guami[i];
         //for (j = 0; j < served_guami->num_of_plmn_id, j++)
         //{
        	
@@ -105,17 +105,17 @@ status_t ngap_build_setup_rsp(pkbuf_t **pkbuf)
 
 
     //TODO fix it : use real counter
-    for (i = 0; i < 1/*mme_self()->max_num_of_plmn_support*/; i++)
+    for (i = 0; i < 1/*amf4g_self()->max_num_of_plmn_support*/; i++)
     {
         NGAP_PLMNSupportItem_t *PLMNSupportItem = NULL;
         PLMNSupportItem = (NGAP_PLMNSupportItem_t *) core_calloc(1, sizeof(NGAP_PLMNSupportItem_t));
 
-        // plmn_support_t *plmn_support = &mme_self()->plmn_support[i];
+        // plmn_support_t *plmn_support = &amf4g_self()->plmn_support[i];
         plmn_id_t plmn_id;
         plmn_id_build(&plmn_id, 1, 1, 2);
         ngap_buffer_to_OCTET_STRING(&plmn_id, 3, &PLMNSupportItem->pLMNIdentity);
         //TODO fix it: use real counter
-        for (j = 0; j < 1/*mme_self()->plmn_support->num_of_s_nssai*/; j++)
+        for (j = 0; j < 1/*amf4g_self()->plmn_support->num_of_s_nssai*/; j++)
         {         
             NGAP_SliceSupportItem_t *SliceSupportItem = NULL;
             SliceSupportItem = (NGAP_SliceSupportItem_t *) core_calloc(1, sizeof(NGAP_SliceSupportItem_t));
@@ -213,7 +213,7 @@ status_t ngap_build_initial_context_setup_request(
     ie->value.present = NGAP_InitialContextSetupRequestIEs__value_PR_GUAMI;
     GUAMI = &ie->value.choice.GUAMI;
     /* which guami plmn/rid/ should be selete ?*/
-    served_guami_t *served_guami = &mme_self()->served_guami[0];
+    served_guami_t *served_guami = &amf4g_self()->served_guami[0];
     ngap_buffer_to_OCTET_STRING( &served_guami->plmn_id[0], 3, &GUAMI->pLMNIdentity);
     ngap_buffer_to_OCTET_STRING( &served_guami->amf_rid[0], 3, &GUAMI->aMFRegionID);
 	//ngap_buffer_to_OCTET_STRING( &served_guami->amf_sid[0], 3, &GUAMI->aMFSetID);  //BIT_STRING_t
@@ -254,9 +254,9 @@ status_t ngap_build_initial_context_setup_request(
     ie->value.present = NGAP_InitialContextSetupRequestIEs__value_PR_AllowedNSSAI;
     AllowedNSSAI = &ie->value.choice.AllowedNSSAI;
     NGAP_AllowedNSSAI_Item_t *AllowedNSSAI_Item = NULL;
-    for (i = 0 ; i < mme_self()->plmn_support->num_of_s_nssai; i++)
+    for (i = 0 ; i < amf4g_self()->plmn_support->num_of_s_nssai; i++)
     {
-        plmn_support_t *plmn_support = &mme_self()->plmn_support[i];
+        plmn_support_t *plmn_support = &amf4g_self()->plmn_support[i];
         AllowedNSSAI_Item = (NGAP_AllowedNSSAI_Item_t *) core_calloc(1, sizeof(NGAP_AllowedNSSAI_Item_t));
         ngap_buffer_to_OCTET_STRING(&plmn_support->s_nssai[i].sst, SST_LEN, &AllowedNSSAI_Item->s_NSSAI.sST);
         ASN_SEQUENCE_ADD(&AllowedNSSAI->list, AllowedNSSAI_Item);
@@ -362,7 +362,7 @@ status_t ngap_build_pdu_session_resource_setup_request(pkbuf_t **ngapbuf, amf_ue
         PDUSessionResourceSetupItemCxtReqIEs->criticality = NGAP_Criticality_reject;
             // PDUSessionResourceSetupItemCxtReq->pDUSessionID = ran_ue->amf_ue->psi;
             // NGAP_PDUSessionID_t	 pDUSessionID;
-	    ngap_buffer_to_OCTET_STRING(&mme_self()->plmn_support->s_nssai[0].sst, SST_LEN, &PDUSessionResourceSetupItemCxtReq->s_NSSAI.sST);
+	    ngap_buffer_to_OCTET_STRING(&amf4g_self()->plmn_support->s_nssai[0].sst, SST_LEN, &PDUSessionResourceSetupItemCxtReq->s_NSSAI.sST);
 	        // OCTET_STRING_t	 pDUSessionResourceSetupRequestTransfer;
         
         ASN_SEQUENCE_ADD(&PDUSessionResourceSetupListSUReq->list, PDUSessionResourceSetupItemCxtReq);
@@ -1144,14 +1144,14 @@ status_t ngap_build_path_switch_ack(pkbuf_t **ngapbuf, amf_ue_t *amf_ue)
     ie->value.present = NGAP_PathSwitchRequestAcknowledgeIEs__value_PR_SecurityContext;
     SecurityContext = &ie->value.choice.SecurityContext;
    
-    SecurityContext->nextHopChainingCount = mme_ue->nhcc;
+    SecurityContext->nextHopChainingCount = amf4g_ue->nhcc;
     SecurityContext->nextHopParameter.size = SHA256_DIGEST_SIZE;
     SecurityContext->nextHopParameter.buf = 
         core_calloc(SecurityContext->nextHopParameter.size,
         sizeof(c_uint8_t));
     SecurityContext->nextHopParameter.bits_unused = 0;
     memcpy(SecurityContext->nextHopParameter.buf,
-            mme_ue->nh, SecurityContext->nextHopParameter.size);
+            amf4g_ue->nh, SecurityContext->nextHopParameter.size);
 #endif
 
     ie = core_calloc(1, sizeof(NGAP_PathSwitchRequestAcknowledgeIEs_t));
@@ -1351,13 +1351,13 @@ status_t ngap_build_amf_configuration_update(pkbuf_t **pkbuf)
     ie->value.present = NGAP_AMFConfigurationUpdateIEs__value_PR_ServedGUAMIList;
     ServedGUAMIList = &ie->value.choice.ServedGUAMIList;
     
-        for (int i = 0 ; i < mme_self()->max_num_of_served_guami ; i ++)
+        for (int i = 0 ; i < amf4g_self()->max_num_of_served_guami ; i ++)
         {
             //TODO: fix it, use NGAP_ServedGUAMIItem_IEs instead 
             NGAP_ServedGUAMIItem_t *ServedGUAMIItem = NULL;
             ServedGUAMIItem =(NGAP_ServedGUAMIItem_t *) core_calloc(1, sizeof(NGAP_ServedGUAMIItem_t));
             
-            served_guami_t *served_guami =&mme_self()->served_guami[i];
+            served_guami_t *served_guami =&amf4g_self()->served_guami[i];
             for (j = 0; j < 1/*served_guami->num_of_plmn_id*/; j++)
             {
                 ngap_buffer_to_OCTET_STRING(&served_guami->plmn_id[j], PLMN_ID_LEN, &ServedGUAMIItem->gUAMI.pLMNIdentity);
@@ -1374,13 +1374,13 @@ status_t ngap_build_amf_configuration_update(pkbuf_t **pkbuf)
     ie->criticality = NGAP_Criticality_reject;
     ie->value.present = NGAP_AMFConfigurationUpdateIEs__value_PR_PLMNSupportList;
     PLMNSupportList = &ie->value.choice.PLMNSupportList;
-        for (i = 0 ; i < mme_self()->max_num_of_plmn_support ; i ++)
+        for (i = 0 ; i < amf4g_self()->max_num_of_plmn_support ; i ++)
         {
             //TODO: fix it, NGAP_PLMNSupportItem_IEs_t instead
             NGAP_PLMNSupportItem_t *PLMNSupportItem = NULL;
             PLMNSupportItem =(NGAP_PLMNSupportItem_t *) core_calloc(1, sizeof(NGAP_PLMNSupportItem_t));
             
-            served_guami_t *served_guami =&mme_self()->served_guami[i];
+            served_guami_t *served_guami =&amf4g_self()->served_guami[i];
             for (j = 0; j < 1/*served_guami->num_of_plmn_id*/; j++)
             {
                 ngap_buffer_to_OCTET_STRING(&served_guami->plmn_id[j], PLMN_ID_LEN, &PLMNSupportItem->pLMNIdentity);
@@ -1391,11 +1391,11 @@ status_t ngap_build_amf_configuration_update(pkbuf_t **pkbuf)
                 NGAP_SliceSupportItem_t *NGAP_SliceSupportItem = NULL;
                 NGAP_SliceSupportItem =(NGAP_SliceSupportItem_t *) core_calloc(1, sizeof(NGAP_SliceSupportItem_t));
                 ASN_SEQUENCE_ADD(&PLMNSupportItem->sliceSupportList.list, NGAP_SliceSupportItem);
-                for (j = 0; j < mme_self()->max_num_of_plmn_support ; j++)
+                for (j = 0; j < amf4g_self()->max_num_of_plmn_support ; j++)
                 {
-                    for (k = 0; k < mme_self()->plmn_support[j].num_of_s_nssai; k++)
+                    for (k = 0; k < amf4g_self()->plmn_support[j].num_of_s_nssai; k++)
                     {
-                        memcpy(&NGAP_SliceSupportItem->s_NSSAI, &mme_self()->plmn_support[j].s_nssai[k],  sizeof(NGAP_S_NSSAI_t));
+                        memcpy(&NGAP_SliceSupportItem->s_NSSAI, &amf4g_self()->plmn_support[j].s_nssai[k],  sizeof(NGAP_S_NSSAI_t));
                     }
                 }
             ASN_SEQUENCE_ADD(&PLMNSupportList->list, PLMNSupportItem);

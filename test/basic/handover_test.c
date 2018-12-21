@@ -5,7 +5,7 @@
 #include <mongoc.h>
 
 #include "app/context.h"
-#include "amf/mme_context.h"
+#include "amf/amf4g_context.h"
 #include "s1ap/s1ap_message.h"
 
 #include "testutil.h"
@@ -103,7 +103,7 @@ static void handover_test1(abts_case *tc, void *data)
       "\"__v\" : 0"
     "}";
 
-    mme_self()->mme_ue_s1ap_id = 16777689;
+    amf4g_self()->mme_ue_s1ap_id = 16777689;
 
     /* Two eNB connects to MME */
     rv = tests1ap_enb_connect(&sock1);
@@ -354,7 +354,7 @@ static void handover_test2(abts_case *tc, void *data)
     int i;
     int msgindex = 10;
     enb_ue_t *enb_ue = NULL;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
     c_uint32_t m_tmsi = 0;
 
     mongoc_collection_t *collection = NULL;
@@ -432,7 +432,7 @@ static void handover_test2(abts_case *tc, void *data)
       "\"__v\" : 0"
     "}";
 
-    mme_self()->mme_ue_s1ap_id = 33554627;
+    amf4g_self()->mme_ue_s1ap_id = 33554627;
 
     /* Two eNB connects to MME */
     rv = tests1ap_enb_connect(&sock1);
@@ -586,9 +586,9 @@ static void handover_test2(abts_case *tc, void *data)
     /* Retreive M-TMSI */
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(33554628);
     d_assert(enb_ue, goto out,);
-    mme_ue = enb_ue->mme_ue;
-    d_assert(mme_ue, goto out,);
-    m_tmsi = mme_ue->guti.m_tmsi;
+    amf4g_ue = enb_ue->amf4g_ue;
+    d_assert(amf4g_ue, goto out,);
+    m_tmsi = amf4g_ue->guti.m_tmsi;
 
     /* Receive E-RAB Setup Request + 
      * Activate dedicated EPS bearer context request */
@@ -701,7 +701,7 @@ static void handover_test2(abts_case *tc, void *data)
 
     /* Send Tracking Area Update Request */
     rv = tests1ap_build_tau_request(&sendbuf, 1,
-            0x000300, 0x000800, 0, m_tmsi, 4, 0, mme_ue->knas_int);
+            0x000300, 0x000800, 0, m_tmsi, 4, 0, amf4g_ue->knas_int);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock2, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);

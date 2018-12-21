@@ -5,7 +5,7 @@
 #include <mongoc.h>
 
 #include "app/context.h"
-#include "amf/mme_context.h"
+#include "amf/amf4g_context.h"
 #include "s1ap/s1ap_message.h"
 
 #include "testutil.h"

@@ -4,21 +4,21 @@
 
 #include "nas/nas_message.h"
 
-#include "mme_event.h"
-#include "mme_sm.h"
-#include "mme_fd_path.h"
+#include "amf4g_event.h"
+#include "amf4g_sm.h"
+#include "amf4g_fd_path.h"
 #include "emm_handler.h"
 #include "esm_build.h"
 #include "esm_handler.h"
-#include "mme_s11_handler.h"
+#include "amf4g_s11_handler.h"
 #include "nas_path.h"
-#include "mme_gtp_path.h"
+#include "amf4g_gtp_path.h"
 
 void esm_state_initial(fsm_t *s, event_t *e)
 {
     d_assert(s, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     FSM_TRAN(s, &esm_state_inactive);
 }
@@ -27,27 +27,27 @@ void esm_state_final(fsm_t *s, event_t *e)
 {
     d_assert(s, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 }
 
 void esm_state_inactive(fsm_t *s, event_t *e)
 {
     status_t rv;
-    mme_ue_t *mme_ue = NULL;
-    mme_sess_t *sess = NULL;
-    mme_bearer_t *bearer = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_sess_t *sess = NULL;
+    amf4g_bearer_t *bearer = NULL;
 
     d_assert(s, return, "Null param");
     d_assert(e, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
-    bearer = mme_bearer_find(event_get_param1(e));
+    bearer = amf4g_bearer_find(event_get_param1(e));
     d_assert(bearer, return, "Null param");
     sess = bearer->sess;
     d_assert(sess, return, "Null param");
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return, "Null param");
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return, "Null param");
 
     switch (event_get(e))
     {
@@ -70,7 +70,7 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                 {
                     d_trace(3, "[ESM] PDN Connectivity request\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-                            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+                            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     rv = esm_handle_pdn_connectivity_request(
                             bearer, &message->esm.pdn_connectivity_request);
                     if (rv != CORE_OK)
@@ -84,7 +84,7 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                 {
                     d_trace(3, "[ESM] ESM information response\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-                            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+                            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     rv = esm_handle_information_response(
                             sess, &message->esm.esm_information_response);
                     if (rv != CORE_OK)
@@ -99,12 +99,12 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                     d_trace(3, "[ESM] Activate default EPS bearer "
                             "context accept\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-                            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+                            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     /* Check if Initial Context Setup Response or 
                      *          E-RAB Setup Response is received */
                     if (MME_HAVE_ENB_S1U_PATH(bearer))
                     {
-                        rv = mme_gtp_send_modify_bearer_request(bearer, 0);
+                        rv = amf4g_gtp_send_modify_bearer_request(bearer, 0);
                         d_assert(rv == CORE_OK,, "gtp send failed");
                     }
 
@@ -119,7 +119,7 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                     d_trace(3, "[ESM] Activate dedicated EPS bearer "
                             "context accept\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-                            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+                            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     /* Check if Initial Context Setup Response or 
                      *          E-RAB Setup Response is received */
                     if (MME_HAVE_ENB_S1U_PATH(bearer))
@@ -142,7 +142,7 @@ void esm_state_inactive(fsm_t *s, event_t *e)
 
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }
@@ -151,21 +151,21 @@ void esm_state_inactive(fsm_t *s, event_t *e)
 void esm_state_active(fsm_t *s, event_t *e)
 {
     status_t rv;
-    mme_ue_t *mme_ue = NULL;
-    mme_sess_t *sess = NULL;
-    mme_bearer_t *bearer = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_sess_t *sess = NULL;
+    amf4g_bearer_t *bearer = NULL;
 
     d_assert(s, return, "Null param");
     d_assert(e, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
-    bearer = mme_bearer_find(event_get_param1(e));
+    bearer = amf4g_bearer_find(event_get_param1(e));
     d_assert(bearer, return, "Null param");
     sess = bearer->sess;
     d_assert(sess, return, "Null param");
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return, "Null param");
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return, "Null param");
 
     switch (event_get(e))
     {
@@ -188,7 +188,7 @@ void esm_state_active(fsm_t *s, event_t *e)
                 {
                     d_trace(3, "[ESM] PDN Connectivity request\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-                            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+                            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     rv = esm_handle_pdn_connectivity_request(
                             bearer, &message->esm.pdn_connectivity_request);
                     if (rv != CORE_OK)
@@ -204,12 +204,12 @@ void esm_state_active(fsm_t *s, event_t *e)
                 {
                     d_trace(3, "[ESM] PDN disconnect request\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-                            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+                            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     if (MME_HAVE_SGW_S1U_PATH(sess))
                     {
-                        rv = mme_gtp_send_delete_session_request(sess);
+                        rv = amf4g_gtp_send_delete_session_request(sess);
                         d_assert(rv == CORE_OK, return,
-                                "mme_gtp_send_delete_session_request error");
+                                "amf4g_gtp_send_delete_session_request error");
                     }
                     else
                     {
@@ -224,11 +224,11 @@ void esm_state_active(fsm_t *s, event_t *e)
                 {
                     d_trace(3, "[ESM] Modify EPS bearer context accept\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-                            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+                            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
 
-                    // rv = mme_gtp_send_update_bearer_response(bearer);
+                    // rv = amf4g_gtp_send_update_bearer_response(bearer);
                     // d_assert(rv == CORE_OK, return,
-                    //         "mme_gtp_send_update_session_request error");
+                    //         "amf4g_gtp_send_update_session_request error");
                     break;
                 }
                 case NAS_DEACTIVATE_EPS_BEARER_CONTEXT_ACCEPT:
@@ -236,10 +236,10 @@ void esm_state_active(fsm_t *s, event_t *e)
                     d_trace(3, "[ESM] [A] Deactivate EPS bearer "
                             "context accept\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-                            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
-                    // rv = mme_gtp_send_delete_bearer_response(bearer);
+                            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
+                    // rv = amf4g_gtp_send_delete_bearer_response(bearer);
                     // d_assert(rv == CORE_OK, return,
-                    //         "mme_gtp_send_delete_session_request error");
+                    //         "amf4g_gtp_send_delete_session_request error");
                     FSM_TRAN(s, esm_state_bearer_deactivated);
                     break;
                 }
@@ -255,7 +255,7 @@ void esm_state_active(fsm_t *s, event_t *e)
 
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }
@@ -263,21 +263,21 @@ void esm_state_active(fsm_t *s, event_t *e)
 
 void esm_state_pdn_will_disconnect(fsm_t *s, event_t *e)
 {
-    mme_ue_t *mme_ue = NULL;
-    mme_sess_t *sess = NULL;
-    mme_bearer_t *bearer = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_sess_t *sess = NULL;
+    amf4g_bearer_t *bearer = NULL;
 
     d_assert(s, return, "Null param");
     d_assert(e, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
-    bearer = mme_bearer_find(event_get_param1(e));
+    bearer = amf4g_bearer_find(event_get_param1(e));
     d_assert(bearer, return, "Null param");
     sess = bearer->sess;
     d_assert(sess, return, "Null param");
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return, "Null param");
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return, "Null param");
 
     switch (event_get(e))
     {
@@ -301,7 +301,7 @@ void esm_state_pdn_will_disconnect(fsm_t *s, event_t *e)
                     d_trace(3, "[ESM] [D] Deactivate EPS bearer "
                             "context accept\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-                            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+                            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     FSM_TRAN(s, esm_state_pdn_did_disconnect);
                     break;
                 }
@@ -317,7 +317,7 @@ void esm_state_pdn_will_disconnect(fsm_t *s, event_t *e)
 
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }
@@ -325,7 +325,7 @@ void esm_state_pdn_will_disconnect(fsm_t *s, event_t *e)
 
 void esm_state_pdn_did_disconnect(fsm_t *s, event_t *e)
 {
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     switch (event_get(e))
     {
@@ -339,7 +339,7 @@ void esm_state_pdn_did_disconnect(fsm_t *s, event_t *e)
         }
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }
@@ -347,7 +347,7 @@ void esm_state_pdn_did_disconnect(fsm_t *s, event_t *e)
 
 void esm_state_bearer_deactivated(fsm_t *s, event_t *e)
 {
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     switch (event_get(e))
     {
@@ -361,7 +361,7 @@ void esm_state_bearer_deactivated(fsm_t *s, event_t *e)
         }
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }
@@ -369,7 +369,7 @@ void esm_state_bearer_deactivated(fsm_t *s, event_t *e)
 
 void esm_state_exception(fsm_t *s, event_t *e)
 {
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     switch (event_get(e))
     {
@@ -383,7 +383,7 @@ void esm_state_exception(fsm_t *s, event_t *e)
         }
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }
