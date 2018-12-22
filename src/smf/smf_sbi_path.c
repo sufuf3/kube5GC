@@ -43,7 +43,7 @@ static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
     {
         d_error("smf_event_send error");
 	    pkbuf_free(pkbuf);
-	return 0;
+	    return CORE_ERROR;
     }
 
     return CORE_OK;
@@ -69,8 +69,8 @@ static int _smf_sbi_message_smf_smContextUpdate(sock_id sock, void *data)
     if (rv != CORE_OK)
     {
         d_error("smf_event_send error");
-	pkbuf_free(pkbuf);
-	return 0;
+        pkbuf_free(pkbuf);
+        return CORE_ERROR;
     }
 
     return CORE_OK;
@@ -95,10 +95,11 @@ static int _smf_sbi_message_smf_smContextRelease(sock_id sock, void *data)
     if (rv != CORE_OK)
     {
         d_error("smf_event_send error");
-	pkbuf_free(pkbuf);
-	return 0;
+	    pkbuf_free(pkbuf);
+	    return CORE_ERROR;
     }
 
+	pkbuf_free(pkbuf);
     return CORE_OK;
 }
 
@@ -121,8 +122,8 @@ static int _smf_sbi_message_smf_smContextRetrieve(sock_id sock, void *data)
     if (rv != CORE_OK)
     {
         d_error("smf_event_send error");
-	pkbuf_free(pkbuf);
-	return 0;
+	    pkbuf_free(pkbuf);
+	    return CORE_ERROR;
     }
 
     return CORE_OK;
@@ -239,6 +240,18 @@ status_t smf_sbi_send_sm_context_retrieve(pkbuf_t *pkbuf)
 
 status_t smf_sbi_server_close()
 {
+
+    smf_sbi_delete(smContextCreateSock);
+    smf_sbi_delete(smContextReleaseSock);
+    smf_sbi_delete(smContextRetrieveSock);
+    smf_sbi_delete(smContextUpdateSock);
     kill(smf_self()->server_pid, SIGINT);
+
     return CORE_OK;
+}
+
+status_t smf_sbi_delete(sock_id sock)
+{
+    d_assert(sock, return CORE_ERROR,);
+    return sock_delete(sock);
 }

@@ -72,6 +72,12 @@ status_t smf_context_final()
     d_assert(context_initialized == 1, return CORE_ERROR,
             "SMF context already has been finalized");
 
+    smf_sess_remove_all();
+
+    d_assert(self.sess_hash, , "Null param");
+    hash_destroy(self.sess_hash);
+
+
     index_final(&smf_sess_pool);
     index_final(&smf_bearer_pool);
 

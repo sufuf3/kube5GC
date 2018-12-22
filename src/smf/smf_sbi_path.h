@@ -14,6 +14,7 @@ extern "C" {
 
 CORE_DECLARE(status_t) smf_sbi_server_open();
 CORE_DECLARE(status_t) smf_sbi_server_close();
+CORE_DECLARE(status_t) smf_sbi_delete(sock_id sock);
 
 CORE_DECLARE(status_t) smf_sbi_send_sm_context_create(pkbuf_t *pkbuf);
 CORE_DECLARE(status_t) smf_sbi_send_sm_context_update(pkbuf_t *pkbuf);

@@ -68,8 +68,8 @@ static int _amf_sbi_message_amf_smContextUpdate(sock_id sock, void *data)
     if (rv != CORE_OK)
     {
         d_error("amf4g_event_send error");
-	pkbuf_free(pkbuf);
-	return 0;
+	    pkbuf_free(pkbuf);
+	    return CORE_ERROR;
     }
 
     return CORE_OK;
@@ -94,8 +94,8 @@ static int _amf_sbi_message_amf_smContextRelease(sock_id sock, void *data)
     if (rv != CORE_OK)
     {
         d_error("amf4g_event_send error");
-	pkbuf_free(pkbuf);
-	return 0;
+	    pkbuf_free(pkbuf);
+	    return CORE_ERROR;
     }
 
     return CORE_OK;
@@ -119,8 +119,8 @@ static int _amf_sbi_message_amf_smContextRetrieve(sock_id sock, void *data)
     if (rv != CORE_OK)
     {
         d_error("amf4g_event_send error");
-	pkbuf_free(pkbuf);
-	return 0;
+	    pkbuf_free(pkbuf);
+	    return CORE_ERROR;
     }
     
     return CORE_OK;
@@ -236,6 +236,18 @@ status_t amf_sbi_send_sm_context_retrieve(pkbuf_t *pkbuf)
 
 status_t amf_sbi_server_close()
 {
+
+    amf_sbi_delete(smContextCreateSock);
+    amf_sbi_delete(smContextReleaseSock);
+    amf_sbi_delete(smContextRetrieveSock);
+    amf_sbi_delete(smContextUpdateSock);
     kill(amf4g_self()->server_pid, SIGINT);
+
     return CORE_OK;
+}
+
+status_t amf_sbi_delete(sock_id sock)
+{
+    d_assert(sock, return CORE_ERROR,);
+    return sock_delete(sock);
 }
