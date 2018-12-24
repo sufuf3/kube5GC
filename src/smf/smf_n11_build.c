@@ -250,10 +250,13 @@ CORE_DECLARE(status_t) smf_n11_build_delete_session_response(
     char *string = NULL;
     cJSON *j_deleteSession = cJSON_CreateObject();
     delete_session_t deleteSession = {0};
-     c_uint32_t length = 0;
-     // IMSI
+    c_uint32_t length = 0;
+    // IMSI
     memcpy(deleteSession.imsi, sess->imsi, sess->imsi_len);
     deleteSession.imsi_len = sess->imsi_len;
+
+    /* EBI */
+    deleteSession.ebi = smf_default_bearer_in_sess(sess)->ebi;
 
     JSONTRANSFORM_StToJs_delete_session_response(&deleteSession, j_deleteSession);
     

@@ -484,6 +484,24 @@ void emm_state_authentication(fsm_t *s, event_t *e)
                     FSM_TRAN(s, &emm_state_de_registered);
                     break;
                 }
+                case NAS_ATTACH_REQUEST:
+                {
+                    if (SESSION_CONTEXT_IS_AVAILABLE(amf4g_ue))
+                    {
+                        d_info("%s %d start", __FUNCTION__, __LINE__);
+                        rv = amf4g_gtp_send_delete_all_sessions(amf4g_ue);
+                        d_assert(rv == CORE_OK,,
+                            "amf4g_gtp_send_delete_all_sessions() failed");
+                        d_info("%s %d end", __FUNCTION__, __LINE__);
+                    }
+                    else
+                    {
+                        d_info("%s %d start", __FUNCTION__, __LINE__);
+                        amf4g_s6a_send_air(amf4g_ue, NULL);
+                        d_info("%s %d end", __FUNCTION__, __LINE__);
+                    }
+                    break;
+                }
                 default:
                 {
                     d_warn("Unknown message[%d]", message->emm.h.message_type);

@@ -767,6 +767,8 @@ void amf_n11_handle_modify_bearer_response( amf4g_ue_t *amf4g_ue, modify_bearer_
     else if (modifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS)
     {
         enb_ue_t* enb_ue = amf4g_ue->enb_ue;
+        d_assert(enb_ue, return, "Null param");
+
         rv = CLEAR_BEARER_CONTEXT(amf4g_ue);
         d_assert(rv == CORE_OK,, "MME_BEARER_SET_INACTIVE failed");
 
@@ -783,23 +785,74 @@ void amf_n11_handle_modify_bearer_response( amf4g_ue_t *amf4g_ue, modify_bearer_
 
 void amf_n11_handle_delete_session_response(amf4g_ue_t *amf4g_ue, delete_session_t *deleteSession)
 {
-     status_t rv;
-    enb_ue_t *enb_ue = NULL;
+    status_t rv;
+    amf4g_sess_t *sess = NULL;
 
     d_assert(amf4g_ue, return, "Null param");
 
-    d_trace(3, "[MME] Release Access Bearers Response\n");
-    enb_ue = amf4g_ue->enb_ue;
-    d_assert(enb_ue, return, "Null param");
+    d_trace(3, "[AMF] Release Access Bearers Response\n");
+    sess = amf4g_sess_find_by_ebi(amf4g_ue, deleteSession->ebi);
+    d_assert(sess, return, "Null param");
 
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
+        if (FSM_CHECK(&amf4g_ue->sm, emm_state_authentication))
+    {
+        if (amf4g_sess_count(amf4g_ue) == 1) /* Last Session */
+        {
+            amf4g_s6a_send_air(amf4g_ue, NULL);
+        }
+    }
+    else if (FSM_CHECK(&amf4g_ue->sm, emm_state_de_registered))
+    {
+        if (amf4g_sess_count(amf4g_ue) == 1) /* Last Session */
+        {
+            rv = nas_send_detach_accept(amf4g_ue);
+            d_assert(rv == CORE_OK,, "nas_send_detach_accept failed");
+        }
+    }
+    else if (FSM_CHECK(&amf4g_ue->sm, emm_state_registered))
+    {
+        amf4g_bearer_t *bearer = amf4g_default_bearer_in_sess(sess);
+        d_assert(bearer, goto cleanup, "Null param");
 
-    rv = CLEAR_BEARER_CONTEXT(amf4g_ue);
-    d_assert(rv == CORE_OK,, "MME_BEARER_SET_INACTIVE failed");
+        if (FSM_CHECK(&bearer->sm, esm_state_pdn_will_disconnect))
+        {
+            rv = nas_send_deactivate_bearer_context_request(bearer);
+            d_assert(rv == CORE_OK,,
+                "nas_send_deactivate_bearer_context_request failed");
+            
+            /*
+             * amf4g_sess_remove() should not be called here.
+             *
+             * Session will be removed if Deactivate bearer context 
+             * accept is received */
+            CLEAR_SGW_S1U_PATH(sess);
+            return;
+        }
+        else
+            d_assert(0,, "Invalid ESM state");
+    }
+    else if (FSM_CHECK(&amf4g_ue->sm, emm_state_initial_context_setup) ||
+             FSM_CHECK(&amf4g_ue->sm, emm_state_exception))
+    {
+        if (amf4g_sess_count(amf4g_ue) == 1) /* Last Session */
+        {
+            enb_ue_t *enb_ue = NULL;
 
-    rv = s1ap_send_ue_context_release_command(enb_ue,
-            S1AP_Cause_PR_nas, S1AP_CauseNas_normal_release,
-            S1AP_UE_CTX_REL_S1_NORMAL_RELEASE, 0);
-    d_assert(rv == CORE_OK,, "s1ap send error");
+            enb_ue = amf4g_ue->enb_ue;
+            d_assert(enb_ue, goto cleanup, );
+
+            rv = s1ap_send_ue_context_release_command(enb_ue,
+                S1AP_Cause_PR_nas, S1AP_CauseNas_normal_release,
+                S1AP_UE_CTX_REL_UE_CONTEXT_REMOVE, 0);
+            d_assert(rv == CORE_OK,, "s1ap send error");
+        }
+    }
+    else
+        d_assert(0,, "Invalid EMM state");
+
+cleanup:
+    if (amf4g_sess_count(amf4g_ue) == 1) /* Last Session */
+        CLEAR_SESSION_CONTEXT(amf4g_ue);
+
+    amf4g_sess_remove(sess);
 }
