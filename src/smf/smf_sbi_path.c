@@ -99,7 +99,6 @@ static int _smf_sbi_message_smf_smContextRelease(sock_id sock, void *data)
 	    return CORE_ERROR;
     }
 
-	pkbuf_free(pkbuf);
     return CORE_OK;
 }
 
