@@ -486,18 +486,18 @@ void emm_state_authentication(fsm_t *s, event_t *e)
                 }
                 case NAS_ATTACH_REQUEST:
                 {
-                    if (SESSION_CONTEXT_IS_AVAILABLE(mme_ue))
+                    if (SESSION_CONTEXT_IS_AVAILABLE(amf4g_ue))
                     {
                         d_info("%s %d start", __FUNCTION__, __LINE__);
-                        rv = mme_gtp_send_delete_all_sessions(mme_ue);
+                        rv = amf4g_gtp_send_delete_all_sessions(amf4g_ue);
                         d_assert(rv == CORE_OK,,
-                            "mme_gtp_send_delete_all_sessions() failed");
+                            "amf4g_gtp_send_delete_all_sessions() failed");
                         d_info("%s %d end", __FUNCTION__, __LINE__);
                     }
                     else
                     {
                         d_info("%s %d start", __FUNCTION__, __LINE__);
-                        mme_s6a_send_air(mme_ue, NULL);
+                        amf4g_s6a_send_air(amf4g_ue, NULL);
                         d_info("%s %d end", __FUNCTION__, __LINE__);
                     }
                     break;
