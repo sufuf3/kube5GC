@@ -1741,7 +1741,6 @@ status_t amf4g_context_setup_trace_module()
     int ngap = context_self()->logger.trace.ngap;
 
 
-    int gtpv2 = context_self()->logger.trace.gtpv2;
     if (app)
     {
         extern int _amf4g_context;
@@ -1802,26 +1801,6 @@ status_t amf4g_context_setup_trace_module()
         d_trace_level(&_fd_init, diameter);
         extern int _fd_logger;
         d_trace_level(&_fd_logger, diameter);
-    }
-
-    if (gtpv2)
-    {
-        extern int _amf4g_s11_handler;
-        d_trace_level(&_amf4g_s11_handler, gtpv2);
-        extern int _amf4g_gtp_path;
-        d_trace_level(&_amf4g_gtp_path, gtpv2);
-
-        extern int _gtp_node;
-        d_trace_level(&_gtp_node, gtpv2);
-        extern int _gtp_message;
-        d_trace_level(&_gtp_message, gtpv2);
-        extern int _gtp_path;
-        d_trace_level(&_gtp_path, gtpv2);
-        extern int _gtp_xact;
-        d_trace_level(&_gtp_xact, gtpv2);
-
-        extern int _tlv_msg;
-        d_trace_level(&_tlv_msg, gtpv2);
     }
 
     if (ngap)

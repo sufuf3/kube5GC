@@ -203,18 +203,16 @@ void smf_state_operational(fsm_t *s, event_t *e)
         {
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
             int msgType = event_get_param2(e);
-            create_session_t createSession = {0};
             smf_sess_t *sess = NULL;
             d_info("N11 message enter");
             switch (msgType)
             {
                 case N11_TYPE_SM_CONTEXT_CREATE:
                 {
-                    d_trace(10, "Create Session OK");
+                    create_session_t createSession = {0};
                     smf_json_handler_create_session(&recvbuf, &createSession);
                     sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
-                    smf_n11_handle_create_session_request_by_JsonCreateSession(sess, &createSession);
-                    d_trace(10, "Create Session Ended");
+                    smf_n11_handle_create_session_request(sess, &createSession);
                     smf_gx_send_ccr(sess, GX_CC_REQUEST_TYPE_INITIAL_REQUEST);
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
                     break;
@@ -222,25 +220,20 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 case N11_TYPE_SM_CONTEXT_UPDATE:
                 {
                     modify_bearer_t modifyBearer = {0};
-                    d_info("smf_json_handler_update_session");
                     smf_json_handler_update_session(&recvbuf, &modifyBearer);
-                    d_info("update smf_sess_find_by_JsonUpdateSession");
                     sess = smf_sess_find_by_JsonUpdateSession(&modifyBearer);
-                    d_info("update smf_n11_handle_update_session_request_by_JsonUpdateSession");
-                    smf_n11_handle_update_session_request_by_JsonUpdateSession(sess, &modifyBearer);
-                    d_info("update Ended");
+                    smf_n11_handle_update_session_request(sess, &modifyBearer);
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
                     break;
                 }
                 case N11_TYPE_SM_CONTEXT_RELEASE:
                 {
-                    d_info("[SMF] Delete Session request");
                     delete_session_t deleteSession= {0};
                     smf_json_handler_delete_session(&recvbuf, &deleteSession);
                     sess = smf_sess_find_by_imsi_apn(deleteSession.imsi, deleteSession.imsi_len, deleteSession.apn);
                     d_assert(sess, goto release_n11_pkbuf, "No Session Context");
 
-                    smf_n11_handle_delete_session_request_by_JsonDeleteSession(sess, &deleteSession);
+                    smf_n11_handle_delete_session_request(sess, &deleteSession);
                     d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
                     smf_gx_send_ccr(sess, GX_CC_REQUEST_TYPE_TERMINATION_REQUEST);
                     break;

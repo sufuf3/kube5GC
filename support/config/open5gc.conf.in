@@ -7,9 +7,9 @@ logger:
         s1ap: 1
         nas: 1
         diameter: 1
-        gtpv2: 1
         gtp: 1
         pfcp: 1
+        sbi: 1
 
 # 
 # parameter:
@@ -345,11 +345,6 @@ pcrf:
 
 smf:
     freeDiameter: pgw.conf
-
-    gtpc:
-      addr: 
-        - 127.0.0.2
-        - ::1
 
     pfcp:
       - addr: 127.0.0.2
