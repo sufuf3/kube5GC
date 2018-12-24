@@ -229,6 +229,8 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 case N11_TYPE_SM_CONTEXT_RELEASE:
                 {
                     delete_session_t deleteSession= {0};
+                    d_trace(3, "[SMF] N11 Context Release\n");
+                    d_warn("%s", recvbuf->payload);
                     smf_json_handler_delete_session(&recvbuf, &deleteSession);
                     sess = smf_sess_find_by_imsi_apn(deleteSession.imsi, deleteSession.imsi_len, deleteSession.apn);
                     d_assert(sess, goto release_n11_pkbuf, "No Session Context");
