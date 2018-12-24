@@ -222,18 +222,35 @@ status_t amf4g_gtp_send_release_access_bearers_request(amf4g_ue_t *amf4g_ue)
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
     return CORE_OK;
 #else
-    amf4g_bearer_t *bearer = NULL;
     pkbuf_t *pkbuf = NULL;
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
-    
+#if 0 
     bearer = amf4g_bearer_find_by_ue_ebi(amf4g_ue, amf4g_ue->ebi);
 
     bearer->enb_s1u_teid = 0;
-    amf_json_build_modify_bearer(&pkbuf, bearer, SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS);
-    // d_info("send sbi sm context update start");
-    amf_sbi_send_sm_context_update(pkbuf);
-    // d_info("send sbi sm context update end");
-    pkbuf_free(pkbuf);
+#else
+    amf4g_sess_t *sess = NULL;
+    d_assert(amf4g_ue, return CORE_ERROR,);
+
+    sess = amf4g_sess_first(amf4g_ue);
+    while(sess)
+    {
+        d_trace(-1, "release_access_bearers_request sess enter\n");
+        amf4g_bearer_t *bearer = amf4g_bearer_first(sess);
+        while(bearer)
+        {
+            d_trace(-1, "release_access_bearers_request bearer enter\n");
+            CLEAR_ENB_S1U_PATH(bearer);
+            amf_json_build_modify_bearer(&pkbuf, bearer, SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS);
+            amf_sbi_send_sm_context_update(pkbuf);
+            pkbuf_free(pkbuf);
+
+            bearer = amf4g_bearer_next(bearer);
+        }
+        sess = amf4g_sess_next(sess);
+        d_trace(-1, "release_access_bearers_request sess exit enter\n");
+    }
+#endif
 
     return CORE_OK;
 #endif
