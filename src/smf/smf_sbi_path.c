@@ -36,8 +36,8 @@ static int _smf_sbi_message_smf_smContextCreate(sock_id sock, void *data)
     event_set(&e, SMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_TYPE_SM_CONTEXT_CREATE);
-    d_trace(-1, "[SMF] Recv SM Context Create\n");
-    d_trace(-1, "Payload: %s\n", pkbuf->payload);
+    d_trace(10, "[SMF] Recv SM Context Create: %s\n", pkbuf->payload);
+    
     rv = smf_event_send(&e);
     if (rv != CORE_OK)
     {
@@ -63,8 +63,8 @@ static int _smf_sbi_message_smf_smContextUpdate(sock_id sock, void *data)
     event_set(&e, SMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_TYPE_SM_CONTEXT_UPDATE);
-    d_trace(-1, "[SMF] Recv SM Context Update\n");
-    d_trace(-1, "Payload: %s\n", pkbuf->payload);
+    d_trace(10, "[SMF] Recv SM Context Update: %s\n", pkbuf->payload);
+
     rv = smf_event_send(&e);
     if (rv != CORE_OK)
     {
@@ -89,8 +89,8 @@ static int _smf_sbi_message_smf_smContextRelease(sock_id sock, void *data)
     event_set(&e, SMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_TYPE_SM_CONTEXT_RELEASE);
-    d_trace(-1, "[SMF] Recv SM Context Release\n");
-    d_trace(-1, "Payload: %s\n", pkbuf->payload);
+    d_trace(10, "[SMF] Recv SM Context Release: %s\n", pkbuf->payload);
+
     rv = smf_event_send(&e);
     if (rv != CORE_OK)
     {
@@ -115,6 +115,8 @@ static int _smf_sbi_message_smf_smContextRetrieve(sock_id sock, void *data)
     event_set(&e, SMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_TYPE_SM_CONTEXT_RETRIEVE);
+    d_trace(10, "[SMF] Recv SM Context Retrieve: %s\n", pkbuf->payload);
+
     rv = smf_event_send(&e);
     if (rv != CORE_OK)
     {

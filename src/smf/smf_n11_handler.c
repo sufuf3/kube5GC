@@ -8,7 +8,7 @@
 
 void smf_n11_handle_create_session_request(smf_sess_t *sess, create_session_t *createSession)
 {
-    d_trace(3, "[SMF] N11 Create Session Reqeust\n");
+    d_trace(3, "[SMF] N11 %s \n", __FUNCTION__);
     if (createSession->ue_pco.length != 0) {
         memcpy(sess->pco_buf, createSession->ue_pco.buffer, createSession->ue_pco.length);
         sess->pco_len = createSession->ue_pco.length;
@@ -19,7 +19,7 @@ void smf_n11_handle_create_session_request(smf_sess_t *sess, create_session_t *c
 
 void smf_n11_handle_update_session_request(smf_sess_t *sess, modify_bearer_t *pModifyBearer)
 {
-    d_trace(3, "[SMF] N11 update Session Reqeust by_JsonUpdateSession\n");
+    d_trace(3, "[SMF] N11 %s \n", __FUNCTION__);
     status_t rv;
     smf_bearer_t *bearer = NULL;
 
@@ -42,4 +42,5 @@ void smf_n11_handle_update_session_request(smf_sess_t *sess, modify_bearer_t *pM
 void smf_n11_handle_delete_session_request(
     smf_sess_t *sess, delete_session_t *pDeleteSession)
 {
+    d_trace(3, "[SMF] N11 %s \n", __FUNCTION__);
 }

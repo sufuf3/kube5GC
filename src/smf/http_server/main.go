@@ -11,8 +11,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -32,7 +30,6 @@ var (
 )
 
 func init() {
-	fmt.Errorf("1111")
 	flag.StringVar(&ip, "ip", "localhost", "ip address of sbi server")
 	flag.UintVar(&port, "port", 8080, "port")
 	flag.StringVar(&certFile, "cert", sysConfigPath+"/"+packageName+"/https/smf.cert", "TLS certificate")
@@ -48,6 +45,6 @@ func main() {
 
 	http2.ConfigureServer(&server, &http2.Server{})
 
-	log.Fatal(server.ListenAndServeTLS(certFile, keyFile))
+	server.ListenAndServeTLS(certFile, keyFile)
 
 }
