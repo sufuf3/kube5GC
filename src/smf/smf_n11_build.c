@@ -1,4 +1,4 @@
-#define TRACE_MODULE _smf_n11
+#define TRACE_MODULE _smf_n11_build
 #include "gtp/gtp_conv.h"
 #include "smf_n11_build.h"
 

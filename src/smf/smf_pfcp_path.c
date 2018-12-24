@@ -51,7 +51,7 @@ static int _smf_pfcp_recv_cb(sock_id sock, void *data)
     {
         d_error("smf_event_send error");
         pkbuf_free(pkbuf);
-        return CORE_OK;
+        return CORE_ERROR;
     }
 
     return CORE_OK;
@@ -132,6 +132,7 @@ status_t smf_pfcp_send_heartbeat_request(pfcp_node_t *pnode)
 
     rv = pfcp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
+	pkbuf_free(pkbuf);
 
     return CORE_OK;
 }
@@ -156,6 +157,7 @@ status_t smf_pfcp_send_association_setup_request(pfcp_node_t *pnode)
 
     rv = pfcp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
+	pkbuf_free(pkbuf);
 
     return CORE_OK;
 }
@@ -182,6 +184,7 @@ status_t smf_pfcp_send_association_update_request(
     rv = pfcp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
+	pkbuf_free(pkbuf);
     return CORE_OK;
 }
 status_t smf_pfcp_send_association_release_request(pfcp_node_t * pnode)
@@ -205,6 +208,7 @@ status_t smf_pfcp_send_association_release_request(pfcp_node_t * pnode)
     rv = pfcp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
+	pkbuf_free(pkbuf);
     return CORE_OK;
 }
 
@@ -229,6 +233,7 @@ status_t smf_pfcp_send_session_establishment_request(smf_sess_t *sess)
     rv = pfcp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
+	pkbuf_free(pkbuf);
     return CORE_OK;
 }
 
@@ -253,6 +258,7 @@ status_t smf_pfcp_send_session_modification_request(smf_sess_t *sess)
     rv = pfcp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
+	pkbuf_free(pkbuf);
     return CORE_OK;
 }
 
@@ -277,5 +283,6 @@ status_t smf_pfcp_send_session_deletion_request(smf_sess_t *sess)
     rv = pfcp_xact_commit(xact);
     d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
 
+	pkbuf_free(pkbuf);
     return CORE_OK;
 }

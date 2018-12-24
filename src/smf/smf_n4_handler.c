@@ -42,6 +42,8 @@ void smf_n4_handle_heartbeat_request(
     
     rv = pfcp_xact_commit(xact);
     d_assert(rv == CORE_OK, return, "xact_commit error");
+	pkbuf_free(pkbuf);
+
 }
 
 void smf_n4_handle_heartbeat_response(
@@ -220,6 +222,8 @@ void smf_n4_handle_session_establishment_response(
         smf_n11_build_create_session_response(&pkbuf, sess);
         smf_sbi_send_sm_context_create(pkbuf);
     }
+    pkbuf_free(pkbuf);
+
 }
 
 void smf_n4_handle_session_modification_response(
@@ -230,6 +234,8 @@ void smf_n4_handle_session_modification_response(
     pkbuf_t *pkbuf = NULL;
     smf_n11_build_update_session_response(&pkbuf, sess);
     smf_sbi_send_sm_context_update(pkbuf);
+    pkbuf_free(pkbuf);
+
 }
 
 void smf_n4_handle_session_deletion_response(
@@ -253,6 +259,7 @@ void smf_n4_handle_session_deletion_response(
         pkbuf_t *pkbuf = NULL;
         smf_n11_build_delete_session_response(&pkbuf, sess);
         smf_sbi_send_sm_context_release(pkbuf);
+        pkbuf_free(pkbuf);
         /* Remove a smf session */
         smf_sess_remove(sess);
     }

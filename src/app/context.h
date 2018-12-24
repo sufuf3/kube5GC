@@ -45,6 +45,7 @@ typedef struct _context_t {
             int pfcp;
             int diameter;
             int ngap;
+            int sbi;
         } trace;
     } logger;
 
