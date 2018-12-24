@@ -806,7 +806,10 @@ status_t JSONTRANSFORM_JsToSt_delete_session_request(delete_session_t *sess, cJS
     _add_apn_to_struct(pJson, sess->apn);
 
     /* EBI */
-    _add_ebi_to_struct(pJson, &sess->ebi);
+    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
+    int tmpData = 0;
+    tmpData = atoi(j_ebi->valuestring);
+    sess->ebi = tmpData;
 
     return CORE_OK;
 }
@@ -834,7 +837,11 @@ status_t JSONTRANSFORM_JsToSt_delete_session_response(delete_session_t *sess, cJ
     _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
 
     /* EBI */  
-    _add_ebi_to_struct(pJson, &sess->ebi);
+    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
+    int tmpData = 0;
+    tmpData = atoi(j_ebi->valuestring);
+    sess->ebi = tmpData;
+
     return CORE_OK;
 }
 
