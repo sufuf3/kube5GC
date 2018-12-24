@@ -694,6 +694,7 @@ status_t smf_context_setup_trace_module()
 {
     int app = context_self()->logger.trace.app;
     int pfcp = context_self()->logger.trace.pfcp;
+    int sbi = context_self()->logger.trace.sbi;
 
     if (app)
     {
@@ -717,6 +718,17 @@ status_t smf_context_setup_trace_module()
         d_trace_level(&_smf_n4_handler, pfcp);
         extern int _smf_n4_build;
         d_trace_level(&_smf_n4_build, pfcp);
+    }
+    if (sbi)
+    {
+        extern int _json_tranform;
+        d_trace_level(&_json_tranform, sbi);
+        extern int _smf_sbi_path;
+        d_trace_level(&_smf_sbi_path, sbi);
+        extern int _smf_n11_handler;
+        d_trace_level(&_smf_n11_handler, sbi);
+        extern int _smf_n11_build;
+        d_trace_level(&_smf_n11_build, sbi);
     }
     return CORE_OK;
 }
@@ -747,8 +759,6 @@ smf_sess_t* smf_sess_add(
     sess->imsi_len = imsi_len;
     memcpy(sess->imsi, imsi, sess->imsi_len);
     core_buffer_to_bcd(sess->imsi, sess->imsi_len, sess->imsi_bcd);
-    d_info("sess IMSI: %s", sess->imsi_bcd);
-    // d_print_hex(sess->imsi_bcd, strlen(sess->imsi_bcd));
 
     /* Set APN */
     core_cpystrn(sess->pdn.apn, apn, MAX_APN_LEN + 1);
@@ -767,7 +777,6 @@ smf_sess_t* smf_sess_add(
         d_assert(sess->ipv4, smf_sess_remove(sess); return NULL, 
                 "Can't allocate IPv4 Pool");
         sess->pdn.paa.addr = sess->ipv4->addr[0];
-        // d_print_hex(&sess->pdn.paa.addr, 4);
     }
     else if (pdn_type == GTP_PDN_TYPE_IPV6)
     {
@@ -779,21 +788,16 @@ smf_sess_t* smf_sess_add(
         d_assert(subnet6, smf_sess_remove(sess); return NULL, 
                 "No IPv6 subnet");
         sess->pdn.paa.len = subnet6->prefixlen;
-        // d_trace(10, "Prefix Len: %d", subnet6->prefixlen);
-        // d_print_hex(sess->ipv6->addr, 16);
         memcpy(sess->pdn.paa.addr6, sess->ipv6->addr, IPV6_LEN);
-        // d_print_hex(&sess->pdn.paa.addr6, 16);
     }
     else if (pdn_type == GTP_PDN_TYPE_IPV4V6)
     {
         sess->ipv4 = smf_ue_ip_alloc(AF_INET, apn);
         d_assert(sess->ipv4, smf_sess_remove(sess); return NULL, 
                 "Can't allocate IPv4 Pool");
-        // d_print_hex(sess->ipv4->addr, 4);
         sess->ipv6 = smf_ue_ip_alloc(AF_INET6, apn);
         d_assert(sess->ipv6, smf_sess_remove(sess); return NULL, 
                 "Can't allocate IPv6 Pool");
-        // d_print_hex(sess->ipv6->addr, 16);
 
         subnet6 = sess->ipv6->subnet;
         d_assert(subnet6, smf_sess_remove(sess); return NULL, 
@@ -802,8 +806,6 @@ smf_sess_t* smf_sess_add(
         sess->pdn.paa.both.addr = sess->ipv4->addr[0];
         sess->pdn.paa.both.len = subnet6->prefixlen;
         memcpy(sess->pdn.paa.both.addr6, sess->ipv6->addr, IPV6_LEN);
-        // d_print_hex(&sess->pdn.paa.both.addr, 4);
-        // d_print_hex(&sess->pdn.paa.both.addr6, 16);
     }
     else
         d_assert(0, return NULL, "Unsupported PDN Type(%d)", pdn_type);
@@ -1408,7 +1410,7 @@ smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(create_session_t *createSe
         d_error("No IMSI");
         return NULL;
     }
-    // apn_parse(apn, req->access_point_name.data, req->access_point_name.len);
+
     if (createSession->apn != NULL) {
         memcpy(apn, createSession->apn, strlen(createSession->apn));
     }
@@ -1419,29 +1421,7 @@ smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(create_session_t *createSe
         
     d_trace(9, "smf_sess_add_by_message() [APN:%s, PDN:%d, EDI:%d]\n",
              apn, createSession->pdn.pdn_type, createSession->ebi);
-    
-#if 0 // dummy 
-    d_trace(10, "APN");
-    // d_print_hex(apn, strlen(apn));
 
-    d_trace(10, "IMSI BCD");
-    // d_print_hex(createSession->imsi_bcd, strlen(createSession->imsi_bcd));
-    d_trace(10, "IMSI BCD");
-    // d_print_hex(createSession->imsi_bcd, strlen(createSession->imsi_bcd));
-    d_trace(10, "IMSI LEN: %d ", imsi_len);
-
-    // memcpy(imsi, "\x20\x9A\xFA\xD4\x29\x7F\x00\x00", 8);
-    // memcpy(apn, "\x69\x6E\x74\x65\x72\x6E\x65\x74", 9);
-
-    sess = smf_sess_find_by_imsi_apn(imsi, 8, apn);
-    if (!sess)
-    {
-        sess = smf_sess_add(imsi, 8, apn,
-            3,
-            5);
-        d_assert(sess, return NULL, "No Session Context");
-    }
-#else
     sess = smf_sess_find_by_imsi_apn(createSession->imsi, createSession->imsi_len, apn);
     if (!sess)
     {
@@ -1451,7 +1431,6 @@ smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(create_session_t *createSe
             createSession->ebi);
         d_assert(sess, return NULL, "No Session Context");
     }
-#endif
     return sess;
 }
 
@@ -1463,7 +1442,6 @@ smf_sess_t *smf_sess_find_by_JsonUpdateSession(modify_bearer_t *pModifyBearer)
         d_error("No IMSI");
         return NULL;
     }
-    // apn_parse(apn, req->access_point_name.data, req->access_point_name.len);
     if (pModifyBearer->apn != NULL) {
         memcpy(apn, pModifyBearer->apn, strlen(pModifyBearer->apn));
     }
@@ -1471,35 +1449,11 @@ smf_sess_t *smf_sess_find_by_JsonUpdateSession(modify_bearer_t *pModifyBearer)
         d_error("No APN");
         return NULL;
     }
-          
 
-#if 0 // dummy 
-    d_trace(10, "APN");
-    // d_print_hex(apn, strlen(apn));
-
-    d_trace(10, "IMSI BCD");
-    // d_print_hex(createSession->imsi_bcd, strlen(createSession->imsi_bcd));
-    d_trace(10, "IMSI BCD");
-    // d_print_hex(createSession->imsi_bcd, strlen(createSession->imsi_bcd));
-    d_trace(10, "IMSI LEN: %d ", imsi_len);
-
-    // memcpy(imsi, "\x20\x9A\xFA\xD4\x29\x7F\x00\x00", 8);
-    // memcpy(apn, "\x69\x6E\x74\x65\x72\x6E\x65\x74", 9);
-
-    sess = smf_sess_find_by_imsi_apn(imsi, 8, apn);
-    if (!sess)
-    {
-        sess = smf_sess_add(imsi, 8, apn,
-            3,
-            5);
-        d_assert(sess, return NULL, "No Session Context");
-    }
-#else
     sess = smf_sess_find_by_imsi_apn(pModifyBearer->imsi, pModifyBearer->imsi_len, apn);
     if (!sess)
     {
         d_assert(sess, return NULL, "No Session Context");
     }
-#endif
     return sess;
 }
