@@ -2499,6 +2499,7 @@ amf4g_ue_t* amf4g_ue_add(enb_ue_t *enb_ue)
     list_init(&amf4g_ue->sess_list);
 
     amf4g_ue->amf4g_s11_teid = amf4g_ue->index;
+    amf4g_ue->sgw_s11_teid = 0;
 
     /*
      * SCTP output stream identification
