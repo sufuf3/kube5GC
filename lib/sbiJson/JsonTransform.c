@@ -7,10 +7,6 @@
 #include "string.h"
 #include <arpa/inet.h>
 
-#define JSON_DEBUG 0
-
-int _json = 10;
-
 void plmn_id_to_buffer(plmn_id_t plmn_id, char* mcc, char* mnc){
     bzero(mcc, 4);
     bzero(mnc, 4);
@@ -191,113 +187,108 @@ void add_m_bearer_ctx_to_json(cJSON* json_key, c_uint8_t ebi, ip_t ip, c_uint32_
 
 status_t JSONTRANSFORM_StToJs_create_session_request(create_session_t *sess, cJSON *pJson)
 {
-    d_assert(sess, return CORE_ERROR, "Null param");
-    d_assert(pJson, return CORE_ERROR, "Null param");
-
-    /* imsi */
-#if JSON_DEBUG
-    d_info("%d %s \n", __LINE__, __FUNCTION__);
-#endif
     char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
-    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
-    /* user location information */
-    add_uli_to_json(pJson, sess->tai, sess->e_cgi);
+    char conv[1000] = {0};
 
-    /* serving network */
-#if JSON_DEBUG
-    d_info("%d %s \n", __LINE__, __FUNCTION__);
-#endif
-    add_servingnw_to_json(pJson, sess->visited_plmn_id);
+    d_trace(10, "JSONTRANSFORM_StToJs_create_session_request (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(sess, return CORE_ERROR, "Null param");
+        d_assert(pJson, return CORE_ERROR, "Null param");
 
-    /* radio access technology */
-#if JSON_DEBUG
-    d_info("%d %s \n", __LINE__, __FUNCTION__);
-#endif
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_RATTYPE, RATTYPE_EUTRA);
+        /* imsi */
+        d_trace(15, "\tBuild IMSI\n");
+        core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
 
-    /* protocol_configuration_options(nas) */
-    if (sess->ue_pco.length && sess->ue_pco.buffer)
-    {
-        char conv[1000] = {0};
-#if JSON_DEBUG
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
-#endif
-        core_hex_to_ascii_no_space(sess->ue_pco.buffer, sess->ue_pco.length, conv, sizeof(conv));
-        d_info(conv);
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, conv);
-    }
-    
-    /* APN */
-#if JSON_DEBUG
-    d_info("%d %s \n", __LINE__, __FUNCTION__);
-#endif
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
+        /* user location information */
+        d_trace(15, "\tBuild ULI\n");
+        add_uli_to_json(pJson, sess->tai, sess->e_cgi);
 
-    /* packet data network */
-    // d_info("sess->pdn_type :%d\n", sess->pdn_type);
-#if JSON_DEBUG
-    d_info("%d %s \n", __LINE__, __FUNCTION__);
-#endif
-    add_pdn_to_json(pJson , &sess->pdn);
-    
-    /* create bearer contexts */
-#if JSON_DEBUG
-    d_info("%d %s \n", __LINE__, __FUNCTION__);
-#endif
-    add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
-    // cJSON *j_bearer = cJSON_AddObjectToObject(session, "bearer_contexts");
-    // cJSON *j_bearer_qos = cJSON_AddObjectToObject(j_bearer, "bearer_qos");
-    // cJSON_AddNumberToObject(j_bearer, "ebi", bearer->ebi);
-    // cJSON_AddNumberToObject(j_bearer_qos, "qci", pdn->qos.qci); //QoS class identifier
-    // cJSON_AddNumberToObject(j_bearer_qos, "priority", pdn->qos.arp.priority_level); //priority level
-    // cJSON_AddNumberToObject(j_bearer_qos, "pec", pdn->qos.arp.pre_emption_capability); //pre emption capability
-    // cJSON_AddNumberToObject(j_bearer_qos, "pev", pdn->qos.arp.pre_emption_vulnerability); //pre emption vulnerability
+        /* serving network */
+        d_trace(15, "\tBuild ServingNetwork\n");
+        add_servingnw_to_json(pJson, sess->visited_plmn_id);
 
-    /*TODO : ue timezone*/
+        /* radio access technology */
+        d_trace(15, "\tBuild RAT\n");
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_RATTYPE, RATTYPE_EUTRA);
 
-    /* gummei */
-#if JSON_DEBUG
-    d_info("%d %s \n", __LINE__, __FUNCTION__);
-#endif
-    add_gummei_to_json(pJson, sess->guti);
-    
+        /* protocol_configuration_options(nas) */
+        d_trace(15, "\tBuild PCO\n");
+        if (sess->ue_pco.length && sess->ue_pco.buffer)
+        {
+            core_hex_to_ascii_no_space(sess->ue_pco.buffer, sess->ue_pco.length, conv, sizeof(conv));
+            d_info(conv);
+            cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, conv);
+        }
+        
+        /* APN */
+        d_trace(15, "\tBuild APN\n");
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
+
+        /* packet data network */
+        d_trace(15, "\tBuild PDN\n");
+        add_pdn_to_json(pJson , &sess->pdn);
+        
+        /* create bearer contexts */
+        d_trace(15, "\tBuild Create Bearer Contexts\n");
+        add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
+
+        /*TODO : ue timezone*/
+
+        /* gummei */
+        d_trace(15, "\tBuild GUMMEI\n");
+        add_gummei_to_json(pJson, sess->guti);
+    } while(0);
+
     return CORE_OK;
 }
 
 status_t JSONTRANSFORM_StToJs_modify_bearer_request(modify_bearer_t *sess, cJSON *pJson)
 {
-    d_assert(sess, return CORE_ERROR, "Null param");
-    d_assert(pJson, return CORE_ERROR, "Null param");
-
-    /* sm_context_update_type */
-    add_uint8_to_json(pJson, sess->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
-
-    /* imsi */
     char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
-    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
-    
-    /* uli */
-    if(sess->uli_presence)
-        add_uli_to_json(pJson, sess->tai, sess->e_cgi);
-    /* uli presence */
-    add_uint8_to_json(pJson, sess->uli_presence, JSONKEY_4G_ULI_PRESENCE);
 
-    /* serving network */
-    add_servingnw_to_json(pJson, sess->visited_plmn_id);
+    d_trace(10, "JSONTRANSFORM_StToJs_modify_bearer_request (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(sess, return CORE_ERROR, "Null param");
+        d_assert(pJson, return CORE_ERROR, "Null param");
 
-    /* gummei */
-    add_gummei_to_json(pJson, sess->guti);
+        /* sm_context_update_type */
+        add_uint8_to_json(pJson, sess->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
 
-    /* radio access technology */
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_RATTYPE, RATTYPE_EUTRA);
+        /* imsi */
+        d_trace(15, "\tBuild IMSI\n");
+        core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
+        
+        /* uli */
+        d_trace(15, "\tBuild ULI\n");
+        if(sess->uli_presence)
+            add_uli_to_json(pJson, sess->tai, sess->e_cgi);
+        
+        /* uli presence */
+        d_trace(15, "\tBuild ULI PRESENCE\n");
+        add_uint8_to_json(pJson, sess->uli_presence, JSONKEY_4G_ULI_PRESENCE);
 
-    /* modified bearer context */
-    add_m_bearer_ctx_to_json(pJson, sess->ebi, sess->enb_s1u_ip, sess->enb_s1u_teid);
+        /* serving network */
+        d_trace(15, "\tBuild ServingNetwork\n");
+        add_servingnw_to_json(pJson, sess->visited_plmn_id);
 
-    /* apn */
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
+        /* gummei */
+        d_trace(15, "\tBuild GUMMEI\n");
+        add_gummei_to_json(pJson, sess->guti);
+
+        /* radio access technology */
+        d_trace(15, "\tBuild RAT\n");
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_RATTYPE, RATTYPE_EUTRA);
+
+        /* modified bearer context */
+        d_trace(15, "\tBuild Modify Bearer Context\n");
+        add_m_bearer_ctx_to_json(pJson, sess->ebi, sess->enb_s1u_ip, sess->enb_s1u_teid);
+
+        /* apn */
+        d_trace(15, "\tBuild APN\n");
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
+    } while(0);
     
     return CORE_OK;
 }
@@ -340,6 +331,7 @@ void conv_json_to_plmnid(cJSON* json_key, plmn_id_t* ptr_plmnid,char* key){
 
 void _add_imsi_to_struct(cJSON* json_key, c_uint8_t *pImsi, c_int32_t *imsi_len) {
     cJSON *j_imsi = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_IMSI);
+    if (j_imsi ==NULL)
     d_info("_add_imsi_to_struct: %s", j_imsi->valuestring);
     core_bcd_to_buffer(j_imsi->valuestring, pImsi, imsi_len);
 #if 0
@@ -492,47 +484,52 @@ void _add_pdn_to_struct(cJSON *json_key, pdn_t *pdn) {
     guti->mme_code = atoi(gummei_mmecode->valuestring);
  }
 
-
 status_t JSONTRANSFORM_JsToSt_create_session_request(create_session_t *sess, cJSON *pJson)
 {
-    /* imsi */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
-    
-    /* user location information */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_uld_to_struct(pJson, sess);
-    
-    // /* serving network */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_serving_network_to_struct(pJson, &sess->visited_plmn_id);
+    d_trace(10, "JSONTRANSFORM_JsToSt_create_session_request\n");
+    do {
+        d_assert(sess, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
 
-    /* radio access technology */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_radio_type_to_struct(pJson, sess->rat_type);
+        /* imsi */
+        d_trace(15, "\tParse IMSI\n");
+        _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
+        
+        /* user location information */
+        d_trace(15, "\tParse ULI\n");
+        _add_uld_to_struct(pJson, sess);
+        
+        /* serving network */
+        d_trace(15, "\tParse ServingNetwork\n");
+        _add_serving_network_to_struct(pJson, &sess->visited_plmn_id);
 
-    /* protocol_configuration_options(nas) */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_pco_to_struct(pJson, &sess->ue_pco);
-    
-    /* APN */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_apn_to_struct(pJson, sess->apn);
+        /* radio access technology */
+        d_trace(15, "\tParse RAT\n");
+        _add_radio_type_to_struct(pJson, sess->rat_type);
 
-    /* packet data network */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_pdn_to_struct(pJson, &sess->pdn);
+        /* protocol_configuration_options(nas) */
+        d_trace(15, "\tParse PCO\n");
+        _add_pco_to_struct(pJson, &sess->ue_pco);
+        
+        /* APN */
+        d_trace(15, "\tParse APN\n");
+        _add_apn_to_struct(pJson, sess->apn);
 
-    /* ebi */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    c_int16_t ebi;
-    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
-    ebi = atoi(j_ebi->valuestring);
-    sess->ebi = ebi;
+        /* packet data network */
+        d_trace(15, "\tParse PDN\n");
+        _add_pdn_to_struct(pJson, &sess->pdn);
 
-    /* gummei */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_gummei_to_struct(pJson, &sess->guti);
+        /* ebi */
+        d_trace(15, "\tParse EBI\n");
+        c_int16_t ebi;
+        cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
+        ebi = atoi(j_ebi->valuestring);
+        sess->ebi = ebi;
+
+        /* gummei */
+        d_trace(15, "\tParse GUMMEI\n");
+        _add_gummei_to_struct(pJson, &sess->guti);
+    } while(0);
 
     return CORE_OK;
 }
@@ -569,7 +566,6 @@ void _add_json_to_struct_ui32_by_key(cJSON* json_key, c_uint32_t *ui32value, con
     int tmpData = 0;
     tmpData = atoi(j_sub_data->valuestring);
     *ui32value = tmpData;
-     
  }
 
 void _add_ipt_to_struct(cJSON* json_key, ip_t *pIP)
@@ -611,37 +607,55 @@ void _add_enb_s1u_teid(cJSON *json_key, c_uint32_t *teid)
 
 status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBearer, cJSON *pJson)
 {
-    /* sm_context_update_type */
-    _add_json_to_struct_ui8_by_key(pJson, &pModifyBearer->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
+    d_trace(10, "JSONTRANSFORM_JsToSt_modify_bearer_request (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(pModifyBearer, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
 
-    /* imsi */
-    _add_imsi_to_struct(pJson, pModifyBearer->imsi, &pModifyBearer->imsi_len);
-    
-    // c_uint8_t       uli_presence;
-    _add_json_to_struct_ui8_by_key(pJson, &pModifyBearer->uli_presence, JSONKEY_4G_ULI_PRESENCE);
+        /* sm_context_update_type */
+        d_trace(15, "\tParse sm_context_update_type\n");
+        _add_json_to_struct_ui8_by_key(pJson, &pModifyBearer->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
 
-    /* user location information */
-    _add_uld_to_modfiy_bearer_struct(pJson, pModifyBearer);  
-    
-    // /* serving network */
-    _add_serving_network_to_struct(pJson, &pModifyBearer->visited_plmn_id);
+        /* imsi */
+        d_trace(15, "\tParse IMSI\n");
+        _add_imsi_to_struct(pJson, pModifyBearer->imsi, &pModifyBearer->imsi_len);
+        
+        // c_uint8_t       uli_presence;
+        d_trace(15, "\tParse ULI_PRESENCE\n");
+        _add_json_to_struct_ui8_by_key(pJson, &pModifyBearer->uli_presence, JSONKEY_4G_ULI_PRESENCE);
 
-    /* radio access technology */
-    _add_radio_type_to_struct(pJson, pModifyBearer->rat_type);
+        /* user location information */
+        d_trace(15, "\tParse ULI\n");
+        _add_uld_to_modfiy_bearer_struct(pJson, pModifyBearer);  
+        
+        /* serving network */
+        d_trace(15, "\tParse ServingNetwork\n");
+        _add_serving_network_to_struct(pJson, &pModifyBearer->visited_plmn_id);
 
-    /* ebi */
-    _add_ebi_to_struct(pJson, &pModifyBearer->ebi);
-    
-    /* gummei */
-    _add_gummei_to_struct(pJson, &pModifyBearer->guti);
+        /* radio access technology */
+        d_trace(15, "\tParse RAT\n");
+        _add_radio_type_to_struct(pJson, pModifyBearer->rat_type);
 
-    // ip_t            enb_s1u_ip;
-    _add_ipt_to_struct(pJson, &pModifyBearer->enb_s1u_ip);
-    // c_uint32_t      enb_s1u_teid;
-    _add_enb_s1u_teid(pJson, &pModifyBearer->enb_s1u_teid);
-    
-    /* APN */
-    _add_apn_to_struct(pJson, pModifyBearer->apn);
+        /* ebi */
+        d_trace(15, "\tParse EBI\n");
+        _add_ebi_to_struct(pJson, &pModifyBearer->ebi);
+
+        /* gummei */
+        d_trace(15, "\tParse GUMMEI\n");
+        _add_gummei_to_struct(pJson, &pModifyBearer->guti);
+
+        // ip_t            enb_s1u_ip;
+        d_trace(15, "\tParse eNB_S1U_IP\n");
+        _add_ipt_to_struct(pJson, &pModifyBearer->enb_s1u_ip);
+
+        // c_uint32_t      enb_s1u_teid;
+        d_trace(15, "\tParse eNB_S1U_TEID\n");
+        _add_enb_s1u_teid(pJson, &pModifyBearer->enb_s1u_teid);
+
+        /* APN */
+        d_trace(15, "\tParse APN\n");
+        _add_apn_to_struct(pJson, pModifyBearer->apn);
+    } while(0);
     
     return CORE_OK;
 }
@@ -680,31 +694,47 @@ void _add_sgw_ipt_to_struct(cJSON* json_key, ip_t *pIP)
 
 status_t JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJSON *pJson)
 {
-    /* imsi */
-    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
-
-    /* sgw_s1u_teid */
-    _add_json_to_struct_ui32_by_key(pJson, &sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
-
-    /* protocol_configuration_options(nas) */
-    _add_pco_to_struct(pJson, &sess->ue_pco);
+    d_trace(10, "JSONTRANSFORM_JsToSt_create_session_response (%s:%d)\n", __FILE__, __LINE__);
     
-    /* APN */
-    _add_apn_to_struct(pJson, sess->apn);
+    do {
+        d_assert(sess, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
 
-    /* packet data network */
-    _add_pdn_to_struct(pJson, &sess->pdn);
+        /* imsi */
+        d_trace(15, "\tParse IMSI\n");
+        _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
 
-    /* ebi */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    c_int16_t ebi;
-    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
-    ebi = atoi(j_ebi->valuestring);
-    sess->ebi = ebi;
+        /* sgw_s1u_teid */
+        d_trace(15, "\tParse SGW_S1U_TEID\n");
+        _add_json_to_struct_ui32_by_key(pJson, &sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
 
-    /* sgw_ip */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_sgw_ipt_to_struct(pJson, &sess->sgw_ip);
+        /* protocol_configuration_options(nas) */
+        d_trace(15, "\tParse PCO\n");
+        _add_pco_to_struct(pJson, &sess->ue_pco);
+
+        /* APN */
+        d_trace(15, "\tParse APN\n");
+        _add_apn_to_struct(pJson, sess->apn);
+
+        /* APN */
+        d_trace(15, "\tParse APN\n");
+        _add_apn_to_struct(pJson, sess->apn);
+
+        /* packet data network */
+        d_trace(15, "\tParse PDN\n");
+        _add_pdn_to_struct(pJson, &sess->pdn);
+
+        /* ebi */
+        d_trace(15, "\tParse EBI\n");
+        c_int16_t ebi;
+        cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
+        ebi = atoi(j_ebi->valuestring);
+        sess->ebi = ebi;
+
+        /* sgw_ip */
+        d_trace(15, "\tParse SGW_IP\n");
+        _add_sgw_ipt_to_struct(pJson, &sess->sgw_ip);
+    } while(0);
     
     return CORE_OK;
 }
@@ -713,72 +743,80 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
 {
     char ip4_buf[INET6_ADDRSTRLEN];
     char ip6_buf[INET6_ADDRSTRLEN];
-    /* imsi */
-    char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
-    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
 
-    /* ebi */
-    add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
+    d_trace(10, "JSONTRANSFORM_StToJs_create_session_response (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(sess, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
 
-    /* sgw_s1u_teid */
-    add_uint32_to_json(pJson, sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
-    
-    /* PCO */
-    if (sess->ue_pco.length && sess->ue_pco.buffer)
-    {
-        char conv[1000] = {0};
-#if JSON_DEBUG
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
-#endif
-        d_info("PCO length: %d", sess->ue_pco.length);
-        d_print_hex(sess->ue_pco.buffer, sess->ue_pco.length);
-        core_hex_to_ascii_no_space(sess->ue_pco.buffer, sess->ue_pco.length, conv, sizeof(conv));
-        d_info("PCO: %s", conv);
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, conv);
-    }
+        /* imsi */
+        d_trace(15, "\tBuild IMSI\n");
+        char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
+        core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
 
-    /* sgw_s1u_ip */
-    if(sess->sgw_ip.ipv4 && sess->sgw_ip.ipv6){
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
-        INET_NTOP(&sess->sgw_ip.both.addr, ip4_buf);
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
-        INET6_NTOP(&sess->sgw_ip.both.addr6, ip6_buf);
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
-    }
-    else if(sess->sgw_ip.ipv4){
-        INET_NTOP(&sess->sgw_ip.addr, ip4_buf);
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
-    }
-    else if(sess->sgw_ip.ipv6){
-        INET6_NTOP(&sess->sgw_ip.addr6, ip6_buf);
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
-        cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
-    }
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
+        /* ebi */
+        d_trace(15, "\tBuild EBI\n");
+        add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
 
-    /* APN */
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
+        /* sgw_s1u_teid */
+        d_trace(15, "\tBuild SGW_S1U_TEID\n");
+        add_uint32_to_json(pJson, sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
+        
+        /* PCO */
+        d_trace(15, "\tBuild PCO\n");
+        if (sess->ue_pco.length && sess->ue_pco.buffer)
+        {
+            char conv[1000] = {0};
+            d_print_hex(sess->ue_pco.buffer, sess->ue_pco.length);
+            core_hex_to_ascii_no_space(sess->ue_pco.buffer, sess->ue_pco.length, conv, sizeof(conv));
+            cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, conv);
+        }
 
-    /* PDN Address Allocation */
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
-    add_pdn_to_json(pJson , &sess->pdn);
-    
-        d_info("%d %s \n", __LINE__, __FUNCTION__);
+        /* sgw_s1u_ip */
+        d_trace(15, "\tBuild SGW_S1U_IP\n");
+        if(sess->sgw_ip.ipv4 && sess->sgw_ip.ipv6){
+            INET_NTOP(&sess->sgw_ip.both.addr, ip4_buf);
+            INET6_NTOP(&sess->sgw_ip.both.addr6, ip6_buf);
+            cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
+            cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
+        }
+        else if(sess->sgw_ip.ipv4){
+            INET_NTOP(&sess->sgw_ip.addr, ip4_buf);
+            cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
+        }
+        else if(sess->sgw_ip.ipv6){
+            INET6_NTOP(&sess->sgw_ip.addr6, ip6_buf);
+            cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
+        }
+
+        /* APN */
+        d_trace(15, "\tBuild APN\n");
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
+
+        /* PDN Address Allocation */
+        d_trace(15, "\tBuild PAA\n");
+        add_pdn_to_json(pJson , &sess->pdn);
+    } while(0);
+
     return CORE_OK;
 }
          
 status_t JSONTRANSFORM_JsToSt_update_session_response(modify_bearer_t *sess, cJSON *pJson)
 {
-    /* sm_context_update_type */
-    _add_json_to_struct_ui8_by_key(pJson, &sess->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
+    d_trace(10, "JSONTRANSFORM_JsToSt_update_session_response (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(sess, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
 
-    /* imsi */
-    d_info("%s:%d(%s)", __FILE__, __LINE__, __FUNCTION__);
-    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
+        /* sm_context_update_type */
+        d_trace(15, "\tParse sm_context_update_type\n");
+        _add_json_to_struct_ui8_by_key(pJson, &sess->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
+
+        /* imsi */
+        d_trace(15, "\tParse IMSI\n");
+        _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
+    } while(0);
 
     return CORE_OK;
 }
@@ -786,31 +824,47 @@ status_t JSONTRANSFORM_JsToSt_update_session_response(modify_bearer_t *sess, cJS
 
 status_t JSONTRANSFORM_StToJs_update_session_response(modify_bearer_t *sess, cJSON *pJson)
 {
-    /* sm_context_update_type */
-    add_uint8_to_json(pJson, sess->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
-    
-    /* imsi */
-    char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
-    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
+    d_trace(10, "JSONTRANSFORM_StToJs_update_session_response (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(sess, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
+
+        /* sm_context_update_type */
+        d_trace(15, "\tBuild sm_context_update_type\n");
+        add_uint8_to_json(pJson, sess->sm_context_update_type, JSONKEY_5G_SM_CONTEXT_UPDATE_TYPE);
+        
+        /* imsi */
+        d_trace(15, "\tBuild IMSI\n");
+        char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
+        core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
+    } while(0);
 
     return CORE_OK;
 }
 
 status_t JSONTRANSFORM_JsToSt_delete_session_request(delete_session_t *sess, cJSON *pJson)
 {
-    /* imsi */
-    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
+    d_trace(10, "JSONTRANSFORM_JsToSt_delete_session_request (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(sess, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
 
-    /* apn */
-    _add_apn_to_struct(pJson, sess->apn);
+        /* imsi */
+        d_trace(15, "\tParse IMSI\n");
+        _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
 
-    /* EBI */
-    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
-    int tmpData = 0;
-    tmpData = atoi(j_ebi->valuestring);
-    sess->ebi = tmpData;
+        /* apn */
+        d_trace(15, "\tParse APN\n");
+        _add_apn_to_struct(pJson, sess->apn);
 
+        /* EBI */
+        d_trace(15, "\tParse EBI\n");
+        cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
+        int tmpData = 0;
+        tmpData = atoi(j_ebi->valuestring);
+        sess->ebi = tmpData;
+    } while(0);
     return CORE_OK;
 }
 
@@ -818,29 +872,46 @@ status_t JSONTRANSFORM_StToJs_delete_session_request(delete_session_t *sess, cJS
 {
     char imsi_bcd[MAX_IMSI_BCD_LEN+1] = {0};
 
-    /* imsi */
-    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
+    d_trace(10, "JSONTRANSFORM_StToJs_delete_session_request (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(sess, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
 
-    /* apn */
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
+        /* imsi */
+        d_trace(15, "\tBuild IMSI\n");
+        core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
 
-    /* EBI */
-    add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
+        /* apn */
+        d_trace(15, "\tBuild APN\n");
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_APN, sess->apn);
+
+        /* EBI */
+        d_trace(15, "\tBuild EBI\n");
+        add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
+    } while(0);
 
     return CORE_OK;
 }
 
 status_t JSONTRANSFORM_JsToSt_delete_session_response(delete_session_t *sess, cJSON *pJson)
 {
-    /* imsi */
-    _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
+    d_trace(10, "JSONTRANSFORM_JsToSt_delete_session_response (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(sess, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
 
-    /* EBI */  
-    cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
-    int tmpData = 0;
-    tmpData = atoi(j_ebi->valuestring);
-    sess->ebi = tmpData;
+        /* imsi */
+        d_trace(15, "\tParse IMSI\n");
+        _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
+
+        /* EBI */
+        d_trace(15, "\tParse EBI\n");
+        cJSON *j_ebi = cJSON_GetObjectItemCaseSensitive(pJson, JSONKEY_4G_EBI);
+        int tmpData = 0;
+        tmpData = atoi(j_ebi->valuestring);
+        sess->ebi = tmpData;
+    } while(0);
 
     return CORE_OK;
 }
@@ -848,11 +919,21 @@ status_t JSONTRANSFORM_JsToSt_delete_session_response(delete_session_t *sess, cJ
 status_t JSONTRANSFORM_StToJs_delete_session_response(delete_session_t *sess, cJSON *pJson)
 {
     char imsi_bcd[MAX_IMSI_BCD_LEN + 1] = {0};
-    /* imsi */
-    core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
-    cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
 
-    /* EBI */  
-    add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
+    d_trace(10, "JSONTRANSFORM_StToJs_delete_session_response (%s:%d)\n", __FILE__, __LINE__);
+    do {
+        d_assert(sess, break, "Null Param");
+        d_assert(pJson, break, "Null Param");
+
+        /* imsi */
+        d_trace(15, "\tBuild IMSI\n");
+        core_buffer_to_bcd(sess->imsi, sess->imsi_len, imsi_bcd);
+        cJSON_AddStringToObject(pJson, JSONKEY_4G_IMSI, imsi_bcd);
+
+        /* EBI */
+        d_trace(15, "\tBuild EBI\n");
+        add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
+    } while(0);
+
     return CORE_OK;
 }
