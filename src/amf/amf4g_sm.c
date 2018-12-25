@@ -238,8 +238,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
 
             rv = s1ap_decode_pdu(&message, pkbuf);
             if (rv != CORE_OK)
-            {
-                d_print_hex(pkbuf->payload, pkbuf->len);
+            {            
                 d_assert(0, s1ap_free_pdu(&message); pkbuf_free(pkbuf); break,
                         "Can't decode S1AP_PDU");
             }
@@ -413,7 +412,6 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             rv = ngap_decode_pdu(&message, pkbuf);
             if (rv != CORE_OK)
             {
-                d_print_hex(pkbuf->payload, pkbuf->len);
                 d_assert(0, ngap_free_pdu(&message); pkbuf_free(pkbuf); break,
                         "Can't decode NGAP_PDU");
             }

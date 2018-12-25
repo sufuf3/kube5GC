@@ -36,7 +36,6 @@ status_t amf_json_build_create_session(pkbuf_t **pkbuf, amf4g_sess_t *sess) {
     if (sess->ue_pco.length && sess->ue_pco.buffer) {
         createSession.ue_pco.length = sess->ue_pco.length;
         memcpy(createSession.ue_pco.buffer, sess->ue_pco.buffer, sess->ue_pco.length);
-        d_print_hex(createSession.ue_pco.buffer, createSession.ue_pco.length);
     }
     memcpy(createSession.apn, pdn->apn, sizeof(pdn->apn));
 
