@@ -1739,6 +1739,7 @@ status_t amf4g_context_setup_trace_module()
     int nas = context_self()->logger.trace.nas;
     int diameter = context_self()->logger.trace.diameter;
     int ngap = context_self()->logger.trace.ngap;
+    int sbi = context_self()->logger.trace.sbi;
 
 
     if (app)
@@ -1813,6 +1814,13 @@ status_t amf4g_context_setup_trace_module()
         d_trace_level(&_ngap_build, ngap);
         
     }
+
+    if (sbi) 
+    {
+        extern int _amf_json_build;
+        d_trace_level(&_amf_json_build, sbi);
+    }
+
     return CORE_OK;
 }
 

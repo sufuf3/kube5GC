@@ -9,8 +9,6 @@
 #include "sbiJson/JsonTransform.h"
 #include "amf_json_build.h"
 
-int _amf_json_build = 10;
-
 status_t amf_json_build_create_session(pkbuf_t **pkbuf, amf4g_sess_t *sess) {
     
     pdn_t *pdn = NULL;
