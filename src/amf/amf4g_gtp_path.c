@@ -171,7 +171,7 @@ status_t amf4g_gtp_send_delete_all_sessions(amf4g_ue_t *amf4g_ue)
     {
         next_sess = amf4g_sess_next(sess);
 
-        if (MME_HAVE_SGW_S1U_PATH(sess))
+        if (AMF4G_HAVE_SGW_S1U_PATH(sess))
         {
             amf4g_bearer_t *bearer = amf4g_default_bearer_in_sess(sess);
             d_assert(bearer,, "Null param");

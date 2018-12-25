@@ -77,7 +77,7 @@ static void common_register_state(fsm_t *s, event_t *e)
         {
             return;
         }
-        case MME_EVT_EMM_MESSAGE:
+        case AMF4G_EVT_EMM_MESSAGE:
         {
             nas_message_t *message = (nas_message_t *)event_get_param5(e);
             d_assert(message, return, "Null param");
@@ -98,7 +98,7 @@ static void common_register_state(fsm_t *s, event_t *e)
                     return;
                 }
 
-                if (!MME_UE_HAVE_IMSI(amf4g_ue))
+                if (!AMF4G_UE_HAVE_IMSI(amf4g_ue))
                 {
                     d_warn("[EMM] Service request : Unknown UE");
                     rv = nas_send_service_reject(amf4g_ue,
@@ -145,7 +145,7 @@ static void common_register_state(fsm_t *s, event_t *e)
                         return;
                     }
 
-                    if (!MME_UE_HAVE_IMSI(amf4g_ue))
+                    if (!AMF4G_UE_HAVE_IMSI(amf4g_ue))
                     {
                         d_error("No IMSI");
                         FSM_TRAN(s, emm_state_exception);
@@ -180,7 +180,7 @@ static void common_register_state(fsm_t *s, event_t *e)
                         return;
                     }
 
-                    if (!MME_UE_HAVE_IMSI(amf4g_ue))
+                    if (!AMF4G_UE_HAVE_IMSI(amf4g_ue))
                     {
                         d_warn("[EMM] TAU request : Unknown UE");
                         rv = nas_send_tau_reject(amf4g_ue, EMM_CAUSE_UE_IDENTITY_CANNOT_BE_DERIVED_BY_THE_NETWORK);
@@ -234,7 +234,7 @@ static void common_register_state(fsm_t *s, event_t *e)
             }
             break;
         }
-        case MME_EVT_EMM_T3413:
+        case AMF4G_EVT_EMM_T3413:
         {
             if (amf4g_ue->max_paging_retry >= MAX_NUM_OF_PAGING)
             {
@@ -263,7 +263,7 @@ static void common_register_state(fsm_t *s, event_t *e)
         }
     }
 
-    if (!MME_UE_HAVE_IMSI(amf4g_ue))
+    if (!AMF4G_UE_HAVE_IMSI(amf4g_ue))
     {
         rv = nas_send_identity_request(amf4g_ue);
         d_assert(rv == CORE_OK, return, "nas_send_identity_request() failed");
@@ -275,7 +275,7 @@ static void common_register_state(fsm_t *s, event_t *e)
 
     switch(amf4g_ue->nas_eps.type)
     {
-        case MME_EPS_TYPE_ATTACH_REQUEST:
+        case AMF4G_EPS_TYPE_ATTACH_REQUEST:
         {
             if (SECURITY_CONTEXT_IS_VALID(amf4g_ue))
             {
@@ -300,7 +300,7 @@ static void common_register_state(fsm_t *s, event_t *e)
             }
             break;
         }
-        case MME_EPS_TYPE_TAU_REQUEST:
+        case AMF4G_EPS_TYPE_TAU_REQUEST:
         {
             S1AP_ProcedureCode_t procedureCode =
                 (S1AP_ProcedureCode_t)event_get_param2(e);
@@ -383,7 +383,7 @@ void emm_state_authentication(fsm_t *s, event_t *e)
         {
             break;
         }
-        case MME_EVT_EMM_MESSAGE:
+        case AMF4G_EVT_EMM_MESSAGE:
         {
             nas_message_t *message = (nas_message_t *)event_get_param5(e);
             d_assert(message, break, "Null param");
@@ -549,7 +549,7 @@ void emm_state_security_mode(fsm_t *s, event_t *e)
         {
             break;
         }
-        case MME_EVT_EMM_MESSAGE:
+        case AMF4G_EVT_EMM_MESSAGE:
         {
             nas_message_t *message = (nas_message_t *)event_get_param5(e);
             d_assert(message, break, "Null param");
@@ -571,13 +571,13 @@ void emm_state_security_mode(fsm_t *s, event_t *e)
                     }
 
                     amf4g_s6a_send_ulr(amf4g_ue);
-                    if (amf4g_ue->nas_eps.type == MME_EPS_TYPE_ATTACH_REQUEST)
+                    if (amf4g_ue->nas_eps.type == AMF4G_EPS_TYPE_ATTACH_REQUEST)
                     {
                         FSM_TRAN(s, &emm_state_initial_context_setup);
                     }
                     else if (amf4g_ue->nas_eps.type ==
-                            MME_EPS_TYPE_SERVICE_REQUEST ||
-                            amf4g_ue->nas_eps.type == MME_EPS_TYPE_TAU_REQUEST)
+                            AMF4G_EPS_TYPE_SERVICE_REQUEST ||
+                            amf4g_ue->nas_eps.type == AMF4G_EPS_TYPE_TAU_REQUEST)
                     {
                         FSM_TRAN(s, &emm_state_registered);
                     }
@@ -661,7 +661,7 @@ void emm_state_initial_context_setup(fsm_t *s, event_t *e)
         {
             break;
         }
-        case MME_EVT_EMM_MESSAGE:
+        case AMF4G_EVT_EMM_MESSAGE:
         {
             nas_message_t *message = (nas_message_t *)event_get_param5(e);
             d_assert(message, break, "Null param");

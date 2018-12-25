@@ -114,7 +114,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             }
             break;
         }
-        case MME_EVT_S1AP_LO_ACCEPT:
+        case AMF4G_EVT_S1AP_LO_ACCEPT:
         {
             sock_id sock = (sock_id)event_get_param1(e);
             d_assert(sock, break,);
@@ -147,7 +147,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
 
             break;
         }
-        case MME_EVT_S1AP_LO_SCTP_COMM_UP:
+        case AMF4G_EVT_S1AP_LO_SCTP_COMM_UP:
         {
             amf4g_enb_t *enb = NULL;
             sock_id sock = 0;
@@ -186,7 +186,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
 
             break;
         }
-        case MME_EVT_S1AP_LO_CONNREFUSED:
+        case AMF4G_EVT_S1AP_LO_CONNREFUSED:
         {
             amf4g_enb_t *enb = NULL;
             sock_id sock = 0;
@@ -212,7 +212,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
 
             break;
         }
-        case MME_EVT_S1AP_MESSAGE:
+        case AMF4G_EVT_S1AP_MESSAGE:
         {
             s1ap_message_t message;
             amf4g_enb_t *enb = NULL;
@@ -238,8 +238,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
 
             rv = s1ap_decode_pdu(&message, pkbuf);
             if (rv != CORE_OK)
-            {
-                d_print_hex(pkbuf->payload, pkbuf->len);
+            {            
                 d_assert(0, s1ap_free_pdu(&message); pkbuf_free(pkbuf); break,
                         "Can't decode S1AP_PDU");
             }
@@ -252,7 +251,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             pkbuf_free(pkbuf);
             break;
         }
-        case MME_EVT_S1AP_DELAYED_SEND:
+        case AMF4G_EVT_S1AP_DELAYED_SEND:
         {
             enb_ue_t *enb_ue = NULL;
             pkbuf_t *pkbuf = NULL;
@@ -273,14 +272,14 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             tm_delete(timer);
             break;
         }
-        case MME_EVT_S1AP_S1_HOLDING_TIMER:
+        case AMF4G_EVT_S1AP_S1_HOLDING_TIMER:
         {
             enb_ue_t *enb_ue = NULL;
 
             enb_ue = enb_ue_find(event_get_param1(e));
             d_assert(enb_ue, break, "No ENB UE context");
             d_warn("Implicit S1 release");
-            d_warn("    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]",
+            d_warn("    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]",
                 enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
             rv = enb_ue_remove(enb_ue);
@@ -413,7 +412,6 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             rv = ngap_decode_pdu(&message, pkbuf);
             if (rv != CORE_OK)
             {
-                d_print_hex(pkbuf->payload, pkbuf->len);
                 d_assert(0, ngap_free_pdu(&message); pkbuf_free(pkbuf); break,
                         "Can't decode NGAP_PDU");
             }
@@ -462,7 +460,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             break;
         }
         /***********************************************************************/
-        case MME_EVT_EMM_MESSAGE:
+        case AMF4G_EVT_EMM_MESSAGE:
         {
             nas_message_t message;
             pkbuf_t *pkbuf = NULL;
@@ -487,7 +485,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
                 }
                 else
                 {
-                    /* Here, if the MME_UE Context is found,
+                    /* Here, if the AMF4G_UE Context is found,
                      * the integrity check is not performed
                      * For example, ATTACH_REQUEST, 
                      * TRACKING_AREA_UPDATE_REQUEST message
@@ -515,7 +513,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
 #if 1 /* IMPLICIT_S1_RELEASE */
                    /* Implcit S1 release */
                     d_trace(5, "Implicit S1 release\n");
-                    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+                    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
                           amf4g_ue->enb_ue->enb_ue_s1ap_id,
                           amf4g_ue->enb_ue->mme_ue_s1ap_id);
                     rv = enb_ue_remove(amf4g_ue->enb_ue);
@@ -528,7 +526,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
                      * Newly associated S1(enb_ue_t) context holding timer
                      * is stopped. */
                     d_trace(5, "Start S1 Holding Timer\n");
-                    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+                    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
                             amf4g_ue->enb_ue->enb_ue_s1ap_id, 
                             amf4g_ue->enb_ue->mme_ue_s1ap_id);
                     tm_start(amf4g_ue->enb_ue->holding_timer);
@@ -542,7 +540,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
                 amf4g_ue_associate_enb_ue(amf4g_ue, enb_ue);
             }
 
-            d_assert(amf4g_ue, pkbuf_free(pkbuf); break, "No MME UE context");
+            d_assert(amf4g_ue, pkbuf_free(pkbuf); break, "No AMF4G UE context");
             d_assert(FSM_STATE(&amf4g_ue->sm), pkbuf_free(pkbuf); break, 
                     "No EMM State Machine");
 
@@ -561,7 +559,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             pkbuf_free(pkbuf);
             break;
         }
-        case MME_EVT_EMM_T3413:
+        case AMF4G_EVT_EMM_T3413:
         {
             amf4g_ue_t *amf4g_ue = amf4g_ue_find(event_get_param1(e));
             d_assert(amf4g_ue, break, "No UE context");
@@ -571,7 +569,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
 
             break;
         }
-        case MME_EVT_ESM_MESSAGE:
+        case AMF4G_EVT_ESM_MESSAGE:
         {
             nas_message_t message;
             amf4g_ue_t *amf4g_ue = NULL;
@@ -627,7 +625,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             pkbuf_free(pkbuf);
             break;
         }
-        case MME_EVT_S6A_MESSAGE:
+        case AMF4G_EVT_S6A_MESSAGE:
         {
             status_t rv;
             amf4g_ue_t *amf4g_ue = amf4g_ue_find(event_get_param1(e));
@@ -675,7 +673,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
 
                     if (FSM_CHECK(&amf4g_ue->sm, emm_state_initial_context_setup))
                     {
-                        if (amf4g_ue->nas_eps.type == MME_EPS_TYPE_ATTACH_REQUEST)
+                        if (amf4g_ue->nas_eps.type == AMF4G_EPS_TYPE_ATTACH_REQUEST)
                         {
                             rv = nas_send_emm_to_esm(amf4g_ue,
                                     &amf4g_ue->pdn_connectivity_request);
@@ -688,7 +686,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
                     }
                     else if (FSM_CHECK(&amf4g_ue->sm, emm_state_registered))
                     {
-                        if (amf4g_ue->nas_eps.type == MME_EPS_TYPE_TAU_REQUEST)
+                        if (amf4g_ue->nas_eps.type == AMF4G_EPS_TYPE_TAU_REQUEST)
                         {
                             rv = nas_send_tau_accept(amf4g_ue,
                                     S1AP_ProcedureCode_id_InitialContextSetup);
@@ -696,7 +694,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
                                     "nas_send_tau_accept() failed");
                         }
                         else if (amf4g_ue->nas_eps.type ==
-                            MME_EPS_TYPE_SERVICE_REQUEST)
+                            AMF4G_EPS_TYPE_SERVICE_REQUEST)
                         {
                             rv = s1ap_send_initial_context_setup_request(
                                     amf4g_ue);
@@ -722,7 +720,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             pkbuf_free(s6abuf);
             break;
         }
-        case MME_EVT_S11_MESSAGE:
+        case AMF4G_EVT_S11_MESSAGE:
         {
             status_t rv;
             pkbuf_t *pkbuf = (pkbuf_t *)event_get_param1(e);
@@ -817,14 +815,14 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             pkbuf_free(pkbuf);
             break;
         }
-        case MME_EVT_S11_T3_RESPONSE:
-        case MME_EVT_S11_T3_HOLDING:
+        case AMF4G_EVT_S11_T3_RESPONSE:
+        case AMF4G_EVT_S11_T3_HOLDING:
         {
             gtp_xact_timeout(event_get_param1(e), event_get(e));
             break;
         }
         /******************** Added by Chi ********************/
-        case MME_EVT_CHECK_OVERLOAD:
+        case AMF4G_EVT_CHECK_OVERLOAD:
         {
             tm_block_id timer = (tm_block_id) event_get_param1(e);
             int n_cores = get_cpu_cores();
@@ -839,14 +837,14 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             int n_enb_to_send = 0;
             pkbuf_t *s1apbuf = NULL;
 
-            /* d_trace(9, "MME_EVT_CHECK_OVERLOAD: load_avg=%.2f, n_cores=%d, threshold=%.2f\n", 
+            /* d_trace(9, "AMF4G_EVT_CHECK_OVERLOAD: load_avg=%.2f, n_cores=%d, threshold=%.2f\n", 
                 load_avg, n_cores, OVERLOAD_THRESHOLD); */
 
             if (load_per_core > OVERLOAD_THRESHOLD)
             {
                 if (!amf4g_self()->overload_started)
                 {
-                    d_trace(1, "MME overload_start (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
+                    d_trace(1, "AM4G overload_start (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
                         load_per_core, OVERLOAD_THRESHOLD);
 
                     s1ap_build_overload_start(&s1apbuf);
@@ -859,7 +857,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             {
                 if (amf4g_self()->overload_started)
                 {
-                    d_trace(1, "MME overload_stop (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
+                    d_trace(1, "AMF4G overload_stop (load_avg/n_cores=%.2f, threshold=%.2f)\n", 
                         load_per_core, OVERLOAD_THRESHOLD);
 
                     s1ap_build_overload_stop(&s1apbuf);
@@ -871,7 +869,7 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
 
             if (s1apbuf != NULL && n_enb_to_send > 0)
             {
-                // Send message to randomly selected eNBs which connected to this MME
+                // Send message to randomly selected eNBs which connected to this AMF4G
                 amf4g_enb_t **selected_enb = (amf4g_enb_t **) malloc(n_enb_to_send * sizeof(amf4g_enb_t *));
                 d_assert(ht_rand_select_non_dup(enbs, n_enb_to_send, (void **) selected_enb) == CORE_OK, break, "Unable to select target eNBs");
 

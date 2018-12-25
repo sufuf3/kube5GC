@@ -41,7 +41,7 @@ status_t emm_handle_attach_request(
     /* Set EPS Attach Type */
     memcpy(&amf4g_ue->nas_eps.attach, eps_attach_type,
             sizeof(nas_eps_attach_type_t));
-    amf4g_ue->nas_eps.type = MME_EPS_TYPE_ATTACH_REQUEST;
+    amf4g_ue->nas_eps.type = AMF4G_EPS_TYPE_ATTACH_REQUEST;
     amf4g_ue->nas_eps.ksi = eps_attach_type->nas_key_set_identifier;
     d_trace(5, "    NAS_EPS TYPE[%d] KSI[%d] ATTACH[0x%x]\n",
             amf4g_ue->nas_eps.type, amf4g_ue->nas_eps.ksi, amf4g_ue->nas_eps.data);
@@ -151,7 +151,7 @@ status_t emm_handle_attach_request(
                     guti.mme_gid,
                     guti.mme_code,
                     guti.m_tmsi,
-                    MME_UE_HAVE_IMSI(amf4g_ue) 
+                    AMF4G_UE_HAVE_IMSI(amf4g_ue) 
                         ? amf4g_ue->imsi_bcd : "Unknown");
             break;
         }
@@ -304,7 +304,7 @@ status_t emm_handle_detach_request(
 
     /* Set EPS Attach Type */
     memcpy(&amf4g_ue->nas_eps.detach, detach_type, sizeof(nas_detach_type_t));
-    amf4g_ue->nas_eps.type = MME_EPS_TYPE_DETACH_REQUEST_FROM_UE;
+    amf4g_ue->nas_eps.type = AMF4G_EPS_TYPE_DETACH_REQUEST_FROM_UE;
     amf4g_ue->nas_eps.ksi = detach_type->nas_key_set_identifier;
     d_trace(5, "    NAS_EPS TYPE[%d] KSI[%d] DETACH[0x%x]\n",
             amf4g_ue->nas_eps.type, amf4g_ue->nas_eps.ksi, amf4g_ue->nas_eps.data);
@@ -345,7 +345,7 @@ status_t emm_handle_service_request(
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     /* Set EPS Update Type */
-    amf4g_ue->nas_eps.type = MME_EPS_TYPE_SERVICE_REQUEST;
+    amf4g_ue->nas_eps.type = AMF4G_EPS_TYPE_SERVICE_REQUEST;
     amf4g_ue->nas_eps.ksi = ksi_and_sequence_number->ksi;
     d_trace(5, "    NAS_EPS TYPE[%d] KSI[%d]\n",
             amf4g_ue->nas_eps.type, amf4g_ue->nas_eps.ksi);
@@ -375,7 +375,7 @@ status_t emm_handle_service_request(
             amf4g_ue->guti.mme_gid,
             amf4g_ue->guti.mme_code,
             amf4g_ue->guti.m_tmsi,
-            MME_UE_HAVE_IMSI(amf4g_ue) ? amf4g_ue->imsi_bcd : "Unknown");
+            AMF4G_UE_HAVE_IMSI(amf4g_ue) ? amf4g_ue->imsi_bcd : "Unknown");
 
     return CORE_OK;
 }
@@ -398,7 +398,7 @@ status_t emm_handle_tau_request(
     /* Set EPS Update Type */
     memcpy(&amf4g_ue->nas_eps.update, eps_update_type,
             sizeof(nas_eps_update_type_t));
-    amf4g_ue->nas_eps.type = MME_EPS_TYPE_TAU_REQUEST;
+    amf4g_ue->nas_eps.type = AMF4G_EPS_TYPE_TAU_REQUEST;
     amf4g_ue->nas_eps.ksi = eps_update_type->nas_key_set_identifier;
     d_trace(5, "    NAS_EPS TYPE[%d] KSI[%d] UPDATE[0x%x]\n",
             amf4g_ue->nas_eps.type, amf4g_ue->nas_eps.ksi,
@@ -486,7 +486,7 @@ status_t emm_handle_tau_request(
     }
 
     /* TODO: 
-     *   1) Consider if MME is changed or not.
+     *   1) Consider if AMF4G is changed or not.
      *   2) Consider if SGW is changed or not.
      */
     switch(eps_mobile_identity->imsi.type)
@@ -506,7 +506,7 @@ status_t emm_handle_tau_request(
                     guti.mme_gid,
                     guti.mme_code,
                     guti.m_tmsi,
-                    MME_UE_HAVE_IMSI(amf4g_ue) 
+                    AMF4G_UE_HAVE_IMSI(amf4g_ue) 
                         ? amf4g_ue->imsi_bcd : "Unknown");
             break;
         }

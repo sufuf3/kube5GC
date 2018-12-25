@@ -105,7 +105,6 @@ func SMContextCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func SMContextUpdate(w http.ResponseWriter, r *http.Request) {
-	log.Println("SMF SM Context Update")
 	var buf []byte
 	buf = make([]byte, 4096)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

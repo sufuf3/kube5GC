@@ -16,18 +16,18 @@ char* amf4g_event_get_name(event_t *e)
         case FSM_EXIT_SIG: 
             return FSM_NAME_EXIT_SIG;
 
-        case MME_EVT_S1AP_MESSAGE:
-            return "MME_EVT_S1AP_MESSAGE";
-        case MME_EVT_S1AP_DELAYED_SEND:
-            return "MME_EVT_S1AP_DELAYED_SEND";
-        case MME_EVT_S1AP_LO_ACCEPT:
-            return "MME_EVT_S1AP_LO_ACCEPT";
-        case MME_EVT_S1AP_LO_SCTP_COMM_UP:
-            return "MME_EVT_S1AP_LO_SCTP_COMM_UP";
-        case MME_EVT_S1AP_LO_CONNREFUSED:
-            return "MME_EVT_S1AP_LO_CONNREFUSED";
-        case MME_EVT_S1AP_S1_HOLDING_TIMER:
-            return "MME_EVT_S1AP_S1_HOLDING_TIMER";
+        case AMF4G_EVT_S1AP_MESSAGE:
+            return "AMF4G_EVT_S1AP_MESSAGE";
+        case AMF4G_EVT_S1AP_DELAYED_SEND:
+            return "AMF4G_EVT_S1AP_DELAYED_SEND";
+        case AMF4G_EVT_S1AP_LO_ACCEPT:
+            return "AMF4G_EVT_S1AP_LO_ACCEPT";
+        case AMF4G_EVT_S1AP_LO_SCTP_COMM_UP:
+            return "AMF4G_EVT_S1AP_LO_SCTP_COMM_UP";
+        case AMF4G_EVT_S1AP_LO_CONNREFUSED:
+            return "AMF4G_EVT_S1AP_LO_CONNREFUSED";
+        case AMF4G_EVT_S1AP_S1_HOLDING_TIMER:
+            return "AMF4G_EVT_S1AP_S1_HOLDING_TIMER";
 
             
     /******************** Added by Hu ********************/
@@ -46,27 +46,27 @@ char* amf4g_event_get_name(event_t *e)
     /*****************************************************/
 
 
-        case MME_EVT_EMM_MESSAGE:
-            return "MME_EVT_EMM_MESSAGE";
-        case MME_EVT_EMM_T3413:
-            return "MME_EVT_EMM_T3413";
+        case AMF4G_EVT_EMM_MESSAGE:
+            return "AMF4G_EVT_EMM_MESSAGE";
+        case AMF4G_EVT_EMM_T3413:
+            return "AMF4G_EVT_EMM_T3413";
 
-        case MME_EVT_ESM_MESSAGE:
-            return "MME_EVT_ESM_MESSAGE";
+        case AMF4G_EVT_ESM_MESSAGE:
+            return "AMF4G_EVT_ESM_MESSAGE";
 
-        case MME_EVT_S11_MESSAGE:
-            return "MME_EVT_S11_MESSAGE";
-        case MME_EVT_S11_T3_RESPONSE:
-            return "MME_EVT_S11_T3_RESPONSE";
-        case MME_EVT_S11_T3_HOLDING:
-            return "MME_EVT_S11_T3_HOLDING";
+        case AMF4G_EVT_S11_MESSAGE:
+            return "AMF4G_EVT_S11_MESSAGE";
+        case AMF4G_EVT_S11_T3_RESPONSE:
+            return "AMF4G_EVT_S11_T3_RESPONSE";
+        case AMF4G_EVT_S11_T3_HOLDING:
+            return "AMF4G_EVT_S11_T3_HOLDING";
 
-        case MME_EVT_S6A_MESSAGE:
-            return "MME_EVT_S6A_MESSAGE";
+        case AMF4G_EVT_S6A_MESSAGE:
+            return "AMF4G_EVT_S6A_MESSAGE";
 
         /******************** Added by Chi ********************/
-        case MME_EVT_CHECK_OVERLOAD:
-            return "MME_EVT_CHECK_OVERLOAD";
+        case AMF4G_EVT_CHECK_OVERLOAD:
+            return "AMF4G_EVT_CHECK_OVERLOAD";
         /******************************************************/
         
         case AMF_EVT_N11_MESSAGE:

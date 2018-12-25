@@ -59,7 +59,7 @@ void esm_state_inactive(fsm_t *s, event_t *e)
         {
             break;
         }
-        case MME_EVT_ESM_MESSAGE:
+        case AMF4G_EVT_ESM_MESSAGE:
         {
             nas_message_t *message = (nas_message_t *)event_get_param3(e);
             d_assert(message, break, "Null param");
@@ -102,7 +102,7 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                             amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     /* Check if Initial Context Setup Response or 
                      *          E-RAB Setup Response is received */
-                    if (MME_HAVE_ENB_S1U_PATH(bearer))
+                    if (AMF4G_HAVE_ENB_S1U_PATH(bearer))
                     {
                         rv = amf4g_gtp_send_modify_bearer_request(bearer, 0);
                         d_assert(rv == CORE_OK,, "gtp send failed");
@@ -122,7 +122,7 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                             amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     /* Check if Initial Context Setup Response or 
                      *          E-RAB Setup Response is received */
-                    if (MME_HAVE_ENB_S1U_PATH(bearer))
+                    if (AMF4G_HAVE_ENB_S1U_PATH(bearer))
                     {                    
                         // TODO: SEND CREATE BEARER RESPONSE
                     }
@@ -177,7 +177,7 @@ void esm_state_active(fsm_t *s, event_t *e)
         {
             break;
         }
-        case MME_EVT_ESM_MESSAGE:
+        case AMF4G_EVT_ESM_MESSAGE:
         {
             nas_message_t *message = (nas_message_t *)event_get_param3(e);
             d_assert(message, break, "Null param");
@@ -205,7 +205,7 @@ void esm_state_active(fsm_t *s, event_t *e)
                     d_trace(3, "[ESM] PDN disconnect request\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
                             amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
-                    if (MME_HAVE_SGW_S1U_PATH(sess))
+                    if (AMF4G_HAVE_SGW_S1U_PATH(sess))
                     {
                         rv = amf4g_gtp_send_delete_session_request(sess);
                         d_assert(rv == CORE_OK, return,
@@ -289,7 +289,7 @@ void esm_state_pdn_will_disconnect(fsm_t *s, event_t *e)
         {
             break;
         }
-        case MME_EVT_ESM_MESSAGE:
+        case AMF4G_EVT_ESM_MESSAGE:
         {
             nas_message_t *message = (nas_message_t *)event_get_param3(e);
             d_assert(message, break, "Null param");

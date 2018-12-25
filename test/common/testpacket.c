@@ -2850,7 +2850,7 @@ status_t tests1ap_build_e_rab_release_indication(
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
         core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
-    d_trace(3, "[MME] E-RAB release indication\n");
+    d_trace(3, "[AMF4G] E-RAB release indication\n");
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = S1AP_ProcedureCode_id_E_RABReleaseIndication;
     initiatingMessage->criticality = S1AP_Criticality_reject;
@@ -2969,7 +2969,7 @@ status_t tests1ap_build_enb_cp_relocation_indication(pkbuf_t **pkbuf,
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
         core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
-    d_trace(3, "[MME] ENB CP Relocation Indication\n");
+    d_trace(3, "[AMF4G] ENB CP Relocation Indication\n");
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = S1AP_ProcedureCode_id_eNBCPRelocationIndication;
     initiatingMessage->criticality = S1AP_Criticality_ignore;
@@ -3028,7 +3028,7 @@ status_t tests1ap_build_ue_context_modification_indication(pkbuf_t **pkbuf,
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
         core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
-    d_trace(3, "[MME] UE context modification indication\n");
+    d_trace(3, "[AMF4G] UE context modification indication\n");
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = S1AP_ProcedureCode_id_UEContextModificationIndication;
     initiatingMessage->criticality = S1AP_Criticality_reject;
@@ -3146,7 +3146,7 @@ status_t tests1ap_build_ue_context_suspend_request(
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
         core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
-    d_trace(3, "[MME] UE context suspend request\n");
+    d_trace(3, "[AMF4G] UE context suspend request\n");
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = S1AP_ProcedureCode_id_UEContextSuspend;
     initiatingMessage->criticality = S1AP_Criticality_reject;
@@ -3207,7 +3207,7 @@ status_t tests1ap_build_ue_context_resume_request(
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
         core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
-    d_trace(3, "[MME] UE context resume request\n");
+    d_trace(3, "[AMF4G] UE context resume request\n");
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = S1AP_ProcedureCode_id_UEContextResume;
     initiatingMessage->criticality = S1AP_Criticality_reject;
@@ -3268,7 +3268,7 @@ status_t tests1ap_build_nas_delivery_indication(
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
         core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
-    d_trace(3, "[MME] NAS delivery indication \n");
+    d_trace(3, "[AMF4G] NAS delivery indication \n");
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = S1AP_ProcedureCode_id_NASDeliveryIndication;
     initiatingMessage->criticality = S1AP_Criticality_ignore;
@@ -3329,7 +3329,7 @@ status_t tests1ap_build_nas_non_delivery_indication(
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
         core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
-    d_trace(3, "[MME] NAS non-delivery indication \n");
+    d_trace(3, "[AMF4G] NAS non-delivery indication \n");
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = S1AP_ProcedureCode_id_NASNonDeliveryIndication;
     initiatingMessage->criticality = S1AP_Criticality_ignore;
@@ -3408,7 +3408,7 @@ status_t tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf)
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
         core_calloc(1, sizeof(S1AP_InitiatingMessage_t));
-    d_trace(3, "[MME] retrieve UE information \n");
+    d_trace(3, "[AMF4G] retrieve UE information \n");
     initiatingMessage = pdu.choice.initiatingMessage;
     initiatingMessage->procedureCode = S1AP_ProcedureCode_id_RetrieveUEInformation;
     initiatingMessage->criticality = S1AP_Criticality_reject;

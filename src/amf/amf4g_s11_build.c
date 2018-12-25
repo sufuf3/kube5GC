@@ -41,8 +41,8 @@ status_t amf4g_s11_build_create_session_request(
     amf4g_ue = sess->amf4g_ue;
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Create Session Request\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Create Session Request\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
     memset(&gtp_message, 0, sizeof(gtp_message_t));
 
@@ -246,8 +246,8 @@ status_t amf4g_s11_build_modify_bearer_request(pkbuf_t **pkbuf,
     amf4g_ue = bearer->amf4g_ue;
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Modifty Bearer Request\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Modifty Bearer Request\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
     d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
         bearer->enb_s1u_teid, bearer->sgw_s1u_teid);
@@ -312,8 +312,8 @@ status_t amf4g_s11_build_delete_session_request(
     bearer = amf4g_default_bearer_in_sess(sess);
     d_assert(bearer, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Delete Session Request\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Delete Session Request\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     memset(&gtp_message, 0, sizeof(gtp_message_t));
@@ -367,8 +367,8 @@ status_t amf4g_s11_build_create_bearer_response(
     amf4g_ue = bearer->amf4g_ue;
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
     
-    d_trace(3, "[MME] Create Bearer Response\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Create Bearer Response\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     memset(&gtp_message, 0, sizeof(gtp_message_t));
@@ -464,8 +464,8 @@ status_t amf4g_s11_build_update_bearer_response(
     amf4g_ue = bearer->amf4g_ue;
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Update Bearer Response\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Update Bearer Response\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     memset(&gtp_message, 0, sizeof(gtp_message_t));
@@ -541,8 +541,8 @@ status_t amf4g_s11_build_delete_bearer_response(
     amf4g_ue = bearer->amf4g_ue;
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Delete Bearer Response\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Delete Bearer Response\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     memset(&gtp_message, 0, sizeof(gtp_message_t));
@@ -607,7 +607,7 @@ status_t amf4g_s11_build_release_access_bearers_request(
     gtp_release_access_bearers_request_t *req = 
         &gtp_message.release_access_bearers_request;
 
-    d_trace(3, "[MME] Release Access Bearers Request\n");
+    d_trace(3, "[AMF4G] Release Access Bearers Request\n");
     memset(&gtp_message, 0, sizeof(gtp_message_t));
 
     req->originating_node.presence = 1;
@@ -630,7 +630,7 @@ status_t amf4g_s11_build_downlink_data_notification_ack(
 
     gtp_cause_t cause;
 
-    d_trace(3, "[MME] Downlink Data Notification Ackknowledge\n");
+    d_trace(3, "[AMF4G] Downlink Data Notification Ackknowledge\n");
 
     memset(&gtp_message, 0, sizeof(gtp_message_t));
 
@@ -668,8 +668,8 @@ status_t amf4g_s11_build_create_indirect_data_forwarding_tunnel_request(
 
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Create Indirect Data Forwarding Tunnel Request\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Create Indirect Data Forwarding Tunnel Request\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     gtp_bearers_in_create_indirect_tunnel_request(&bearers, req);
@@ -682,7 +682,7 @@ status_t amf4g_s11_build_create_indirect_data_forwarding_tunnel_request(
         bearer = amf4g_bearer_first(sess);
         while(bearer != NULL)
         {
-            if (MME_HAVE_ENB_DL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_ENB_DL_INDIRECT_TUNNEL(bearer))
             {
                 memset(&dl_teid[i], 0, sizeof(gtp_f_teid_t));
                 dl_teid[i].interface_type =
@@ -696,7 +696,7 @@ status_t amf4g_s11_build_create_indirect_data_forwarding_tunnel_request(
                 bearers[i]->s1_u_enodeb_f_teid.len = len;
             }
 
-            if (MME_HAVE_ENB_UL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_ENB_UL_INDIRECT_TUNNEL(bearer))
             {
                 memset(&ul_teid[i], 0, sizeof(gtp_f_teid_t));
                 ul_teid[i].interface_type =
@@ -710,8 +710,8 @@ status_t amf4g_s11_build_create_indirect_data_forwarding_tunnel_request(
                 bearers[i]->s12_rnc_f_teid.len = len;
             }
 
-            if (MME_HAVE_ENB_DL_INDIRECT_TUNNEL(bearer) ||
-                MME_HAVE_ENB_UL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_ENB_DL_INDIRECT_TUNNEL(bearer) ||
+                AMF4G_HAVE_ENB_UL_INDIRECT_TUNNEL(bearer))
             {
                 bearers[i]->presence = 1;
                 bearers[i]->eps_bearer_id.presence = 1;

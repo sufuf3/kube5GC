@@ -47,12 +47,12 @@ static int context_initialized = 0;
 status_t amf4g_context_init()
 {
     d_assert(context_initialized == 0, return CORE_ERROR,
-            "MME context already has been context_initialized");
+            "AMF4G context already has been context_initialized");
 
     /* Initial FreeDiameter Config */
     memset(&g_fd_conf, 0, sizeof(fd_config_t));
 
-    /* Initialize MME context */
+    /* Initialize AMF4G context */
     memset(&self, 0, sizeof(amf_context_t));
     self.fd_config = &g_fd_conf;
 
@@ -121,7 +121,7 @@ status_t amf4g_context_init()
 status_t amf4g_context_final()
 {
     d_assert(context_initialized == 1, return CORE_ERROR,
-            "MME context already has been finalized");
+            "AMF4G context already has been finalized");
 
     amf_ran_remove_all();
     amf4g_enb_remove_all();
@@ -129,10 +129,10 @@ status_t amf4g_context_final()
 
     if (pool_used(&self.m_tmsi))
     {
-        d_error("%d not freed in M-TMSI pool[%d] in MME-Context",
+        d_error("%d not freed in M-TMSI pool[%d] in AMF4G-Context",
                 pool_used(&self.m_tmsi), pool_size(&self.m_tmsi));
     }
-    d_trace(9, "%d not freed in M-TMSI pool[%d] in MME-Context\n",
+    d_trace(9, "%d not freed in M-TMSI pool[%d] in AMF4G-Context\n",
             pool_used(&self.m_tmsi), pool_size(&self.m_tmsi));
 
     /****************add by HU***************/
@@ -1739,6 +1739,7 @@ status_t amf4g_context_setup_trace_module()
     int nas = context_self()->logger.trace.nas;
     int diameter = context_self()->logger.trace.diameter;
     int ngap = context_self()->logger.trace.ngap;
+    int sbi = context_self()->logger.trace.sbi;
 
 
     if (app)
@@ -1813,6 +1814,17 @@ status_t amf4g_context_setup_trace_module()
         d_trace_level(&_ngap_build, ngap);
         
     }
+
+    if (sbi) 
+    {
+        extern int _amf_json_build;
+        extern int _amf_json_handler;
+        extern int _amf_sbi_path;
+        d_trace_level(&_amf_json_build, sbi);
+        d_trace_level(&_amf_json_handler, sbi);
+        d_trace_level(&_amf_sbi_path, sbi);
+    }
+
     return CORE_OK;
 }
 
@@ -2330,7 +2342,7 @@ enb_ue_t* enb_ue_add(amf4g_enb_t *enb)
 
     /* Create S1 holding timer */
     enb_ue->holding_timer = timer_create(&self.tm_service,
-            MME_EVT_S1AP_S1_HOLDING_TIMER, self.s1_holding_timer_value * 1000);
+            AMF4G_EVT_S1AP_S1_HOLDING_TIMER, self.s1_holding_timer_value * 1000);
     d_assert(enb_ue->holding_timer, return NULL, "Null param");
     timer_set_param1(enb_ue->holding_timer, enb_ue->index);
 
@@ -2462,7 +2474,7 @@ static status_t amf4g_ue_new_guti(amf4g_ue_t *amf4g_ue)
 
     if (amf4g_ue->m_tmsi)
     {
-        /* MME has a VALID GUIT
+        /* AMF4G has a VALID GUIT
          * As such, we need to remove previous GUTI in hash table */
         hash_set(self.guti_ue_hash, &amf4g_ue->guti, sizeof(guti_t), NULL);
         d_assert(amf4g_m_tmsi_free(amf4g_ue->m_tmsi) == CORE_OK,,);
@@ -2521,7 +2533,7 @@ amf4g_ue_t* amf4g_ue_add(enb_ue_t *enb_ue)
     amf4g_self()->sgw = list_next(amf4g_self()->sgw);
 
     /* Create paging retry timer */
-    amf4g_ue->t3413 = timer_create(&self.tm_service, MME_EVT_EMM_T3413,
+    amf4g_ue->t3413 = timer_create(&self.tm_service, AMF4G_EVT_EMM_T3413,
             self.t3413_value * 1000);
     d_assert(amf4g_ue->t3413, return NULL, "Null param");
     timer_set_param1(amf4g_ue->t3413, amf4g_ue->index);
@@ -2817,10 +2829,10 @@ int amf4g_ue_have_indirect_tunnel(amf4g_ue_t *amf4g_ue)
         amf4g_bearer_t *bearer = amf4g_bearer_first(sess);
         while(bearer)
         {
-            if (MME_HAVE_ENB_DL_INDIRECT_TUNNEL(bearer) ||
-                MME_HAVE_ENB_UL_INDIRECT_TUNNEL(bearer) ||
-                MME_HAVE_SGW_DL_INDIRECT_TUNNEL(bearer) ||
-                MME_HAVE_SGW_UL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_ENB_DL_INDIRECT_TUNNEL(bearer) ||
+                AMF4G_HAVE_ENB_UL_INDIRECT_TUNNEL(bearer) ||
+                AMF4G_HAVE_SGW_DL_INDIRECT_TUNNEL(bearer) ||
+                AMF4G_HAVE_SGW_UL_INDIRECT_TUNNEL(bearer))
             {
                 return 1;
             }
@@ -3295,7 +3307,7 @@ int amf4g_bearer_is_inactive(amf4g_ue_t *amf4g_ue)
         amf4g_bearer_t *bearer = amf4g_bearer_first(sess);
         while(bearer)
         {
-            if (MME_HAVE_ENB_S1U_PATH(bearer))
+            if (AMF4G_HAVE_ENB_S1U_PATH(bearer))
             {
                 return 0;
             }
@@ -3553,7 +3565,7 @@ status_t amf4g_overload_checking_init()
 
     tm_block_id *timer = &self.overloading_checking_timer;
     *timer = timer_create(
-            &self.tm_service, MME_EVT_CHECK_OVERLOAD, duration);
+            &self.tm_service, AMF4G_EVT_CHECK_OVERLOAD, duration);
     d_assert(*timer, return CORE_ERROR,);
 
     timer_set_param1(*timer, *timer);

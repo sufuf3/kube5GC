@@ -169,7 +169,7 @@ status_t s1ap_delayed_send_to_enb_ue(
     if (duration)
     {
         timer = timer_create(
-                &amf4g_self()->tm_service, MME_EVT_S1AP_DELAYED_SEND, duration);
+                &amf4g_self()->tm_service, AMF4G_EVT_S1AP_DELAYED_SEND, duration);
         d_assert(timer, return CORE_ERROR,);
 
         timer_set_param1(timer, (c_uintptr_t)enb_ue->index);
@@ -196,7 +196,7 @@ status_t s1ap_send_to_esm(amf4g_ue_t *amf4g_ue, pkbuf_t *esmbuf)
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
     d_assert(esmbuf, return CORE_ERROR, "Null param");
 
-    event_set(&e, MME_EVT_ESM_MESSAGE);
+    event_set(&e, AMF4G_EVT_ESM_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)amf4g_ue->index);
     event_set_param2(&e, (c_uintptr_t)esmbuf);
     amf4g_event_send(&e);
@@ -275,7 +275,7 @@ status_t s1ap_send_to_nas(enb_ue_t *enb_ue,
     d_assert(h, pkbuf_free(nasbuf); return CORE_ERROR, "Null param");
     if (h->protocol_discriminator == NAS_PROTOCOL_DISCRIMINATOR_EMM)
     {
-        event_set(&e, MME_EVT_EMM_MESSAGE);
+        event_set(&e, AMF4G_EVT_EMM_MESSAGE);
         event_set_param1(&e, (c_uintptr_t)enb_ue->index);
         event_set_param2(&e, (c_uintptr_t)procedureCode);
         event_set_param3(&e, (c_uintptr_t)security_header_type.type);
@@ -324,8 +324,8 @@ status_t s1ap_send_ue_context_release_command(
     d_assert(enb_ue, return CORE_ERROR, "Null param");
     enb_ue->ue_ctx_rel_action = action;
 
-    d_trace(3, "[MME] UE Context release command\n");
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(3, "[AMF4G] UE Context release command\n");
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
     d_trace(5, "    Group[%d] Cause[%d] Action[%d] Delay[%d]\n",
             group, cause, action, delay);
@@ -478,7 +478,7 @@ status_t s1ap_send_handover_request(
 
     enb_ue_t *source_ue = NULL, *target_ue = NULL;
 
-    d_trace(3, "[MME] Handover request\n");
+    d_trace(3, "[AMF4G] Handover request\n");
     
     d_assert(target_enb, return CORE_ERROR, "Cannot find target eNB");
 
@@ -491,9 +491,9 @@ status_t s1ap_send_handover_request(
     target_ue = enb_ue_add(target_enb);
     d_assert(target_ue, return CORE_ERROR,);
 
-    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
-    d_trace(5, "    Target : ENB_UE_S1AP_ID[Unknown] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Target : ENB_UE_S1AP_ID[Unknown] AMF4G_UE_S1AP_ID[%d]\n",
             target_ue->mme_ue_s1ap_id);
 
     rv = source_ue_associate_target_ue(source_ue, target_ue);
@@ -638,7 +638,7 @@ status_t s1ap_send_ue_context_modification_confirm(
 
     d_assert(enb_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] UE Context release command\n");
+    d_trace(3, "[AMF4G] UE Context release command\n");
 
     rv = s1ap_build_ue_context_modification_confirm(&s1apbuf, enb_ue);
     d_assert(rv == CORE_OK && s1apbuf, return CORE_ERROR, "s1ap build error");

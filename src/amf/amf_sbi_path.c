@@ -30,6 +30,8 @@ static int _amf_sbi_message_amf_smContextCreate(sock_id sock, void *data)
     pkbuf_t *pkbuf = NULL;
     c_sockaddr_t from;
     event_t e;
+    
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
 
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
@@ -37,15 +39,17 @@ static int _amf_sbi_message_amf_smContextCreate(sock_id sock, void *data)
     event_set(&e, AMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_SM_CONTEXT_CREATE);
-    d_trace(-1, "[AMF] Recv SM Context Create\n");
-    d_trace(-1, "Payload: %s\n", pkbuf->payload);
+    d_trace(15, "[AMF] Recv SM Context Create\n");
+    d_trace(15, "Payload: %s\n", pkbuf->payload);
     rv = amf4g_event_send(&e);
     if (rv != CORE_OK)
     {
         d_error("amf4g_event_send error");
-	pkbuf_free(pkbuf);
-	return 0;
+        pkbuf_free(pkbuf);
+        return 0;
     }
+
+    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
 
     return CORE_OK;
 }
@@ -56,14 +60,17 @@ static int _amf_sbi_message_amf_smContextUpdate(sock_id sock, void *data)
     pkbuf_t *pkbuf = NULL;
     c_sockaddr_t from;
     event_t e;
+
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
+
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
 
     event_set(&e, AMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_SM_CONTEXT_UPDATE);
-    d_trace(-1, "[AMF] Recv SM Context Update\n");
-    d_trace(-1, "Payload: %s\n", pkbuf->payload);
+    d_trace(15, "[AMF] Recv SM Context Update\n");
+    d_trace(15, "Payload: %s\n", pkbuf->payload);
     rv = amf4g_event_send(&e);
     if (rv != CORE_OK)
     {
@@ -71,6 +78,8 @@ static int _amf_sbi_message_amf_smContextUpdate(sock_id sock, void *data)
 	    pkbuf_free(pkbuf);
 	    return CORE_ERROR;
     }
+
+    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
 
     return CORE_OK;
 }
@@ -81,6 +90,8 @@ static int _amf_sbi_message_amf_smContextRelease(sock_id sock, void *data)
     pkbuf_t *pkbuf = NULL;
     c_sockaddr_t from;
     event_t e;
+    
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
 
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
@@ -88,8 +99,8 @@ static int _amf_sbi_message_amf_smContextRelease(sock_id sock, void *data)
     event_set(&e, AMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
     event_set_param2(&e, N11_SM_CONTEXT_RELEASE);
-    d_trace(-1, "[AMF] Recv SM Context Release\n");
-    d_trace(-1, "Payload: %s\n", pkbuf->payload);
+    d_trace(15, "[AMF] Recv SM Context Release\n");
+    d_trace(15, "Payload: %s\n", pkbuf->payload);
     rv = amf4g_event_send(&e);
     if (rv != CORE_OK)
     {
@@ -97,6 +108,8 @@ static int _amf_sbi_message_amf_smContextRelease(sock_id sock, void *data)
 	    pkbuf_free(pkbuf);
 	    return CORE_ERROR;
     }
+
+    d_trace(10, "%s %d Leave", __FUNCTION__, __LINE__);
 
     return CORE_OK;
 }
@@ -108,9 +121,11 @@ static int _amf_sbi_message_amf_smContextRetrieve(sock_id sock, void *data)
     c_sockaddr_t from;
     event_t e;
 
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
+
     rv = unixgram_recvfrom(sock, &pkbuf, &from);
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
-    d_info("Recv: %s, from: %s", pkbuf->payload, from.sun_path);
+    d_trace(15, "Recv: %s, from: %s", pkbuf->payload, from.sun_path);
 
     event_set(&e, AMF_EVT_N11_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)pkbuf);
@@ -123,6 +138,8 @@ static int _amf_sbi_message_amf_smContextRetrieve(sock_id sock, void *data)
 	    return CORE_ERROR;
     }
     
+    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
+
     return CORE_OK;
 }
 
@@ -203,8 +220,8 @@ status_t amf_sbi_server_open()
 
 status_t amf_sbi_send_sm_context_create(pkbuf_t *pkbuf)
 {
-    d_info("AMF SMContextCreate send");
     status_t rv;
+    d_trace(10, "%s %d \n", __FUNCTION__, __LINE__);
     rv = unixgram_sendto(smContextCreateSock, pkbuf, &smContextCreateRemoteAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Create Send Failed!");
     return CORE_OK;
@@ -213,6 +230,7 @@ status_t amf_sbi_send_sm_context_create(pkbuf_t *pkbuf)
 status_t amf_sbi_send_sm_context_update(pkbuf_t *pkbuf)
 {
     status_t rv;
+    d_trace(10, "%s %d \n", __FUNCTION__, __LINE__);
     rv = unixgram_sendto(smContextUpdateSock, pkbuf, &smContextUpdateRemoteAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Update Send Failed!");
     return CORE_OK;
@@ -221,6 +239,7 @@ status_t amf_sbi_send_sm_context_update(pkbuf_t *pkbuf)
 status_t amf_sbi_send_sm_context_release(pkbuf_t *pkbuf)
 {
     status_t rv;
+    d_trace(10, "%s %d \n", __FUNCTION__, __LINE__);
     rv = unixgram_sendto(smContextReleaseSock, pkbuf, &smContextReleaseRemoteAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Release Send Failed!");
     return CORE_OK;
@@ -229,6 +248,7 @@ status_t amf_sbi_send_sm_context_release(pkbuf_t *pkbuf)
 status_t amf_sbi_send_sm_context_retrieve(pkbuf_t *pkbuf)
 {
     status_t rv;
+    d_trace(10, "%s %d \n", __FUNCTION__, __LINE__);
     rv = unixgram_sendto(smContextRetrieveSock, pkbuf, &smContextRetrieveRemoteAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Retrieve Send Failed!");
     return CORE_OK;

@@ -286,9 +286,9 @@ status_t emm_build_security_mode_command(
             replayed_ue_security_capabilities->uia,
             replayed_ue_security_capabilities->gea);
 
-    amf4g_kdf_nas(MME_KDF_NAS_INT_ALG, amf4g_ue->selected_int_algorithm,
+    amf4g_kdf_nas(AMF4G_KDF_NAS_INT_ALG, amf4g_ue->selected_int_algorithm,
             amf4g_ue->kasme, amf4g_ue->knas_int);
-    amf4g_kdf_nas(MME_KDF_NAS_ENC_ALG, amf4g_ue->selected_enc_algorithm,
+    amf4g_kdf_nas(AMF4G_KDF_NAS_ENC_ALG, amf4g_ue->selected_enc_algorithm,
             amf4g_ue->kasme, amf4g_ue->knas_enc);
 
     rv = nas_security_encode(emmbuf, amf4g_ue, &message);
@@ -433,7 +433,7 @@ status_t emm_build_tau_reject(pkbuf_t **emmbuf, nas_emm_cause_t emm_cause,
 
     d_trace(3, "[EMM] Tracking area update reject\n");
     d_trace(5, "    IMSI[%s] Cause[%d]\n",
-            MME_UE_HAVE_IMSI(amf4g_ue) ? amf4g_ue->imsi_bcd : "Unknown", emm_cause);
+            AMF4G_UE_HAVE_IMSI(amf4g_ue) ? amf4g_ue->imsi_bcd : "Unknown", emm_cause);
 
     memset(&message, 0, sizeof(message));
     message.emm.h.protocol_discriminator = NAS_PROTOCOL_DISCRIMINATOR_EMM;

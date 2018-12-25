@@ -597,11 +597,11 @@ struct _amf4g_ue_t {
     fsm_t           sm;     /* A state machine */
 
     struct {
-#define MME_EPS_TYPE_ATTACH_REQUEST                 1
-#define MME_EPS_TYPE_TAU_REQUEST                    2
-#define MME_EPS_TYPE_SERVICE_REQUEST                3
-#define MME_EPS_TYPE_DETACH_REQUEST_FROM_UE         4 
-#define MME_EPS_TYPE_DETACH_REQUEST_TO_UE           5 
+#define AMF4G_EPS_TYPE_ATTACH_REQUEST                 1
+#define AMF4G_EPS_TYPE_TAU_REQUEST                    2
+#define AMF4G_EPS_TYPE_SERVICE_REQUEST                3
+#define AMF4G_EPS_TYPE_DETACH_REQUEST_FROM_UE         4 
+#define AMF4G_EPS_TYPE_DETACH_REQUEST_TO_UE           5 
         c_uint8_t   type;
         c_uint8_t   ksi;
         union {
@@ -613,7 +613,7 @@ struct _amf4g_ue_t {
     } nas_eps;
 
     /* UE identity */
-#define MME_UE_HAVE_IMSI(__mME) \
+#define AMF4G_UE_HAVE_IMSI(__mME) \
     ((__mME) && ((__mME)->imsi_len))
     c_uint8_t       imsi[MAX_IMSI_LEN];
     int             imsi_len;
@@ -778,7 +778,7 @@ struct _amf4g_ue_t {
     ue_application_layer_measurement_capability_t ue_application_layer_measurement_capability;
 };
 
-#define MME_HAVE_SGW_S1U_PATH(__sESS) \
+#define AMF4G_HAVE_SGW_S1U_PATH(__sESS) \
     ((__sESS) && (amf4g_bearer_first(__sESS)) && \
     ((amf4g_default_bearer_in_sess(__sESS)->sgw_s1u_teid)))
 
@@ -814,7 +814,7 @@ typedef struct _amf4g_sess_t {
     /* Related Context */
     amf4g_ue_t        *amf4g_ue;
 
-#define MME_UE_HAVE_APN(__mME) \
+#define AMF4G_UE_HAVE_APN(__mME) \
     ((__mME) && (amf4g_sess_first(__mME)) && \
     ((amf4g_sess_first(__mME))->pdn))
     pdn_t           *pdn;
@@ -834,7 +834,7 @@ typedef struct _amf4g_sess_t {
 #define CLEAR_BEARER_CONTEXT(__mME)   \
     amf4g_bearer_set_inactive(__mME)
 
-#define MME_HAVE_ENB_S1U_PATH(__bEARER) \
+#define AMF4G_HAVE_ENB_S1U_PATH(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_s1u_teid))
 #define CLEAR_ENB_S1U_PATH(__bEARER) \
     do { \
@@ -842,13 +842,13 @@ typedef struct _amf4g_sess_t {
         (__bEARER)->enb_s1u_teid = 0; \
     } while(0)
 
-#define MME_HAVE_ENB_DL_INDIRECT_TUNNEL(__bEARER) \
+#define AMF4G_HAVE_ENB_DL_INDIRECT_TUNNEL(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_dl_teid))
-#define MME_HAVE_ENB_UL_INDIRECT_TUNNEL(__bEARER) \
+#define AMF4G_HAVE_ENB_UL_INDIRECT_TUNNEL(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_ul_teid))
-#define MME_HAVE_SGW_DL_INDIRECT_TUNNEL(__bEARER) \
+#define AMF4G_HAVE_SGW_DL_INDIRECT_TUNNEL(__bEARER) \
     ((__bEARER) && ((__bEARER)->sgw_dl_teid))
-#define MME_HAVE_SGW_UL_INDIRECT_TUNNEL(__bEARER) \
+#define AMF4G_HAVE_SGW_UL_INDIRECT_TUNNEL(__bEARER) \
     ((__bEARER) && ((__bEARER)->sgw_ul_teid))
 #define CLEAR_INDIRECT_TUNNEL(__bEARER) \
     do { \

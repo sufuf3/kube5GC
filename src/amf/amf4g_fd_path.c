@@ -28,7 +28,7 @@ static void state_cleanup(struct sess_state *sess_data, os0_t sid, void *opaque)
     pool_free_node(&amf4g_s6a_sess_pool, sess_data);
 }
 
-/* MME Sends Authentication Information Request to HSS */
+/* AMF4G Sends Authentication Information Request to HSS */
 void amf4g_s6a_send_air(amf4g_ue_t *amf4g_ue,
     nas_authentication_failure_parameter_t *authentication_failure_parameter)
 {
@@ -45,7 +45,7 @@ void amf4g_s6a_send_air(amf4g_ue_t *amf4g_ue,
 
     d_assert(amf4g_ue, return, "Null param");
 
-    d_trace(3, "[MME] Authentication-Information-Request\n");
+    d_trace(3, "[AMF4G] Authentication-Information-Request\n");
 
     /* Clear Security Context */
     CLEAR_SECURITY_CONTEXT(amf4g_ue);
@@ -174,7 +174,7 @@ void amf4g_s6a_send_air(amf4g_ue_t *amf4g_ue,
     d_assert(pthread_mutex_unlock(&fd_logger_self()->stats_lock) == 0,, );
 }
 
-/* MME received Authentication Information Answer from HSS */
+/* AMF4G received Authentication Information Answer from HSS */
 static void amf4g_s6a_aia_cb(void *data, struct msg **msg)
 {
     int ret;
@@ -197,7 +197,7 @@ static void amf4g_s6a_aia_cb(void *data, struct msg **msg)
     c_uint16_t s6abuf_len = 0;
     e_utran_vector_t *e_utran_vector = NULL;
 
-    d_trace(3, "[MME] Authentication-Information-Answer\n");
+    d_trace(3, "[AMF4G] Authentication-Information-Answer\n");
     
     ret = clock_gettime(CLOCK_REALTIME, &ts);
     d_assert(ret == 0, return,);
@@ -390,7 +390,7 @@ static void amf4g_s6a_aia_cb(void *data, struct msg **msg)
 out:
     if (!error)
     {
-        event_set(&e, MME_EVT_S6A_MESSAGE);
+        event_set(&e, AMF4G_EVT_S6A_MESSAGE);
         event_set_param1(&e, (c_uintptr_t)amf4g_ue->index);
         event_set_param2(&e, (c_uintptr_t)s6abuf);
         amf4g_event_send(&e);
@@ -443,7 +443,7 @@ out:
     return;
 }
 
-/* MME Sends Update Location Request to HSS */
+/* AMF4G Sends Update Location Request to HSS */
 void amf4g_s6a_send_ulr(amf4g_ue_t *amf4g_ue)
 {
     int ret;
@@ -456,7 +456,7 @@ void amf4g_s6a_send_ulr(amf4g_ue_t *amf4g_ue)
 
     d_assert(amf4g_ue, return, "Null Param");
 
-    d_trace(3, "[MME] Update-Location-Request\n");
+    d_trace(3, "[AMF4G] Update-Location-Request\n");
     
     /* Create the random value to store with the session */
     pool_alloc_node(&amf4g_s6a_sess_pool, &sess_data);
@@ -572,7 +572,7 @@ void amf4g_s6a_send_ulr(amf4g_ue_t *amf4g_ue)
     d_assert(pthread_mutex_unlock(&fd_logger_self()->stats_lock) == 0,, );
 }
 
-/* MME received Update Location Answer from HSS */
+/* AMF4G received Update Location Answer from HSS */
 static void amf4g_s6a_ula_cb(void *data, struct msg **msg)
 {
     int ret;
@@ -595,7 +595,7 @@ static void amf4g_s6a_ula_cb(void *data, struct msg **msg)
     s6a_subscription_data_t *subscription_data = NULL;
     c_uint16_t s6abuf_len = 0;
 
-    d_trace(3, "[MME] Update-Location-Answer\n");
+    d_trace(3, "[AMF4G] Update-Location-Answer\n");
 
     ret = clock_gettime(CLOCK_REALTIME, &ts);
     d_assert(ret == 0, return,);
@@ -1035,7 +1035,7 @@ static void amf4g_s6a_ula_cb(void *data, struct msg **msg)
     
     if (!error)
     {
-        event_set(&e, MME_EVT_S6A_MESSAGE);
+        event_set(&e, AMF4G_EVT_S6A_MESSAGE);
         event_set_param1(&e, (c_uintptr_t)amf4g_ue->index);
         event_set_param2(&e, (c_uintptr_t)s6abuf);
         amf4g_event_send(&e);
