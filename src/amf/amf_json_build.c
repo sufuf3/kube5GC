@@ -93,7 +93,7 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, amf4g_beare
 
     d_assert(bearer, return CORE_ERROR, "Null param");
     
-    d_trace(10, "%s %d Enter", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
     
     memcpy(modifyBearer.imsi, bearer->amf4g_ue->imsi, bearer->amf4g_ue->imsi_len);
     modifyBearer.imsi_len = bearer->amf4g_ue->imsi_len; 
@@ -112,7 +112,6 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, amf4g_beare
     
     JSONTRANSFORM_StToJs_modify_bearer_request(&modifyBearer, j_modifyBearerReq);
     string = cJSON_Print(j_modifyBearerReq);
-    d_info(string);
     length = strlen(string) + 1;
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;
@@ -120,7 +119,7 @@ CORE_DECLARE(status_t) amf_json_build_modify_bearer(pkbuf_t **pkbuf, amf4g_beare
     free(string);
     cJSON_Delete(j_modifyBearerReq);
 
-    d_trace(10, "%s %d Leave", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
     return 0;
 }
 
@@ -131,13 +130,12 @@ status_t amf_json_build_delete_session(pkbuf_t **pkbuf, amf4g_sess_t *sess)
     delete_session_t deleteSession = {0};
     c_uint32_t length = 0;
     
-    d_trace(10, "%s %d Enter", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
     
     /* imsi */
     memcpy(deleteSession.imsi, sess->amf4g_ue->imsi, sess->amf4g_ue->imsi_len);
     deleteSession.imsi_len = sess->amf4g_ue->imsi_len;
-    d_info("AMF delete IMSI");
-    d_print_hex(deleteSession.imsi, deleteSession.imsi_len);
+    
     /* apn */
     strcpy(deleteSession.apn, sess->pdn->apn);
     /* ebi */
@@ -145,7 +143,7 @@ status_t amf_json_build_delete_session(pkbuf_t **pkbuf, amf4g_sess_t *sess)
 
     JSONTRANSFORM_StToJs_delete_session_request(&deleteSession, j_deleteSession);
     string = cJSON_Print(j_deleteSession);
-    d_trace(15, "Delete Session JSON: %s", string);
+    d_trace(15, "Delete Session JSON: %s \n", string);
     
     length = strlen(string) + 1;
     *pkbuf = pkbuf_alloc(0, length);
@@ -157,7 +155,7 @@ status_t amf_json_build_delete_session(pkbuf_t **pkbuf, amf4g_sess_t *sess)
     free(string);
     cJSON_Delete(j_deleteSession);
 
-    d_trace(10, "%s %d Leave", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
 
     return CORE_OK;
 }

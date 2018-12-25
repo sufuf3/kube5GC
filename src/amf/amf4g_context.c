@@ -1819,8 +1819,10 @@ status_t amf4g_context_setup_trace_module()
     {
         extern int _amf_json_build;
         extern int _amf_json_handler;
+        extern int _amf_sbi_path;
         d_trace_level(&_amf_json_build, sbi);
         d_trace_level(&_amf_json_handler, sbi);
+        d_trace_level(&_amf_sbi_path, sbi);
     }
 
     return CORE_OK;

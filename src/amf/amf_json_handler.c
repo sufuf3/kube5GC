@@ -67,7 +67,7 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, amf4g_sess_t *pSess) {
     amf4g_bearer_t *bearer = NULL;
     amf4g_bearer_t *ori_bearer = NULL;
 
-    d_trace(10, "%s %d Enter", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
 
     d_assert(pSess, return CORE_ERROR, "Null param");
     d_assert(pkbuf, return CORE_ERROR, "Null param");
@@ -203,7 +203,7 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, amf4g_sess_t *pSess) {
     
     cJSON_Delete(session);
 
-    d_trace(10, "%s %d Leave", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
 
     return 0;
 
@@ -213,7 +213,7 @@ status_t amf_json_handler_create_session_response(pkbuf_t **pkbuf, create_sessio
 {
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
     
-    d_trace(10, "%s %d Enter", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
     
     d_assert(session, return CORE_ERROR, "Null param");
 
@@ -221,7 +221,7 @@ status_t amf_json_handler_create_session_response(pkbuf_t **pkbuf, create_sessio
     
     cJSON_Delete(session);
     
-    d_trace(10, "%s %d Leave", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
     
     return CORE_OK;
 }
@@ -230,7 +230,7 @@ status_t amf_json_handler_update_session_response(pkbuf_t **pkbuf, modify_bearer
 {
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
     
-    d_trace(10, "%s %d Enter", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
 
     d_assert(session, return CORE_ERROR, "Null param");
 
@@ -238,7 +238,7 @@ status_t amf_json_handler_update_session_response(pkbuf_t **pkbuf, modify_bearer
     
     cJSON_Delete(session);
     
-    d_trace(10, "%s %d Leave", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
 
     return CORE_OK;
 }
@@ -248,12 +248,12 @@ status_t amf_json_handler_delete_session_response(pkbuf_t **pkbuf, delete_sessio
     cJSON *session = cJSON_Parse((*pkbuf)->payload);
     d_assert(session, return CORE_ERROR, "Null param");
     
-    d_trace(10, "%s %d Enter", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Enter \n", __FUNCTION__, __LINE__);
 
     JSONTRANSFORM_JsToSt_delete_session_response(deleteSession, session);
     
     cJSON_Delete(session);
      
-    d_trace(10, "%s %d Leave", __FUNCTION__, __LINE__);
+    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
     return CORE_OK;
 }
