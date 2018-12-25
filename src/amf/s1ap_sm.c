@@ -49,7 +49,7 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
         {
             break;
         }
-        case MME_EVT_S1AP_MESSAGE:
+        case AMF4G_EVT_S1AP_MESSAGE:
         {
             S1AP_S1AP_PDU_t *pdu = (S1AP_S1AP_PDU_t *)event_get_param4(e);
             d_assert(pdu, break, "Null param");

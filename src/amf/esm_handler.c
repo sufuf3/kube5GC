@@ -26,7 +26,7 @@ status_t esm_handle_pdn_connectivity_request(amf4g_bearer_t *bearer,
 
     d_assert(pdn_connectivity_request, return CORE_ERROR,);
 
-    d_assert(MME_UE_HAVE_IMSI(amf4g_ue), return CORE_ERROR,
+    d_assert(AMF4G_UE_HAVE_IMSI(amf4g_ue), return CORE_ERROR,
         "No IMSI in PDN_CPNNECTIVITY_REQUEST");
     d_assert(SECURITY_CONTEXT_IS_VALID(amf4g_ue), return CORE_ERROR,
         "No Security Context in PDN_CPNNECTIVITY_REQUEST");

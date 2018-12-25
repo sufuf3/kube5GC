@@ -11,14 +11,14 @@ extern "C" {
 
 /* forward declaration */
 typedef enum {
-    MME_EVT_BASE = FSM_USER_SIG,
+    AMF4G_EVT_BASE = FSM_USER_SIG,
 
-    MME_EVT_S1AP_MESSAGE,
-    MME_EVT_S1AP_DELAYED_SEND,
-    MME_EVT_S1AP_LO_ACCEPT,
-    MME_EVT_S1AP_LO_SCTP_COMM_UP,
-    MME_EVT_S1AP_LO_CONNREFUSED,
-    MME_EVT_S1AP_S1_HOLDING_TIMER,
+    AMF4G_EVT_S1AP_MESSAGE,
+    AMF4G_EVT_S1AP_DELAYED_SEND,
+    AMF4G_EVT_S1AP_LO_ACCEPT,
+    AMF4G_EVT_S1AP_LO_SCTP_COMM_UP,
+    AMF4G_EVT_S1AP_LO_CONNREFUSED,
+    AMF4G_EVT_S1AP_S1_HOLDING_TIMER,
 
  /******************** Added by Hu ********************/
     AMF_EVT_NGAP_MESSAGE,
@@ -29,24 +29,24 @@ typedef enum {
     AMF_EVT_NGAP_NG_HOLDING_TIMER,
   /******************************************************/
 
-    MME_EVT_EMM_MESSAGE,
-    MME_EVT_EMM_T3413,
+    AMF4G_EVT_EMM_MESSAGE,
+    AMF4G_EVT_EMM_T3413,
 
-    MME_EVT_ESM_MESSAGE,
+    AMF4G_EVT_ESM_MESSAGE,
 
-    MME_EVT_S11_MESSAGE,
-    MME_EVT_S11_T3_RESPONSE,
-    MME_EVT_S11_T3_HOLDING,
+    AMF4G_EVT_S11_MESSAGE,
+    AMF4G_EVT_S11_T3_RESPONSE,
+    AMF4G_EVT_S11_T3_HOLDING,
 
-    MME_EVT_S6A_MESSAGE,
+    AMF4G_EVT_S6A_MESSAGE,
 
     /******************** Added by Chi ********************/
-    MME_EVT_CHECK_OVERLOAD,
+    AMF4G_EVT_CHECK_OVERLOAD,
     /******************************************************/
     
     AMF_EVT_N11_MESSAGE,
     
-    MME_EVT_TOP,
+    AMF4G_EVT_TOP,
 
 } event_e;
 

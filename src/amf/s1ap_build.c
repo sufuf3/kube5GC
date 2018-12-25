@@ -28,7 +28,7 @@ status_t s1ap_build_ue_radio_capability_match_request(
 
     d_assert(enb_ue, return CORE_ERROR, "Null param");
 
-    d_trace(1, "[MME] UE Radio Capability Match Request\n");
+    d_trace(1, "[AMF] UE Radio Capability Match Request\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
 
@@ -76,7 +76,7 @@ status_t s1ap_build_ue_radio_capability_match_request(
 
     UERadioCapability = &ie->value.choice.UERadioCapability;*/
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -112,7 +112,7 @@ status_t s1ap_build_e_rab_modification_confirm(
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
 
-    d_trace(1, "[MME] E-RAB Modification Confirm\n");
+    d_trace(1, "[AMF] E-RAB Modification Confirm\n");
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
     pdu.choice.successfulOutcome = 
@@ -148,7 +148,7 @@ status_t s1ap_build_e_rab_modification_confirm(
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
     //debug place
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -184,7 +184,7 @@ status_t s1ap_build_mme_cp_relocation_indication(
     d_assert(s1apbuf, return CORE_ERROR,);
     d_assert(source_ue, return CORE_ERROR,);
 
-    d_trace(3, "[MME] MME CP relocation indication\n");
+    d_trace(3, "[AMF] AMF4G CP relocation indication\n");
 
 
 	memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
@@ -223,7 +223,7 @@ status_t s1ap_build_mme_cp_relocation_indication(
 
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = source_ue->mme_ue_s1ap_id;
@@ -260,7 +260,7 @@ status_t s1ap_build_reroute_nas_request(
 
     d_assert(enb_ue, return CORE_ERROR, "Null param");
 
-    d_trace(1, "[MME] Reroute NAS request\n");
+    d_trace(1, "[AMF] Reroute NAS request\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
 
@@ -318,7 +318,7 @@ status_t s1ap_build_reroute_nas_request(
 
     MME_Group_ID = &ie->value.choice.MME_Group_ID;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -516,7 +516,7 @@ status_t s1ap_build_ERAB_release_command(pkbuf_t **s1apbuf,
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
 
-    d_trace(3, "[MME] ERAB release command failure\n");
+    d_trace(3, "[AMF] ERAB release command failure\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -648,7 +648,7 @@ status_t s1ap_build_mme_configuration_update(pkbuf_t **pkbuf)
                     served_gummei->amf4g_gid[j], MME_Group_ID);
             ASN_SEQUENCE_ADD(
                     &ServedGUMMEIsItem->servedGroupIDs.list, MME_Group_ID);
-            d_trace(5, "    MME Group[%d]\n", served_gummei->amf4g_gid[j]);
+            d_trace(5, "    AMF4G Group[%d]\n", served_gummei->amf4g_gid[j]);
         }
 
         for (j = 0; j < served_gummei->num_of_amf4g_code; j++)
@@ -658,7 +658,7 @@ status_t s1ap_build_mme_configuration_update(pkbuf_t **pkbuf)
                 core_calloc(1, sizeof(S1AP_MME_Code_t));
             s1ap_uint8_to_OCTET_STRING(served_gummei->amf4g_code[j], MME_Code);
             ASN_SEQUENCE_ADD(&ServedGUMMEIsItem->servedMMECs.list, MME_Code);
-            d_trace(5, "    MME Code[%d]\n", served_gummei->amf4g_code[j]);
+            d_trace(5, "    AMF4G Code[%d]\n", served_gummei->amf4g_code[j]);
         }
         ASN_SEQUENCE_ADD(&ServedGUMMEIs->list, ServedGUMMEIsItem);
 	}
@@ -750,7 +750,7 @@ status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
                     served_gummei->amf4g_gid[j], MME_Group_ID);
             ASN_SEQUENCE_ADD(
                     &ServedGUMMEIsItem->servedGroupIDs.list, MME_Group_ID);
-            d_trace(5, "    MME Group[%d]\n", served_gummei->amf4g_gid[j]);
+            d_trace(5, "    AMF4G Group[%d]\n", served_gummei->amf4g_gid[j]);
         }
 
         for (j = 0; j < served_gummei->num_of_amf4g_code; j++)
@@ -760,7 +760,7 @@ status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
                 core_calloc(1, sizeof(S1AP_MME_Code_t));
             s1ap_uint8_to_OCTET_STRING(served_gummei->amf4g_code[j], MME_Code);
             ASN_SEQUENCE_ADD(&ServedGUMMEIsItem->servedMMECs.list, MME_Code);
-            d_trace(5, "    MME Code[%d]\n", served_gummei->amf4g_code[j]);
+            d_trace(5, "    AMF4G Code[%d]\n", served_gummei->amf4g_code[j]);
         }
         ASN_SEQUENCE_ADD(&ServedGUMMEIs->list, ServedGUMMEIsItem);
     }
@@ -1134,7 +1134,7 @@ status_t s1ap_build_downlink_nas_transport(
     d_assert(emmbuf, return CORE_ERROR, "Null param");
     d_assert(enb_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Downlink NAS transport\n");
+    d_trace(3, "[AMF4G] Downlink NAS transport\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -1183,7 +1183,7 @@ status_t s1ap_build_downlink_nas_transport(
     // ie->value.present = S1AP_DownlinkNASTransport_IEs__value_PR_NRUESecurityCapabilities;
     // NRUESecurityCapabilities = &ie->value.choice.NRUESecurityCapabilities;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -1234,7 +1234,7 @@ status_t s1ap_build_initial_context_setup_request(
     subscription_data = &amf4g_ue->subscription_data;
     d_assert(subscription_data, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Initial context setup request\n");
+    d_trace(3, "[AMF4G] Initial context setup request\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -1311,7 +1311,7 @@ status_t s1ap_build_initial_context_setup_request(
 
     SecurityKey = &ie->value.choice.SecurityKey;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -1558,7 +1558,7 @@ status_t s1ap_build_e_rab_setup_request(
     E_RABToBeSetupListBearerSUReq =
         &ie->value.choice.E_RABToBeSetupListBearerSUReq;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -1664,7 +1664,7 @@ status_t s1ap_build_e_rab_modify_request(
     enb_ue = amf4g_ue->enb_ue;
     d_assert(enb_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] E-RAB modify request\n");
+    d_trace(3, "[AMF4G] E-RAB modify request\n");
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
     pdu.choice.initiatingMessage = 
@@ -1707,7 +1707,7 @@ status_t s1ap_build_e_rab_modify_request(
     E_RABToBeModifiedListBearerModReq =
         &ie->value.choice.E_RABToBeModifiedListBearerModReq;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -1811,7 +1811,7 @@ status_t s1ap_build_e_rab_release_command(pkbuf_t **s1apbuf,
     subscription_data = &amf4g_ue->subscription_data;
     d_assert(subscription_data, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] E-RAB release command\n");
+    d_trace(3, "[AMF4G] E-RAB release command\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -1872,7 +1872,7 @@ status_t s1ap_build_e_rab_release_command(pkbuf_t **s1apbuf,
 
     nasPdu = &ie->value.choice.NAS_PDU;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -2019,7 +2019,7 @@ status_t s1ap_build_ue_context_resume_response(
 
     // S1AP_E_RABFailedToResumeListResumeRes_t	 *E_RABFailedToResumeListResumeRes;
    
-    d_trace(3, "[MME] UE Context Resume Response\n");
+    d_trace(3, "[AMF4G] UE Context Resume Response\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
@@ -2055,7 +2055,7 @@ status_t s1ap_build_ue_context_resume_response(
 
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             *enb_ue_s1ap_id, *mme_ue_s1ap_id);
             
     *MME_UE_S1AP_ID = *mme_ue_s1ap_id;
@@ -2134,7 +2134,7 @@ status_t s1ap_build_ue_context_resume_failure(
     d_assert(s1apbuf, return CORE_ERROR,);
     d_assert(cause, return CORE_ERROR,);
 
-    d_trace(3, "[MME] UE Context Resume Failure\n");
+    d_trace(3, "[AMF4G] UE Context Resume Failure\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_unsuccessfulOutcome;
@@ -2180,7 +2180,7 @@ status_t s1ap_build_ue_context_resume_failure(
 
     Cause = &ie->value.choice.Cause;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue_s1ap_id, mme_ue_s1ap_id);
     d_trace(5, "    Group[%d] Cause[%d]\n",
             cause->present, cause->choice.radioNetwork);
@@ -2336,7 +2336,7 @@ status_t s1ap_build_ue_context_modification_confirm(
 
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -2378,7 +2378,7 @@ status_t s1ap_build_paging(pkbuf_t **s1apbuf, amf4g_ue_t *amf4g_ue)
 
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Paging\n");
+    d_trace(3, "[AMF4G] Paging\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -2455,7 +2455,7 @@ status_t s1ap_build_paging(pkbuf_t **s1apbuf, amf4g_ue_t *amf4g_ue)
     s1ap_uint32_to_OCTET_STRING(amf4g_ue->guti.m_tmsi, 
             &UEPagingID->choice.s_TMSI->m_TMSI);
 
-    d_trace(5, "    MME_CODE[%d] M_TMSI[0x%x]\n",
+    d_trace(5, "    AMF4G_CODE[%d] M_TMSI[0x%x]\n",
             amf4g_ue->guti.mme_code, amf4g_ue->guti.m_tmsi);
 
     *CNDomain = S1AP_CNDomain_ps;
@@ -2501,7 +2501,7 @@ status_t s1ap_build_mme_configuration_transfer(
     d_assert(s1apbuf, return CORE_ERROR,);
     d_assert(son_configuration_transfer, return CORE_ERROR,);
 
-    d_trace(3, "[MME] MME Configuration Transfer\n");
+    d_trace(3, "[AMF4G] MME Configuration Transfer\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -2556,7 +2556,7 @@ status_t s1ap_build_mme_direct_information_transfer(
 //    S1AP_MMEDirectInformationTransferIEs_t *ie = NULL;
 //	S1AP_Inter_SystemInformationTransferType_t *Inter_SystemInformationTransferType = NULL;
 
-    d_trace(3, "[MME] MME Direct Information Transfer\n");
+    d_trace(3, "[AMF4G] MME Direct Information Transfer\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -2618,7 +2618,7 @@ status_t s1ap_build_path_switch_ack(pkbuf_t **s1apbuf, amf4g_ue_t *amf4g_ue)
     enb_ue = amf4g_ue->enb_ue;
     d_assert(enb_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Path switch acknowledge\n");
+    d_trace(3, "[AMF4G] Path switch acknowledge\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
@@ -2664,7 +2664,7 @@ status_t s1ap_build_path_switch_ack(pkbuf_t **s1apbuf, amf4g_ue_t *amf4g_ue)
 
     SecurityContext = &ie->value.choice.SecurityContext;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = enb_ue->mme_ue_s1ap_id;
@@ -2706,7 +2706,7 @@ status_t s1ap_build_path_switch_failure(pkbuf_t **s1apbuf,
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_Cause_t *Cause = NULL;
 
-    d_trace(3, "[MME] Path switch failure\n");
+    d_trace(3, "[AMF4G] Path switch failure\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_unsuccessfulOutcome;
@@ -2752,7 +2752,7 @@ status_t s1ap_build_path_switch_failure(pkbuf_t **s1apbuf,
 
     Cause = &ie->value.choice.Cause;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue_s1ap_id, mme_ue_s1ap_id);
     d_trace(5, "    Group[%d] Cause[%d]\n", group, cause);
 
@@ -2796,7 +2796,7 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
     d_assert(source_ue, return CORE_ERROR, "Null param");
     amf4g_ue = source_ue->amf4g_ue;
 
-    d_trace(3, "[MME] Handover command\n");
+    d_trace(3, "[AMF4G] Handover command\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
@@ -2844,7 +2844,7 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
     *ENB_UE_S1AP_ID = source_ue->enb_ue_s1ap_id;
     *HandoverType = source_ue->handover_type;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
 
     sess = amf4g_sess_first(amf4g_ue);
@@ -2855,8 +2855,8 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
         {
             S1AP_E_RABDataForwardingItem_t *e_rab = NULL;
 
-            if (MME_HAVE_SGW_DL_INDIRECT_TUNNEL(bearer) ||
-                MME_HAVE_SGW_UL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_SGW_DL_INDIRECT_TUNNEL(bearer) ||
+                AMF4G_HAVE_SGW_UL_INDIRECT_TUNNEL(bearer))
             {
                 S1AP_E_RABDataForwardingItemIEs_t *item = NULL;
 
@@ -2892,7 +2892,7 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
                 e_rab->e_RAB_ID = bearer->ebi;
             }
 
-            if (MME_HAVE_SGW_DL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_SGW_DL_INDIRECT_TUNNEL(bearer))
             {
                 d_assert(e_rab, return CORE_ERROR,);
                 e_rab->dL_transportLayerAddress =
@@ -2909,7 +2909,7 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
                 d_trace(5, "    SGW-DL-TEID[%d]\n", bearer->sgw_dl_teid);
             }
 
-            if (MME_HAVE_SGW_UL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_SGW_UL_INDIRECT_TUNNEL(bearer))
             {
                 d_assert(e_rab, return CORE_ERROR,);
                 e_rab->uL_TransportLayerAddress =
@@ -2975,7 +2975,7 @@ status_t s1ap_build_handover_preparation_failure(
     d_assert(source_ue, return CORE_ERROR,);
     d_assert(cause, return CORE_ERROR,);
 
-    d_trace(3, "[MME] Handover preparation failure\n");
+    d_trace(3, "[AMF4G] Handover preparation failure\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_unsuccessfulOutcome;
@@ -3021,7 +3021,7 @@ status_t s1ap_build_handover_preparation_failure(
 
     Cause = &ie->value.choice.Cause;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
     d_trace(5, "    Group[%d] Cause[%d]\n",
             cause->present, cause->choice.radioNetwork);
@@ -3311,7 +3311,7 @@ status_t s1ap_build_handover_cancel_ack(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
 
     d_assert(source_ue, return CORE_ERROR, "Null param");
 
-    d_trace(3, "[MME] Handover cancel acknowledge\n");
+    d_trace(3, "[AMF4G] Handover cancel acknowledge\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
@@ -3350,7 +3350,7 @@ status_t s1ap_build_handover_cancel_ack(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
     *MME_UE_S1AP_ID = source_ue->mme_ue_s1ap_id;
     *ENB_UE_S1AP_ID = source_ue->enb_ue_s1ap_id;
 
-    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
 
     rv = s1ap_encode_pdu(s1apbuf, &pdu);
@@ -3385,7 +3385,7 @@ status_t s1ap_build_mme_status_transfer(pkbuf_t **s1apbuf,
     d_assert(target_ue, return CORE_ERROR,);
     d_assert(enb_statustransfer_transparentContainer, return CORE_ERROR,);
     
-    d_trace(3, "[MME] MME status transfer\n");
+    d_trace(3, "[AMF4G] MME status transfer\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -3432,7 +3432,7 @@ status_t s1ap_build_mme_status_transfer(pkbuf_t **s1apbuf,
     *MME_UE_S1AP_ID = target_ue->mme_ue_s1ap_id;
     *ENB_UE_S1AP_ID = target_ue->enb_ue_s1ap_id;
 
-    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             target_ue->enb_ue_s1ap_id, target_ue->mme_ue_s1ap_id);
 
     rv = s1ap_copy_ie(
@@ -3470,7 +3470,7 @@ status_t s1ap_build_error_indication(
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
     S1AP_Cause_t *Cause = NULL;
 
-    d_trace(3, "[MME] Error Indication\n");
+    d_trace(3, "[AMF4G] Error Indication\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -3497,7 +3497,7 @@ status_t s1ap_build_error_indication(
         MME_UE_S1AP_ID = &ie->value.choice.MME_UE_S1AP_ID;
 
         *MME_UE_S1AP_ID = *mme_ue_s1ap_id;
-        d_trace(5, "    MME_UE_S1AP_ID[%d]\n", mme_ue_s1ap_id);
+        d_trace(5, "    AMF4G_UE_S1AP_ID[%d]\n", mme_ue_s1ap_id);
     }
 
     if (enb_ue_s1ap_id)
@@ -3557,7 +3557,7 @@ status_t s1ap_build_s1_reset(
     S1AP_Cause_t *Cause = NULL;
     S1AP_ResetType_t *ResetType = NULL;
 
-    d_trace(3, "[MME] Reset\n");
+    d_trace(3, "[AMF4G] Reset\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -3660,7 +3660,7 @@ status_t s1ap_build_s1_reset_ack(
 
     S1AP_ResetAcknowledgeIEs_t *ie = NULL;
 
-    d_trace(3, "[MME] ResetAcknowledge\n");
+    d_trace(3, "[AMF4G] ResetAcknowledge\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_successfulOutcome;
@@ -3707,7 +3707,7 @@ status_t s1ap_build_s1_reset_ack(
 
             if (item1->mME_UE_S1AP_ID == NULL && item1->eNB_UE_S1AP_ID == NULL)
             {
-                d_warn("No MME_UE_S1AP_ID & ENB_UE_S1AP_ID");
+                d_warn("No AMF4G_UE_S1AP_ID & ENB_UE_S1AP_ID");
                 continue;
             }
             ie2 = core_calloc(1,
@@ -3739,7 +3739,7 @@ status_t s1ap_build_s1_reset_ack(
                 *item2->eNB_UE_S1AP_ID = *item1->eNB_UE_S1AP_ID;
             }
 
-            d_trace(5, "    MME_UE_S1AP_ID[%d] ENB_UE_S1AP_ID[%d]\n",
+            d_trace(5, "    AMF4G_UE_S1AP_ID[%d] ENB_UE_S1AP_ID[%d]\n",
                     item2->mME_UE_S1AP_ID ? *item2->mME_UE_S1AP_ID : -1,
                     item2->eNB_UE_S1AP_ID ? *item2->eNB_UE_S1AP_ID : -1);
         }
@@ -3772,7 +3772,7 @@ status_t s1ap_build_connection_establishment_indication(pkbuf_t **s1apbuf,
     S1AP_MME_UE_S1AP_ID_t *MME_UE_S1AP_ID = NULL;
     S1AP_ENB_UE_S1AP_ID_t *ENB_UE_S1AP_ID = NULL;
 
-    d_trace(3, "[MME] Connection Establishment Indication\n");
+    d_trace(3, "[AMF4G] Connection Establishment Indication\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;
@@ -3787,7 +3787,7 @@ status_t s1ap_build_connection_establishment_indication(pkbuf_t **s1apbuf,
 
     ConnectionEstablishmentIndication = &initiatingMessage->value.choice.ConnectionEstablishmentIndication;
 
-    /* MME_UE_S1AP_ID */
+    /* AMF4G_UE_S1AP_ID */
     ie = core_calloc(1, sizeof(S1AP_ConnectionEstablishmentIndicationIEs_t));
     ASN_SEQUENCE_ADD(&ConnectionEstablishmentIndication->protocolIEs, ie);
 
@@ -3809,7 +3809,7 @@ status_t s1ap_build_connection_establishment_indication(pkbuf_t **s1apbuf,
 
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue_s1ap_id, mme_ue_s1ap_id);
 
     *MME_UE_S1AP_ID = *mme_ue_s1ap_id;
@@ -3861,7 +3861,7 @@ status_t s1ap_build_ue_information_transfer(
 
     S1AP_UEInformationTransferIEs_t *ie = NULL;
 
-    d_trace(3, "[MME] UE information transfer\n");
+    d_trace(3, "[AMF4G] UE information transfer\n");
 
     memset(&pdu, 0, sizeof (S1AP_S1AP_PDU_t));
     pdu.present = S1AP_S1AP_PDU_PR_initiatingMessage;

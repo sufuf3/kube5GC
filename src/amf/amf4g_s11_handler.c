@@ -33,7 +33,7 @@ void amf4g_s11_handle_create_session_response(
     d_assert(amf4g_ue, return, "Null param");
     d_assert(rsp, return, "Null param");
 
-    d_trace(3, "[MME] Create Session Response\n");
+    d_trace(3, "[AMF4G] Create Session Response\n");
 
     if (rsp->sender_f_teid_for_control_plane.presence == 0)
     {
@@ -88,7 +88,7 @@ void amf4g_s11_handle_create_session_response(
     sgw_s1u_teid = rsp->bearer_contexts_created.s1_u_enodeb_f_teid.data;
     bearer->sgw_s1u_teid = ntohl(sgw_s1u_teid->teid);
 
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
     d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
         bearer->enb_s1u_teid, bearer->sgw_s1u_teid);
@@ -123,8 +123,8 @@ void amf4g_s11_handle_modify_bearer_response(
     d_assert(xact, goto cleanup, "Null param");
     d_assert(rsp, goto cleanup, "Null param");
 
-    d_trace(3, "[MME] Modify Bearer Response\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Modify Bearer Response\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     rv = gtp_xact_commit(xact);
@@ -167,13 +167,13 @@ void amf4g_s11_handle_delete_session_response(
     d_assert(sess, return, "Null param");
     d_assert(rsp, goto cleanup, "Null param");
 
-    d_trace(3, "[MME] Delete Session Response\n");
+    d_trace(3, "[AMF4G] Delete Session Response\n");
     if (rsp->cause.presence == 0)
     {
         d_error("No Cause");
         goto cleanup;
     }
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     rv = gtp_xact_commit(xact);
@@ -256,7 +256,7 @@ void amf4g_s11_handle_create_bearer_request(
     d_assert(amf4g_ue, return, "Null param");
     d_assert(req, return, "Null param");
 
-    d_trace(3, "[MME] Create Bearer Response\n");
+    d_trace(3, "[AMF4G] Create Bearer Response\n");
 
     if (req->linked_eps_bearer_id.presence == 0)
     {
@@ -289,7 +289,7 @@ void amf4g_s11_handle_create_bearer_request(
         return;
     }
 
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     sess = amf4g_sess_find_by_ebi(amf4g_ue, req->linked_eps_bearer_id.u8);
@@ -334,7 +334,7 @@ void amf4g_s11_handle_create_bearer_request(
         FSM_CHECK(&default_bearer->sm, esm_state_active) &&
         /* Check if Initial Context Setup Response or 
          *          E-RAB Setup Response is received */
-        MME_HAVE_ENB_S1U_PATH(default_bearer))
+        AMF4G_HAVE_ENB_S1U_PATH(default_bearer))
     {
         rv = nas_send_activate_dedicated_bearer_context_request(bearer);
         d_assert(rv == CORE_OK, return,
@@ -353,7 +353,7 @@ void amf4g_s11_handle_update_bearer_request(
     d_assert(amf4g_ue, return, "Null param");
     d_assert(req, return, "Null param");
 
-    d_trace(3, "[MME] Update Bearer Request\n");
+    d_trace(3, "[AMF4G] Update Bearer Request\n");
     if (req->bearer_contexts.presence == 0)
     {
         d_error("No Bearer");
@@ -364,7 +364,7 @@ void amf4g_s11_handle_update_bearer_request(
         d_error("No EPS Bearer ID");
         return;
     }
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     bearer = amf4g_bearer_find_by_ue_ebi(amf4g_ue,
@@ -379,7 +379,7 @@ void amf4g_s11_handle_update_bearer_request(
         FSM_CHECK(&bearer->sm, esm_state_active) &&
         /* Check if Initial Context Setup Response or 
          *          E-RAB Setup Response is received */
-        MME_HAVE_ENB_S1U_PATH(bearer))
+        AMF4G_HAVE_ENB_S1U_PATH(bearer))
     {
         if (req->bearer_contexts.bearer_level_qos.presence == 1)
         {
@@ -428,7 +428,7 @@ void amf4g_s11_handle_update_bearer_request(
         {
             d_assert(0,, "Invalid Bearer State");
         }
-        else if (!MME_HAVE_ENB_S1U_PATH(bearer))
+        else if (!AMF4G_HAVE_ENB_S1U_PATH(bearer))
         {
             d_assert(0,, "No ENB S1U PATH");
         }
@@ -448,7 +448,7 @@ void amf4g_s11_handle_delete_bearer_request(
     d_assert(amf4g_ue, return, "Null param");
     d_assert(req, return, "Null param");
 
-    d_trace(3, "[MME] Delete Bearer Request\n");
+    d_trace(3, "[AMF4G] Delete Bearer Request\n");
     if (req->linked_eps_bearer_id.presence == 1)
     {
         bearer = amf4g_bearer_find_by_ue_ebi(amf4g_ue, req->linked_eps_bearer_id.u8);
@@ -467,7 +467,7 @@ void amf4g_s11_handle_delete_bearer_request(
         d_error("No Linked EBI or EPS Bearer ID");
         return;
     }
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     /* Save Transaction. will be handled after EMM-attached */
@@ -477,7 +477,7 @@ void amf4g_s11_handle_delete_bearer_request(
         FSM_CHECK(&bearer->sm, esm_state_active) &&
         /* Check if Initial Context Setup Response or 
          *          E-RAB Setup Response is received */
-        MME_HAVE_ENB_S1U_PATH(bearer))
+        AMF4G_HAVE_ENB_S1U_PATH(bearer))
     {
         rv = nas_send_deactivate_bearer_context_request(bearer);
         d_assert(rv == CORE_OK, return,
@@ -489,7 +489,7 @@ void amf4g_s11_handle_delete_bearer_request(
         {
             d_assert(0,, "Invalid Bearer State");
         }
-        else if (!MME_HAVE_ENB_S1U_PATH(bearer))
+        else if (!AMF4G_HAVE_ENB_S1U_PATH(bearer))
         {
             d_assert(0,, "No ENB S1U PATH");
         }
@@ -510,11 +510,11 @@ void amf4g_s11_handle_release_access_bearers_response(
     d_assert(amf4g_ue, return, "Null param");
     d_assert(rsp, return, "Null param");
 
-    d_trace(3, "[MME] Release Access Bearers Response\n");
+    d_trace(3, "[AMF4G] Release Access Bearers Response\n");
     enb_ue = amf4g_ue->enb_ue;
     d_assert(enb_ue, return, "Null param");
 
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     rv = gtp_xact_commit(xact);
@@ -527,7 +527,7 @@ void amf4g_s11_handle_release_access_bearers_response(
     }
 
     rv = CLEAR_BEARER_CONTEXT(amf4g_ue);
-    d_assert(rv == CORE_OK,, "MME_BEARER_SET_INACTIVE failed");
+    d_assert(rv == CORE_OK,, "AMF4G_BEARER_SET_INACTIVE failed");
 
     rv = s1ap_send_ue_context_release_command(enb_ue,
             S1AP_Cause_PR_nas, S1AP_CauseNas_normal_release,
@@ -547,8 +547,8 @@ void amf4g_s11_handle_downlink_data_notification(
     d_assert(amf4g_ue, return, "Null param");
     d_assert(noti, return, "Null param");
 
-    d_trace(3, "[MME] Downlink Data Notification\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Downlink Data Notification\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     /* Build Downlink data notification ack */
@@ -585,13 +585,13 @@ void amf4g_s11_handle_create_indirect_data_forwarding_tunnel_response(
     source_ue = amf4g_ue->enb_ue;
     d_assert(source_ue, return, "Null param");
 
-    d_trace(3, "[MME] Create Indirect Data Forwarding Tunnel Response\n");
+    d_trace(3, "[AMF4G] Create Indirect Data Forwarding Tunnel Response\n");
     if (rsp->cause.presence == 0)
     {
         d_error("No Cause");
         return;
     }
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     rv = gtp_xact_commit(xact);
@@ -645,13 +645,13 @@ void amf4g_s11_handle_delete_indirect_data_forwarding_tunnel_response(
     d_assert(amf4g_ue, return, "Null param");
     d_assert(rsp, return, "Null param");
 
-    d_trace(3, "[MME] Delete Indirect Data Forwarding Tunnel Response\n");
+    d_trace(3, "[AMF4G] Delete Indirect Data Forwarding Tunnel Response\n");
     if (rsp->cause.presence == 0)
     {
         d_error("No Cause");
         return;
     }
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     rv = gtp_xact_commit(xact);
@@ -674,7 +674,7 @@ void amf_n11_handle_create_session_response(
     d_assert(amf4g_ue, return, "Null param");
     d_assert(pCreateSession, return, "Null param");
 
-    d_trace(3, "[MME] Create Session Response\n");
+    d_trace(3, "[AMF4G] Create Session Response\n");
 
     d_assert(amf4g_ue, return, "Null param");
 
@@ -697,7 +697,7 @@ void amf_n11_handle_create_session_response(
     /* Data Plane(UL) : SGW-S1U */
     bearer->sgw_s1u_teid = pCreateSession->sgw_s1u_teid;
 
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
     d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
         bearer->enb_s1u_teid, bearer->sgw_s1u_teid);
@@ -734,8 +734,8 @@ void amf_n11_handle_modify_bearer_response( amf4g_ue_t *amf4g_ue, modify_bearer_
     d_assert(amf4g_ue, return, "Null param");
     d_assert(modifyBearer, goto cleanup, "Null param");
 
-    d_trace(3, "[MME] Modify Bearer Response\n");
-    d_trace(5, "    MME_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(3, "[AMF4G] Modify Bearer Response\n");
+    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
 
     if (modifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_MODIFY)
@@ -770,7 +770,7 @@ void amf_n11_handle_modify_bearer_response( amf4g_ue_t *amf4g_ue, modify_bearer_
         d_assert(enb_ue, return, "Null param");
 
         rv = CLEAR_BEARER_CONTEXT(amf4g_ue);
-        d_assert(rv == CORE_OK,, "MME_BEARER_SET_INACTIVE failed");
+        d_assert(rv == CORE_OK,, "AMF4G_BEARER_SET_INACTIVE failed");
 
         rv = s1ap_send_ue_context_release_command(enb_ue,
                 S1AP_Cause_PR_nas, S1AP_CauseNas_normal_release,

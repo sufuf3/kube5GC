@@ -44,7 +44,7 @@ void s1ap_handle_s1_setup_request(amf4g_enb_t *enb, s1ap_message_t *message)
     S1SetupRequest = &initiatingMessage->value.choice.S1SetupRequest;
     d_assert(S1SetupRequest, return,);
 
-    d_trace(3, "[MME] S1-Setup request\n");
+    d_trace(3, "[AMF4G] S1-Setup request\n");
 
     for (i = 0; i < S1SetupRequest->protocolIEs.list.count; i++)
     {
@@ -147,13 +147,13 @@ void s1ap_handle_s1_setup_request(amf4g_enb_t *enb, s1ap_message_t *message)
 
     if (group == S1AP_Cause_PR_NOTHING)
     {
-        d_trace(3, "[MME] S1-Setup response\n");
+        d_trace(3, "[AMF4G] S1-Setup response\n");
         d_assert(s1ap_build_setup_rsp(&s1apbuf) == CORE_OK, 
                 return, "s1ap_build_setup_rsp() failed");
     }
     else
     {
-        d_trace(3, "[MME] S1-Setup failure\n");
+        d_trace(3, "[AMF4G] S1-Setup failure\n");
         d_assert(s1ap_build_setup_failure(
                 &s1apbuf, group, cause, S1AP_TimeToWait_v10s) == CORE_OK, 
                 return, "s1ap_build_setup_failure() failed");
@@ -187,7 +187,7 @@ void s1ap_handle_eNB_configuration_update(amf4g_enb_t *enb, s1ap_message_t *mess
     ENBConfigurationUpdate = &initiatingMessage->value.choice.ENBConfigurationUpdate;
     d_assert(ENBConfigurationUpdate, return,);
 
-    d_trace(3, "[MME] eNB Configuration update\n");
+    d_trace(3, "[AMF4G] eNB Configuration update\n");
 
     for (i = 0; i < ENBConfigurationUpdate->protocolIEs.list.count; i++)
     {
@@ -280,13 +280,13 @@ void s1ap_handle_eNB_configuration_update(amf4g_enb_t *enb, s1ap_message_t *mess
 
     if (group == S1AP_Cause_PR_NOTHING)
     {
-        d_trace(3, "[MME]eNB Configuration update ACKNOWLEDGE\n");
+        d_trace(3, "[AMF4G]eNB Configuration update ACKNOWLEDGE\n");
         d_assert(s1ap_build_enb_configuration_update_acknowledge(&s1apbuf) == CORE_OK, 
                 return, "s1ap_build_setup_rsp() failed");
     }
     else
     {
-        d_trace(3, "[MME] eNB Configuration update failure\n");
+        d_trace(3, "[AMF4G] eNB Configuration update failure\n");
         d_assert(s1ap_build_enb_configuration_update_failure(
                 &s1apbuf, group, cause, S1AP_TimeToWait_v10s) == CORE_OK, 
                 return, "s1ap_build_setup_failure() failed");
@@ -319,7 +319,7 @@ void s1ap_handle_ue_context_suspend(
     UEContextSuspendRequest = &initiatingMessage->value.choice.UEContextSuspendRequest;
     d_assert(UEContextSuspendRequest, return,);
 
-    d_trace(3, "[MME] ue context suspend request\n");
+    d_trace(3, "[AMF4G] ue context suspend request\n");
 
     for (i = 0; i < UEContextSuspendRequest->protocolIEs.list.count; i++)
     {
@@ -337,7 +337,7 @@ void s1ap_handle_ue_context_suspend(
         }
     }
 
-    d_trace(3, "[MME] ue context suspend response\n");
+    d_trace(3, "[AMF4G] ue context suspend response\n");
     d_assert(s1ap_build_ue_context_suspend_response(&s1apbuf,MME_UE_S1AP_ID,ENB_UE_S1AP_ID) == CORE_OK, 
             return, "s1ap_build_setup_rsp() failed");
 
@@ -367,7 +367,7 @@ void s1ap_handle_ERAB_release_response(
     E_RABReleaseResponse = &successfulOutcome->value.choice.E_RABReleaseResponse;
     d_assert(E_RABReleaseResponse, return,);
 
-    d_trace(3, "[MME] ERAB release response\n");
+    d_trace(3, "[AMF4G] ERAB release response\n");
 
     for (i = 0; i < E_RABReleaseResponse->protocolIEs.list.count; i++)
     {
@@ -409,7 +409,7 @@ void s1ap_handle_mme_configuration_update_acknowledge(
 
     d_assert(MMEConfigurationUpdateAcknowledge, return,);
 
-    d_trace(3, "[MME] MME configuration update acknowledge\n");
+    d_trace(3, "[AMF4G] MME configuration update acknowledge\n");
 }
 
 void s1ap_handle_enb_direct_information_transfer(amf4g_enb_t *enb, s1ap_message_t *message)
@@ -432,7 +432,7 @@ void s1ap_handle_enb_direct_information_transfer(amf4g_enb_t *enb, s1ap_message_
     ENBDirectInformationTransfer = &initiatingMessage->value.choice.ENBDirectInformationTransfer;
     //--------------
     
-    d_trace(3, "[MME] ENB Direct Information Transfer\n");
+    d_trace(3, "[AMF4G] ENB Direct Information Transfer\n");
     
     for (i = 0; i < ENBDirectInformationTransfer->protocolIEs.list.count; i++)
     {
@@ -474,7 +474,7 @@ void s1ap_handle_mme_configuration_update_failure(
         &unsuccessfulOutcome->value.choice.MMEConfigurationUpdateFailure;
     d_assert(MMEConfigurationUpdateFailure, return,);
 
-    d_trace(3, "[MME] MME configuration update failure\n");
+    d_trace(3, "[AMF4G] MME configuration update failure\n");
     // End of Message Type
     
     for (i = 0; i < MMEConfigurationUpdateFailure->protocolIEs.list.count; i++)
@@ -513,7 +513,7 @@ void s1ap_handle_e_rab_release_indication(
     E_RABReleaseIndication = &initiatingMessage->value.choice.E_RABReleaseIndication;
     //--------------
     
-    d_trace(3, "[MME] E-RAB Release Indication\n");
+    d_trace(3, "[AMF4G] E-RAB Release Indication\n");
     
     for (i = 0; i < E_RABReleaseIndication->protocolIEs.list.count; i++)
     {
@@ -532,13 +532,13 @@ void s1ap_handle_e_rab_release_indication(
                 break;
         }
     }
-    d_trace(1, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n", *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID );
+    d_trace(1, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n", *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID );
 }
 
 void s1ap_handle_CBC_write_replace_warning_message(amf4g_enb_t *enb)
 {
     pkbuf_t *s1apbuf = NULL;
-    d_trace(3, "[MME] S1 send write replace warning request\n");
+    d_trace(3, "[AMF4G] S1 send write replace warning request\n");
     d_assert(s1ap_build_write_replace_warning_request(&s1apbuf) == CORE_OK,return, "s1ap_build_write_replace_warning_request() failed");
     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,"s1ap_send_to_enb() failed");
 
@@ -547,7 +547,7 @@ void s1ap_handle_CBC_write_replace_warning_message(amf4g_enb_t *enb)
 void s1ap_handle_CBC_stop_warning_message(amf4g_enb_t *enb)
 {
     pkbuf_t *s1apbuf = NULL;
-    d_trace(3, "[MME] S1 send kill request\n");
+    d_trace(3, "[AMF4G] S1 send kill request\n");
     d_assert(s1ap_build_kill_request(&s1apbuf) == CORE_OK,return, "s1ap_build_kill_request() failed");
     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,"s1ap_send_to_enb() failed");
 }
@@ -584,7 +584,7 @@ void s1ap_handle_initial_ue_message(amf4g_enb_t *enb, s1ap_message_t *message)
     InitialUEMessage = &initiatingMessage->value.choice.InitialUEMessage;
     d_assert(InitialUEMessage, return,);
 
-    d_trace(3, "[MME] Initial UE Message\n");
+    d_trace(3, "[AMF4G] Initial UE Message\n");
 
     for (i = 0; i < InitialUEMessage->protocolIEs.list.count; i++)
     {
@@ -656,7 +656,7 @@ void s1ap_handle_initial_ue_message(amf4g_enb_t *enb, s1ap_message_t *message)
                         amf4g_ue->guti.mme_gid,
                         amf4g_ue->guti.mme_code,
                         amf4g_ue->guti.m_tmsi,
-                        MME_UE_HAVE_IMSI(amf4g_ue) 
+                        AMF4G_UE_HAVE_IMSI(amf4g_ue) 
                             ? amf4g_ue->imsi_bcd : "Unknown");
 
                 /* If NAS(amf4g_ue_t) has already been associated with
@@ -666,7 +666,7 @@ void s1ap_handle_initial_ue_message(amf4g_enb_t *enb, s1ap_message_t *message)
 #if 1  /* IMPLICIT_S1_RELEASE */
                    /* Implcit S1 release */
                     d_trace(5, "Implicit S1 release\n");
-                    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+                    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
                           amf4g_ue->enb_ue->enb_ue_s1ap_id,
                           amf4g_ue->enb_ue->mme_ue_s1ap_id);
                     rv = enb_ue_remove(amf4g_ue->enb_ue);
@@ -718,7 +718,7 @@ void s1ap_handle_initial_ue_message(amf4g_enb_t *enb, s1ap_message_t *message)
             sizeof(enb_ue->nas.e_cgi.cell_id));
     enb_ue->nas.e_cgi.cell_id = (ntohl(enb_ue->nas.e_cgi.cell_id) >> 4);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] TAC[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d] TAC[%d]\n",
         enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id, enb_ue->nas.tai.tac);
 
     d_trace(10, "UE_Application_Layer_Measurement_Capability\n");
@@ -762,7 +762,7 @@ void s1ap_handle_uplink_nas_transport(
     UplinkNASTransport = &initiatingMessage->value.choice.UplinkNASTransport;
     d_assert(UplinkNASTransport, return,);
 
-    d_trace(3, "[MME] Uplink NAS transport\n");
+    d_trace(3, "[AMF4G] Uplink NAS transport\n");
 
     for (i = 0; i < UplinkNASTransport->protocolIEs.list.count; i++)
     {
@@ -788,7 +788,7 @@ void s1ap_handle_uplink_nas_transport(
     d_assert(enb_ue, return, "No UE Context[ENB_UE_S1AP_ID:%d]",
             *ENB_UE_S1AP_ID);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     d_assert(s1ap_send_to_nas(enb_ue,
@@ -821,7 +821,7 @@ void s1ap_handle_ue_radio_capability_match_response(
         &successfulOutcome->value.choice.UERadioCapabilityMatchResponse;
     d_assert(UERadioCapabilityMatchResponse, return,);
 
-    d_trace(1, "[MME] UE Radio Capability Match Response\n");
+    d_trace(1, "[AMF4G] UE Radio Capability Match Response\n");
 
     for (i = 0; i < UERadioCapabilityMatchResponse->protocolIEs.list.count; i++)
     {
@@ -846,7 +846,7 @@ void s1ap_handle_ue_radio_capability_match_response(
             CORE_ADDR(enb->addr, buf), enb->enb_id);
     //d_trace(1, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
     //        enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
-    d_trace(1, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d] VoiceSupportMatchIndicator[%d]\n",
+    d_trace(1, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d] VoiceSupportMatchIndicator[%d]\n",
             *ENB_UE_S1AP_ID, *MME_UE_S1AP_ID, *VoiceSupportMatchIndicator);
 }
 
@@ -873,8 +873,8 @@ void s1ap_handle_nas_delivery_indication(
     NASDeliveryIndication = &initiatingMessage->value.choice.NASDeliveryIndication;
     d_assert(NASDeliveryIndication, return,);
 
-    d_trace(3, "[MME] NAS DELIVERY INDICATION\n");
-    d_trace(3, "[MME] Sending to SCEF\n");
+    d_trace(3, "[AMF4G] NAS DELIVERY INDICATION\n");
+    d_trace(3, "[AMF4G] Sending to SCEF\n");
 
     //retrieve data from packet
     printf("protocolIE list count = %d\n",NASDeliveryIndication->protocolIEs.list.count);
@@ -899,7 +899,7 @@ void s1ap_handle_nas_delivery_indication(
     d_assert(enb_ue, return, "No UE Context[ENB_UE_S1AP_ID:%d]",
             *ENB_UE_S1AP_ID);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     /*d_assert(s1ap_send_to_nas(enb_ue,
@@ -932,8 +932,8 @@ void s1ap_handle_nas_non_delivery_indication(
     NASNonDeliveryIndication = &initiatingMessage->value.choice.NASNonDeliveryIndication;
     d_assert(NASNonDeliveryIndication, return,);
 
-    d_trace(3, "[MME] NAS NON DELIVERY INDICATION\n");
-    d_trace(3, "[MME] Sending to SCEF\n");
+    d_trace(3, "[AMF4G] NAS NON DELIVERY INDICATION\n");
+    d_trace(3, "[AMF4G] Sending to SCEF\n");
 
     for (i = 0; i < NASNonDeliveryIndication->protocolIEs.list.count; i++)
     {
@@ -962,7 +962,7 @@ void s1ap_handle_nas_non_delivery_indication(
     d_assert(enb_ue, return, "No UE Context[ENB_UE_S1AP_ID:%d]",
             *ENB_UE_S1AP_ID);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     d_assert(Cause, return,);
@@ -1001,7 +1001,7 @@ void s1ap_handle_e_rab_modification_indication(
     E_RABModificationIndication = &initiatingMessage->value.choice.E_RABModificationIndication;
     d_assert(E_RABModificationIndication, return,);
 
-    d_trace(1, "[MME] E-RAB Modification Indication\n");
+    d_trace(1, "[AMF4G] E-RAB Modification Indication\n");
 
     for (i = 0; i < E_RABModificationIndication->protocolIEs.list.count; i++)
     {
@@ -1041,7 +1041,7 @@ void s1ap_handle_e_rab_modification_indication(
     d_assert(enb_ue, return, "No UE Context[ENB_UE_S1AP_ID:%d]",
             *ENB_UE_S1AP_ID);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%s]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%s]\n",
             enb_ue->enb_ue_s1ap_id, *MME_UE_S1AP_ID);
 
     d_assert(s1ap_send_e_rab_modification_confirm(enb_ue) == CORE_OK,,
@@ -1074,7 +1074,7 @@ void s1ap_handle_ue_capability_info_indication(
         &initiatingMessage->value.choice.UECapabilityInfoIndication;
     d_assert(UECapabilityInfoIndication, return,);
 
-    d_trace(3, "[MME] UE capability info indication\n");
+    d_trace(3, "[AMF4G] UE capability info indication\n");
 
     for (i = 0; i < UECapabilityInfoIndication->protocolIEs.list.count; i++)
     {
@@ -1101,7 +1101,7 @@ void s1ap_handle_ue_capability_info_indication(
     enb_ue = enb_ue_find_by_enb_ue_s1ap_id(enb, *ENB_UE_S1AP_ID);
     d_assert(enb_ue, return, "No UE Context[%d]", *ENB_UE_S1AP_ID);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     if (enb_ue->amf4g_ue)
@@ -1170,7 +1170,7 @@ void s1ap_handle_initial_context_setup_response(
         &successfulOutcome->value.choice.InitialContextSetupResponse;
     d_assert(InitialContextSetupResponse, return,);
 
-    d_trace(3, "[MME] Initial context setup response\n");
+    d_trace(3, "[AMF4G] Initial context setup response\n");
 
     for (i = 0; i < InitialContextSetupResponse->protocolIEs.list.count; i++)
     {
@@ -1198,7 +1198,7 @@ void s1ap_handle_initial_context_setup_response(
     amf4g_ue = enb_ue->amf4g_ue;
     d_assert(amf4g_ue, return,);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     d_assert(E_RABSetupListCtxtSURes, return,);
@@ -1235,7 +1235,7 @@ void s1ap_handle_initial_context_setup_response(
         {
             d_trace(5, "    NAS_EPS Type[%d]\n", amf4g_ue->nas_eps.type);
             int uli_presence = 0;
-            if (amf4g_ue->nas_eps.type != MME_EPS_TYPE_ATTACH_REQUEST)
+            if (amf4g_ue->nas_eps.type != AMF4G_EPS_TYPE_ATTACH_REQUEST)
             {
                 d_trace(5, "    ### ULI PRESENT ###\n");
                 uli_presence = 1;
@@ -1290,7 +1290,7 @@ void s1ap_handle_eNB_cp_relocation_indication(
     ENBCPRelocationIndication = &initiatingMessage->value.choice.ENBCPRelocationIndication;
     d_assert(ENBCPRelocationIndication, return,);
 
-    d_trace(3, "[MME] eNB CP Relocation Indication\n");
+    d_trace(3, "[AMF4G] eNB CP Relocation Indication\n");
 
     for (i = 0; i < ENBCPRelocationIndication->protocolIEs.list.count; i++)
     {
@@ -1466,7 +1466,7 @@ void s1ap_handle_initial_context_setup_failure(
         &unsuccessfulOutcome->value.choice.InitialContextSetupFailure;
     d_assert(InitialContextSetupFailure, return,);
 
-    d_trace(3, "[MME] Initial context setup failure\n");
+    d_trace(3, "[AMF4G] Initial context setup failure\n");
 
     for (i = 0; i < InitialContextSetupFailure->protocolIEs.list.count; i++)
     {
@@ -1499,7 +1499,7 @@ void s1ap_handle_initial_context_setup_failure(
     }
     amf4g_ue = enb_ue->amf4g_ue;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
     d_trace(5, "    Cause[Group:%d Cause:%d]\n",
             Cause->present, Cause->choice.radioNetwork);
@@ -1591,7 +1591,7 @@ void s1ap_handle_e_rab_setup_response(
     E_RABSetupResponse = &successfulOutcome->value.choice.E_RABSetupResponse;
     d_assert(E_RABSetupResponse, return,);
 
-    d_trace(3, "[MME] E-RAB setup response\n");
+    d_trace(3, "[AMF4G] E-RAB setup response\n");
 
     for (i = 0; i < E_RABSetupResponse->protocolIEs.list.count; i++)
     {
@@ -1619,7 +1619,7 @@ void s1ap_handle_e_rab_setup_response(
     amf4g_ue = enb_ue->amf4g_ue;
     d_assert(amf4g_ue, return,);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     d_assert(E_RABSetupListBearerSURes, return,);
@@ -1697,7 +1697,7 @@ void s1ap_handle_e_rab_modify_response(
     E_RABModifyResponse = &successfulOutcome->value.choice.E_RABModifyResponse;
     d_assert(E_RABModifyResponse, return,);
 
-    d_trace(3, "[MME] E-RAB modify response\n");
+    d_trace(3, "[AMF4G] E-RAB modify response\n");
 
     for (i = 0; i < E_RABModifyResponse->protocolIEs.list.count; i++)
     {
@@ -1729,7 +1729,7 @@ void s1ap_handle_e_rab_modify_response(
     amf4g_ue = enb_ue->amf4g_ue;
     d_assert(amf4g_ue, return,);
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     d_assert(E_RABModifyListBearerModRes, return,);
@@ -1802,7 +1802,7 @@ void s1ap_handle_ue_context_release_request(
         &initiatingMessage->value.choice.UEContextReleaseRequest;
     d_assert(UEContextReleaseRequest, return,);
 
-    d_trace(3, "[MME] UE Context release request\n");
+    d_trace(3, "[AMF4G] UE Context release request\n");
 
     for (i = 0; i < UEContextReleaseRequest->protocolIEs.list.count; i++)
     {
@@ -1830,7 +1830,7 @@ void s1ap_handle_ue_context_release_request(
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(*MME_UE_S1AP_ID);
     if (!enb_ue)
     {
-        d_warn("No ENB UE Context : MME_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
+        d_warn("No ENB UE Context : AMF4G_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
         rv = s1ap_send_error_indication(enb, 
                 MME_UE_S1AP_ID, ENB_UE_S1AP_ID,
                 S1AP_Cause_PR_radioNetwork,
@@ -1839,7 +1839,7 @@ void s1ap_handle_ue_context_release_request(
         return;
     }
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     d_assert(Cause, return,);
@@ -1915,7 +1915,7 @@ void s1ap_handle_ue_context_release_complete(
         &successfulOutcome->value.choice.UEContextReleaseComplete;
     d_assert(UEContextReleaseComplete, return,);
 
-    d_trace(3, "[MME] UE Context release complete\n");
+    d_trace(3, "[AMF4G] UE Context release complete\n");
 
     for (i = 0; i < UEContextReleaseComplete->protocolIEs.list.count; i++)
     {
@@ -1937,7 +1937,7 @@ void s1ap_handle_ue_context_release_complete(
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(*MME_UE_S1AP_ID);
     if (!enb_ue)
     {
-        d_warn("No ENB UE Context : MME_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
+        d_warn("No ENB UE Context : AMF4G_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
         rv = s1ap_send_error_indication(enb, 
                 MME_UE_S1AP_ID, NULL,
                 S1AP_Cause_PR_radioNetwork,
@@ -1947,7 +1947,7 @@ void s1ap_handle_ue_context_release_complete(
     }
     amf4g_ue = enb_ue->amf4g_ue;
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     switch (enb_ue->ue_ctx_rel_action)
@@ -2040,7 +2040,7 @@ void s1ap_handle_ue_context_resume_request(
     UEContextResumeRequest= &initiatingMessage->value.choice.UEContextResumeRequest;
 	//--------------
 	
-    d_trace(3, "[MME] UE Context Resume Request\n");
+    d_trace(3, "[AMF4G] UE Context Resume Request\n");
 	
     for (i = 0; i <UEContextResumeRequest->protocolIEs.list.count; i++)
     {
@@ -2064,7 +2064,7 @@ void s1ap_handle_ue_context_resume_request(
     // Build response and send back to enb
     pkbuf_t *s1apbuf = NULL;
 
-    d_trace(3, "[MME] s1 ue_context_resume response\n");
+    d_trace(3, "[AMF4G] s1 ue_context_resume response\n");
     d_assert(s1ap_build_ue_context_resume_response(&s1apbuf, ENB_UE_S1AP_ID, MME_UE_S1AP_ID) == CORE_OK, 
             return, "s1ap_build_ue_context_resume_response() failed");
 
@@ -2099,7 +2099,7 @@ void s1ap_handle_ue_context_modification_response(
         &successfulOutcome->value.choice.UEContextModificationResponse;
     d_assert(UEContextModificationResponse, return,);
 
-    d_trace(3, "[MME] Receive UE Context modification response\n");
+    d_trace(3, "[AMF4G] Receive UE Context modification response\n");
     
     for (i = 0; i < UEContextModificationResponse->protocolIEs.list.count; i++)
     {
@@ -2124,7 +2124,7 @@ void s1ap_handle_ue_context_modification_response(
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(*MME_UE_S1AP_ID);
     if (!enb_ue)
     {
-        d_warn("No ENB UE Context : MME_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
+        d_warn("No ENB UE Context : AMF4G_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
         rv = s1ap_send_error_indication(enb, 
                 MME_UE_S1AP_ID, NULL,
                 S1AP_Cause_PR_radioNetwork,
@@ -2132,7 +2132,7 @@ void s1ap_handle_ue_context_modification_response(
         d_assert(rv == CORE_OK, return, "s1ap send error");
         return;
     }
-    d_trace(3, "UE Context modification. MME_UE_S1AP_ID[%lu], eNB_UE_S1AP_ID[%lu]\n", *MME_UE_S1AP_ID, *ENB_UE_S1AP_ID);
+    d_trace(3, "UE Context modification. AMF4G_UE_S1AP_ID[%lu], eNB_UE_S1AP_ID[%lu]\n", *MME_UE_S1AP_ID, *ENB_UE_S1AP_ID);
 }
 
 void s1ap_handle_ue_context_modification_failure(
@@ -2162,7 +2162,7 @@ void s1ap_handle_ue_context_modification_failure(
         &unsuccessfulOutcome->value.choice.UEContextModificationFailure;
     d_assert(UEContextModificationFailure, return,);
 
-    d_trace(3, "[MME] Receive UE Context modification response\n");
+    d_trace(3, "[AMF4G] Receive UE Context modification response\n");
     
     for (i = 0; i < UEContextModificationFailure->protocolIEs.list.count; i++)
     {
@@ -2190,7 +2190,7 @@ void s1ap_handle_ue_context_modification_failure(
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(*MME_UE_S1AP_ID);
     if (!enb_ue)
     {
-        d_warn("No ENB UE Context : MME_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
+        d_warn("No ENB UE Context : AMF4G_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
         rv = s1ap_send_error_indication(enb, 
                 MME_UE_S1AP_ID, NULL,
                 S1AP_Cause_PR_radioNetwork,
@@ -2198,7 +2198,7 @@ void s1ap_handle_ue_context_modification_failure(
         d_assert(rv == CORE_OK, return, "s1ap send error");
         return;
     }
-    d_trace(3, "UE Context modification failure. MME_UE_S1AP_ID[%lu], eNB_UE_S1AP_ID[%lu]\n", *MME_UE_S1AP_ID, *ENB_UE_S1AP_ID);
+    d_trace(3, "UE Context modification failure. AMF4G_UE_S1AP_ID[%lu], eNB_UE_S1AP_ID[%lu]\n", *MME_UE_S1AP_ID, *ENB_UE_S1AP_ID);
     d_trace(3, "Group[%d]Cause[%d]\n", Cause->present, Cause->choice.radioNetwork);
 }
 
@@ -2229,7 +2229,7 @@ void s1ap_handle_ue_context_modification_indication(
         &initiatingMessage->value.choice.UEContextModificationIndication;
     d_assert(UEContextModificationIndication, return,);
 
-    d_trace(3, "[MME] Receive UE Context confirm\n");
+    d_trace(3, "[AMF4G] Receive UE Context confirm\n");
     
     for (i = 0; i < UEContextModificationIndication->protocolIEs.list.count; i++)
     {
@@ -2255,7 +2255,7 @@ void s1ap_handle_ue_context_modification_indication(
     enb_ue = enb_ue_find_by_mme_ue_s1ap_id(*MME_UE_S1AP_ID);
     if (!enb_ue)
     {
-        d_warn("No ENB UE Context : MME_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
+        d_warn("No ENB UE Context : AMF4G_UE_S1AP_ID[%d]", *MME_UE_S1AP_ID);
         rv = s1ap_send_error_indication(enb, 
                 MME_UE_S1AP_ID, NULL,
                 S1AP_Cause_PR_radioNetwork,
@@ -2349,7 +2349,7 @@ void s1ap_handle_path_switch_request(
     PathSwitchRequest = &initiatingMessage->value.choice.PathSwitchRequest;
     d_assert(PathSwitchRequest, return,);
 
-    d_trace(3, "[MME] Path switch request\n");
+    d_trace(3, "[AMF4G] Path switch request\n");
 
     for (i = 0; i < PathSwitchRequest->protocolIEs.list.count; i++)
     {
@@ -2420,7 +2420,7 @@ void s1ap_handle_path_switch_request(
         return;
     }
 
-    d_trace(5, "    ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             enb_ue->enb_ue_s1ap_id, enb_ue->mme_ue_s1ap_id);
 
     amf4g_ue = enb_ue->amf4g_ue;
@@ -2538,7 +2538,7 @@ void s1ap_handle_enb_configuration_transfer(
         &initiatingMessage->value.choice.ENBConfigurationTransfer;
     d_assert(ENBConfigurationTransfer, return,);
 
-    d_trace(3, "[MME] ENB configuration transfer\n");
+    d_trace(3, "[AMF4G] ENB configuration transfer\n");
     for (i = 0; i < ENBConfigurationTransfer->protocolIEs.list.count; i++)
     {
         ie = ENBConfigurationTransfer->protocolIEs.list.array[i];
@@ -2638,7 +2638,7 @@ void s1ap_handle_handover_required(amf4g_enb_t *enb, s1ap_message_t *message)
     amf4g_enb_t *target_enb = NULL;
     c_uint32_t target_enb_id = 0;
 
-    d_trace(3, "[MME] Handover required\n");
+    d_trace(3, "[AMF4G] Handover required\n");
     for (i = 0; i < HandoverRequired->protocolIEs.list.count; i++)
     {
         ie = HandoverRequired->protocolIEs.list.array[i];
@@ -2768,7 +2768,7 @@ void s1ap_handle_handover_request_ack(amf4g_enb_t *enb, s1ap_message_t *message)
         &successfulOutcome->value.choice.HandoverRequestAcknowledge;
     d_assert(HandoverRequestAcknowledge, return,);
 
-    d_trace(3, "[MME] Handover request acknowledge\n");
+    d_trace(3, "[AMF4G] Handover request acknowledge\n");
     for (i = 0; i < HandoverRequestAcknowledge->protocolIEs.list.count; i++)
     {
         ie = HandoverRequestAcknowledge->protocolIEs.list.array[i];
@@ -2812,9 +2812,9 @@ void s1ap_handle_handover_request_ack(amf4g_enb_t *enb, s1ap_message_t *message)
     amf4g_ue = source_ue->amf4g_ue;
     d_assert(amf4g_ue, return,);
 
-    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
-    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             target_ue->enb_ue_s1ap_id, target_ue->mme_ue_s1ap_id);
 
     for (i = 0; i < E_RABAdmittedList->list.count; i++)
@@ -2903,7 +2903,7 @@ void s1ap_handle_handover_failure(amf4g_enb_t *enb, s1ap_message_t *message)
     HandoverFailure = &unsuccessfulOutcome->value.choice.HandoverFailure;
     d_assert(HandoverFailure, return,);
 
-    d_trace(3, "[MME] Handover failure\n");
+    d_trace(3, "[AMF4G] Handover failure\n");
     for (i = 0; i < HandoverFailure->protocolIEs.list.count; i++)
     {
         ie = HandoverFailure->protocolIEs.list.array[i];
@@ -2935,9 +2935,9 @@ void s1ap_handle_handover_failure(amf4g_enb_t *enb, s1ap_message_t *message)
     source_ue = target_ue->source_ue;
     d_assert(source_ue, return,);
 
-    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
-    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             target_ue->enb_ue_s1ap_id, target_ue->mme_ue_s1ap_id);
 
     rv = s1ap_send_handover_preparation_failure(source_ue, Cause);
@@ -2976,7 +2976,7 @@ void s1ap_handle_handover_cancel(amf4g_enb_t *enb, s1ap_message_t *message)
     HandoverCancel = &initiatingMessage->value.choice.HandoverCancel;
     d_assert(HandoverCancel, return,);
 
-    d_trace(3, "[MME] Handover cancel\n");
+    d_trace(3, "[AMF4G] Handover cancel\n");
     for (i = 0; i < HandoverCancel->protocolIEs.list.count; i++)
     {
         ie = HandoverCancel->protocolIEs.list.array[i];
@@ -3008,15 +3008,15 @@ void s1ap_handle_handover_cancel(amf4g_enb_t *enb, s1ap_message_t *message)
             *ENB_UE_S1AP_ID,
             CORE_ADDR(enb->addr, buf), enb->enb_id);
     d_assert(source_ue->mme_ue_s1ap_id == *MME_UE_S1AP_ID, return,
-            "Conflict MME-UE-S1AP-ID : %d != %d\n",
+            "Conflict amf4g-UE-S1AP-ID : %d != %d\n",
             source_ue->mme_ue_s1ap_id, *MME_UE_S1AP_ID);
 
     target_ue = source_ue->target_ue;
     d_assert(target_ue, return,);
 
-    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
-    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             target_ue->enb_ue_s1ap_id, target_ue->mme_ue_s1ap_id);
 
     rv = s1ap_send_handover_cancel_ack(source_ue);
@@ -3028,7 +3028,7 @@ void s1ap_handle_handover_cancel(amf4g_enb_t *enb, s1ap_message_t *message)
             S1AP_UE_CTX_REL_DELETE_INDIRECT_TUNNEL, 300);
     d_assert(rv == CORE_OK, return, "s1ap send error");
 
-    d_trace(3, "[MME] Handover Cancel : "
+    d_trace(3, "[AMF4G] Handover Cancel : "
             "UE[eNB-UE-S1AP-ID(%d)] --> eNB[%s:%d]\n",
             source_ue->enb_ue_s1ap_id,
             CORE_ADDR(enb->addr, buf), enb->enb_id);
@@ -3060,7 +3060,7 @@ void s1ap_handle_enb_status_transfer(amf4g_enb_t *enb, s1ap_message_t *message)
     ENBStatusTransfer = &initiatingMessage->value.choice.ENBStatusTransfer;
     d_assert(ENBStatusTransfer, return,);
 
-    d_trace(3, "[MME] ENB status transfer\n");
+    d_trace(3, "[AMF4G] ENB status transfer\n");
     for (i = 0; i < ENBStatusTransfer->protocolIEs.list.count; i++)
     {
         ie = ENBStatusTransfer->protocolIEs.list.array[i];
@@ -3093,15 +3093,15 @@ void s1ap_handle_enb_status_transfer(amf4g_enb_t *enb, s1ap_message_t *message)
             *ENB_UE_S1AP_ID,
             CORE_ADDR(enb->addr, buf), enb->enb_id);
     d_assert(source_ue->mme_ue_s1ap_id == *MME_UE_S1AP_ID, return,
-            "Conflict MME-UE-S1AP-ID : %d != %d\n",
+            "Conflict AMF4G-UE-S1AP-ID : %d != %d\n",
             source_ue->mme_ue_s1ap_id, *MME_UE_S1AP_ID);
 
     target_ue = source_ue->target_ue;
     d_assert(target_ue, return,);
 
-    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
-    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             target_ue->enb_ue_s1ap_id, target_ue->mme_ue_s1ap_id);
 
     rv = s1ap_send_mme_status_transfer(target_ue,
@@ -3143,7 +3143,7 @@ void s1ap_handle_handover_notification(amf4g_enb_t *enb, s1ap_message_t *message
     HandoverNotify = &initiatingMessage->value.choice.HandoverNotify;
     d_assert(HandoverNotify, return,);
 
-    d_trace(3, "[MME] Handover notification\n");
+    d_trace(3, "[AMF4G] Handover notification\n");
     for (i = 0; i < HandoverNotify->protocolIEs.list.count; i++)
     {
         ie = HandoverNotify->protocolIEs.list.array[i];
@@ -3196,9 +3196,9 @@ void s1ap_handle_handover_notification(amf4g_enb_t *enb, s1ap_message_t *message
     amf4g_ue = source_ue->amf4g_ue;
     d_assert(amf4g_ue, return,);
 
-    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Source : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             source_ue->enb_ue_s1ap_id, source_ue->mme_ue_s1ap_id);
-    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] MME_UE_S1AP_ID[%d]\n",
+    d_trace(5, "    Target : ENB_UE_S1AP_ID[%d] AMF4G_UE_S1AP_ID[%d]\n",
             target_ue->enb_ue_s1ap_id, target_ue->mme_ue_s1ap_id);
 
     amf4g_ue_associate_enb_ue(amf4g_ue, target_ue);
@@ -3272,7 +3272,7 @@ void s1ap_handle_s1_reset(
     Reset = &initiatingMessage->value.choice.Reset;
     d_assert(Reset, return,);
 
-    d_trace(3, "[MME] Reset\n");
+    d_trace(3, "[AMF4G] Reset\n");
 
     for (i = 0; i < Reset->protocolIEs.list.count; i++)
     {
@@ -3342,7 +3342,7 @@ void s1ap_handle_s1_reset(
                 item = &ie2->value.choice.UE_associatedLogicalS1_ConnectionItem;
                 d_assert(item, return,);
                 
-                d_trace(5, "    MME_UE_S1AP_ID[%d] ENB_UE_S1AP_ID[%d]\n",
+                d_trace(5, "    AMF4G_UE_S1AP_ID[%d] ENB_UE_S1AP_ID[%d]\n",
                         item->mME_UE_S1AP_ID ? *item->mME_UE_S1AP_ID : -1,
                         item->eNB_UE_S1AP_ID ? *item->eNB_UE_S1AP_ID : -1);
 
@@ -3356,7 +3356,7 @@ void s1ap_handle_s1_reset(
                 if (enb_ue == NULL)
                 {
                     d_warn("Cannot find S1 Context "
-                            "(MME_UE_S1AP_ID[%d] ENB_UE_S1AP_ID[%d])\n",
+                            "(AMF4G_UE_S1AP_ID[%d] ENB_UE_S1AP_ID[%d])\n",
                             item->mME_UE_S1AP_ID ? *item->mME_UE_S1AP_ID : -1,
                             item->eNB_UE_S1AP_ID ? *item->eNB_UE_S1AP_ID : -1);
                     continue;
@@ -3396,7 +3396,7 @@ void s1ap_handle_retrieve_ue_information(amf4g_enb_t *enb, s1ap_message_t *messa
     RetrieveUEInformation = &initiatingMessage->value.choice.RetrieveUEInformation;
     d_assert(RetrieveUEInformation, return,);
 
-d_trace(3, "[MME] Retrieve UE Information\n");
+d_trace(3, "[AMF4G] Retrieve UE Information\n");
     
 // Retrieve s-tmsi
     for (i = 0; i < RetrieveUEInformation->protocolIEs.list.count; i++)
@@ -3412,7 +3412,7 @@ d_trace(3, "[MME] Retrieve UE Information\n");
         }
     }
     
-    // Find MME_UE if S_TMSI included
+    // Find AMF4G_UE if S_TMSI included
     if (S_TMSI)
     {
         served_gummei_t *served_gummei = &amf4g_self()->served_gummei[0];

@@ -85,10 +85,10 @@ static void *THREAD_FUNC sm_main(thread_id id, void *data)
 
     amf4g_self()->queue_id = event_create(MSGQ_O_BLOCK);
     d_assert(amf4g_self()->queue_id, return NULL, 
-            "MME event queue creation failed");
+            "AMF4G event queue creation failed");
     tm_service_init(&amf4g_self()->tm_service);
     gtp_xact_init(&amf4g_self()->tm_service,
-            MME_EVT_S11_T3_RESPONSE, MME_EVT_S11_T3_HOLDING);
+            AMF4G_EVT_S11_T3_RESPONSE, AMF4G_EVT_S11_T3_HOLDING);
 
     fsm_create(&amf4g_sm, amf4g_state_initial, amf4g_state_final);
     fsm_init(&amf4g_sm, 0);
