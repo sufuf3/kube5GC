@@ -1,3 +1,4 @@
+#define TRACE_MODULE _amf_json_handler
 #include <cJSON/cJSON.h>
 
 #include "core_debug.h"
@@ -65,7 +66,9 @@ status_t amf_json_handle_create_session(pkbuf_t **pkbuf, amf4g_sess_t *pSess) {
     pdn_t *pdn = NULL;
     amf4g_bearer_t *bearer = NULL;
     amf4g_bearer_t *ori_bearer = NULL;
-    // char *string = NULL;
+
+    d_trace(10, "%s %d Enter", __FUNCTION__, __LINE__);
+
     d_assert(pSess, return CORE_ERROR, "Null param");
     d_assert(pkbuf, return CORE_ERROR, "Null param");
     ori_amf4g_ue = pSess->amf4g_ue;

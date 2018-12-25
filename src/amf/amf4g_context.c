@@ -1818,7 +1818,9 @@ status_t amf4g_context_setup_trace_module()
     if (sbi) 
     {
         extern int _amf_json_build;
+        extern int _amf_json_handler;
         d_trace_level(&_amf_json_build, sbi);
+        d_trace_level(&_amf_json_handler, sbi);
     }
 
     return CORE_OK;
