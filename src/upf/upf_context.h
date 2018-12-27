@@ -163,8 +163,6 @@ typedef struct _upf_pdr_t {
 
 #define SMF_TEID_IP_DESC_IPV4  1
 #define SMF_TEID_IP_DESC_IPV6  2
-    //$ IP address of SGW-U is not the same as SGW-C, so need store 
-    c_uint8_t       fteid_ip_desc;
     union {
         /* PFCP_F_TEID_IPV4 */
         c_uint32_t addr;
@@ -207,9 +205,9 @@ typedef struct _upf_far_t {
     c_uint8_t       apply_action;
     c_uint8_t       destination_interface;
     //pfcp_outer_hdr_t outer_hdr;
-    c_uint32_t      sgw_s5u_teid;
+    c_uint32_t      upf_n3_teid;
         
-    upf_bar_t      *bar;
+    upf_bar_t       *bar;
     pfcp_node_t     *pnode;
     gtp_node_t      *gnode;
 } upf_far_t;

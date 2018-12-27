@@ -259,14 +259,14 @@ status_t context_parse_config()
                     self.parameter.no_hss =
                         yaml_iter_bool(&parameter_iter);
                 }
-                else if (!strcmp(parameter_key, "no_sgw"))
+                else if (!strcmp(parameter_key, "no_smf"))
                 {
-                    self.parameter.no_sgw =
+                    self.parameter.no_smf =
                         yaml_iter_bool(&parameter_iter);
                 }
-                else if (!strcmp(parameter_key, "no_pgw"))
+                else if (!strcmp(parameter_key, "no_upf"))
                 {
-                    self.parameter.no_pgw =
+                    self.parameter.no_upf =
                         yaml_iter_bool(&parameter_iter);
                 }
                 else if (!strcmp(parameter_key, "no_pcrf"))

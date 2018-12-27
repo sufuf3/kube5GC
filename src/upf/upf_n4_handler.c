@@ -126,7 +126,7 @@ void upf_n4_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
                 d_assert(0, upf_far_remove(far);return, "Forwarding without GTPU not supported");
             }
             
-            far->sgw_s5u_teid = ntohl(outer_hdr->teid);
+            far->upf_n3_teid = ntohl(outer_hdr->teid);
             rv = pfcp_outer_hdr_to_ip(outer_hdr, &ip);
             d_assert(rv == CORE_OK, upf_far_remove(far);return, "Outer hdr IP convert fail for create_far");
             
@@ -276,7 +276,7 @@ void upf_n4_handle_session_modification_request(
             gtp_node_t *node = NULL;
             pfcp_outer_hdr_t *outer_header;
             outer_header = req->update_far.update_forwarding_parameters.outer_header_creation.data;
-            target_far->sgw_s5u_teid = ntohl(outer_header->teid);
+            target_far->upf_n3_teid = ntohl(outer_header->teid);
             rv = pfcp_outer_hdr_to_ip(outer_header, &ip);
             d_assert(rv == CORE_OK, upf_far_remove(target_far);return, "Outer hdr IP convert fail for crdate_far");
 

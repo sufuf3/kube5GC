@@ -200,16 +200,7 @@ void test_app_terminate(void)
     if (hss_sem1) semaphore_delete(hss_sem1);
     if (hss_sem2) semaphore_delete(hss_sem2);
 
-    if (context_self()->parameter.no_sgw == 0)
-    {
-        // TODO
-        // if (sgw_sem2) semaphore_post(sgw_sem2);
-        // if (sgw_sem1) semaphore_wait(sgw_sem1);
-    }
-    // if (sgw_sem1) semaphore_delete(sgw_sem1);
-    // if (sgw_sem2) semaphore_delete(sgw_sem2);
-
-    if (context_self()->parameter.no_pgw == 0)
+    if (context_self()->parameter.no_upf == 0)
     {
         // TODO
         // if (pgw_sem2) semaphore_post(pgw_sem2);
