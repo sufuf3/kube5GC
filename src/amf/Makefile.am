@@ -43,7 +43,7 @@ endif
 libamf_la_DEPENDENCIES = \
 	$(top_srcdir)/lib/nextepc/s1ap/libs1ap.la \
 	$(top_srcdir)/lib/ngap/libngap.la \
-	$(top_srcdir)/lib/nas/libnas.la \
+	$(top_srcdir)/lib/nextepc/nas/libnas.la \
 	$(top_srcdir)/lib/nextepc/fd/libfd.la \
 	$(top_srcdir)/lib/nextepc/gtp/libgtp.la \
 	$(top_srcdir)/lib/cJSON/libcJSON.la \
@@ -54,7 +54,7 @@ libamf_la_DEPENDENCIES = \
 libamf_la_LIBADD = \
 	$(top_srcdir)/lib/nextepc/s1ap/libs1ap.la \
 	$(top_srcdir)/lib/ngap/libngap.la \
-	$(top_srcdir)/lib/nas/libnas.la \
+	$(top_srcdir)/lib/nextepc/nas/libnas.la \
 	$(top_srcdir)/lib/nextepc/fd/libfd.la \
 	$(top_srcdir)/lib/nextepc/gtp/libgtp.la \
 	$(top_srcdir)/lib/cJSON/libcJSON.la \
@@ -64,6 +64,7 @@ libamf_la_LIBADD = \
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/nextepc/core/include \
+	-I$(top_srcdir)/lib/nextepc \
 	-I$(top_srcdir)/lib \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/lib/nextepc/s1ap/asn1c \

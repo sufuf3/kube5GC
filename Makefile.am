@@ -7,10 +7,10 @@ SUBDIRS = lib src support test
 bin_PROGRAMS = nextepc-hssd nextepc-pcrfd open5gc-amfd open5gc-smfd open5gc-upfd open5gc-ngcd
 
 dist_nextepc_hssd_SOURCES = main.c
-nextepc_hssd_LDADD = $(top_srcdir)/src/libhss.la
+nextepc_hssd_LDADD = $(top_srcdir)/src/nextepc/libhss.la
 
 dist_nextepc_pcrfd_SOURCES = main.c
-nextepc_pcrfd_LDADD = $(top_srcdir)/src/libpcrf.la
+nextepc_pcrfd_LDADD = $(top_srcdir)/src/nextepc/libpcrf.la
 
 dist_open5gc_amfd_SOURCES = main.c
 open5gc_amfd_LDADD = $(top_srcdir)/src/libamf.la
