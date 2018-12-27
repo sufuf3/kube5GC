@@ -4,9 +4,8 @@
 #include "core_network.h"
 #include "core_thread.h"
 
-#include "gtp/gtp_xact.h"
-
 #include "pfcp/pfcp_xact.h"
+#include "smf_fd_path.h"
 
 #include "smf_context.h"
 #include "smf_event.h"
@@ -34,6 +33,9 @@ status_t smf_initialize()
     rv = smf_ue_pool_generate();
     if (rv != CORE_OK) return rv;
 
+    rv = smf_fd_init();
+    if (rv != CORE_OK) return CORE_ERROR;
+
     rv = thread_create(&smf_thread, NULL, smf_main, NULL);
     if (rv != CORE_OK) return rv;
 
@@ -48,10 +50,10 @@ void smf_terminate(void)
 
     thread_delete(smf_thread);
 
-    gtp_xact_final();
-    
     pfcp_xact_final();
     
+    smf_fd_final();
+
     smf_context_final();
 }
 
@@ -68,8 +70,6 @@ static void *THREAD_FUNC smf_main(thread_id id, void *data)
     d_assert(smf_self()->queue_id, return NULL, 
             "SMF event queue creation failed");
     tm_service_init(&smf_self()->tm_service);
-    gtp_xact_init(&smf_self()->tm_service, 
-            SMF_EVT_S11_T3_RESPONSE, SMF_EVT_S11_T3_RESPONSE);
     pfcp_xact_init(&smf_self()->tm_service, 
             SMF_EVT_N4_T3_RESPONSE, SMF_EVT_N4_T3_RESPONSE);
     fsm_create(&smf_sm, smf_state_initial, smf_state_final);

@@ -18,6 +18,8 @@
 
 #include "fd/fd_lib.h"
 
+#include "JsonTransform.h"
+
 #define MAX_NUM_OF_SUBNET       16
 #define MAX_SMF_SESS_HASH_LEN   MAX_IMSI_LEN + MAX_APN_LEN + 1
 
@@ -33,15 +35,7 @@ typedef struct _smf_context_t {
     fd_config_t         *fd_config;     /* SMF freeDiameter config */
 
     c_uint32_t          pfcp_port;      /* Default: SMF PFCP local port */
-    c_uint32_t          gtpc_port;      /* Default: SMF GTP-C local port */
     c_uint8_t           cp_function_features;
-
-    list_t              gtpc_list;      /* SMF GTP-C IPv4 Server List */
-    list_t              gtpc_list6;     /* SMF GTP-C IPv6 Server List */
-    sock_id             gtpc_sock;      /* SMF GTP-C IPv4 Socket */
-    sock_id             gtpc_sock6;     /* SMF GTP-C IPv6 Socket */
-    c_sockaddr_t        *gtpc_addr;     /* SMF GTP-C IPv4 Address */
-    c_sockaddr_t        *gtpc_addr6;    /* SMF GTP-C IPv6 Address */
 
     list_t              pfcp_list;      /* SMF PFCP IPv4 Server List */
     list_t              pfcp_list6;     /* SMF PFCP IPv6 Server List */
@@ -55,10 +49,11 @@ typedef struct _smf_context_t {
     list_t              subnet_list;    /* SMF UE Subnet List */
     
     list_t              upf_n4_list;    /* UPF PFCP client List */
-    list_t              mme_s11_list;
     
     hash_t              *sess_hash;     /* Session Hash Table (IMSI + APN) */
 
+    pid_t               server_pid;
+    
     #define MAX_NUM_OF_DNS              2
     const char          *dns[MAX_NUM_OF_DNS];
     const char          *dns6[MAX_NUM_OF_DNS];
@@ -78,9 +73,6 @@ typedef struct _smf_sess_t {
     
     c_uint64_t      smf_n4_seid;    /* SMF SEID is derived from INDEX */
     c_uint64_t      upf_n4_seid;    /* UPF SEID is received from UPF */
-    
-    c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is derived from INDEX */
-    c_uint32_t      mme_s11_teid;   /* MME-S11-TEID is received from MME */
     
     c_int8_t        *gx_sid;        /* Gx Session ID */
     
@@ -112,6 +104,13 @@ typedef struct _smf_sess_t {
     gtp_node_t      *mme_node;
     pfcp_node_t     *upf_node;
     gtp_xact_t      *s11_xact;
+
+    /* PCO */
+    uint8_t         pco_buf[MAX_PCO_LEN];
+    uint32_t        pco_len;
+
+    /* Last SM Context Update Type */
+    c_uint8_t       sm_context_update_type;
 } smf_sess_t;
 
 typedef struct _smf_bearer_t {
@@ -268,8 +267,6 @@ CORE_DECLARE(smf_context_t*)    smf_self(void);
 CORE_DECLARE(status_t)          smf_context_parse_config(void);
 CORE_DECLARE(status_t)          smf_context_setup_trace_module(void);
 
-CORE_DECLARE(smf_sess_t*)       smf_sess_add_or_find_by_message(
-                                    gtp_message_t *message);
 CORE_DECLARE(smf_sess_t*)       smf_sess_add(c_uint8_t *imsi, int imsi_len, 
                                     c_int8_t *apn, c_uint8_t pdn_type, 
                                     c_uint8_t ebi);
@@ -284,8 +281,6 @@ CORE_DECLARE(smf_sess_t*)       smf_sess_find_by_imsi_apn(
 CORE_DECLARE(smf_sess_t*)       smf_sess_this(hash_index_t *hi);
 CORE_DECLARE(hash_index_t*)     smf_sess_first();
 CORE_DECLARE(hash_index_t*)     smf_sess_next(hash_index_t *hi);
-
-CORE_DECLARE(gtp_node_t *)      smf_mme_add_by_message(gtp_message_t *message);
 
 CORE_DECLARE(smf_bearer_t*)     smf_bearer_add(smf_sess_t *sess);
 CORE_DECLARE(status_t)          smf_bearer_remove(smf_bearer_t *bearer);
@@ -330,3 +325,7 @@ CORE_DECLARE(status_t)          smf_subnet_remove(smf_subnet_t *subnet);
 CORE_DECLARE(status_t)          smf_subnet_remove_all();
 CORE_DECLARE(smf_subnet_t*)     smf_subnet_first();
 CORE_DECLARE(smf_subnet_t*)     smf_subnet_next(smf_subnet_t *subnet);
+
+
+CORE_DECLARE(smf_sess_t*)       smf_sess_add_or_find_by_JsonCreateSession(create_session_t *createSession);
+CORE_DECLARE(smf_sess_t*)       smf_sess_find_by_JsonUpdateSession(modify_bearer_t *pModifyBearer);

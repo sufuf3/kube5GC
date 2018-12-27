@@ -58,8 +58,7 @@ static void state_cleanup(struct sess_state *sess_data, os0_t sid, void *opaque)
     pool_free_node(&smf_gx_sess_pool, sess_data);
 }
 
-void smf_gx_send_ccr(smf_sess_t *sess, gtp_xact_t *xact,
-        pkbuf_t *gtpbuf, c_uint32_t cc_request_type)
+void smf_gx_send_ccr(smf_sess_t *sess, c_uint32_t cc_request_type)
 {
     int ret;
 
@@ -70,14 +69,10 @@ void smf_gx_send_ccr(smf_sess_t *sess, gtp_xact_t *xact,
     struct sess_state *sess_data = NULL, *svg;
     struct session *session = NULL;
     int new;
-    gtp_message_t *message = NULL;
     paa_t paa; /* For changing Framed-IPv6-Prefix Length to 128 */
 
     d_assert(sess, return,);
     d_assert(sess->ipv4 || sess->ipv6, return,);
-    d_assert(gtpbuf, return, );
-    message = gtpbuf->payload;
-    d_assert(message, return, );
 
     d_trace(3, "[PGW] Credit-Control-Request\n");
 
@@ -131,8 +126,6 @@ void smf_gx_send_ccr(smf_sess_t *sess, gtp_xact_t *xact,
 
     /* Update session state */
     sess_data->sess = sess;
-    sess_data->xact = xact;
-    sess_data->gtpbuf = gtpbuf;
 
     sess_data->cc_request_type = cc_request_type;
     if (cc_request_type == GX_CC_REQUEST_TYPE_INITIAL_REQUEST ||
@@ -392,18 +385,6 @@ void smf_gx_send_ccr(smf_sess_t *sess, gtp_xact_t *xact,
             d_assert(ret == 0, return,);
         }
 
-        /* Set 3GPP-MS-Timezone */
-        if (message->create_session_request.ue_time_zone.presence)
-        {
-            ret = fd_msg_avp_new(gx_3gpp_ms_timezone, 0, &avp);
-            d_assert(ret == 0, return,);
-            val.os.data = message->create_session_request.ue_time_zone.data;
-            val.os.len = message->create_session_request.ue_time_zone.len;
-            ret = fd_msg_avp_setvalue(avp, &val);
-            d_assert(ret == 0, return,);
-            ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
-            d_assert(ret == 0, return,);
-        }
     }
 
     /* Set Called-Station-Id */
@@ -452,9 +433,8 @@ static void smf_gx_cca_cb(void *data, struct msg **msg)
     int new;
 
     event_t e;
-    gtp_xact_t *xact = NULL;
     smf_sess_t *sess = NULL;
-    pkbuf_t *gxbuf = NULL, *gtpbuf = NULL;
+    pkbuf_t *gxbuf = NULL;
     gx_message_t *gx_message = NULL;
     c_uint16_t gxbuf_len = 0;
 
@@ -472,12 +452,8 @@ static void smf_gx_cca_cb(void *data, struct msg **msg)
     d_assert(ret == 0, return,);
     d_assert(sess_data && (void *)sess_data == data, return, );
 
-    xact = sess_data->xact;
-    d_assert(xact, return, "Null param");
     sess = sess_data->sess;
     d_assert(sess, return, "Null param");
-    gtpbuf = sess_data->gtpbuf;
-    d_assert(gtpbuf, return, "Null param");
 
     gxbuf_len = sizeof(gx_message_t);
     d_assert(gxbuf_len < 8192, return, "Not supported size:%d", gxbuf_len);
@@ -719,8 +695,6 @@ out:
         event_set(&e, SMF_EVT_GX_MESSAGE);
         event_set_param1(&e, (c_uintptr_t)sess->index);
         event_set_param2(&e, (c_uintptr_t)gxbuf);
-        event_set_param3(&e, (c_uintptr_t)xact->index);
-        event_set_param4(&e, (c_uintptr_t)gtpbuf);
         smf_event_send(&e);
     }
     else
@@ -728,7 +702,6 @@ out:
         gx_message_free(gx_message);
         pkbuf_free(gxbuf);
 
-        pkbuf_free(gtpbuf);
     }
 
     /* Free the message */

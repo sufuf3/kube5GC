@@ -281,6 +281,8 @@ socklen_t sockaddr_len(const void *sa)
             return sizeof(struct sockaddr_in);
         case AF_INET6:
             return sizeof(struct sockaddr_in6);
+        case AF_UNIX:
+            return sizeof(struct sockaddr_un);
         default:
             d_assert(0, return 0, "Unknown family(%d)", sockaddr->c_sa_family);
     }

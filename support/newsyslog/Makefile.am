@@ -1,4 +1,4 @@
-EXTRA_DIST = nextepc.conf.in
+EXTRA_DIST = open5gc.conf.in
 
 MAINTAINERCLEANFILES = Makefile.in 
 MOSTLYCLEANFILES = *.stackdump

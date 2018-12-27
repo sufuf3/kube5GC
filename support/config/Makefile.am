@@ -1,12 +1,13 @@
 configfiles = \
-	nextepc.conf \
+	open5gc.conf \
+	open5gc.testngc.conf \
 	hss.conf \
 	pcrf.conf \
 	upf.conf \
 	smf.conf \
 	$(NULL)
 
-configdir = ${sysconfdir}/nextepc
+configdir = ${sysconfdir}/open5gc
 
 config_DATA = ${configfiles}
 

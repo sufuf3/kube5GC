@@ -8,14 +8,14 @@
 #include "s1ap_build.h"
 #include "s1ap_handler.h"
 
-#include "mme_event.h"
-#include "mme_sm.h"
+#include "amf4g_event.h"
+#include "amf4g_sm.h"
 
 void s1ap_state_initial(fsm_t *s, event_t *e)
 {
     d_assert(s, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     FSM_TRAN(s, &s1ap_state_operational);
 }
@@ -24,19 +24,19 @@ void s1ap_state_final(fsm_t *s, event_t *e)
 {
     d_assert(s, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 }
 
 void s1ap_state_operational(fsm_t *s, event_t *e)
 {
-    mme_enb_t *enb = NULL;
+    amf4g_enb_t *enb = NULL;
 
     d_assert(s, return, "Null param");
     d_assert(e, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
-    enb = mme_enb_find(event_get_param1(e));
+    enb = amf4g_enb_find(event_get_param1(e));
     d_assert(enb, return,);
 
     switch (event_get(e))
@@ -49,7 +49,7 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
         {
             break;
         }
-        case MME_EVT_S1AP_MESSAGE:
+        case AMF4G_EVT_S1AP_MESSAGE:
         {
             S1AP_S1AP_PDU_t *pdu = (S1AP_S1AP_PDU_t *)event_get_param4(e);
             d_assert(pdu, break, "Null param");
@@ -330,7 +330,7 @@ void s1ap_state_operational(fsm_t *s, event_t *e)
         }
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }
@@ -341,7 +341,7 @@ void s1ap_state_exception(fsm_t *s, event_t *e)
     d_assert(s, return, "Null param");
     d_assert(e, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     switch (event_get(e))
     {
@@ -355,7 +355,7 @@ void s1ap_state_exception(fsm_t *s, event_t *e)
         }
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }

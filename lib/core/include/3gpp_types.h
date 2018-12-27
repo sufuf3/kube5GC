@@ -63,6 +63,8 @@ extern "C" {
 #define MAX_APN_LEN             100
 #define MAX_PCO_LEN             251
 
+#define MAX_SBI_MESSAGE_LEN     4096
+
 #define NEXT_ID(__id, __min, __max) \
     ((__id) = ((__id) == (__max) ? (__min) : ((__id) + 1)))
 #define COMPARE_ID(__id1, __id2, __max) \
@@ -165,6 +167,10 @@ typedef struct _paa_t {
 #define GTP_PDN_TYPE_IPV6                               2
 #define GTP_PDN_TYPE_IPV4V6                             3
 #define GTP_PDN_TYPE_NON_IP                             4
+#define SBI_PDN_TYPE_IPV4                               1
+#define SBI_PDN_TYPE_IPV6                               2
+#define SBI_PDN_TYPE_IPV4V6                             3
+#define SBI_PDN_TYPE_NON_IP                             4
 ED2(c_uint8_t spare:5;,
     c_uint8_t pdn_type:3;)
     union {

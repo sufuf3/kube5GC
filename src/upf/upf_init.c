@@ -45,6 +45,8 @@ void upf_terminate(void)
 {
     if (!initialized) return;
 
+    pfcp_xact_final();
+
     thread_delete(upf_thread);
 
     upf_context_final();

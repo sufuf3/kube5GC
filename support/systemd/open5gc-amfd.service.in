@@ -1,0 +1,20 @@
+[Unit]
+Description=Open5GC AMF Daemon
+After=networking.service
+
+[Service]
+Type=simple
+
+User=open5gc
+Group=open5gc
+
+RuntimeDirectory=open5gc-amfd
+PIDFile=@LIB_DIR@/run/open5gc-amfd/pid
+
+Restart=always
+ExecStart=@BIN_DIR@/open5gc-amfd -f @SYSCONF_DIR@/open5gc/mme.conf
+RestartSec=2
+RestartPreventExitStatus=1
+
+[Install]
+WantedBy=multi-user.target

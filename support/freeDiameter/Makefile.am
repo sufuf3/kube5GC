@@ -17,7 +17,7 @@ pemfiles = \
 	pcrf.cert.pem \
     $(NULL)
 
-freeDiameterdir = ${sysconfdir}/nextepc/freeDiameter
+freeDiameterdir = ${sysconfdir}/open5gc/freeDiameter
 
 freeDiameter_DATA = ${configfiles} ${pemfiles}
 

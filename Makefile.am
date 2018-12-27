@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = lib src support test
 
-bin_PROGRAMS = nextepc-hssd nextepc-pcrfd nextepc-amfd nextepc-smfd nextepc-upfd nextepc-epcd
+bin_PROGRAMS = nextepc-hssd nextepc-pcrfd open5gc-amfd open5gc-smfd open5gc-upfd open5gc-ngcd
 
 dist_nextepc_hssd_SOURCES = main.c
 nextepc_hssd_LDADD = $(top_srcdir)/src/libhss.la
@@ -12,17 +12,17 @@ nextepc_hssd_LDADD = $(top_srcdir)/src/libhss.la
 dist_nextepc_pcrfd_SOURCES = main.c
 nextepc_pcrfd_LDADD = $(top_srcdir)/src/libpcrf.la
 
-dist_nextepc_amfd_SOURCES = main.c
-nextepc_amfd_LDADD = $(top_srcdir)/src/libamf.la
+dist_open5gc_amfd_SOURCES = main.c
+open5gc_amfd_LDADD = $(top_srcdir)/src/libamf.la
 
-dist_nextepc_smfd_SOURCES = main.c
-nextepc_smfd_LDADD = $(top_srcdir)/src/libsmf.la
+dist_open5gc_smfd_SOURCES = main.c
+open5gc_smfd_LDADD = $(top_srcdir)/src/libsmf.la
 
-dist_nextepc_upfd_SOURCES = main.c
-nextepc_upfd_LDADD = $(top_srcdir)/src/libupf.la
+dist_open5gc_upfd_SOURCES = main.c
+open5gc_upfd_LDADD = $(top_srcdir)/src/libupf.la
 
-dist_nextepc_epcd_SOURCES = main.c
-nextepc_epcd_LDADD = $(top_srcdir)/src/libepc.la
+dist_open5gc_ngcd_SOURCES = main.c
+open5gc_ngcd_LDADD = $(top_srcdir)/src/libngc.la
 
 AM_CPPFLAGS = \
     -I$(top_srcdir)/lib/core/include \
@@ -30,13 +30,13 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 install-data-hook:
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/log/nextepc
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/log/open5gc
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-hssd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-pcrfd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-amfd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-smfd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-upfd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-epcd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-amfd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-smfd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-upfd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/open5gc-ngcd
 
 CLEANFILES = -R data
 DISTCLEANFILES = $(DIST_ARCHIVES)

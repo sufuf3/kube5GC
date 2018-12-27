@@ -47,6 +47,23 @@ void *core_hex_to_ascii(void *in, int in_len, void *out, int out_len)
     return out;
 }
 
+void *core_hex_to_ascii_no_space(void *in, int in_len, void *out, int out_len)
+{
+    char *p;
+    int i = 0, l, off = 0;
+
+    p = out;
+    p[0] = 0;
+
+    l = (in_len - off) > out_len ? out_len : in_len - off;
+    for (i = 0; i < l; i++)
+    {
+        p += sprintf(p, "%02X", ((char*)in)[off+i] & 0xff);
+    }
+
+    return out;
+}
+
 void *core_uint64_to_buffer(c_uint64_t num, int size, void *buffer)
 {
     int i;

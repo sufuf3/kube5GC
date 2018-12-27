@@ -22,6 +22,8 @@ typedef enum {
     SMF_EVT_N4_T3_HOLDING,
     SMF_EVT_N4_T_HEARTBEAT,
 
+    SMF_EVT_N11_MESSAGE,
+
     SMF_EVT_TOP,
 
 } event_e;

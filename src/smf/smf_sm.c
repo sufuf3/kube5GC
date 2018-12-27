@@ -5,16 +5,19 @@
 
 #include "smf_context.h"
 #include "smf_event.h"
-#include "smf_gtp_path.h"
 #include "smf_pfcp_path.h"
+#include "smf_sbi_path.h"
 #include "smf_n4_handler.h"
-#include "smf_s11_handler.h"
+#include "smf_n11_handler.h"
 #include "smf_gx_handler.h"
+#include "smf_fd_path.h"
 #include "smf_sm.h"
 
 #include "gtp/gtp_message.h"
 #include "pfcp/pfcp_message.h"
 
+#include "sbiJson/JsonTransform.h"
+#include "smf_json_handler.h"
 
 void smf_state_initial(fsm_t *s, event_t *e)
 {
@@ -43,109 +46,35 @@ void smf_state_operational(fsm_t *s, event_t *e)
     {
         case FSM_ENTRY_SIG:
         {
-            rv = smf_gtp_open();
-            if (rv != CORE_OK)
-            {
-                d_error("Can't establish S11-GTP-C path");
-                break;
-            }
             rv = smf_pfcp_open();
             if (rv != CORE_OK)
             {
                 d_error("Can't establish N4-PFCP path");
                 break;
             }
+            rv = smf_sbi_server_open();
+            if (rv != CORE_OK)
+            {
+                d_error("Can't establish SMF-SBI path");
+                break;
+            }
             break;
+
         }
         case FSM_EXIT_SIG:
         {
-            rv = smf_gtp_close();
-            if (rv != CORE_OK)
-            {
-                d_error("Can't close S11-GTP-C path");
-                break;
-            }
             rv = smf_pfcp_close();
             if (rv != CORE_OK)
             {
                 d_error("Can't close N4-PFCP path");
                 break;
             }
-            break;
-        }
-        case SMF_EVT_S11_MESSAGE:
-        {
-            status_t rv;
-            pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
-            pkbuf_t *copybuf = NULL;
-            gtp_message_t *s11_message = NULL;
-            c_uint16_t copybuf_len = 0;
-            gtp_xact_t *s11_xact = NULL;
-            smf_sess_t *sess = NULL;
-
-            copybuf_len = sizeof(gtp_message_t);
-            copybuf = pkbuf_alloc(0, copybuf_len);
-            d_assert(copybuf, break, "Null param");
-            s11_message = copybuf->payload;
-            d_assert(s11_message, break, "Null param");
-
-            rv = gtp_parse_msg(s11_message, recvbuf);
-            d_assert(rv == CORE_OK, goto release_s11_pkbuf;,);
-            
-            d_trace(8, "S11 Message: [type: %d, TEID: %08x]\n", 
-                    s11_message->h.type, s11_message->h.teid);
-
-            if (s11_message->h.teid) {
-                sess = smf_sess_find_by_teid(s11_message->h.teid);
-                d_assert(sess, goto release_s11_pkbuf;, "Session Context Not Found");
-            }
-            else {
-                sess = smf_sess_add_or_find_by_message(s11_message);
-                d_assert(sess, goto release_s11_pkbuf;, "Session Context Not Created");
-
-                gtp_node_t *mme = smf_mme_add_by_message(s11_message);
-                d_assert(mme, goto release_s11_pkbuf;, "MME Not Found");
-                sess->mme_node = mme;
-            }
-
-            smf_default_bearer_in_sess(sess)->gtp_pkbuf = copybuf;
-
-            rv = gtp_xact_receive(sess->mme_node, &s11_message->h, &s11_xact);
-            d_assert(rv == CORE_OK, goto release_s11_pkbuf;, "GTP Transaction Recive Error");
-
-            switch (s11_message->h.type)
+            rv = smf_sbi_server_close();
+            if (rv != CORE_OK)
             {
-                case GTP_CREATE_SESSION_REQUEST_TYPE:
-                {
-                    smf_s11_handle_create_session_request(s11_xact, sess, &s11_message->create_session_request);
-                    break;
-                }
-                case GTP_DELETE_SESSION_REQUEST_TYPE:
-                {
-                    smf_s11_handle_delete_session_request(s11_xact, sess, &s11_message->delete_session_request);
-                    break;
-                }
-                case GTP_MODIFY_BEARER_REQUEST_TYPE:
-                {
-                    smf_s11_handle_modify_bearer_request(s11_xact, sess, &s11_message->modify_bearer_request);
-                    break;
-                }
-                default:
-                {
-                    d_error("No handler for event %s", smf_event_get_name(e));
-                    break;
-                }
+                d_error("Can't close SMF-SBI path");
+                break;
             }
-
-        release_s11_pkbuf:
-            pkbuf_free(recvbuf);
-            pkbuf_free(copybuf);
-            break;
-        }
-        case SMF_EVT_S11_T3_RESPONSE:
-        case SMF_EVT_S11_T3_HOLDING:
-        {
-            gtp_xact_timeout(event_get_param1(e), event_get(e));
             break;
         }
         case SMF_EVT_N4_MESSAGE:
@@ -221,7 +150,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 pkbuf_free(copybuf);
                 break;
             }
-                      
+
             d_assert(message->h.seid, pkbuf_free(recvbuf); pkbuf_free(copybuf); break,
                     "No Session seid");
             sess = smf_sess_find_by_seid(message->h.seid);
@@ -244,7 +173,7 @@ void smf_state_operational(fsm_t *s, event_t *e)
                     break;
                 case PFCP_SESSION_MODIFICATION_RESPONSE_TYPE:
                     smf_n4_handle_session_modification_response(
-                        xact, sess,&message->pfcp_session_modification_response);
+                        xact, sess, &message->pfcp_session_modification_response);
                     break;
                 case PFCP_SESSION_DELETION_RESPONSE_TYPE:
                     smf_n4_handle_session_deletion_response(
@@ -270,6 +199,57 @@ void smf_state_operational(fsm_t *s, event_t *e)
             }
             break;
         }
+        case SMF_EVT_N11_MESSAGE:
+        {
+            pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);
+            int msgType = event_get_param2(e);
+            smf_sess_t *sess = NULL;
+            d_info("N11 message enter");
+            switch (msgType)
+            {
+                case N11_TYPE_SM_CONTEXT_CREATE:
+                {
+                    create_session_t createSession = {0};
+                    smf_json_handler_create_session(&recvbuf, &createSession);
+                    sess = smf_sess_add_or_find_by_JsonCreateSession(&createSession);
+                    smf_n11_handle_create_session_request(sess, &createSession);
+                    smf_gx_send_ccr(sess, GX_CC_REQUEST_TYPE_INITIAL_REQUEST);
+                    d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    break;
+                }
+                case N11_TYPE_SM_CONTEXT_UPDATE:
+                {
+                    modify_bearer_t modifyBearer = {0};
+                    smf_json_handler_update_session(&recvbuf, &modifyBearer);
+                    sess = smf_sess_find_by_JsonUpdateSession(&modifyBearer);
+                    smf_n11_handle_update_session_request(sess, &modifyBearer);
+                    d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    break;
+                }
+                case N11_TYPE_SM_CONTEXT_RELEASE:
+                {
+                    delete_session_t deleteSession= {0};
+                    d_trace(3, "[SMF] N11 Context Release\n");
+                    d_warn("%s", recvbuf->payload);
+                    smf_json_handler_delete_session(&recvbuf, &deleteSession);
+                    sess = smf_sess_find_by_imsi_apn(deleteSession.imsi, deleteSession.imsi_len, deleteSession.apn);
+                    d_assert(sess, goto release_n11_pkbuf, "No Session Context");
+
+                    smf_n11_handle_delete_session_request(sess, &deleteSession);
+                    d_assert(recvbuf, goto release_n11_pkbuf, "Null param");
+                    smf_gx_send_ccr(sess, GX_CC_REQUEST_TYPE_TERMINATION_REQUEST);
+                    break;
+                }
+                default:
+                {
+                    d_error("Not support N11 Message");
+                }
+            }
+
+        release_n11_pkbuf:
+            pkbuf_free(recvbuf);
+            break;
+        }
         case SMF_EVT_GX_MESSAGE:
         {
             index_t sess_index = event_get_param1(e);
@@ -289,19 +269,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
             {
                 case GX_CMD_CODE_CREDIT_CONTROL:
                 {
-                    index_t xact_index = event_get_param3(e);
-                    gtp_xact_t *xact = NULL;
-
-                    pkbuf_t *gtpbuf = (pkbuf_t *)event_get_param4(e);
-                    gtp_message_t *message = NULL;
-
-                    d_assert(xact_index, return, "Null param");
-                    xact = gtp_xact_find(xact_index);
-                    d_assert(xact, return, "Null param");
-
-                    d_assert(gtpbuf, return, "Null param");
-                    message = gtpbuf->payload;
-
                     if (gx_message->result_code != ER_DIAMETER_SUCCESS)
                     {
                         d_error("Diameter Error(%d)", gx_message->result_code);
@@ -312,15 +279,13 @@ void smf_state_operational(fsm_t *s, event_t *e)
                         case GX_CC_REQUEST_TYPE_INITIAL_REQUEST:
                         {
                             smf_gx_handle_cca_initial_request(
-                                    sess, gx_message, xact, 
-                                    &message->create_session_request);
+                                    sess, gx_message);
                             break;
                         }
                         case GX_CC_REQUEST_TYPE_TERMINATION_REQUEST:
                         {
                             smf_gx_handle_cca_termination_request(
-                                    sess, gx_message, xact,
-                                    &message->delete_session_request);
+                                    sess, gx_message);
                             break;
                         }
                         default:
@@ -330,7 +295,6 @@ void smf_state_operational(fsm_t *s, event_t *e)
                         }
                     }
 
-                    pkbuf_free(gtpbuf);
                     break;
                 }
                 case GX_CMD_RE_AUTH:

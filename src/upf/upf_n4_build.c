@@ -45,7 +45,7 @@ status_t upf_n4_build_session_establishment_response(
     /* Set UP F-SEID, mandatory */
     rsp->up_f_seid.presence = 1;
     rsp->up_f_seid.data = &upf_seid;
-    upf_seid.seid = sess->upf_seid;
+    upf_seid.seid = htobe64(sess->upf_seid);
     rv =  pfcp_sockaddr_to_f_seid(upf_self()->gtpu_addr, upf_self()->gtpu_addr6, &upf_seid, &len);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build session establishment response failed"); 
     rsp->up_f_seid.len = len;

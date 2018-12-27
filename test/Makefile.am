@@ -2,7 +2,7 @@
 
 bin_PROGRAMS = testepc testvolte
 
-configdir = ${sysconfdir}/nextepc/test
+configdir = ${sysconfdir}/open5gc/test
 config_DATA = sample.conf sample-volte.conf
 
 testepc_SOURCES = \
@@ -22,11 +22,11 @@ testvolte_SOURCES = \
 	$(NULL)
 
 LDADD = \
-    $(top_srcdir)/src/libepc.la \
+    $(top_srcdir)/src/libngc.la \
 	$(NULL)
 
 DEPENDENCIES = \
-    $(top_srcdir)/src/libepc.la \
+    $(top_srcdir)/src/libngc.la \
 	$(NULL)
 
 AM_CPPFLAGS = \

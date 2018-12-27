@@ -1,12 +1,13 @@
-### For reference, see `nextepc.conf`
+### For reference, see `open5gc.conf`
 
 logger:
-    file: @LOCALSTATE_DIR@/log/nextepc/smf.log
+    file: @LOCALSTATE_DIR@/log/open5gc/smf.log
     trace: 
         app: 1
         diameter: 1
-        gtpv2: 1
         gtp: 1
+        pfcp: 1
+        sbi: 1
 
 parameter:
 

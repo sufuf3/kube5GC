@@ -2,7 +2,7 @@
 #define __NGAP_BUILD_H__
 
 #include "ngap/ngap_message.h"
-#include "mme_context.h"
+#include "amf4g_context.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -4,31 +4,31 @@
 
 #include "nas/nas_message.h"
 
-#include "mme_context.h"
+#include "amf4g_context.h"
 #include "nas_path.h"
-#include "mme_gtp_path.h"
+#include "amf4g_gtp_path.h"
 
 #include "esm_build.h"
 
-status_t esm_handle_pdn_connectivity_request(mme_bearer_t *bearer, 
+status_t esm_handle_pdn_connectivity_request(amf4g_bearer_t *bearer, 
         nas_pdn_connectivity_request_t *pdn_connectivity_request)
 {
     status_t rv;
-    mme_ue_t *mme_ue = NULL;
-    mme_sess_t *sess = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_sess_t *sess = NULL;
     c_uint8_t security_protected_required = 0;
 
     d_assert(bearer, return CORE_ERROR,);
     sess = bearer->sess;
     d_assert(sess, return CORE_ERROR,);
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR,);
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR,);
 
     d_assert(pdn_connectivity_request, return CORE_ERROR,);
 
-    d_assert(MME_UE_HAVE_IMSI(mme_ue), return CORE_ERROR,
+    d_assert(AMF4G_UE_HAVE_IMSI(amf4g_ue), return CORE_ERROR,
         "No IMSI in PDN_CPNNECTIVITY_REQUEST");
-    d_assert(SECURITY_CONTEXT_IS_VALID(mme_ue), return CORE_ERROR,
+    d_assert(SECURITY_CONTEXT_IS_VALID(amf4g_ue), return CORE_ERROR,
         "No Security Context in PDN_CPNNECTIVITY_REQUEST");
 
     memcpy(&sess->request_type, &pdn_connectivity_request->request_type,
@@ -49,7 +49,7 @@ status_t esm_handle_pdn_connectivity_request(mme_bearer_t *bearer,
     if (pdn_connectivity_request->presencemask &
             NAS_PDN_CONNECTIVITY_REQUEST_ACCESS_POINT_NAME_PRESENT)
     {
-        sess->pdn = mme_pdn_find_by_apn(mme_ue, 
+        sess->pdn = amf4g_pdn_find_by_apn(amf4g_ue, 
             pdn_connectivity_request->access_point_name.apn);
         if (!sess->pdn)
         {
@@ -82,13 +82,13 @@ status_t esm_handle_pdn_connectivity_request(mme_bearer_t *bearer,
     if (!sess->pdn)
     {
         /* Default APN */
-        sess->pdn = mme_default_pdn(mme_ue);
+        sess->pdn = amf4g_default_pdn(amf4g_ue);
     }
 
     if (sess->pdn)
     {
         d_trace(5, "    APN[%s]\n", sess->pdn->apn);
-        rv = mme_gtp_send_create_session_request(sess);
+        rv = amf4g_gtp_send_create_session_request(sess);
         d_assert(rv == CORE_OK, return CORE_ERROR, "gtp send failed");
     }
     else
@@ -103,20 +103,20 @@ status_t esm_handle_pdn_connectivity_request(mme_bearer_t *bearer,
     return CORE_OK;
 }
 
-status_t esm_handle_information_response(mme_sess_t *sess, 
+status_t esm_handle_information_response(amf4g_sess_t *sess, 
         nas_esm_information_response_t *esm_information_response)
 {
     status_t rv;
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
 
     d_assert(sess, return CORE_ERROR, "Null param");
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     if (esm_information_response->presencemask &
             NAS_ESM_INFORMATION_RESPONSE_ACCESS_POINT_NAME_PRESENT)
     {
-        sess->pdn = mme_pdn_find_by_apn(mme_ue, 
+        sess->pdn = amf4g_pdn_find_by_apn(amf4g_ue, 
                 esm_information_response->access_point_name.apn);
     }
 
@@ -131,14 +131,14 @@ status_t esm_handle_information_response(mme_sess_t *sess,
     if (sess->pdn)
     {
         d_trace(5, "    APN[%s]\n", sess->pdn->apn);
-        if (SESSION_CONTEXT_IS_AVAILABLE(mme_ue))
+        if (SESSION_CONTEXT_IS_AVAILABLE(amf4g_ue))
         {
-            rv = nas_send_attach_accept(mme_ue);
+            rv = nas_send_attach_accept(amf4g_ue);
             d_assert(rv == CORE_OK, return CORE_ERROR, "nas send failed");
         }
         else
         {
-            rv = mme_gtp_send_create_session_request(sess);
+            rv = amf4g_gtp_send_create_session_request(sess);
             d_assert(rv == CORE_OK, return CORE_ERROR, "gtp send failed");
         }
     }

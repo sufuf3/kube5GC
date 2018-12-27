@@ -1,10 +1,11 @@
+#define TRACE_MODULE _thread
+
 #include "core.h"
 #include "core_arch_thread.h"
 #include "core_portable.h"
 #include "core_errno.h"
 #include "core_param.h"
 #include "core_general.h"
-#define TRACE_MODULE _thread
 #include "core_debug.h"
 #include "core_pool.h"
 #include "core_semaphore.h"

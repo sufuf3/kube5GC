@@ -39,7 +39,7 @@ interface pgwtun
 	AdvHomeAgentFlag off;
 
 #
-# NextEPC pgwtun prefix
+# Open5GC pgwtun prefix
 #
 	prefix cafe::/64
 	{

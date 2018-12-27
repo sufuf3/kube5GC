@@ -232,10 +232,10 @@ status_t upf_gtp_open()
 
     /* 
      * On Linux, it is possible to create a persistent tun/tap 
-     * interface which will continue to exist even if nextepc quit, 
+     * interface which will continue to exist even if open5gc quit, 
      * although this is normally not required. 
      * It can be useful to set up a tun/tap interface owned 
-     * by a non-root user, so nextepc can be started without 
+     * by a non-root user, so open5gc can be started without 
      * needing any root privileges at all.
      */
 

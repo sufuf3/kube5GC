@@ -83,6 +83,9 @@ pfcp_xact_t *pfcp_xact_local_create(
     d_assert(gnode, return NULL, "Null param");
 
     index_alloc(&pfcp_xact_pool, &xact);
+    d_trace(-1, " %s %d not freed in pfcp_xact_pool[%d] of PFCP Transaction\n",
+            __FUNCTION__,
+            pool_used(&pfcp_xact_pool), pool_size(&pfcp_xact_pool));
     d_assert(xact, return NULL, "Transaction allocation failed");
 
     xact->org = PFCP_LOCAL_ORIGINATOR;

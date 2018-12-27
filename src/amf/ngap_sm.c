@@ -8,14 +8,14 @@
 #include "ngap_build.h"
 #include "ngap_handler.h"
 
-#include "mme_event.h"
-#include "mme_sm.h"
+#include "amf4g_event.h"
+#include "amf4g_sm.h"
 
 void ngap_state_initial(fsm_t *s, event_t *e)
 {
     d_assert(s, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     FSM_TRAN(s, &ngap_state_operational);
 }
@@ -24,7 +24,7 @@ void ngap_state_final(fsm_t *s, event_t *e)
 {
     d_assert(s, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 }
 
 void ngap_state_operational(fsm_t *s, event_t *e)
@@ -34,7 +34,7 @@ void ngap_state_operational(fsm_t *s, event_t *e)
     d_assert(s, return, "Null param");
     d_assert(e, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     ran = amf_ran_find(event_get_param1(e));
     d_assert(ran, return,);
@@ -128,7 +128,7 @@ void ngap_state_operational(fsm_t *s, event_t *e)
         }
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }
@@ -139,7 +139,7 @@ void ngap_state_exception(fsm_t *s, event_t *e)
     d_assert(s, return, "Null param");
     d_assert(e, return, "Null param");
 
-    mme_sm_trace(3, e);
+    amf4g_sm_trace(3, e);
 
     switch (event_get(e))
     {
@@ -153,7 +153,7 @@ void ngap_state_exception(fsm_t *s, event_t *e)
         }
         default:
         {
-            d_error("Unknown event %s", mme_event_get_name(e));
+            d_error("Unknown event %s", amf4g_event_get_name(e));
             break;
         }
     }

@@ -3,7 +3,7 @@
 
 #include "core_pkbuf.h"
 
-#include "mme_context.h"
+#include "amf4g_context.h"
 #include "ngap/ngap_message.h"
 
 #ifdef __cplusplus

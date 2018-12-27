@@ -7,26 +7,26 @@
 
 #include "nas_security.h"
 #include "esm_build.h"
-#include "mme_sm.h"
+#include "amf4g_sm.h"
 
 status_t esm_build_pdn_connectivity_reject(
-        pkbuf_t **pkbuf, mme_sess_t *sess, nas_esm_cause_t esm_cause)
+        pkbuf_t **pkbuf, amf4g_sess_t *sess, nas_esm_cause_t esm_cause)
 {
-    mme_ue_t *mme_ue = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
     nas_message_t message;
     nas_pdn_connectivity_reject_t *pdn_connectivity_reject = 
             &message.esm.pdn_connectivity_reject;
 
     d_assert(sess, return CORE_ERROR, "Null param");
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     d_trace(3, "[ESM] PDN connectivity reject\n");
     d_trace(5, "    IMSI[%s] PTI[%d] Cause[%d]\n",
-            mme_ue->imsi_bcd, sess->pti, esm_cause);
+            amf4g_ue->imsi_bcd, sess->pti, esm_cause);
 
     memset(&message, 0, sizeof(message));
-    if (FSM_CHECK(&mme_ue->sm, emm_state_registered))
+    if (FSM_CHECK(&amf4g_ue->sm, emm_state_registered))
     {
         message.h.security_header_type = 
            NAS_SECURITY_HEADER_INTEGRITY_PROTECTED_AND_CIPHERED;
@@ -39,9 +39,9 @@ status_t esm_build_pdn_connectivity_reject(
 
     pdn_connectivity_reject->esm_cause = esm_cause;
 
-    if (FSM_CHECK(&mme_ue->sm, emm_state_registered))
+    if (FSM_CHECK(&amf4g_ue->sm, emm_state_registered))
     {
-        d_assert(nas_security_encode(pkbuf, mme_ue, &message) == CORE_OK && 
+        d_assert(nas_security_encode(pkbuf, amf4g_ue, &message) == CORE_OK && 
                 *pkbuf, return CORE_ERROR,);
     }
     else
@@ -53,21 +53,21 @@ status_t esm_build_pdn_connectivity_reject(
     return CORE_OK;
 }
 
-status_t esm_build_information_request(pkbuf_t **pkbuf, mme_bearer_t *bearer)
+status_t esm_build_information_request(pkbuf_t **pkbuf, amf4g_bearer_t *bearer)
 {
     nas_message_t message;
-    mme_ue_t *mme_ue = NULL;
-    mme_sess_t *sess = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_sess_t *sess = NULL;
 
     d_assert(bearer, return CORE_ERROR, "Null param");
     sess = bearer->sess;
     d_assert(sess, return CORE_ERROR, "Null param");
-    mme_ue = bearer->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = bearer->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     d_trace(3, "[ESM] ESM information request\n");
     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
 
     memset(&message, 0, sizeof(message));
     message.h.security_header_type = 
@@ -78,14 +78,14 @@ status_t esm_build_information_request(pkbuf_t **pkbuf, mme_bearer_t *bearer)
     message.esm.h.procedure_transaction_identity = sess->pti;
     message.esm.h.message_type = NAS_ESM_INFORMATION_REQUEST;
 
-    d_assert(nas_security_encode(pkbuf, mme_ue, &message) == CORE_OK && 
+    d_assert(nas_security_encode(pkbuf, amf4g_ue, &message) == CORE_OK && 
             *pkbuf, return CORE_ERROR,);
 
     return CORE_OK;
 }
 
 status_t esm_build_activate_default_bearer_context_request(
-        pkbuf_t **pkbuf, mme_sess_t *sess)
+        pkbuf_t **pkbuf, amf4g_sess_t *sess)
 {
     nas_message_t message;
     nas_activate_default_eps_bearer_context_request_t 
@@ -103,26 +103,26 @@ status_t esm_build_activate_default_bearer_context_request(
         &activate_default_eps_bearer_context_request
             ->protocol_configuration_options;
     
-    mme_ue_t *mme_ue = NULL;
-    mme_bearer_t *bearer = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_bearer_t *bearer = NULL;
     pdn_t *pdn = NULL;
 
     d_assert(sess, return CORE_ERROR, "Null param");
-    mme_ue = sess->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = sess->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
     pdn = sess->pdn;
     d_assert(pdn, return CORE_ERROR, "Null param");
-    bearer = mme_default_bearer_in_sess(sess);
+    bearer = amf4g_default_bearer_in_sess(sess);
     d_assert(bearer, return CORE_ERROR, "Null param");
-    d_assert(mme_bearer_next(bearer) == NULL,
+    d_assert(amf4g_bearer_next(bearer) == NULL,
             return CORE_ERROR, "there is dedicated bearer");
 
     d_trace(3, "[ESM] Activate default bearer context request\n");
     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
 
     memset(&message, 0, sizeof(message));
-    if (FSM_CHECK(&mme_ue->sm, emm_state_registered))
+    if (FSM_CHECK(&amf4g_ue->sm, emm_state_registered))
     {
         message.h.security_header_type = 
            NAS_SECURITY_HEADER_INTEGRITY_PROTECTED_AND_CIPHERED;
@@ -186,9 +186,9 @@ status_t esm_build_activate_default_bearer_context_request(
                 sess->pgw_pco.data, protocol_configuration_options->length);
     }
 
-    if (FSM_CHECK(&mme_ue->sm, emm_state_registered))
+    if (FSM_CHECK(&amf4g_ue->sm, emm_state_registered))
     {
-        d_assert(nas_security_encode(pkbuf, mme_ue, &message) == CORE_OK && 
+        d_assert(nas_security_encode(pkbuf, amf4g_ue, &message) == CORE_OK && 
                 *pkbuf, return CORE_ERROR,);
     }
     else
@@ -201,10 +201,10 @@ status_t esm_build_activate_default_bearer_context_request(
 }
 
 status_t esm_build_activate_dedicated_bearer_context_request(
-        pkbuf_t **pkbuf, mme_bearer_t *bearer)
+        pkbuf_t **pkbuf, amf4g_bearer_t *bearer)
 {
-    mme_ue_t *mme_ue = NULL;
-    mme_bearer_t *linked_bearer = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_bearer_t *linked_bearer = NULL;
 
     nas_message_t message;
     nas_activate_dedicated_eps_bearer_context_request_t 
@@ -219,14 +219,14 @@ status_t esm_build_activate_dedicated_bearer_context_request(
         &activate_dedicated_eps_bearer_context_request->tft;
     
     d_assert(bearer, return CORE_ERROR, "Null param");
-    mme_ue = bearer->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
-    linked_bearer = mme_linked_bearer(bearer); 
+    amf4g_ue = bearer->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
+    linked_bearer = amf4g_linked_bearer(bearer); 
     d_assert(linked_bearer, return CORE_ERROR, "Null param");
 
     d_trace(3, "[ESM] Activate dedicated bearer context request\n");
     d_trace(5, "    IMSI[%s] EBI[%d] Linked-EBI[%d]\n",
-            mme_ue->imsi_bcd, bearer->ebi, linked_bearer->ebi);
+            amf4g_ue->imsi_bcd, bearer->ebi, linked_bearer->ebi);
 
     memset(&message, 0, sizeof(message));
     message.h.security_header_type = 
@@ -248,17 +248,17 @@ status_t esm_build_activate_dedicated_bearer_context_request(
     d_assert(bearer->tft.data, return CORE_ERROR, "Null param");
     memcpy(tft->buffer, bearer->tft.data, tft->length);
 
-    d_assert(nas_security_encode(pkbuf, mme_ue, &message) == CORE_OK && 
+    d_assert(nas_security_encode(pkbuf, amf4g_ue, &message) == CORE_OK && 
             *pkbuf, return CORE_ERROR,);
 
     return CORE_OK;
 }
 
 status_t esm_build_modify_bearer_context_request(
-        pkbuf_t **pkbuf, mme_bearer_t *bearer, int qos_presence, int tft_presence)
+        pkbuf_t **pkbuf, amf4g_bearer_t *bearer, int qos_presence, int tft_presence)
 {
-    mme_ue_t *mme_ue = NULL;
-    mme_sess_t *sess = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_sess_t *sess = NULL;
 
     nas_message_t message;
     nas_modify_eps_bearer_context_request_t 
@@ -272,12 +272,12 @@ status_t esm_build_modify_bearer_context_request(
     d_assert(bearer, return CORE_ERROR, "Null param");
     sess = bearer->sess;
     d_assert(sess, return CORE_ERROR, "Null param");
-    mme_ue = bearer->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = bearer->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     d_trace(3, "[ESM] Modify bearer context request\n");
     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
 
     memset(&message, 0, sizeof(message));
     message.h.security_header_type = 
@@ -307,17 +307,17 @@ status_t esm_build_modify_bearer_context_request(
         memcpy(tft->buffer, bearer->tft.data, tft->length);
     }
 
-    d_assert(nas_security_encode(pkbuf, mme_ue, &message) == CORE_OK && 
+    d_assert(nas_security_encode(pkbuf, amf4g_ue, &message) == CORE_OK && 
             *pkbuf, return CORE_ERROR,);
 
     return CORE_OK;
 }
 
 status_t esm_build_deactivate_bearer_context_request(
-        pkbuf_t **pkbuf, mme_bearer_t *bearer, nas_esm_cause_t esm_cause)
+        pkbuf_t **pkbuf, amf4g_bearer_t *bearer, nas_esm_cause_t esm_cause)
 {
-    mme_ue_t *mme_ue = NULL;
-    mme_sess_t *sess = NULL;
+    amf4g_ue_t *amf4g_ue = NULL;
+    amf4g_sess_t *sess = NULL;
 
     nas_message_t message;
     nas_deactivate_eps_bearer_context_request_t 
@@ -327,12 +327,12 @@ status_t esm_build_deactivate_bearer_context_request(
     d_assert(bearer, return CORE_ERROR, "Null param");
     sess = bearer->sess;
     d_assert(sess, return CORE_ERROR, "Null param");
-    mme_ue = bearer->mme_ue;
-    d_assert(mme_ue, return CORE_ERROR, "Null param");
+    amf4g_ue = bearer->amf4g_ue;
+    d_assert(amf4g_ue, return CORE_ERROR, "Null param");
 
     d_trace(3, "[ESM] Deactivate bearer context request\n");
     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
-            mme_ue->imsi_bcd, sess->pti, bearer->ebi);
+            amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
     d_trace(5, "    Cause[%d]\n", esm_cause);
 
     memset(&message, 0, sizeof(message));
@@ -346,7 +346,7 @@ status_t esm_build_deactivate_bearer_context_request(
 
     deactivate_eps_bearer_context_request->esm_cause = esm_cause;
 
-    d_assert(nas_security_encode(pkbuf, mme_ue, &message) == CORE_OK && 
+    d_assert(nas_security_encode(pkbuf, amf4g_ue, &message) == CORE_OK && 
             *pkbuf, return CORE_ERROR,);
 
     return CORE_OK;

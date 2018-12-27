@@ -7,7 +7,7 @@
 #include <netinet/sctp.h>
 #endif
 
-#include "mme_event.h"
+#include "amf4g_event.h"
 
 #include "s1ap_path.h"
 
@@ -107,10 +107,10 @@ static int s1ap_accept_handler(sock_id id, void *data)
         d_trace(1, "eNB-S1 accepted[%s]:%d in s1_path module\n", 
             CORE_ADDR(addr, buf), CORE_PORT(addr));
 
-        event_set(&e, MME_EVT_S1AP_LO_ACCEPT);
+        event_set(&e, AMF4G_EVT_S1AP_LO_ACCEPT);
         event_set_param1(&e, (c_uintptr_t)new);
         event_set_param2(&e, (c_uintptr_t)addr);
-        if (mme_event_send(&e) != CORE_OK)
+        if (amf4g_event_send(&e) != CORE_OK)
         {
             CORE_FREE(addr);
         }
@@ -183,7 +183,7 @@ int s1ap_recv_handler(sock_id sock, void *data)
                     d_assert(addr, pkbuf_free(pkbuf); return -1,);
                     memcpy(addr, sock_remote_addr(sock), sizeof(c_sockaddr_t));
 
-                    event_set(&e, MME_EVT_S1AP_LO_SCTP_COMM_UP);
+                    event_set(&e, AMF4G_EVT_S1AP_LO_SCTP_COMM_UP);
                     event_set_param1(&e, (c_uintptr_t)sock);
                     event_set_param2(&e, (c_uintptr_t)addr);
                     event_set_param3(&e, 
@@ -191,9 +191,9 @@ int s1ap_recv_handler(sock_id sock, void *data)
                     event_set_param4(&e, 
                         (c_uintptr_t)not->sn_assoc_change.sac_outbound_streams);
 
-                    if (mme_event_send(&e) != CORE_OK)
+                    if (amf4g_event_send(&e) != CORE_OK)
                     {
-                        d_error("Event MME_EVT_S1AP_LO_SCTP_COMM_UP failed");
+                        d_error("Event AMF4G_EVT_S1AP_LO_SCTP_COMM_UP failed");
                         CORE_FREE(addr);
                     }
                 }
@@ -210,13 +210,13 @@ int s1ap_recv_handler(sock_id sock, void *data)
                     d_assert(addr, pkbuf_free(pkbuf); return -1,);
                     memcpy(addr, sock_remote_addr(sock), sizeof(c_sockaddr_t));
 
-                    event_set(&e, MME_EVT_S1AP_LO_CONNREFUSED);
+                    event_set(&e, AMF4G_EVT_S1AP_LO_CONNREFUSED);
                     event_set_param1(&e, (c_uintptr_t)sock);
                     event_set_param2(&e, (c_uintptr_t)addr);
 
-                    if (mme_event_send(&e) != CORE_OK)
+                    if (amf4g_event_send(&e) != CORE_OK)
                     {
-                        d_error("Event MME_EVT_S1AP_LO_CONNREFUSED failed");
+                        d_error("Event AMF4G_EVT_S1AP_LO_CONNREFUSED failed");
                         CORE_FREE(addr);
                     }
 
@@ -235,13 +235,13 @@ int s1ap_recv_handler(sock_id sock, void *data)
                 d_assert(addr, pkbuf_free(pkbuf); return -1,);
                 memcpy(addr, sock_remote_addr(sock), sizeof(c_sockaddr_t));
 
-                event_set(&e, MME_EVT_S1AP_LO_CONNREFUSED);
+                event_set(&e, AMF4G_EVT_S1AP_LO_CONNREFUSED);
                 event_set_param1(&e, (c_uintptr_t)sock);
                 event_set_param2(&e, (c_uintptr_t)addr);
 
-                if (mme_event_send(&e) != CORE_OK)
+                if (amf4g_event_send(&e) != CORE_OK)
                 {
-                    d_error("Event MME_EVT_S1AP_LO_CONNREFUSED failed");
+                    d_error("Event AMF4G_EVT_S1AP_LO_CONNREFUSED failed");
                     CORE_FREE(addr);
                 }
 
@@ -286,13 +286,13 @@ int s1ap_recv_handler(sock_id sock, void *data)
         d_assert(addr, pkbuf_free(pkbuf); return -1,);
         memcpy(addr, sock_remote_addr(sock), sizeof(c_sockaddr_t));
 
-        event_set(&e, MME_EVT_S1AP_MESSAGE);
+        event_set(&e, AMF4G_EVT_S1AP_MESSAGE);
         event_set_param1(&e, (c_uintptr_t)sock);
         event_set_param2(&e, (c_uintptr_t)addr);
         event_set_param3(&e, (c_uintptr_t)pkbuf);
-        if (mme_event_send(&e) != CORE_OK)
+        if (amf4g_event_send(&e) != CORE_OK)
         {
-            d_error("Event MME_EVT_S1AP_MESSAGE failed");
+            d_error("Event AMF4G_EVT_S1AP_MESSAGE failed");
             pkbuf_free(pkbuf);
             CORE_FREE(addr);
         }

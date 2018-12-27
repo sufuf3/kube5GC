@@ -4,7 +4,7 @@
 #include "ngap/ngap_message.h"
 
 /* TODP: need to modify the include head file to amf_context.h*/
-#include "mme_context.h"
+#include "amf4g_context.h"
 
 #ifdef __cplusplus
 extern "C" {

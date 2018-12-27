@@ -286,6 +286,7 @@ status_t smf_n4_build_session_modification_request(
     memset(&pfcp_message, 0, sizeof(pfcp_message_t));
     
     /* Set CP F-SEID, mandatory */
+    d_trace(-1, "smf_n4_seid : %lu", sess->smf_n4_seid);
     req->cp_f_seid.presence = 1;
     req->cp_f_seid.data = &smf_f_seid;
     smf_f_seid.seid = htobe64(sess->smf_n4_seid);
@@ -316,7 +317,11 @@ status_t smf_n4_build_session_modification_request(
     outer_hdr->gtpu_ipv6 = 0;
     outer_hdr->gtpu_ipv4 = 1;
     outer_hdr->addr = bearer->addr;
+#ifndef FIVE_G_CORE
     outer_hdr->teid = htonl(bearer->enb_s1u_teid);
+#else
+    outer_hdr->teid = bearer->enb_s1u_teid;
+#endif
     len += IPV4_LEN;
     req->update_far.update_forwarding_parameters.outer_header_creation.len = len;
     req->update_far.update_forwarding_parameters.outer_header_creation.data = outer_hdr;

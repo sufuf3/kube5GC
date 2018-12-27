@@ -1,9 +1,9 @@
 EXTRA_DIST = \
-	nextepc-amfd.service.in \
 	nextepc-hssd.service.in \
 	nextepc-pcrfd.service.in \
-	nextepc-upfd.service.in \
-	nextepc-smfd.service.in \
+	open5gc-amfd.service.in \
+	open5gc-upfd.service.in \
+	open5gc-smfd.service.in \
 	$(NULL)
 
 MAINTAINERCLEANFILES = Makefile.in 
