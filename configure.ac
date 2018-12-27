@@ -426,6 +426,8 @@ AC_CONFIG_FILES([lib/ipfw/Makefile])
 AC_CONFIG_FILES([lib/ngap/asn1c/Makefile])
 AC_CONFIG_FILES([lib/ngap/Makefile])
 AC_CONFIG_FILES([lib/pfcp/Makefile])
+AC_CONFIG_FILES([lib/cJSON/Makefile])
+AC_CONFIG_FILES([lib/sbiJson/Makefile])
 
 AC_CONFIG_FILES([lib/nextepc/core/include/core.h])
 AC_CONFIG_FILES([lib/nextepc/core/src/Makefile])
@@ -441,7 +443,9 @@ AC_CONFIG_FILES([lib/Makefile])
 
 AC_CONFIG_FILES([src/app/Makefile])
 AC_CONFIG_FILES([src/amf/Makefile])
+AC_CONFIG_FILES([src/amf/http_server/Makefile])
 AC_CONFIG_FILES([src/smf/Makefile])
+AC_CONFIG_FILES([src/smf/http_server/Makefile])
 AC_CONFIG_FILES([src/upf/Makefile])
 
 AC_CONFIG_FILES([src/nextepc/hss/Makefile])
