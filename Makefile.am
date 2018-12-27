@@ -7,10 +7,10 @@ SUBDIRS = lib src support test
 bin_PROGRAMS = nextepc-hssd nextepc-pcrfd open5gc-amfd open5gc-smfd open5gc-upfd open5gc-ngcd
 
 dist_nextepc_hssd_SOURCES = main.c
-nextepc_hssd_LDADD = $(top_srcdir)/src/libhss.la
+nextepc_hssd_LDADD = $(top_srcdir)/src/nextepc/libhss.la
 
 dist_nextepc_pcrfd_SOURCES = main.c
-nextepc_pcrfd_LDADD = $(top_srcdir)/src/libpcrf.la
+nextepc_pcrfd_LDADD = $(top_srcdir)/src/nextepc/libpcrf.la
 
 dist_open5gc_amfd_SOURCES = main.c
 open5gc_amfd_LDADD = $(top_srcdir)/src/libamf.la
@@ -25,8 +25,8 @@ dist_open5gc_ngcd_SOURCES = main.c
 open5gc_ngcd_LDADD = $(top_srcdir)/src/libngc.la
 
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/lib/core/include \
-    -I$(top_srcdir)/src/app \
+	-I$(top_srcdir)/lib/nextepc/core/include \
+	-I$(top_srcdir)/src/app \
 	$(NULL)
 
 install-data-hook:
@@ -41,11 +41,11 @@ install-data-hook:
 CLEANFILES = -R data
 DISTCLEANFILES = $(DIST_ARCHIVES)
 MAINTAINERCLEANFILES = \
-    configure config.in \
-    aclocal.m4 m4/ltsugar.m4 m4/libtool.m4 m4/ltversion.m4 \
-    m4/lt~obsolete.m4 m4/ltoptions.m4 \
-    build-aux/ar-lib build-aux/config.guess build-aux/depcomp \
+	configure config.in \
+	aclocal.m4 m4/ltsugar.m4 m4/libtool.m4 m4/ltversion.m4 \
+	m4/lt~obsolete.m4 m4/ltoptions.m4 \
+	build-aux/ar-lib build-aux/config.guess build-aux/depcomp \
 	build-aux/ltmain.sh build-aux/test-driver build-aux/compile \
 	build-aux/config.sub build-aux/missing build-aux/install-sh \
-    Makefile.in
+	Makefile.in
 MOSTLYCLEANFILES = core *.stackdump

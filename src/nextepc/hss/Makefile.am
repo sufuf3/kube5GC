@@ -8,18 +8,19 @@ libhss_la_SOURCES = \
 	$(NULL)
 
 libhss_la_DEPENDENCIES = \
-    $(top_srcdir)/lib/fd/libfd.la \
-    $(top_srcdir)/src/app/libapp.la \
+	$(top_srcdir)/lib/nextepc/fd/libfd.la \
+	$(top_srcdir)/src/app/libapp.la \
 	$(NULL)
 
 libhss_la_LIBADD = \
-    $(top_srcdir)/lib/fd/libfd.la \
-    $(top_srcdir)/src/app/libapp.la \
+	$(top_srcdir)/lib/nextepc/fd/libfd.la \
+	$(top_srcdir)/src/app/libapp.la \
 	$(NULL)
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/lib/core/include \
-    -I$(top_srcdir)/lib \
+	-I$(top_srcdir)/lib/nextepc/core/include \
+	-I$(top_srcdir)/lib/nextepc \
+	-I$(top_srcdir)/lib \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/lib/@FREEDIAMETER_DIR@/include \
 	@MONGOC_CFLAGS@ \

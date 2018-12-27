@@ -8,11 +8,11 @@ libgtp_la_SOURCES = \
 	$(NULL)
 
 libgtp_la_DEPENDENCIES = \
-    $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
 	$(NULL)
 
 libgtp_la_LIBADD = \
-    $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
 	$(NULL)
 
 AM_LDFLAGS = \
@@ -20,7 +20,7 @@ AM_LDFLAGS = \
 	$(NULL)
 
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/lib/core/include \
+	-I$(top_srcdir)/lib/nextepc/core/include \
 	$(NULL)
 
 AM_CFLAGS = \

@@ -6,12 +6,12 @@ libsbiJson_la_SOURCES = \
 	$(NULL)
 
 libsbiJson_la_DEPENDENCIES = \
-    $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
 	$(top_srcdir)/lib/cJSON/libcJSON.la \
 	$(NULL)
 
 libsbiJson_la_LIBADD = \
-    $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
 	$(top_srcdir)/lib/cJSON/libcJSON.la \
 	$(NULL)
 
@@ -20,7 +20,7 @@ AM_CFLAGS = \
 	$(NULL)
 
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/lib/core/include \
+	-I$(top_srcdir)/lib/nextepc/core/include \
 	-I$(top_srcdir)/lib/cJSON \
 	$(NULL)
 

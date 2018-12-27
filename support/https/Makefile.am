@@ -1,10 +1,10 @@
 certfiles = \
-    smf.cert \
-    $(NULL)
+	smf.cert \
+	$(NULL)
 
 keyfiles = \
-    smf.key \
-    $(NULL)
+	smf.key \
+	$(NULL)
 
 
 freeDiameterdir = ${sysconfdir}/open5gc/https

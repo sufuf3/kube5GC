@@ -9,17 +9,17 @@ libapp_la_SOURCES = \
 	$(NULL)
 
 libapp_la_DEPENDENCIES = \
-    $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
 	$(NULL)
 
 libapp_la_LIBADD = \
-    $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
 	@YAML_LIBS@ \
 	@MONGOC_LIBS@ \
 	$(NULL)
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/lib/core/include \
+	-I$(top_srcdir)/lib/nextepc/core/include \
 	@MONGOC_CFLAGS@ \
 	$(NULL)
 

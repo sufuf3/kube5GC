@@ -22,11 +22,11 @@ libcore_la_SOURCES = \
 	aes.c aes_cmac.c sha1.c sha1_hmac.c sha2.c sha2_hmac.c misc.c event.c \
 	3gpp_types.c \
 	\
-    ../include/arch/core_private_common.h \
-    ../include/arch/unix/core_arch_file.h \
-    ../include/arch/unix/core_arch_mutex.h \
-    ../include/arch/unix/core_arch_semaphore.h \
-    ../include/arch/unix/core_arch_thread.h \
+	../include/arch/core_private_common.h \
+	../include/arch/unix/core_arch_file.h \
+	../include/arch/unix/core_arch_mutex.h \
+	../include/arch/unix/core_arch_semaphore.h \
+	../include/arch/unix/core_arch_thread.h \
 	unix/start.c unix/errorcodes.c unix/pkbuf.c \
 	unix/rand.c unix/time.c unix/file.c \
 	unix/thread.c unix/signal.c \
@@ -43,8 +43,8 @@ AM_LDFLAGS = \
 	$(NULL)
 
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/lib/core/include/arch/@OSDIR@ \
-    -I$(top_srcdir)/lib/core/include \
+	-I$(top_srcdir)/lib/nextepc/core/include/arch/@OSDIR@ \
+	-I$(top_srcdir)/lib/nextepc/core/include \
 	$(NULL)
 
 AM_CFLAGS = \

@@ -6,12 +6,12 @@ dict_s6a_la_SOURCES = \
 	dict_s6a.c
 
 dict_s6a_la_DEPENDENCIES = \
-    $(top_srcdir)/libfdcore/libfdcore.la \
-    $(top_srcdir)/libfdproto/libfdproto.la
+	$(top_srcdir)/libfdcore/libfdcore.la \
+	$(top_srcdir)/libfdproto/libfdproto.la
 
 dict_s6a_la_LIBADD = \
-    $(top_srcdir)/libfdcore/libfdcore.la \
-    $(top_srcdir)/libfdproto/libfdproto.la
+	$(top_srcdir)/libfdcore/libfdcore.la \
+	$(top_srcdir)/libfdproto/libfdproto.la
 
 AM_LDFLAGS = \
 	-module -avoid-version -shared

@@ -17,15 +17,15 @@ libfd_la_SOURCES = \
 	$(NULL)
 
 libfd_la_DEPENDENCIES = \
-    $(top_srcdir)/lib/core/src/libcore.la \
-    $(top_srcdir)/lib/@FREEDIAMETER_DIR@/libfdcore/libfdcore.la \
-    $(top_srcdir)/lib/@FREEDIAMETER_DIR@/libfdproto/libfdproto.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
+	$(top_srcdir)/lib/@FREEDIAMETER_DIR@/libfdcore/libfdcore.la \
+	$(top_srcdir)/lib/@FREEDIAMETER_DIR@/libfdproto/libfdproto.la \
 	$(NULL)
 
 libfd_la_LIBADD = \
-    $(top_srcdir)/lib/core/src/libcore.la \
-    $(top_srcdir)/lib/@FREEDIAMETER_DIR@/libfdcore/libfdcore.la \
-    $(top_srcdir)/lib/@FREEDIAMETER_DIR@/libfdproto/libfdproto.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
+	$(top_srcdir)/lib/@FREEDIAMETER_DIR@/libfdcore/libfdcore.la \
+	$(top_srcdir)/lib/@FREEDIAMETER_DIR@/libfdproto/libfdproto.la \
 	$(NULL)
 
 AM_LDFLAGS = \
@@ -33,7 +33,7 @@ AM_LDFLAGS = \
 	$(NULL)
 
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/lib/core/include \
+	-I$(top_srcdir)/lib/nextepc/core/include \
 	-I$(top_srcdir)/lib/@FREEDIAMETER_DIR@/include \
 	$(NULL)
 
