@@ -44,7 +44,7 @@ test/testsuite.log
 # executables
 lib/core/test/testcore
 test/testvolte
-test/testepc
+test/testngc
 nextepc-pcrfd
 nextepc-hssd
 open5gc-upfd

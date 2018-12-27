@@ -1,11 +1,11 @@
 ## Process this file with automake to produce Makefile.in.
 
-bin_PROGRAMS = testepc testvolte
+bin_PROGRAMS = testngc testvolte
 
 configdir = ${sysconfdir}/open5gc/test
 config_DATA = sample.conf sample-volte.conf
 
-testepc_SOURCES = \
+testngc_SOURCES = \
 	common/abts.h common/abts.c \
 	common/testpacket.h common/testpacket.c common/testutil.h \
 	basic/testutil.c basic/s1ap_message_test.c basic/nas_message_test.c \
