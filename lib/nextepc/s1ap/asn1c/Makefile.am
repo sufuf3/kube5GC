@@ -1225,11 +1225,11 @@ pkglib_LTLIBRARIES=libs1apasn1c.la
 libs1apasn1c_la_SOURCES=$(ASN_MODULE_SRCS) $(ASN_MODULE_HDRS)
 
 libs1apasn1c_la_DEPENDENCIES = \
-    $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
 	$(NULL)
 
 libs1apasn1c_la_LIBADD = \
-    $(top_srcdir)/lib/core/src/libcore.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
 	$(NULL)
 
 AM_LDFLAGS = \
@@ -1237,7 +1237,7 @@ AM_LDFLAGS = \
 	$(NULL)
 
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/lib/core/include \
+	-I$(top_srcdir)/lib/nextepc/core/include \
 	$(NULL)
 
 AM_CFLAGS = \

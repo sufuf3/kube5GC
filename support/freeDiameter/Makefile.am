@@ -3,7 +3,7 @@ configfiles = \
 	hss.conf \
 	pgw.conf \
 	pcrf.conf \
-    $(NULL)
+	$(NULL)
 
 pemfiles = \
 	cacert.pem \
@@ -15,7 +15,7 @@ pemfiles = \
 	pgw.cert.pem \
 	pcrf.key.pem \
 	pcrf.cert.pem \
-    $(NULL)
+	$(NULL)
 
 freeDiameterdir = ${sysconfdir}/open5gc/freeDiameter
 

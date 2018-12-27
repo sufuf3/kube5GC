@@ -29,7 +29,7 @@ AM_LDFLAGS = \
 	-version-info @LIBVERSION@
 
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/include
+	-I$(top_srcdir)/include
 
 AM_CFLAGS =
 

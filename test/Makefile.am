@@ -22,20 +22,22 @@ testvolte_SOURCES = \
 	$(NULL)
 
 LDADD = \
-    $(top_srcdir)/src/libngc.la \
+	$(top_srcdir)/src/libngc.la \
 	$(NULL)
 
 DEPENDENCIES = \
-    $(top_srcdir)/src/libngc.la \
+	$(top_srcdir)/src/libngc.la \
 	$(NULL)
 
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/lib/core/include \
-    -I$(top_srcdir)/lib \
-    -I$(top_srcdir)/src \
-    -I$(top_srcdir)/lib/s1ap/asn1c \
+	-I$(top_srcdir)/lib/nextepc/core/include \
+	-I$(top_srcdir)/lib/nextepc/s1ap/asn1c \
+	-I$(top_srcdir)/lib/nextepc \
 	-I$(top_srcdir)/lib/ngap/asn1c \
 	-I$(top_srcdir)/lib/@FREEDIAMETER_DIR@/include \
+	-I$(top_srcdir)/lib \
+	-I$(top_srcdir)/src/nextepc \
+	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/test/common \
 	@MONGOC_CFLAGS@ \
 	$(NULL)
@@ -77,20 +79,20 @@ $(TESTSUITE): $(srcdir)/testsuite.at $(srcdir)/package.m4
 # The `:;' works around a Bash 3.2 bug when the output is not writeable.
 $(srcdir)/package.m4: $(top_srcdir)/configure.ac
 	:;{ \
-               echo '# Signature of the current package.' && \
-               echo 'm4_define([AT_PACKAGE_NAME],' && \
-               echo '  [$(PACKAGE_NAME)])' && \
-               echo 'm4_define([AT_PACKAGE_TARNAME],' && \
-               echo '  [$(PACKAGE_TARNAME)])' && \
-               echo 'm4_define([AT_PACKAGE_VERSION],' && \
-               echo '  [$(PACKAGE_VERSION)])' && \
-               echo 'm4_define([AT_PACKAGE_STRING],' && \
-               echo '  [$(PACKAGE_STRING)])' && \
-               echo 'm4_define([AT_PACKAGE_BUGREPORT],' && \
-               echo '  [$(PACKAGE_BUGREPORT)])'; \
-               echo 'm4_define([AT_PACKAGE_URL],' && \
-               echo '  [$(PACKAGE_URL)])'; \
-             } >'$(srcdir)/package.m4'
+			   echo '# Signature of the current package.' && \
+			   echo 'm4_define([AT_PACKAGE_NAME],' && \
+			   echo '  [$(PACKAGE_NAME)])' && \
+			   echo 'm4_define([AT_PACKAGE_TARNAME],' && \
+			   echo '  [$(PACKAGE_TARNAME)])' && \
+			   echo 'm4_define([AT_PACKAGE_VERSION],' && \
+			   echo '  [$(PACKAGE_VERSION)])' && \
+			   echo 'm4_define([AT_PACKAGE_STRING],' && \
+			   echo '  [$(PACKAGE_STRING)])' && \
+			   echo 'm4_define([AT_PACKAGE_BUGREPORT],' && \
+			   echo '  [$(PACKAGE_BUGREPORT)])'; \
+			   echo 'm4_define([AT_PACKAGE_URL],' && \
+			   echo '  [$(PACKAGE_URL)])'; \
+			 } >'$(srcdir)/package.m4'
 
 EXTRA_DIST = testsuite.at $(srcdir)/package.m4 $(TESTSUITE)
 
