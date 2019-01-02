@@ -339,18 +339,8 @@ status_t smf_n4_build_session_deletion_request(
 {
     status_t rv;
     pfcp_message_t pfcp_message;
-    pfcp_session_deletion_request_t *req = NULL;
-    pfcp_f_seid_t smf_f_seid;
 
-    req = &pfcp_message.pfcp_session_deletion_request;
     memset(&pfcp_message, 0, sizeof(pfcp_message_t));
-    
-    /* Set CP F-SEID, mandatory */
-    req->cp_f_seid.presence = 1;
-    req->cp_f_seid.data = &smf_f_seid;
-    smf_f_seid.seid = sess->smf_n4_seid;
-    rv = pfcp_sockaddr_to_f_seid(smf_self()->pfcp_addr, smf_self()->pfcp_addr6,
-            &smf_f_seid, (c_int32_t *)&req->cp_f_seid.len);
     
     pfcp_message.h.type = PFCP_SESSION_DELETION_REQUEST_TYPE;
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
