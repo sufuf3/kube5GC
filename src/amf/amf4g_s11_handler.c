@@ -18,6 +18,11 @@
 #include "amf4g_s11_build.h"
 #include "amf4g_s11_handler.h"
 
+#include "amf_json_build.h"
+#include "sbiJson/commonJsonKey.h"
+#include "sbiJson/JsonTransform.h"
+#include "amf_sbi_path.h"
+
 void amf4g_s11_handle_create_session_response(
         gtp_xact_t *xact, amf4g_ue_t *amf4g_ue, gtp_create_session_response_t *rsp)
 {
@@ -776,6 +781,23 @@ void amf_n11_handle_modify_bearer_response( amf4g_ue_t *amf4g_ue, modify_bearer_
                 S1AP_Cause_PR_nas, S1AP_CauseNas_normal_release,
                 S1AP_UE_CTX_REL_S1_NORMAL_RELEASE, 0);
         d_assert(rv == CORE_OK,, "s1ap send error");
+    }
+    else if (modifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION)
+    {
+        amf4g_ue_t *amf4g_ue = NULL;
+        amf4g_sess_t *sess = NULL;
+	    amf4g_bearer_t *bearer = NULL;
+        pkbuf_t *pkbuf = NULL;
+        d_trace(3, "[AMF] SM Context Update Type Downlink Data Notification\n");
+	    sess = amf4g_sess_first(amf4g_ue);
+	    d_assert(sess, return, "Null param");
+        bearer = amf4g_bearer_first(sess);
+        d_assert(bearer, return, "Null param");
+        d_trace(3, "[AMF] SM Context Update Type Downlink Data Notification Ack\n");
+        amf_json_build_modify_bearer(&pkbuf, bearer, SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION_ACK);
+        amf_sbi_send_sm_context_update(pkbuf);
+        pkbuf_free(pkbuf);
+
     }
     else
     {

@@ -929,6 +929,15 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
                     amf_n11_handle_modify_bearer_response(amf4g_ue, &modifyBearer);
                     d_assert(recvbuf, goto release_amf_n11_pkbuf, "Null param");
                     d_info("AMF Update Session Done");
+
+                    if (ECM_IDLE(amf4g_ue) && modifyBearer.sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION)
+                    {
+                        d_trace(10, "[AMF] amf4g ue is ECM_IDLE\n");
+                        s1ap_handle_paging(amf4g_ue);
+                        /* Start T3413 */
+                        tm_start(amf4g_ue->t3413);
+                    }
+
                     break;
                 }
                 default :
