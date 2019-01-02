@@ -24,7 +24,7 @@
 #include "nas_path.h"
 #include "emm_handler.h"
 #include "esm_handler.h"
-#include "amf4g_gtp_path.h"
+#include "amf_n11_path.h"
 #include "amf4g_s11_handler.h"
 #include "amf4g_fd_path.h"
 #include "amf4g_s6a_handler.h"
