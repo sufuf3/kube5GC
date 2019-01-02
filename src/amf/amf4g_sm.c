@@ -33,6 +33,7 @@
 
 #include "JsonTransform.h"
 #include "amf_json_handler.h"
+#include "amf_n11_handler.h"
 
 void amf4g_state_initial(fsm_t *s, event_t *e)
 {

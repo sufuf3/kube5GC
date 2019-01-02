@@ -31,6 +31,7 @@ libamf_la_SOURCES = \
 	amf4g_sm.c amf4g_path.c \
 	amf_sbi_path.h amf_sbi_path.c \
 	JsonTransform.h \
+	amf_n11_handler.c amf_n11_handler.h \
 	$(NULL)
 
 if USRSCTP
