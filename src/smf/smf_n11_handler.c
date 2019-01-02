@@ -34,9 +34,16 @@ void smf_n11_handle_update_session_request(smf_sess_t *sess, modify_bearer_t *pM
         bearer->sgw_s1u_teid, bearer->enb_s1u_teid);
 
     sess->sm_context_update_type = pModifyBearer->sm_context_update_type;
-
-    rv = smf_pfcp_send_session_modification_request(sess);
-    d_assert(rv == CORE_OK, , "pfcp session modification fail");
+    if (pModifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS)
+    {
+        rv = smf_pfcp_send_session_modification_request(sess);
+        d_assert(rv == CORE_OK, , "pfcp session modification fail");
+    }
+    else if (pModifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION_ACK)
+    {
+        d_trace(5, "    SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION_ACK\n");
+    }
+    
 }
 
 void smf_n11_handle_delete_session_request(

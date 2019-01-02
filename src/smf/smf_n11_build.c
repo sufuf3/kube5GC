@@ -267,3 +267,32 @@ CORE_DECLARE(status_t) smf_n11_build_delete_session_response(
     cJSON_Delete(j_deleteSession);
     return CORE_OK;
 }
+
+status_t smf_n11_build_update_session_downlink_data_notification_request(
+    pkbuf_t **pkbuf, smf_sess_t *sess)
+{
+    char *string = NULL;
+    cJSON *j_updateSession = cJSON_CreateObject();
+    modify_bearer_t modifyBearer = {0};
+     c_uint32_t length = 0;
+     // IMSI
+    memcpy(modifyBearer.imsi, sess->imsi, sess->imsi_len);
+    modifyBearer.imsi_len = sess->imsi_len;
+
+    modifyBearer.sm_context_update_type = sess->sm_context_update_type;
+    d_trace(-1, "smf_n11_build_update_session_downlink_data_notification_request SM %d\n", modifyBearer.sm_context_update_type);
+    d_trace(-1, "smf_n11_build_update_session_downlink_data_notification_request SM %d\n", sess);
+
+    JSONTRANSFORM_StToJs_update_session_response(&modifyBearer, j_updateSession);
+    
+    string = cJSON_Print(j_updateSession);
+    d_info(string);
+    length = strlen(string) + 1;
+    *pkbuf = pkbuf_alloc(0, length);
+    (*pkbuf)->len = length;
+    memcpy((*pkbuf)->payload, string, length -1);
+    free(string);
+    cJSON_Delete(j_updateSession);
+
+    return CORE_OK;
+}
