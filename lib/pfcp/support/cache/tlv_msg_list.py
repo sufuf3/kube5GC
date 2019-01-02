@@ -20,3 +20,4 @@ msg_list["PFCP Session Modification Response"] = { "type" : "53" }
 msg_list["PFCP Session Deletion Request"] = { "type" : "54" }
 msg_list["PFCP Session Deletion Response"] = { "type" : "55" }
 msg_list["PFCP Session Report Request"] = { "type" : "56" }
+msg_list["PFCP Session Report Response"] = { "type" : "57" }
