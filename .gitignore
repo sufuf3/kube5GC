@@ -14,8 +14,9 @@ lib/freeDiameter-*/libfdcore/lex.fdd.[cl]
 lib/freeDiameter-*/include/freeDiameter/version.h
 lib/freeDiameter-*/include/freeDiameter/config.h.in
 lib/freeDiameter-*/include/freeDiameter/freeDiameter-host.h
-lib/core/include/core.h
+lib/nextepc/core/include/core.h
 support/systemd/open5gc-*.service
+support/systemd/nextepc-*.service
 support/logrotate/open5gc
 
 # autotools
@@ -42,7 +43,7 @@ test/testsuite.dir/
 test/testsuite.log
 
 # executables
-lib/core/test/testcore
+lib/nextepc/core/test/testcore
 test/testvolte
 test/testngc
 nextepc-pcrfd
