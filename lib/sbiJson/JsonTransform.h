@@ -34,8 +34,10 @@ typedef struct _create_session_t {
 } create_session_t;
 
 typedef struct _modify_bearer_t {
-    #define SM_CONTEXT_UPDATE_TYPE_MODIFY            0x01
-    #define SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS    0x02
+    #define SM_CONTEXT_UPDATE_TYPE_MODIFY                           0x01
+    #define SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS                   0x02
+    #define SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION       0x03
+    #define SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION_ACK   0x04
     c_uint8_t       sm_context_update_type;
     c_uint8_t       imsi[MAX_IMSI_LEN];
     c_int32_t       imsi_len;
