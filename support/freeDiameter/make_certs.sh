@@ -15,20 +15,20 @@ touch demoCA/index.txt
 # CA self certificate
 openssl req  -new -batch -x509 -days 3650 -nodes -newkey rsa:1024 -out $1/cacert.pem -keyout cakey.pem -subj /CN=ca.localdomain/C=KO/ST=Seoul/L=Nowon/O=Open5GC/OU=Tests
 
-#mme
-openssl genrsa -out $1/mme.key.pem 1024
-openssl req -new -batch -out mme.csr.pem -key $1/mme.key.pem -subj /CN=mme.localdomain/C=KO/ST=Seoul/L=Nowon/O=Open5GC/OU=Tests
-openssl ca -cert $1/cacert.pem -keyfile cakey.pem -in mme.csr.pem -out $1/mme.cert.pem -outdir . -batch
+#amf
+openssl genrsa -out $1/amf.key.pem 1024
+openssl req -new -batch -out amf.csr.pem -key $1/amf.key.pem -subj /CN=amf.localdomain/C=KO/ST=Seoul/L=Nowon/O=Open5GC/OU=Tests
+openssl ca -cert $1/cacert.pem -keyfile cakey.pem -in amf.csr.pem -out $1/amf.cert.pem -outdir . -batch
 
 #hss
 openssl genrsa -out $1/hss.key.pem 1024
 openssl req -new -batch -out hss.csr.pem -key $1/hss.key.pem -subj /CN=hss.localdomain/C=KO/ST=Seoul/L=Nowon/O=Open5GC/OU=Tests
 openssl ca -cert $1/cacert.pem -keyfile cakey.pem -in hss.csr.pem -out $1/hss.cert.pem -outdir . -batch
 
-#pgw
-openssl genrsa -out $1/pgw.key.pem 1024
-openssl req -new -batch -out pgw.csr.pem -key $1/pgw.key.pem -subj /CN=pgw.localdomain/C=KO/ST=Seoul/L=Nowon/O=Open5GC/OU=Tests
-openssl ca -cert $1/cacert.pem -keyfile cakey.pem -in pgw.csr.pem -out $1/pgw.cert.pem -outdir . -batch
+#smf
+openssl genrsa -out $1/smf.key.pem 1024
+openssl req -new -batch -out smf.csr.pem -key $1/smf.key.pem -subj /CN=smf.localdomain/C=KO/ST=Seoul/L=Nowon/O=Open5GC/OU=Tests
+openssl ca -cert $1/cacert.pem -keyfile cakey.pem -in smf.csr.pem -out $1/smf.cert.pem -outdir . -batch
 
 #pcrf
 openssl genrsa -out $1/pcrf.key.pem 1024
@@ -38,4 +38,4 @@ openssl ca -cert $1/cacert.pem -keyfile cakey.pem -in pcrf.csr.pem -out $1/pcrf.
 rm -rf demoCA
 rm -f 01.pem 02.pem 03.pem 04.pem
 rm -f cakey.pem
-rm -f mme.csr.pem hss.csr.pem pgw.csr.pem pcrf.csr.pem
+rm -f amf.csr.pem hss.csr.pem smf.csr.pem pcrf.csr.pem

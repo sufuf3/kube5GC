@@ -12,7 +12,7 @@ RuntimeDirectory=open5gc-amfd
 PIDFile=@LIB_DIR@/run/open5gc-amfd/pid
 
 Restart=always
-ExecStart=@BIN_DIR@/open5gc-amfd -f @SYSCONF_DIR@/open5gc/mme.conf
+ExecStart=@BIN_DIR@/open5gc-amfd -f @SYSCONF_DIR@/open5gc/amf.conf
 RestartSec=2
 RestartPreventExitStatus=1
 

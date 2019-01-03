@@ -42,7 +42,6 @@ void ngap_buffer_to_OCTET_STRING(
 
     memcpy(octet_string->buf, buf, size);
 }
-/********************************add GNB ID convert by Hu***************************/
 void ngap_uint32_to_GNB_ID(
     NGAP_GNB_ID_PR present, c_uint32_t gnb_id, NGAP_GNB_ID_t *gNB_ID)
 {
@@ -87,7 +86,6 @@ void ngap_GNB_ID_to_uint32(NGAP_GNB_ID_t *gNB_ID, c_uint32_t *uint32)
         d_assert(0, return, "Invalid param");
     }
 }
-/*********************************************************************************/
 
 
 

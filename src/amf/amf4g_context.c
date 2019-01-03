@@ -30,11 +30,9 @@
 static amf_context_t self;
 static fd_config_t g_fd_conf;
 
-/*******************add by HU************************/
 index_declare(amf_ran_pool, amf_ran_t, MAX_NUM_OF_RAN);
 index_declare(amf_ue_pool, amf_ue_t, MAX_POOL_OF_5G_UE);
 index_declare(ran_ue_pool, ran_ue_t, MAX_POOL_OF_5G_UE);
-/****************************************************/
 
 index_declare(amf4g_enb_pool, amf4g_enb_t, MAX_NUM_OF_ENB);
 index_declare(amf4g_ue_pool, amf4g_ue_t, MAX_POOL_OF_UE);
@@ -59,10 +57,8 @@ status_t amf4g_context_init()
     list_init(&self.s1ap_list);
     list_init(&self.s1ap_list6);
 
-    /****************add by HU***************/
     list_init(&self.ngap_list);
     list_init(&self.ngap_list6);
-    /****************************************/
 
     list_init(&self.gtpc_list);
     list_init(&self.gtpc_list6);
@@ -71,13 +67,10 @@ status_t amf4g_context_init()
     list_init(&self.sgw_list);
     list_init(&self.pgw_list);
 
-
-    /****************add by HU***************/
     index_init(&amf_ran_pool, MAX_NUM_OF_RAN);
 
     index_init(&amf_ue_pool, MAX_POOL_OF_5G_UE);
     index_init(&ran_ue_pool, MAX_POOL_OF_5G_UE);
-    /****************************************/
 
     index_init(&amf4g_enb_pool, MAX_NUM_OF_ENB);
 
@@ -87,12 +80,11 @@ status_t amf4g_context_init()
     index_init(&amf4g_bearer_pool, MAX_POOL_OF_BEARER);
     pool_init(&self.m_tmsi, MAX_POOL_OF_UE);
 
-    /****************add by HU***************/
     self.ran_sock_hash = hash_make();
     self.ran_addr_hash = hash_make();
     self.ran_id_hash = hash_make();
     self.amf_ue_ngap_id_hash = hash_make();
-    /****************************************/
+
     self.enb_sock_hash = hash_make();
     self.enb_addr_hash = hash_make();
     self.enb_id_hash = hash_make();
@@ -104,14 +96,10 @@ status_t amf4g_context_init()
     self.t3413_value = 2;               /* Paging retry timer: 2 secs */
     self.s1_holding_timer_value = 30;   /* S1 holding timer: 30 secs */
 
-    /****************add by HU***************/
     self.ng_holding_timer_value = 30;   /* NG holding timer: 30 secs */
-    /****************************************/
 
-    /******************** Added by Chi ********************/
     /* Status */
     self.overload_started = false;
-    /******************************************************/
 
     context_initialized = 1;
 
@@ -135,7 +123,6 @@ status_t amf4g_context_final()
     d_trace(9, "%d not freed in M-TMSI pool[%d] in AMF4G-Context\n",
             pool_used(&self.m_tmsi), pool_size(&self.m_tmsi));
 
-    /****************add by HU***************/
     d_assert(self.ran_sock_hash, , "Null param");
     hash_destroy(self.ran_sock_hash);
     d_assert(self.ran_addr_hash, , "Null param");
@@ -145,7 +132,6 @@ status_t amf4g_context_final()
 
     d_assert(self.amf_ue_ngap_id_hash, , "Null param");
     hash_destroy(self.amf_ue_ngap_id_hash);
-    /****************************************/
 
     d_assert(self.enb_sock_hash, , "Null param");
     hash_destroy(self.enb_sock_hash);
@@ -169,12 +155,10 @@ status_t amf4g_context_final()
 
     index_final(&amf4g_enb_pool);
 
-    /****************add by HU***************/
     index_final(&amf_ue_pool);
     index_final(&ran_ue_pool);
 
     index_final(&amf_ran_pool);
-    /****************************************/
 
     gtp_remove_all_nodes(&self.sgw_list);
     gtp_remove_all_nodes(&self.pgw_list);
@@ -182,16 +166,15 @@ status_t amf4g_context_final()
 
     sock_remove_all_nodes(&self.s1ap_list);
     sock_remove_all_nodes(&self.s1ap_list6);
-    /****************add by HU***************/
+
     sock_remove_all_nodes(&self.ngap_list);
     sock_remove_all_nodes(&self.ngap_list6);
-    /****************************************/
+
     sock_remove_all_nodes(&self.gtpc_list);
     sock_remove_all_nodes(&self.gtpc_list6);
 
-    /******************** Added by Chi ********************/
+
     tm_delete(self.overloading_checking_timer);
-    /******************************************************/
 
     context_initialized = 0;
 
@@ -208,9 +191,7 @@ static status_t amf4g_context_prepare()
     self.relative_capacity = 0xff;
 
     self.s1ap_port = S1AP_SCTP_PORT;
-    /*****************add by HU********************/
     self.ngap_port = NGAP_SCTP_PORT;
-    /**********************************************/
     self.gtpc_port = GTPV2_C_UDP_PORT;
     self.fd_config->cnf_port = DIAMETER_PORT;
     self.fd_config->cnf_port_tls = DIAMETER_SECURE_PORT;
@@ -243,17 +224,6 @@ static status_t amf4g_context_validation()
         return CORE_EAGAIN;
     }
 
-    if (list_first(&self.sgw_list) == NULL)
-    {
-        d_error("No sgw.gtpc in '%s'", context_self()->config.path);
-        return CORE_ERROR;
-    }
- 
-    if (list_first(&self.pgw_list) == NULL)
-    {
-        d_error("No pgw.gtpc in '%s'", context_self()->config.path);
-        return CORE_ERROR;
-    }
 
     if (self.max_num_of_served_gummei == 0)
     {
@@ -327,7 +297,7 @@ status_t amf4g_context_parse_config()
     {
         const char *root_key = yaml_iter_key(&root_iter);
         d_assert(root_key, return CORE_ERROR,);
-        if (!strcmp(root_key, "mme"))
+        if (!strcmp(root_key, "amf"))
         {
             yaml_iter_t amf4g_iter;
             yaml_iter_recurse(&root_iter, &amf4g_iter);
@@ -1496,234 +1466,6 @@ status_t amf4g_context_parse_config()
                     d_warn("unknown key `%s`", amf4g_key);
             }
         }
-        else if (!strcmp(root_key, "sgw"))
-        {
-            yaml_iter_t amf4g_iter;
-            yaml_iter_recurse(&root_iter, &amf4g_iter);
-            while(yaml_iter_next(&amf4g_iter))
-            {
-                const char *amf4g_key = yaml_iter_key(&amf4g_iter);
-                d_assert(amf4g_key, return CORE_ERROR,);
-                if (!strcmp(amf4g_key, "gtpc"))
-                {
-                    yaml_iter_t gtpc_array, gtpc_iter;
-                    yaml_iter_recurse(&amf4g_iter, &gtpc_array);
-                    do
-                    {
-                        gtp_node_t *sgw = NULL;
-                        c_sockaddr_t *list = NULL;
-                        int family = AF_UNSPEC;
-                        int i, num = 0;
-                        const char *hostname[MAX_NUM_OF_HOSTNAME];
-                        c_uint16_t port = self.gtpc_port;
-
-                        if (yaml_iter_type(&gtpc_array) == YAML_MAPPING_NODE)
-                        {
-                            memcpy(&gtpc_iter, &gtpc_array,
-                                    sizeof(yaml_iter_t));
-                        }
-                        else if (yaml_iter_type(&gtpc_array) ==
-                            YAML_SEQUENCE_NODE)
-                        {
-                            if (!yaml_iter_next(&gtpc_array))
-                                break;
-                            yaml_iter_recurse(&gtpc_array, &gtpc_iter);
-                        }
-                        else if (yaml_iter_type(&gtpc_array) ==
-                                YAML_SCALAR_NODE)
-                        {
-                            break;
-                        }
-                        else
-                            d_assert(0, return CORE_ERROR,);
-
-                        while(yaml_iter_next(&gtpc_iter))
-                        {
-                            const char *gtpc_key =
-                                yaml_iter_key(&gtpc_iter);
-                            d_assert(gtpc_key,
-                                    return CORE_ERROR,);
-                            if (!strcmp(gtpc_key, "family"))
-                            {
-                                const char *v = yaml_iter_value(&gtpc_iter);
-                                if (v) family = atoi(v);
-                                if (family != AF_UNSPEC &&
-                                    family != AF_INET && family != AF_INET6)
-                                {
-                                    d_warn("Ignore family(%d) : AF_UNSPEC(%d), "
-                                        "AF_INET(%d), AF_INET6(%d) ", 
-                                        family, AF_UNSPEC, AF_INET, AF_INET6);
-                                    family = AF_UNSPEC;
-                                }
-                            }
-                            else if (!strcmp(gtpc_key, "addr") ||
-                                    !strcmp(gtpc_key, "name"))
-                            {
-                                yaml_iter_t hostname_iter;
-                                yaml_iter_recurse(&gtpc_iter, &hostname_iter);
-                                d_assert(yaml_iter_type(&hostname_iter) !=
-                                    YAML_MAPPING_NODE, return CORE_ERROR,);
-
-                                do
-                                {
-                                    if (yaml_iter_type(&hostname_iter) ==
-                                            YAML_SEQUENCE_NODE)
-                                    {
-                                        if (!yaml_iter_next(&hostname_iter))
-                                            break;
-                                    }
-
-                                    d_assert(num <= MAX_NUM_OF_HOSTNAME,
-                                            return CORE_ERROR,);
-                                    hostname[num++] = 
-                                        yaml_iter_value(&hostname_iter);
-                                } while(
-                                    yaml_iter_type(&hostname_iter) ==
-                                        YAML_SEQUENCE_NODE);
-                            }
-                            else if (!strcmp(gtpc_key, "port"))
-                            {
-                                const char *v = yaml_iter_value(&gtpc_iter);
-                                if (v) port = atoi(v);
-                            }
-                            else
-                                d_warn("unknown key `%s`", gtpc_key);
-                        }
-
-                        list = NULL;
-                        for (i = 0; i < num; i++)
-                        {
-                            rv = core_addaddrinfo(&list,
-                                    family, hostname[i], port, 0);
-                            d_assert(rv == CORE_OK, return CORE_ERROR,);
-                        }
-
-                        rv = gtp_add_node(&self.sgw_list, &sgw, list,
-                                context_self()->parameter.no_ipv4,
-                                context_self()->parameter.no_ipv6,
-                                context_self()->parameter.prefer_ipv4);
-                        d_assert(rv == CORE_OK, return CORE_ERROR,);
-
-                        core_freeaddrinfo(list);
-
-                    } while(yaml_iter_type(&gtpc_array) == YAML_SEQUENCE_NODE);
-                }
-            }
-        }
-        else if (!strcmp(root_key, "pgw"))
-        {
-            yaml_iter_t amf4g_iter;
-            yaml_iter_recurse(&root_iter, &amf4g_iter);
-            while(yaml_iter_next(&amf4g_iter))
-            {
-                const char *amf4g_key = yaml_iter_key(&amf4g_iter);
-                d_assert(amf4g_key, return CORE_ERROR,);
-                if (!strcmp(amf4g_key, "gtpc"))
-                {
-                    yaml_iter_t gtpc_array, gtpc_iter;
-                    yaml_iter_recurse(&amf4g_iter, &gtpc_array);
-                    do
-                    {
-                        gtp_node_t *pgw = NULL;
-                        c_sockaddr_t *list = NULL;
-                        int family = AF_UNSPEC;
-                        int i, num = 0;
-                        const char *hostname[MAX_NUM_OF_HOSTNAME];
-                        c_uint16_t port = self.gtpc_port;
-
-                        if (yaml_iter_type(&gtpc_array) == YAML_MAPPING_NODE)
-                        {
-                            memcpy(&gtpc_iter, &gtpc_array,
-                                    sizeof(yaml_iter_t));
-                        }
-                        else if (yaml_iter_type(&gtpc_array) ==
-                            YAML_SEQUENCE_NODE)
-                        {
-                            if (!yaml_iter_next(&gtpc_array))
-                                break;
-                            yaml_iter_recurse(&gtpc_array, &gtpc_iter);
-                        }
-                        else if (yaml_iter_type(&gtpc_array) ==
-                                YAML_SCALAR_NODE)
-                        {
-                            break;
-                        }
-                        else
-                            d_assert(0, return CORE_ERROR,);
-
-                        while(yaml_iter_next(&gtpc_iter))
-                        {
-                            const char *gtpc_key =
-                                yaml_iter_key(&gtpc_iter);
-                            d_assert(gtpc_key,
-                                    return CORE_ERROR,);
-                            if (!strcmp(gtpc_key, "family"))
-                            {
-                                const char *v = yaml_iter_value(&gtpc_iter);
-                                if (v) family = atoi(v);
-                                if (family != AF_UNSPEC &&
-                                    family != AF_INET && family != AF_INET6)
-                                {
-                                    d_warn("Ignore family(%d) : AF_UNSPEC(%d), "
-                                        "AF_INET(%d), AF_INET6(%d) ", 
-                                        family, AF_UNSPEC, AF_INET, AF_INET6);
-                                    family = AF_UNSPEC;
-                                }
-                            }
-                            else if (!strcmp(gtpc_key, "addr") ||
-                                    !strcmp(gtpc_key, "name"))
-                            {
-                                yaml_iter_t hostname_iter;
-                                yaml_iter_recurse(&gtpc_iter, &hostname_iter);
-                                d_assert(yaml_iter_type(&hostname_iter) !=
-                                    YAML_MAPPING_NODE, return CORE_ERROR,);
-
-                                do
-                                {
-                                    if (yaml_iter_type(&hostname_iter) ==
-                                            YAML_SEQUENCE_NODE)
-                                    {
-                                        if (!yaml_iter_next(&hostname_iter))
-                                            break;
-                                    }
-
-                                    d_assert(num <= MAX_NUM_OF_HOSTNAME,
-                                            return CORE_ERROR,);
-                                    hostname[num++] = 
-                                        yaml_iter_value(&hostname_iter);
-                                } while(
-                                    yaml_iter_type(&hostname_iter) ==
-                                        YAML_SEQUENCE_NODE);
-                            }
-                            else if (!strcmp(gtpc_key, "port"))
-                            {
-                                const char *v = yaml_iter_value(&gtpc_iter);
-                                if (v) port = atoi(v);
-                            }
-                            else
-                                d_warn("unknown key `%s`", gtpc_key);
-                        }
-
-                        list = NULL;
-                        for (i = 0; i < num; i++)
-                        {
-                            rv = core_addaddrinfo(&list,
-                                    family, hostname[i], port, 0);
-                            d_assert(rv == CORE_OK, return CORE_ERROR,);
-                        }
-
-                        rv = gtp_add_node(&self.pgw_list, &pgw, list,
-                                context_self()->parameter.no_ipv4,
-                                context_self()->parameter.no_ipv6,
-                                context_self()->parameter.prefer_ipv4);
-                        d_assert(rv == CORE_OK, return CORE_ERROR,);
-
-                        core_freeaddrinfo(list);
-
-                    } while(yaml_iter_type(&gtpc_array) == YAML_SEQUENCE_NODE);
-                }
-            }
-        }
     }
 
     rv = amf4g_context_validation();
@@ -1977,7 +1719,6 @@ int amf4g_enb_sock_type(sock_id sock)
     return SOCK_STREAM;
 }
 
-/*************************add by HU***************************/
 /** amf_ran handling function **/
 
 amf_ran_t* amf_ran_add(sock_id sock, c_sockaddr_t *addr)
@@ -2319,7 +2060,6 @@ ran_ue_t* ran_ue_next_in_ran(ran_ue_t *ran_ue)
     return list_next(ran_ue);
 }
 
-/*************************************************************/
 
 /** enb_ue_context handling function */
 enb_ue_t* enb_ue_add(amf4g_enb_t *enb)
@@ -2524,13 +2264,6 @@ amf4g_ue_t* amf4g_ue_add(enb_ue_t *enb_ue)
     /* Create New GUTI */
     amf4g_ue_new_guti(amf4g_ue);
 
-    /* Setup SGW with round-robin manner */
-    if (amf4g_self()->sgw == NULL)
-        amf4g_self()->sgw = list_first(&amf4g_self()->sgw_list);
-
-    SETUP_GTP_NODE(amf4g_ue, amf4g_self()->sgw);
-
-    amf4g_self()->sgw = list_next(amf4g_self()->sgw);
 
     /* Create paging retry timer */
     amf4g_ue->t3413 = timer_create(&self.tm_service, AMF4G_EVT_EMM_T3413,
@@ -2885,7 +2618,6 @@ status_t enb_ue_deassociate(enb_ue_t *enb_ue)
     
     return CORE_OK;
 }
-/***********************add bu HU*****************************/
 status_t ran_ue_deassociate(ran_ue_t *ran_ue)
 {
     d_assert(ran_ue, return CORE_ERROR, "Null param");
@@ -2893,7 +2625,6 @@ status_t ran_ue_deassociate(ran_ue_t *ran_ue)
     
     return CORE_OK;
 }
-/**************************************************************/
 status_t amf4g_ue_deassociate(amf4g_ue_t *amf4g_ue)
 {
     d_assert(amf4g_ue, return CORE_ERROR, "Null param");
@@ -3558,7 +3289,6 @@ status_t amf4g_m_tmsi_free(amf4g_m_tmsi_t *m_tmsi)
     return CORE_OK;
 }
 
-/******************** Added by Chi ********************/
 status_t amf4g_overload_checking_init()
 {
     c_uint32_t duration = 10 * 1000;
@@ -3573,7 +3303,6 @@ status_t amf4g_overload_checking_init()
 
     return CORE_OK;
 }
-/******************************************************/
 
 status_t amf_ue_deassociate(amf_ue_t *amf_ue)
 {

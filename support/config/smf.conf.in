@@ -12,7 +12,7 @@ logger:
 parameter:
 
 smf:
-    freeDiameter: pgw.conf
+    freeDiameter: smf.conf
 
     gtpc:
       addr:

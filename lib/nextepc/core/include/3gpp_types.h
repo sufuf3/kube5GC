@@ -8,21 +8,19 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define S1AP_SCTP_PORT              36412
-#define NGAP_SCTP_PORT              38412 /*add by Hu*/
+#define NGAP_SCTP_PORT              38412
 #define GTPV2_C_UDP_PORT            2123
 #define GTPV1_U_UDP_PORT            2152
 #define PFCP_UDP_PORT               8805
 
 #define SCTP_S1AP_PPID              18
 #define SCTP_X2AP_PPID              27
-#define SCTP_NGAP_PPID              60 /*add by Hu*/
+#define SCTP_NGAP_PPID              60
 
-/*******************add by HU************************/
 #define MAX_NUM_OF_RAN              128
 #define MAX_NUM_OF_5G_UE            128
 
 #define MAX_POOL_OF_5G_UE           (MAX_NUM_OF_RAN * MAX_NUM_OF_5G_UE)
-/****************************************************/
 
 #define MAX_NUM_OF_ENB              128
 #define MAX_NUM_OF_UE               128
@@ -104,7 +102,6 @@ typedef struct _e_cgi_t {
     c_uint32_t cell_id; /* 28 bit */
 } __attribute__ ((packed)) e_cgi_t;
 
-/****************add by Hu**************/
 typedef struct _s_nssai_t {
     c_uint8_t sst;
     c_uint32_t sd; /* 24 bit */
@@ -124,7 +121,6 @@ typedef struct _guti_5g_t {
     c_uint32_t tmsi_5g;
 } __attribute__ ((packed)) guti_5g_t;
 
-/**************************************/
 
 typedef struct _guti_t {
     plmn_id_t plmn_id;

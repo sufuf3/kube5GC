@@ -1085,13 +1085,11 @@ static void attach_test3(abts_case *tc, void *data)
     d_assert(amf4g_ue, goto out,);
     m_tmsi = amf4g_ue->guti.m_tmsi;
 
-    /******************** Added by Hu ********************/
     /* Send eNB CP relocation indication */
     rv = tests1ap_build_enb_cp_relocation_indication(&sendbuf, enb_ue->enb_ue_s1ap_id);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
-    /******************************************************/
     
 
     /* Send UE Context Release Request */
@@ -1702,21 +1700,17 @@ static void attach_test5(abts_case *tc, void *data)
     
 
 
-    /******************** Added by Chi ********************/
     /* Send eNB direct information transfer */
     rv = tests1ap_build_enb_direct_information_transfer(&sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
-    /******************************************************/
 
     
-    /******************** Added by Roger Chu ********************/
     rv = tests1ap_build_retrieve_ue_information(&sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
-    /************************************************************/
 
 #if 0
     rv = tests1ap_build_s1_reset(&sendbuf, 0);

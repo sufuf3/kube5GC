@@ -5,7 +5,7 @@ noinst_LTLIBRARIES = libapp.la
 libapp_la_SOURCES = \
 	context.h app.h yaml_helper.h \
 	context.c init.c yaml_helper.c \
-	util.h util.c \  # Added by Chi
+	util.h util.c \
 	$(NULL)
 
 libapp_la_DEPENDENCIES = \

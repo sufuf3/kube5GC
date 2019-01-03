@@ -204,7 +204,6 @@ status_t smf_n11_build_create_session_response(
     JSONTRANSFORM_StToJs_create_session_response(&createSession, j_createSession);
     
     string = cJSON_Print(j_createSession);
-    d_info(string);
     length = strlen(string) + 1;
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;
@@ -233,7 +232,6 @@ status_t smf_n11_build_update_session_response(
     JSONTRANSFORM_StToJs_update_session_response(&modifyBearer, j_updateSession);
     
     string = cJSON_Print(j_updateSession);
-    d_info(string);
     length = strlen(string) + 1;
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;
@@ -261,7 +259,6 @@ CORE_DECLARE(status_t) smf_n11_build_delete_session_response(
     JSONTRANSFORM_StToJs_delete_session_response(&deleteSession, j_deleteSession);
     
     string = cJSON_Print(j_deleteSession);
-    d_info(string);
     length = strlen(string) + 1;
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;

@@ -71,7 +71,7 @@ status_t smf_context_final()
 {
     d_assert(context_initialized == 1, return CORE_ERROR,
             "SMF context already has been finalized");
-
+            
     smf_sess_remove_all();
 
     d_assert(self.sess_hash, , "Null param");
@@ -86,6 +86,7 @@ status_t smf_context_final()
     index_final(&smf_urr_pool);
     index_final(&smf_qer_pool);
     
+    pfcp_remove_all_nodes(&self.upf_n4_list);
     sock_remove_all_nodes(&self.pfcp_list);
     sock_remove_all_nodes(&self.pfcp_list6);
     pfcp_node_final();

@@ -10,22 +10,16 @@
 #include "gtp/gtp_xact.h"
 #include "fd/fd_lib.h"
 
-/******************** Added by Chi ********************/
 #include "app/util.h"
 #include "amf4g_context.h"
-/******************************************************/
 
 #include "amf4g_event.h"
 #include "amf4g_sm.h"
 #include "s1ap_handler.h"
 #include "s1ap_path.h"
-/******************** Added by HU ********************/
 #include "ngap_handler.h"
 #include "ngap_path.h"
-/******************************************************/
-/******************** Added by Chi ********************/
 #include "s1ap_build.h"
-/******************************************************/
 #include "nas_security.h"
 #include "nas_path.h"
 #include "emm_handler.h"
@@ -75,14 +69,12 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
                 d_error("Can't establish S1AP path");
                 break;
             }
-            /******************add by HU***********************/
             rv = ngap_open();
             if(rv != CORE_OK)
             {
                 d_error("Can't establish NGAP path");
                 break;
             }
-            /**************************************************/
             rv = amf_sbi_server_open();
             if (rv != CORE_OK)
             {
@@ -98,14 +90,12 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             {
                 d_error("Can't close S1AP path");
             }
-            /******************add by HU***********************/
             rv = ngap_close();
             if(rv != CORE_OK)
             {
                 d_error("Can't close NGAP path");
                 break;
             }
-            /**************************************************/
             rv = amf_sbi_server_close();
             if (rv != CORE_OK)
             {
@@ -286,7 +276,6 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             d_assert(rv == CORE_OK,,);
             break;
         }
-        /*****************************add by HU*********************************/
         case AMF_EVT_NGAP_LO_ACCEPT:
         {
             sock_id sock = (sock_id)event_get_param1(e);
@@ -459,7 +448,6 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             d_assert(rv == CORE_OK,,);
             break;
         }
-        /***********************************************************************/
         case AMF4G_EVT_EMM_MESSAGE:
         {
             nas_message_t message;
@@ -821,7 +809,6 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             gtp_xact_timeout(event_get_param1(e), event_get(e));
             break;
         }
-        /******************** Added by Chi ********************/
         case AMF4G_EVT_CHECK_OVERLOAD:
         {
             tm_block_id timer = (tm_block_id) event_get_param1(e);
@@ -890,7 +877,6 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
             tm_start(timer);
             break;
         }
-        /******************************************************/
         case AMF_EVT_N11_MESSAGE:
         {
             pkbuf_t *recvbuf = (pkbuf_t *)event_get_param1(e);

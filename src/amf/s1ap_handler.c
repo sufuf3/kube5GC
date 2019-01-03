@@ -10,7 +10,7 @@
 #include "nas_path.h"
 #include "amf4g_gtp_path.h"
 
-#include "amf4g_s11_build.h"
+
 #include "s1ap_build.h"
 #include "s1ap_handler.h"
 
@@ -2016,7 +2016,6 @@ void s1ap_handle_ue_context_release_complete(
     }
 }
 
-/*************Add by Steven Lee*****************/
 // Handle UE Context Resume Request
 void s1ap_handle_ue_context_resume_request(
         amf4g_enb_t *enb, s1ap_message_t *message)
@@ -2071,7 +2070,6 @@ void s1ap_handle_ue_context_resume_request(
     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,
             "s1ap_send_to_enb() failed");
 }
-/****************************************************/
 
 void s1ap_handle_ue_context_modification_response(
         amf4g_enb_t *enb, s1ap_message_t *message)

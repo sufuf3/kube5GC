@@ -10,7 +10,6 @@
 #include "s1ap_build.h"
 #include "s1ap_conv.h"
 
-//add by YEE
 status_t s1ap_build_ue_radio_capability_match_request(
     pkbuf_t **s1apbuf, enb_ue_t *enb_ue)
 {
@@ -98,7 +97,6 @@ status_t s1ap_build_ue_radio_capability_match_request(
     return CORE_OK;
 }
 
-//add by YEE 
 status_t s1ap_build_e_rab_modification_confirm(
             pkbuf_t **s1apbuf, enb_ue_t *enb_ue)
 {
@@ -165,9 +163,7 @@ status_t s1ap_build_e_rab_modification_confirm(
 
     return CORE_OK;
 }
-/*********************************************/
 
-/***************Add by Steven****************/
 status_t s1ap_build_mme_cp_relocation_indication(
         pkbuf_t **s1apbuf, enb_ue_t *source_ue)
 {
@@ -240,9 +236,7 @@ status_t s1ap_build_mme_cp_relocation_indication(
 
     return CORE_OK;
 }
-/******************************************/
 
-//add by YEE
 status_t s1ap_build_reroute_nas_request(
             pkbuf_t **s1apbuf, enb_ue_t *enb_ue)
 {
@@ -778,7 +772,6 @@ status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
     return CORE_OK;
 }
 
-/******************** Added by Chi ********************/
 status_t s1ap_build_overload_start(pkbuf_t **pkbuf)
 {
     status_t rv;
@@ -833,9 +826,7 @@ status_t s1ap_build_overload_start(pkbuf_t **pkbuf)
 
     return CORE_OK;
 }
-/******************************************************/
 
-/******************** Chu ********************/
 status_t s1ap_build_overload_stop(pkbuf_t **pkbuf){
 
     status_t rv;
@@ -880,9 +871,7 @@ status_t s1ap_build_overload_stop(pkbuf_t **pkbuf){
 
     return CORE_OK;
 }
-/*********************************************/
 
-/*************************** Qiu ***************************/
 status_t s1ap_build_write_replace_warning_request(pkbuf_t **pkbuf)
 {
 	status_t rv;
@@ -2001,7 +1990,6 @@ status_t s1ap_build_ue_context_release_command(
     return CORE_OK;
 }
 
-/***************Add by Steven****************/
 status_t s1ap_build_ue_context_resume_response(
         pkbuf_t **s1apbuf, 
         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
@@ -2543,7 +2531,6 @@ status_t s1ap_build_mme_configuration_transfer(
 
     return CORE_OK;
 }
-////////////////////////////////////pan
 status_t s1ap_build_mme_direct_information_transfer(
             pkbuf_t **s1apbuf)
 {
@@ -2598,7 +2585,6 @@ status_t s1ap_build_mme_direct_information_transfer(
     return CORE_OK;
 	
 }
-////////////////////////////////////
 status_t s1ap_build_path_switch_ack(pkbuf_t **s1apbuf, amf4g_ue_t *amf4g_ue)
 {
     status_t rv;

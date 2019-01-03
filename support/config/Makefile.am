@@ -4,6 +4,7 @@ configfiles = \
 	hss.conf \
 	pcrf.conf \
 	upf.conf \
+	amf.conf \
 	smf.conf \
 	$(NULL)
 
