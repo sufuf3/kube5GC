@@ -56,7 +56,6 @@ static status_t bearer_binding(smf_sess_t *sess, gx_message_t *gx_message)
     {
         status_t rv;
         
-        gtp_header_t h;
         smf_bearer_t *bearer = NULL;
 
         pcc_rule_t *pcc_rule = &gx_message->pcc_rule[i];
@@ -155,8 +154,6 @@ static status_t bearer_binding(smf_sess_t *sess, gx_message_t *gx_message)
                 memcpy(&pf->rule, &rule, sizeof(smf_rule_t));
                 pf->direction = flow->direction;
             }
-
-            memset(&h, 0, sizeof(gtp_header_t));
 
             if (bearer_created == 1)
             {

@@ -9,8 +9,6 @@
 extern "C" {
 #endif /* __cplusplus */
 
-typedef struct _gtp_xact_t gtp_xact_t;
-
 CORE_DECLARE(status_t) smf_fd_init(void);
 CORE_DECLARE(void) smf_fd_final(void);
 

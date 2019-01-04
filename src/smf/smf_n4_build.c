@@ -460,7 +460,7 @@ status_t smf_n4_build_create_pdr(
         memset(upf_f_teid, 0, sizeof(pfcp_f_teid_t));
         pdi->local_f_teid.presence = 1;    
         pdi->local_f_teid.data = upf_f_teid;
-        upf_f_teid->teid = htonl(bearer->sgw_s1u_teid);
+        upf_f_teid->teid = htonl(bearer->upf_s1u_teid);
         if (sess->upf_node->sa_list->next)
             rv = pfcp_sockaddr_to_f_teid(sess->upf_node->sa_list,
                     sess->upf_node->sa_list->next,

@@ -10,9 +10,6 @@
 #include "core_timer.h"
 
 #include "3gpp_types.h"
-#include "gtp/gtp_node.h"
-#include "gtp/gtp_xact.h"
-#include "gtp/gtp_message.h"
 #include "pfcp/pfcp_types.h"
 #include "pfcp/pfcp_node.h"
 
@@ -101,9 +98,7 @@ typedef struct _smf_sess_t {
     list_t          bearer_list;
     
     /* Related Context */
-    gtp_node_t      *mme_node;
     pfcp_node_t     *upf_node;
-    gtp_xact_t      *s11_xact;
 
     /* PCO */
     uint8_t         pco_buf[MAX_PCO_LEN];
@@ -117,7 +112,7 @@ typedef struct _smf_bearer_t {
     lnode_t         node;           /**< A node of list_t */
     index_t         index;
 
-    c_uint32_t      sgw_s1u_teid;   /* S1U GTP-TEID */
+    c_uint32_t      upf_s1u_teid;   /* S1U GTP-TEID */
     c_uint32_t      enb_s1u_teid;
     
     c_uint8_t       ebi;
@@ -131,8 +126,6 @@ typedef struct _smf_bearer_t {
     list_t          pf_list;
     
     smf_sess_t      *sess;
-    
-    gtp_node_t      *gnode;
 
     pkbuf_t         *gtp_pkbuf;
 

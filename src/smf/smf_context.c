@@ -759,8 +759,6 @@ smf_sess_t* smf_sess_add(
     smf_bearer_t *bearer = NULL;
 
     index_alloc(&smf_sess_pool, &sess);
-
-    sess->s11_xact = NULL;
     
     /* Set IMSI */
     sess->imsi_len = imsi_len;
@@ -825,7 +823,7 @@ smf_sess_t* smf_sess_add(
     hash_set(self.sess_hash, sess->hash_keybuf, sess->hash_keylen, sess);
     
     sess->upf_node = list_first(&smf_self()->upf_n4_list);
-    bearer->sgw_s1u_teid = bearer->index;
+    bearer->upf_s1u_teid = bearer->index;
     
     smf_pdr_t *ul_pdr = smf_pdr_add(bearer);
     sess->ul_pdr = ul_pdr;
@@ -941,7 +939,6 @@ smf_bearer_t* smf_bearer_add(smf_sess_t *sess)
     list_init(&bearer->pf_list);
     
     bearer->sess = sess;
-    bearer->gnode = NULL;
 
     list_append(&sess->bearer_list, bearer);
 

@@ -13,7 +13,6 @@
 #include "smf_fd_path.h"
 #include "smf_sm.h"
 
-#include "gtp/gtp_message.h"
 #include "pfcp/pfcp_message.h"
 
 #include "sbiJson/JsonTransform.h"

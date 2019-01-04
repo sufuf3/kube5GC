@@ -8,8 +8,6 @@
 #include "pfcp/pfcp_node.h"
 #include "pfcp/pfcp_path.h"
 
-#include "gtp/gtp_xact.h"
-
 #include "smf_event.h"
 #include "smf_context.h"
 #include "smf_n4_handler.h"

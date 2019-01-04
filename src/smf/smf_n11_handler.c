@@ -33,8 +33,8 @@ void smf_n11_handle_update_session_request(smf_sess_t *sess, modify_bearer_t *pM
             bearer->enb_s1u_teid = ntohl(pModifyBearer->enb_s1u_teid);
             bearer->addr = pModifyBearer->enb_s1u_ip.addr;
 
-            d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
-                bearer->sgw_s1u_teid, bearer->enb_s1u_teid);
+            d_trace(5, "    ENB_S1U_TEID[%d] UPF_S1U_TEID[%d]\n",
+                bearer->upf_s1u_teid, bearer->enb_s1u_teid);
 
             rv = smf_pfcp_send_setup_donwlink_session_modification_request(sess);
             d_assert(rv == CORE_OK, , "pfcp session modification fail");

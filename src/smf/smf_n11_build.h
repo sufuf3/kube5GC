@@ -1,7 +1,6 @@
 #ifndef __SMF_N11_BUILD_H__
 #define __SMF_N11_BUILD_H__
 
-#include "gtp/gtp_message.h"
 #include "JsonTransform.h"
 
 #include "smf_context.h"

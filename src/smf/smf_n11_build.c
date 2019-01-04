@@ -1,5 +1,6 @@
 #define TRACE_MODULE _smf_n11_build
 #include "gtp/gtp_conv.h"
+#include "gtp/gtp_types.h"
 #include "smf_n11_build.h"
 
 static c_int16_t smf_sbi_pco_build(c_uint8_t *pco_buf, c_uint8_t *pco_ori, c_uint32_t pco_ori_len)
@@ -167,9 +168,8 @@ status_t smf_n11_build_create_session_response(
     gtp_f_teid_t s1_u_enodeb_f_teid;
     c_int32_t f_teid_len;
 
-    // Send Control Plane(UL) : SGW-S11
     bearer = smf_default_bearer_in_sess(sess);
-    createSession.sgw_s1u_teid = bearer->sgw_s1u_teid;
+    createSession.sgw_s1u_teid = bearer->upf_s1u_teid;
 
     // PDN
     memcpy(&createSession.pdn, &sess->pdn, sizeof(sess->pdn));
