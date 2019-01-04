@@ -487,7 +487,7 @@ status_t emm_handle_tau_request(
 
     /* TODO: 
      *   1) Consider if AMF4G is changed or not.
-     *   2) Consider if SGW is changed or not.
+     *   2) Consider if SMF is changed or not.
      */
     switch(eps_mobile_identity->imsi.type)
     {

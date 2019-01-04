@@ -1337,7 +1337,7 @@ status_t s1ap_build_initial_context_setup_request(
             e_rab->e_RAB_ID = bearer->ebi;
             e_rab->e_RABlevelQoSParameters.qCI = bearer->qos.qci;
 
-            d_trace(5, "    EBI[%d] QCI[%d] SGW-S1U-TEID[%d]\n",
+            d_trace(5, "    EBI[%d] QCI[%d] UPF-S1U-TEID[%d]\n",
                     bearer->ebi, bearer->qos.qci, bearer->upf_s1u_teid);
 
             e_rab->e_RABlevelQoSParameters.allocationRetentionPriority.
@@ -1602,7 +1602,7 @@ status_t s1ap_build_e_rab_setup_request(
             &bearer->upf_s1u_ip, &e_rab->transportLayerAddress);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
     s1ap_uint32_to_OCTET_STRING(bearer->upf_s1u_teid, &e_rab->gTP_TEID);
-    d_trace(5, "    SGW-S1U-TEID[%d]\n", bearer->upf_s1u_teid);
+    d_trace(5, "    UPF-S1U-TEID[%d]\n", bearer->upf_s1u_teid);
 
     nasPdu = &e_rab->nAS_PDU;
     nasPdu->size = esmbuf->len;
@@ -2892,7 +2892,7 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
                     core_calloc(1, sizeof(S1AP_GTP_TEID_t));
                 s1ap_uint32_to_OCTET_STRING(
                         bearer->upf_dl_teid, e_rab->dL_gTP_TEID);
-                d_trace(5, "    SGW-DL-TEID[%d]\n", bearer->upf_dl_teid);
+                d_trace(5, "    UPF-DL-TEID[%d]\n", bearer->upf_dl_teid);
             }
 
             if (AMF4G_HAVE_UPF_UL_INDIRECT_TUNNEL(bearer))
@@ -2909,7 +2909,7 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
                     core_calloc(1, sizeof(S1AP_GTP_TEID_t));
                 s1ap_uint32_to_OCTET_STRING(
                         bearer->upf_ul_teid, e_rab->uL_GTP_TEID);
-                d_trace(5, "    SGW-UL-TEID[%d]\n", bearer->upf_dl_teid);
+                d_trace(5, "    UPF-UL-TEID[%d]\n", bearer->upf_dl_teid);
             }
 
             bearer = amf4g_bearer_next(bearer);
@@ -3233,7 +3233,7 @@ status_t s1ap_build_handover_request(
                     &bearer->upf_s1u_ip, &e_rab->transportLayerAddress);
             d_assert(rv == CORE_OK, return CORE_ERROR,);
             s1ap_uint32_to_OCTET_STRING(bearer->upf_s1u_teid, &e_rab->gTP_TEID);
-            d_trace(5, "    SGW-S1U-TEID[%d]\n", bearer->upf_s1u_teid);
+            d_trace(5, "    UPF-S1U-TEID[%d]\n", bearer->upf_s1u_teid);
 
             bearer = amf4g_bearer_next(bearer);
         }

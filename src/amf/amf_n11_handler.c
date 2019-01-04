@@ -52,10 +52,10 @@ void amf_n11_handle_create_session_response(
     sess->pgw_pco.len = pCreateSession->ue_pco.length;
     sess->pgw_pco.presence = 1;
 
-    /* Data Plane(UL) : SGW-S1U */
+    /* Data Plane(UL) : UPF-S1U */
     bearer->upf_s1u_teid = pCreateSession->upf_s1u_teid;
 
-    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SMF_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->smf_s11_teid);
     d_trace(5, "    ENB_S1U_TEID[%d] UPF_S1U_TEID[%d]\n",
         bearer->enb_s1u_teid, bearer->upf_s1u_teid);
@@ -92,7 +92,7 @@ void amf_n11_handle_modify_bearer_response( amf4g_ue_t *amf4g_ue, modify_bearer_
     d_assert(modifyBearer, goto cleanup, "Null param");
 
     d_trace(3, "[AMF4G] Modify Bearer Response\n");
-    d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
+    d_trace(5, "    AMF4G_S11_TEID[%d] SMF_S11_TEID[%d]\n",
             amf4g_ue->amf4g_s11_teid, amf4g_ue->smf_s11_teid);
 
     if (modifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_MODIFY)
