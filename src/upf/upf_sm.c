@@ -185,7 +185,11 @@ void upf_state_operational(fsm_t *s, event_t *e)
                 case PFCP_SESSION_DELETION_REQUEST_TYPE:
                     upf_n4_handle_session_deletion_request(
                         sess, xact, &message->pfcp_session_deletion_request);
-                    break;                                
+                    break;
+                case PFCP_SESSION_REPORT_RESPONSE_TYPE:
+                    upf_n4_handle_session_report_response(
+                        sess, xact, &message->pfcp_session_report_response);
+                    break;
                 default:
                     break;
             }

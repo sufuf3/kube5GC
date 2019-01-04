@@ -270,7 +270,7 @@ status_t smf_n4_build_session_establishment_request(
     return CORE_OK;
 }
 
-status_t smf_n4_build_session_modification_request(
+status_t smf_n4_build_session_modification_request_for_setup_downlink(
         pkbuf_t **pkbuf, smf_sess_t *sess)
 {
     status_t rv;
@@ -334,6 +334,50 @@ status_t smf_n4_build_session_modification_request(
     return CORE_OK;
 }
 
+status_t smf_n4_build_session_modification_request_for_an_release(
+        pkbuf_t **pkbuf, smf_sess_t *sess)
+{
+    status_t rv;
+    pfcp_message_t pfcp_message;
+    pfcp_session_modification_request_t *req = NULL;
+    pfcp_f_seid_t smf_f_seid;
+    uint32_t *far_id = NULL;
+
+    far_id = malloc(sizeof(c_uint32_t));
+    *far_id = htonl(sess->dl_pdr->far->far_id);
+
+    req = &pfcp_message.pfcp_session_modification_request;
+    memset(&pfcp_message, 0, sizeof(pfcp_message_t));
+    
+    /* Set CP F-SEID, mandatory */
+    req->cp_f_seid.presence = 1;
+    req->cp_f_seid.data = &smf_f_seid;
+    smf_f_seid.seid = htobe64(sess->smf_n4_seid);
+    rv = pfcp_sockaddr_to_f_seid(smf_self()->pfcp_addr, smf_self()->pfcp_addr6,
+            &smf_f_seid, (c_int32_t *)&req->cp_f_seid.len);
+
+    req->update_far.presence = 1;
+    req->update_far.far_id.presence = 1;
+    req->update_far.far_id.data = far_id;
+    req->update_far.far_id.len = sizeof(c_uint32_t);
+
+    smf_bearer_t *bearer = NULL;
+
+    bearer = smf_default_bearer_in_sess(sess);
+    d_assert(bearer, return CORE_ERROR, "No Bearer Context");
+
+    req->update_far.apply_action.presence = 1;   
+    req->update_far.apply_action.data = &sess->dl_pdr->far->apply_action;
+    req->update_far.apply_action.len = sizeof(sess->dl_pdr->far->apply_action);
+    
+    pfcp_message.h.type = PFCP_SESSION_MODIFICATION_REQUEST_TYPE;
+    rv = pfcp_build_msg(pkbuf, &pfcp_message);
+    free(far_id);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
+    
+    return CORE_OK;
+}
+
 status_t smf_n4_build_session_deletion_request(
         pkbuf_t **pkbuf, smf_sess_t *sess)
 {
@@ -346,6 +390,29 @@ status_t smf_n4_build_session_deletion_request(
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
 
+    return CORE_OK;
+}
+
+status_t smf_n4_build_session_report_response(
+        pkbuf_t **pkbuf, smf_sess_t *sess)
+{
+    status_t rv;
+    pfcp_message_t pfcp_message;
+    pfcp_session_report_response_t *rsp = NULL;
+    c_uint8_t cause;
+
+    memset(&pfcp_message, 0, sizeof(pfcp_message_t));
+    rsp = &pfcp_message.pfcp_session_report_response;
+
+    /* Set cause, mandatory */
+    rsp->cause.presence = 1;
+    cause = PFCP_CAUSE_SUCCESS;
+    rsp->cause.data = &cause;
+    rsp->cause.len = 1;
+    
+    pfcp_message.h.type = PFCP_SESSION_REPORT_RESPONSE_TYPE;
+    rv = pfcp_build_msg(pkbuf, &pfcp_message);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
     return CORE_OK;
 }
 

@@ -26,33 +26,31 @@ void smf_n11_handle_update_session_request(smf_sess_t *sess, modify_bearer_t *pM
     bearer = smf_bearer_find_by_ebi(sess, pModifyBearer->ebi);
     d_assert(bearer, return, "Bearer Context Not Found");
 
-    
-    bearer->enb_s1u_teid = ntohl(pModifyBearer->enb_s1u_teid);
-    bearer->addr = pModifyBearer->enb_s1u_ip.addr;
+    switch (pModifyBearer->sm_context_update_type)
+    {
+        case SM_CONTEXT_UPDATE_TYPE_MODIFY:
+        {
+            bearer->enb_s1u_teid = ntohl(pModifyBearer->enb_s1u_teid);
+            bearer->addr = pModifyBearer->enb_s1u_ip.addr;
 
-    d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
-        bearer->sgw_s1u_teid, bearer->enb_s1u_teid);
+            d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
+                bearer->sgw_s1u_teid, bearer->enb_s1u_teid);
+
+            rv = smf_pfcp_send_setup_donwlink_session_modification_request(sess);
+            d_assert(rv == CORE_OK, , "pfcp session modification fail");
+            break;
+        }
+        case SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS:
+        {
+            sess->dl_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_DROP;
+
+            rv = smf_pfcp_send_an_release_session_modification_request(sess);
+            d_assert(rv == CORE_OK, , "pfcp session modification fail");
+            break;
+        }
+    }
 
     sess->sm_context_update_type = pModifyBearer->sm_context_update_type;
-    d_error("Dobie pModifyBearer->sm_context_update_type :%d ", pModifyBearer->sm_context_update_type);
-    if (pModifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS)
-    {
-        rv = smf_pfcp_send_session_modification_request(sess);
-        d_assert(rv == CORE_OK, , "pfcp session modification fail");
-    }
-    else if (pModifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_MODIFY) 
-    {
-        rv = smf_pfcp_send_session_modification_request(sess);
-        d_assert(rv == CORE_OK, , "pfcp session modification fail");
-    }
-    else if (pModifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION_ACK)
-    {
-        d_trace(5, "    SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION_ACK\n");
-    }
-    else {
-        d_error("error smf_n11_handle_update_session_request");
-    }    
-
 }
 
 void smf_n11_handle_delete_session_request(

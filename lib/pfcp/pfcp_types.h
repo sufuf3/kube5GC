@@ -194,6 +194,29 @@ ED5(c_uint8_t       spare:4;,
     };
 } __attribute__ ((packed)) pfcp_outer_hdr_t;
 
+typedef struct _pfcp_report_type_t {
+ED5(c_uint8_t       spare0:4;,
+    c_uint8_t       UPIR:1;,            /* User Plane Inactivity Report */
+    c_uint8_t       ERIR:1;,            /* Error Indication Report */
+    c_uint8_t       USAR:1;,            /* Usage Report */
+    c_uint8_t       DLDR:1;)            /* Downlink Data Report */
+} __attribute__ ((packed)) pfcp_report_type_t;
+
+typedef struct _pfcp_downlink_data_service_information_t {
+#define PFCP_DOWNLINK_DATA_SERVICE_INFORMATION_LEN(__data) \
+    sizeof(struct _pfcp_downlink_data_service_information_t) - (__data).PPI - (__data).QFII
+ED3(c_uint8_t       spare1:6;,
+    c_uint8_t       PPI:1;,            /* Paging Policy Indication */
+    c_uint8_t       QFII:1;)
+ED2(
+    c_uint8_t       spare2:2;,
+    c_uint8_t       paging_policy_indication:6;
+)
+ED2(
+    c_uint8_t       spare:2;,
+    c_uint8_t       QFI:6;
+)
+} __attribute__ ((packed)) pfcp_downlink_data_service_information_t;
 
 #ifdef __cplusplus
 }

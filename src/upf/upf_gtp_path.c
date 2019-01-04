@@ -364,9 +364,9 @@ static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
     d_assert(far->gnode, pkbuf_free(sendbuf); return CORE_ERROR,);
     d_assert(far->gnode->sock, pkbuf_free(sendbuf); return CORE_ERROR,);
 
-    if (far->apply_action != PFCP_FAR_APPLY_ACTION_FORW)
+    if (far->apply_action == PFCP_FAR_APPLY_ACTION_DROP)
     {
-        return CORE_ERROR;//$ fixme!!!
+        return CORE_OK;
     }
     
     if(!far->upf_n3_teid)
