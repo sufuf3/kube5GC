@@ -2635,22 +2635,22 @@ status_t testgtpu_enb_send(pkbuf_t *sendbuf)
 
     memset(&sgw, 0, sizeof(c_sockaddr_t));
     sgw.c_sa_port = htons(GTPV1_U_UDP_PORT);
-    if (bearer->sgw_s1u_ip.ipv6)
+    if (bearer->upf_s1u_ip.ipv6)
     {
         sgw.c_sa_family = AF_INET6;
-        if (bearer->sgw_s1u_ip.ipv4)
+        if (bearer->upf_s1u_ip.ipv4)
             memcpy(sgw.sin6.sin6_addr.s6_addr,
-                    bearer->sgw_s1u_ip.both.addr6, IPV6_LEN);
+                    bearer->upf_s1u_ip.both.addr6, IPV6_LEN);
         else
             memcpy(sgw.sin6.sin6_addr.s6_addr,
-                    bearer->sgw_s1u_ip.addr6, IPV6_LEN);
+                    bearer->upf_s1u_ip.addr6, IPV6_LEN);
         rv = sock_fill_scope_id_in_local(&sgw);
         d_assert(rv == CORE_OK, return CORE_ERROR,);
     }
     else
     {
         sgw.c_sa_family = AF_INET;
-        sgw.sin.sin_addr.s_addr = bearer->sgw_s1u_ip.addr;
+        sgw.sin.sin_addr.s_addr = bearer->upf_s1u_ip.addr;
     }
 
     rv = udp_client(&sock, &sgw);

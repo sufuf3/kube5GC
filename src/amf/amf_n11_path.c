@@ -10,7 +10,6 @@
 
 #include "amf4g_event.h"
 #include "amf_n11_path.h"
-#include "amf4g_s11_build.h"
 #include "amf_json_build.h"
 #include "amf_json_handler.h"
 #include "amf4g_sm.h"
@@ -80,7 +79,7 @@ status_t amf_n11_send_delete_all_sessions(amf4g_ue_t *amf4g_ue)
     {
         next_sess = amf4g_sess_next(sess);
 
-        if (AMF4G_HAVE_SGW_S1U_PATH(sess))
+        if (AMF4G_HAVE_UPF_S1U_PATH(sess))
         {
             amf4g_bearer_t *bearer = amf4g_default_bearer_in_sess(sess);
             d_assert(bearer,, "Null param");

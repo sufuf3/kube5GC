@@ -10,7 +10,6 @@
 #include "emm_handler.h"
 #include "esm_build.h"
 #include "esm_handler.h"
-#include "amf4g_s11_handler.h"
 #include "nas_path.h"
 #include "amf_n11_path.h"
 
@@ -205,7 +204,7 @@ void esm_state_active(fsm_t *s, event_t *e)
                     d_trace(3, "[ESM] PDN disconnect request\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
                             amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
-                    if (AMF4G_HAVE_SGW_S1U_PATH(sess))
+                    if (AMF4G_HAVE_UPF_S1U_PATH(sess))
                     {
                         rv = amf_n11_send_delete_session_request(sess);
                         d_assert(rv == CORE_OK, return,

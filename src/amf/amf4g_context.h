@@ -130,25 +130,10 @@ typedef struct _amf4g_context_t {
     fd_config_t     *fd_config;     /* AMF freeDiameter config */
 
     c_uint16_t      s1ap_port;      /* Default S1AP Port */
-    c_uint16_t      gtpc_port;      /* Default GTPC Port */
 
     list_t          s1ap_list;      /* AMF S1AP IPv4 Server List */
     list_t          s1ap_list6;     /* AMF S1AP IPv6 Server List */
-
-    list_t          gtpc_list;      /* AMF GTPC IPv4 Server List */
-    list_t          gtpc_list6;     /* AMF GTPC IPv6 Server List */
-    sock_id         gtpc_sock;      /* AMF GTPC IPv4 Socket */
-    sock_id         gtpc_sock6;     /* AMF GTPC IPv6 Socket */
-    c_sockaddr_t    *gtpc_addr;     /* AMF GTPC IPv4 Address */
-    c_sockaddr_t    *gtpc_addr6;    /* AMF GTPC IPv6 Address */
-
-    list_t          sgw_list;       /* SGW GTPC Client List */
-    gtp_node_t      *sgw;           /* Iterator for SGW round-robin */
-
-    list_t          pgw_list;       /* PGW GTPC Client List */
-    c_sockaddr_t    *pgw_addr;      /* First IPv4 Address Selected */
-    c_sockaddr_t    *pgw_addr6;     /* First IPv6 Address Selected */
-
+    
     /* Served GUMME */
     c_uint8_t       max_num_of_served_gummei;
     served_gummei_t served_gummei[MAX_NUM_OF_SERVED_GUMMEI];
@@ -228,27 +213,12 @@ typedef struct _amf_context_t {
     c_uint16_t      ngap_port;      /* Default NGAP Port */ 
 
 
-    c_uint16_t      gtpc_port;      /* Default GTPC Port */
 
     list_t          s1ap_list;      /* AMF S1AP IPv4 Server List */
     list_t          s1ap_list6;     /* AMF S1AP IPv6 Server List */
 
     list_t          ngap_list;      /* AMF NGAP IPv4 Server List */
     list_t          ngap_list6;     /* AMF NGAP IPv6 Server List */
-
-    list_t          gtpc_list;      /* AMF GTPC IPv4 Server List */
-    list_t          gtpc_list6;     /* AMF GTPC IPv6 Server List */
-    sock_id         gtpc_sock;      /* AMF GTPC IPv4 Socket */
-    sock_id         gtpc_sock6;     /* AMF GTPC IPv6 Socket */
-    c_sockaddr_t    *gtpc_addr;     /* AMF GTPC IPv4 Address */
-    c_sockaddr_t    *gtpc_addr6;    /* AMF GTPC IPv6 Address */
-
-    list_t          sgw_list;       /* SGW GTPC Client List */
-    gtp_node_t      *sgw;           /* Iterator for SGW round-robin */
-
-    list_t          pgw_list;       /* PGW GTPC Client List */
-    c_sockaddr_t    *pgw_addr;      /* First IPv4 Address Selected */
-    c_sockaddr_t    *pgw_addr6;     /* First IPv6 Address Selected */
 
     pid_t           server_pid;
 
@@ -603,7 +573,7 @@ struct _amf4g_ue_t {
     int             guti_present;
 
     c_uint32_t      amf4g_s11_teid;   /* MME-S11-TEID is derived from INDEX */
-    c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is received from SGW */
+    c_uint32_t      smf_s11_teid;
 
     c_uint16_t      ostream_id;     /* SCTP output stream identification */
 
@@ -757,25 +727,25 @@ struct _amf4g_ue_t {
     ue_application_layer_measurement_capability_t ue_application_layer_measurement_capability;
 };
 
-#define AMF4G_HAVE_SGW_S1U_PATH(__sESS) \
+#define AMF4G_HAVE_UPF_S1U_PATH(__sESS) \
     ((__sESS) && (amf4g_bearer_first(__sESS)) && \
-    ((amf4g_default_bearer_in_sess(__sESS)->sgw_s1u_teid)))
+    ((amf4g_default_bearer_in_sess(__sESS)->upf_s1u_teid)))
 
-#define CLEAR_SGW_S1U_PATH(__sESS) \
+#define CLEAR_UPF_S1U_PATH(__sESS) \
     do { \
         amf4g_bearer_t *__bEARER = NULL; \
         d_assert((__sESS), break, "Null param"); \
         __bEARER = amf4g_default_bearer_in_sess(__sESS); \
-        __bEARER->sgw_s1u_teid = 0; \
+        __bEARER->upf_s1u_teid = 0; \
     } while(0)
 
 #define SESSION_CONTEXT_IS_AVAILABLE(__mME) \
-     ((__mME) && ((__mME)->sgw_s11_teid))
+     ((__mME) && ((__mME)->smf_s11_teid))
 
 #define CLEAR_SESSION_CONTEXT(__mME) \
     do { \
         d_assert((__mME), break, "Null param"); \
-        (__mME)->sgw_s11_teid = 0; \
+        (__mME)->smf_s11_teid = 0; \
     } while(0)
 
 typedef struct _amf4g_sess_t {
@@ -825,17 +795,17 @@ typedef struct _amf4g_sess_t {
     ((__bEARER) && ((__bEARER)->enb_dl_teid))
 #define AMF4G_HAVE_ENB_UL_INDIRECT_TUNNEL(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_ul_teid))
-#define AMF4G_HAVE_SGW_DL_INDIRECT_TUNNEL(__bEARER) \
-    ((__bEARER) && ((__bEARER)->sgw_dl_teid))
-#define AMF4G_HAVE_SGW_UL_INDIRECT_TUNNEL(__bEARER) \
-    ((__bEARER) && ((__bEARER)->sgw_ul_teid))
+#define AMF4G_HAVE_UPF_DL_INDIRECT_TUNNEL(__bEARER) \
+    ((__bEARER) && ((__bEARER)->upf_dl_teid))
+#define AMF4G_HAVE_UPF_UL_INDIRECT_TUNNEL(__bEARER) \
+    ((__bEARER) && ((__bEARER)->upf_ul_teid))
 #define CLEAR_INDIRECT_TUNNEL(__bEARER) \
     do { \
         d_assert((__bEARER), break, "Null param"); \
         (__bEARER)->enb_dl_teid = 0; \
         (__bEARER)->enb_ul_teid = 0; \
-        (__bEARER)->sgw_dl_teid = 0; \
-        (__bEARER)->sgw_ul_teid = 0; \
+        (__bEARER)->upf_dl_teid = 0; \
+        (__bEARER)->upf_ul_teid = 0; \
     } while(0)
 typedef struct _amf4g_bearer_t {
     lnode_t         node;           /* A node of list_t */
@@ -846,8 +816,8 @@ typedef struct _amf4g_bearer_t {
 
     c_uint32_t      enb_s1u_teid;
     ip_t            enb_s1u_ip;
-    c_uint32_t      sgw_s1u_teid;
-    ip_t            sgw_s1u_ip;
+    c_uint32_t      upf_s1u_teid;
+    ip_t            upf_s1u_ip;
 
     c_uint32_t      target_s1u_teid;    /* Target S1U TEID from HO-Req-Ack */
     ip_t            target_s1u_ip;      /* Target S1U ADDR from HO-Req-Ack */
@@ -857,10 +827,10 @@ typedef struct _amf4g_bearer_t {
     c_uint32_t      enb_ul_teid;
     ip_t            enb_ul_ip;
 
-    c_uint32_t      sgw_dl_teid;
-    ip_t            sgw_dl_ip;
-    c_uint32_t      sgw_ul_teid;
-    ip_t            sgw_ul_ip;
+    c_uint32_t      upf_dl_teid;
+    ip_t            upf_dl_ip;
+    c_uint32_t      upf_ul_teid;
+    ip_t            upf_ul_ip;
 
     qos_t           qos;
     tlv_octet_t     tft;   /* Saved TFT */

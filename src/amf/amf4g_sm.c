@@ -25,7 +25,6 @@
 #include "emm_handler.h"
 #include "esm_handler.h"
 #include "amf_n11_path.h"
-#include "amf4g_s11_handler.h"
 #include "amf4g_fd_path.h"
 #include "amf4g_s6a_handler.h"
 #include "amf4g_path.h"
@@ -707,107 +706,6 @@ void amf4g_state_operational(fsm_t *s, event_t *e)
                 }
             }
             pkbuf_free(s6abuf);
-            break;
-        }
-        case AMF4G_EVT_S11_MESSAGE:
-        {
-            status_t rv;
-            pkbuf_t *pkbuf = (pkbuf_t *)event_get_param1(e);
-            gtp_xact_t *xact = NULL;
-            gtp_message_t message;
-            amf4g_ue_t *amf4g_ue = NULL;
-
-            d_assert(pkbuf, break, "Null param");
-            rv = gtp_parse_msg(&message, pkbuf);
-            d_assert(rv == CORE_OK, pkbuf_free(pkbuf); break, "parse error");
-
-            amf4g_ue = amf4g_ue_find_by_teid(message.h.teid);
-            d_assert(amf4g_ue, pkbuf_free(pkbuf); break, 
-                    "No UE Context(TEID:%d)", message.h.teid);
-
-            rv = gtp_xact_receive(amf4g_ue->gnode, &message.h, &xact);
-            if (rv != CORE_OK)
-            {
-                pkbuf_free(pkbuf);
-                break;
-            }
-
-            switch(message.h.type)
-            {
-                case GTP_CREATE_SESSION_RESPONSE_TYPE:
-                    amf4g_s11_handle_create_session_response(
-                        xact, amf4g_ue, &message.create_session_response);
-                    break;
-                case GTP_MODIFY_BEARER_RESPONSE_TYPE:
-                    amf4g_s11_handle_modify_bearer_response(
-                        xact, amf4g_ue, &message.modify_bearer_response);
-                    break;
-                case GTP_DELETE_SESSION_RESPONSE_TYPE:
-                    amf4g_s11_handle_delete_session_response(
-                        xact, amf4g_ue, &message.delete_session_response);
-                    break;
-                case GTP_CREATE_BEARER_REQUEST_TYPE:
-                    amf4g_s11_handle_create_bearer_request(
-                        xact, amf4g_ue, &message.create_bearer_request);
-                    break;
-                case GTP_UPDATE_BEARER_REQUEST_TYPE:
-                    amf4g_s11_handle_update_bearer_request(
-                        xact, amf4g_ue, &message.update_bearer_request);
-                    break;
-                case GTP_DELETE_BEARER_REQUEST_TYPE:
-                    amf4g_s11_handle_delete_bearer_request(
-                        xact, amf4g_ue, &message.delete_bearer_request);
-                    break;
-                case GTP_RELEASE_ACCESS_BEARERS_RESPONSE_TYPE:
-                    amf4g_s11_handle_release_access_bearers_response(
-                        xact, amf4g_ue, &message.release_access_bearers_response);
-                    break;
-                case GTP_DOWNLINK_DATA_NOTIFICATION_TYPE:
-                    amf4g_s11_handle_downlink_data_notification(
-                        xact, amf4g_ue, &message.downlink_data_notification);
-
-/*
- * 5.3.4.2 in Spec 23.401
- * Under certain conditions, the current UE triggered Service Request 
- * procedure can cause unnecessary Downlink Packet Notification messages 
- * which increase the load of the MME.
- *
- * This can occur when uplink data sent in step 6 causes a response 
- * on the downlink which arrives at the Serving GW before the Modify Bearer 
- * Request message, step 8. This data cannot be forwarded from the Serving GW 
- * to the eNodeB and hence it triggers a Downlink Data Notification message.
- *
- * If the MME receives a Downlink Data Notification after step 2 and 
- * before step 9, the MME shall not send S1 interface paging messages
- */
-                    if (ECM_IDLE(amf4g_ue))
-                    {
-                        s1ap_handle_paging(amf4g_ue);
-                        /* Start T3413 */
-                        tm_start(amf4g_ue->t3413);
-                    }
-                    break;
-                case GTP_CREATE_INDIRECT_DATA_FORWARDING_TUNNEL_RESPONSE_TYPE:
-                    amf4g_s11_handle_create_indirect_data_forwarding_tunnel_response(
-                        xact, amf4g_ue,
-                        &message.create_indirect_data_forwarding_tunnel_response);
-                    break;
-                case GTP_DELETE_INDIRECT_DATA_FORWARDING_TUNNEL_RESPONSE_TYPE:
-                    amf4g_s11_handle_delete_indirect_data_forwarding_tunnel_response(
-                        xact, amf4g_ue,
-                        &message.delete_indirect_data_forwarding_tunnel_response);
-                    break;
-                default:
-                    d_warn("Not implmeneted(type:%d)", message.h.type);
-                    break;
-            }
-            pkbuf_free(pkbuf);
-            break;
-        }
-        case AMF4G_EVT_S11_T3_RESPONSE:
-        case AMF4G_EVT_S11_T3_HOLDING:
-        {
-            gtp_xact_timeout(event_get_param1(e), event_get(e));
             break;
         }
         case AMF4G_EVT_CHECK_OVERLOAD:

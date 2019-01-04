@@ -1753,7 +1753,7 @@ void s1ap_handle_e_rab_modify_response(
         if (FSM_CHECK(&bearer->sm, esm_state_active))
         {
             status_t rv;
-            if (bearer->enb_s1u_teid != bearer->sgw_s1u_teid)
+            if (bearer->enb_s1u_teid != bearer->upf_s1u_teid)
             {
                 //if(SecondaryRATDataUsageReportList != NULL)
                 {

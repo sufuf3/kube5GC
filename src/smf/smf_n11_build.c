@@ -169,7 +169,7 @@ status_t smf_n11_build_create_session_response(
     c_int32_t f_teid_len;
 
     bearer = smf_default_bearer_in_sess(sess);
-    createSession.sgw_s1u_teid = bearer->upf_s1u_teid;
+    createSession.upf_s1u_teid = bearer->upf_s1u_teid;
 
     // PDN
     memcpy(&createSession.pdn, &sess->pdn, sizeof(sess->pdn));
@@ -199,7 +199,7 @@ status_t smf_n11_build_create_session_response(
     gtp_sockaddr_to_f_teid(
             s1_u_enodeb_addr, NULL, &s1_u_enodeb_f_teid, 
             &f_teid_len);
-    gtp_f_teid_to_ip(&s1_u_enodeb_f_teid, &createSession.sgw_ip);
+    gtp_f_teid_to_ip(&s1_u_enodeb_f_teid, &createSession.upf_ip);
 
     JSONTRANSFORM_StToJs_create_session_response(&createSession, j_createSession);
     

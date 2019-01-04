@@ -15,9 +15,6 @@
 #include "nas_path.h"
 #include "amf4g_fd_path.h"
 
-#include "amf4g_s11_build.h"
-#include "amf4g_s11_handler.h"
-
 #include "amf_json_build.h"
 #include "sbiJson/commonJsonKey.h"
 #include "sbiJson/JsonTransform.h"
@@ -56,20 +53,20 @@ void amf_n11_handle_create_session_response(
     sess->pgw_pco.presence = 1;
 
     /* Data Plane(UL) : SGW-S1U */
-    bearer->sgw_s1u_teid = pCreateSession->sgw_s1u_teid;
+    bearer->upf_s1u_teid = pCreateSession->upf_s1u_teid;
 
     d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
-    d_trace(5, "    ENB_S1U_TEID[%d] SGW_S1U_TEID[%d]\n",
-        bearer->enb_s1u_teid, bearer->sgw_s1u_teid);
+            amf4g_ue->amf4g_s11_teid, amf4g_ue->smf_s11_teid);
+    d_trace(5, "    ENB_S1U_TEID[%d] UPF_S1U_TEID[%d]\n",
+        bearer->enb_s1u_teid, bearer->upf_s1u_teid);
 
-    memcpy(&bearer->sgw_s1u_ip, &pCreateSession->sgw_ip, sizeof(ip_t));
-    d_info("ipv4: %d, ipv6: %d", pCreateSession->sgw_ip.ipv4, pCreateSession->sgw_ip.ipv6);
-    d_info("ipv4: %d, ipv6: %d", bearer->sgw_s1u_ip.ipv4, bearer->sgw_s1u_ip.ipv6);
+    memcpy(&bearer->upf_s1u_ip, &pCreateSession->upf_ip, sizeof(ip_t));
+    d_info("ipv4: %d, ipv6: %d", pCreateSession->upf_ip.ipv4, pCreateSession->upf_ip.ipv6);
+    d_info("ipv4: %d, ipv6: %d", bearer->upf_s1u_ip.ipv4, bearer->upf_s1u_ip.ipv6);
 
     /* TODO: fix it */
     // 
-    amf4g_ue->sgw_s11_teid = amf4g_ue->index;
+    amf4g_ue->smf_s11_teid = amf4g_ue->index;
     /**********/ 
     d_info("create Session");
     if (FSM_CHECK(&amf4g_ue->sm, emm_state_initial_context_setup))
@@ -96,7 +93,7 @@ void amf_n11_handle_modify_bearer_response( amf4g_ue_t *amf4g_ue, modify_bearer_
 
     d_trace(3, "[AMF4G] Modify Bearer Response\n");
     d_trace(5, "    AMF4G_S11_TEID[%d] SGW_S11_TEID[%d]\n",
-            amf4g_ue->amf4g_s11_teid, amf4g_ue->sgw_s11_teid);
+            amf4g_ue->amf4g_s11_teid, amf4g_ue->smf_s11_teid);
 
     if (modifyBearer->sm_context_update_type == SM_CONTEXT_UPDATE_TYPE_MODIFY)
     {
@@ -202,7 +199,7 @@ void amf_n11_handle_delete_session_response(amf4g_ue_t *amf4g_ue, delete_session
              *
              * Session will be removed if Deactivate bearer context 
              * accept is received */
-            CLEAR_SGW_S1U_PATH(sess);
+            CLEAR_UPF_S1U_PATH(sess);
             return;
         }
         else
