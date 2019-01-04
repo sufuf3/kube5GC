@@ -51,7 +51,7 @@ void upf_n4_handle_create_pdr(upf_sess_t *sess, tlv_create_pdr_t *create_pdr, up
         
         d_assert(create_pdr->pdi.local_f_teid.presence, upf_pdr_remove(pdr);return, "local_f_teid for UL PDR not found");
         f_teid = (pfcp_f_teid_t*)create_pdr->pdi.local_f_teid.data;
-        pdr->upf_s5u_teid = ntohl(f_teid->teid);
+        pdr->upf_s1u_teid = ntohl(f_teid->teid);
         //$ Todo: check IP address ?
         //f_teid->ipv4  f_teid->ipv6
     }
@@ -79,7 +79,7 @@ void upf_n4_handle_create_pdr(upf_sess_t *sess, tlv_create_pdr_t *create_pdr, up
 
         d_trace(10, "Create %s PDR[0x%04x] TEID[0x%08x] & FAR ID[0x%08x]", 
                 pdr->source_interface == PFCP_SRC_INTF_ACCESS ? "UL" : "DL", 
-                pdr->pdr_id, pdr->upf_s5u_teid, far_id);
+                pdr->pdr_id, pdr->upf_s1u_teid, far_id);
     }
 
     if (pdr->source_interface==PFCP_SRC_INTF_ACCESS) //UL
@@ -130,10 +130,10 @@ void upf_n4_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
             rv = pfcp_outer_hdr_to_ip(outer_hdr, &ip);
             d_assert(rv == CORE_OK, upf_far_remove(far);return, "Outer hdr IP convert fail for create_far");
             
-            node = gtp_find_node_by_ip(&upf_self()->sgw_s5u_list, &ip);
+            node = gtp_find_node_by_ip(&upf_self()->enb_s1u_list, &ip);
             if (!node)
             {
-                node = gtp_add_node_with_ip(&upf_self()->sgw_s5u_list, &ip,
+                node = gtp_add_node_with_ip(&upf_self()->enb_s1u_list, &ip,
                     upf_self()->gtpu_port, 
                     context_self()->parameter.no_ipv4,
                     context_self()->parameter.no_ipv6,
@@ -280,10 +280,10 @@ void upf_n4_handle_session_modification_request(
                 rv = pfcp_outer_hdr_to_ip(outer_header, &ip);
                 d_assert(rv == CORE_OK, upf_far_remove(target_far);return, "Outer hdr IP convert fail for crdate_far");
 
-                node = gtp_find_node_by_ip(&upf_self()->sgw_s5u_list, &ip);
+                node = gtp_find_node_by_ip(&upf_self()->enb_s1u_list, &ip);
                 if (!node)
                 {
-                    node = gtp_add_node_with_ip(&upf_self()->sgw_s5u_list, &ip,
+                    node = gtp_add_node_with_ip(&upf_self()->enb_s1u_list, &ip,
                         upf_self()->gtpu_port, 
                         context_self()->parameter.no_ipv4,
                         context_self()->parameter.no_ipv6,
@@ -415,7 +415,7 @@ void upf_n4_handle_association_setup_request(
         /* Send Association Setup Response */
         memset(&h, 0, sizeof(pfcp_header_t));
         h.type = PFCP_ASSOCIATION_SETUP_RESPONSE_TYPE;
-        h.seid = 0;//sess->sgw_s5c_teid;
+        h.seid = 0;
     
         rv = upf_n4_build_association_setup_response(
                 &pkbuf, h.type);
@@ -469,7 +469,7 @@ void upf_n4_handle_association_release_request(
         /* Send Association Release Response */
         memset(&h, 0, sizeof(pfcp_header_t));
         h.type = PFCP_ASSOCIATION_RELEASE_RESPONSE_TYPE;
-        h.seid = 0;//sess->sgw_s5c_teid;
+        h.seid = 0;
     
         rv = upf_n4_build_association_release_response(
                 &pkbuf, h.type);
@@ -498,7 +498,7 @@ void upf_n4_handle_heartbeat_request(
     /* Send Heartbeat Response */
     memset(&h, 0, sizeof(pfcp_header_t));
     h.type = PFCP_HEARTBEAT_RESPONSE_TYPE;
-    h.seid = 0;//sess->sgw_s5c_teid;
+    h.seid = 0;
 
     rv = upf_n4_build_heartbeat_response(
             &pkbuf, h.type);

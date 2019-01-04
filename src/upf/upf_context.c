@@ -71,7 +71,7 @@ status_t upf_context_init()
     }
 
     gtp_node_init();
-    list_init(&self.sgw_s5u_list);
+    list_init(&self.enb_s1u_list);
     pfcp_node_init();
     list_init(&self.upf_n4_list);
 
@@ -128,7 +128,7 @@ status_t upf_context_final()
     pool_final(&upf_dev_pool);
     pool_final(&upf_subnet_pool);
 
-    gtp_remove_all_nodes(&self.sgw_s5u_list);
+    gtp_remove_all_nodes(&self.enb_s1u_list);
     gtp_node_final();
 
     sock_remove_all_nodes(&self.gtpu_list);
@@ -148,7 +148,7 @@ static status_t upf_context_prepare()
 {
     self.gtpu_port = GTPV1_U_UDP_PORT;
     self.pfcp_port = PFCP_UDP_PORT; 
-    self.tun_ifname = "pgwtun";
+    self.tun_ifname = "uptun";
 
     return CORE_OK;
 }
@@ -1426,7 +1426,7 @@ upf_pdr_t* upf_pdr_find_by_pdr_id(tlv_packet_detection_rule_id_t *pdr_id)
     return NULL;
 }
 
-upf_pdr_t* upf_pdr_find_by_upf_s5u_teid(c_uint32_t teid)
+upf_pdr_t* upf_pdr_find_by_upf_s1u_teid(c_uint32_t teid)
 {
     hash_index_t *hi = NULL;
     
@@ -1452,7 +1452,7 @@ upf_pdr_t* upf_pdr_find_by_upf_s5u_teid(c_uint32_t teid)
                 continue;
             }
             
-            if (pdr->upf_s5u_teid == teid)
+            if (pdr->upf_s1u_teid == teid)
             {
                 return pdr;
             }

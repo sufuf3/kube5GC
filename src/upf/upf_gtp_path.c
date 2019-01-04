@@ -105,7 +105,7 @@ static int _gtpv1_u_recv_cb(sock_id sock, void *data)
     {
         pkbuf_t *echo_rsp;
 
-        d_trace(3, "[SGW] RECV Echo Request from [%s]\n",
+        d_trace(3, "[UPF] RECV Echo Request from [%s]\n",
                 CORE_ADDR(&from, buf));
         echo_rsp = gtp_handle_echo_req(pkbuf);
         if (echo_rsp)
@@ -113,7 +113,7 @@ static int _gtpv1_u_recv_cb(sock_id sock, void *data)
             ssize_t sent;
 
             /* Echo reply */
-            d_trace(3, "[SGW] SEND Echo Response to [%s]\n",
+            d_trace(3, "[UPF] SEND Echo Response to [%s]\n",
                     CORE_ADDR(&from, buf));
 
             sent = core_sendto(sock,
@@ -130,7 +130,7 @@ static int _gtpv1_u_recv_cb(sock_id sock, void *data)
     {
 		teid = ntohl(gtp_h->teid);
 
-		d_trace(3, "[UPF] RECV GPU-U from SGW : TEID[0x%x]\n", teid);
+		d_trace(3, "[UPF] RECV GPU-U from ENB : TEID[0x%x]\n", teid);
 
 		/* Remove GTP header and send packets to TUN interface */
 		d_assert(pkbuf_header(pkbuf, -size) == CORE_OK, goto cleanup,);
@@ -138,7 +138,7 @@ static int _gtpv1_u_recv_cb(sock_id sock, void *data)
 		ip_h = pkbuf->payload;
 		d_assert(ip_h, goto cleanup,);
 
-		pdr = upf_pdr_find_by_upf_s5u_teid(teid);
+		pdr = upf_pdr_find_by_upf_s1u_teid(teid);
 		d_assert(pdr, goto cleanup,);
 		sess = pdr->sess;
 		d_assert(sess, goto cleanup,);
@@ -202,12 +202,12 @@ status_t upf_gtp_open()
 
     /* NOTE : tun device can be created via following command.
      *
-     * $ sudo ip tuntap add name pgwtun mode tun
+     * $ sudo ip tuntap add name uptun mode tun
      *
      * Also, before running upf, assign the one IP from IP pool of UE 
-     * to pgwtun. The IP should not be assigned to UE
+     * to uptun. The IP should not be assigned to UE
      *
-     * $ sudo ifconfig pgwtun 45.45.0.1/16 up
+     * $ sudo ifconfig uptun 45.45.0.1/16 up
      *
      */
 
@@ -395,11 +395,10 @@ static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
     gtp_h->length = htons(sendbuf->len - GTPV1U_HEADER_LEN);
     gtp_h->teid = htonl(far->upf_n3_teid);
 
-    /* Send to SGW */
     d_trace(50, "[UPF] SEND : ");
     d_trace_hex(50, sendbuf->payload, sendbuf->len);
 
-    d_trace(3, "[UPF] SEND GPU-U to SGW[%s] : TEID[0x%x]\n",
+    d_trace(3, "[UPF] SEND GPU-U to ENB[%s] : TEID[0x%x]\n",
         CORE_ADDR(sock_remote_addr(far->gnode->sock), buf),
         far->upf_n3_teid);
     rv = gtp_send(far->gnode, sendbuf);

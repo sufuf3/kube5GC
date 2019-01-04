@@ -28,7 +28,7 @@ typedef struct _gtp_node_t gtp_node_t;
 typedef struct _upf_context_t {
 
     c_uint32_t      gtpu_port;      /* Default: UPF GTP-U local port */
-    const char      *tun_ifname;    /* Default:: pgwtun */
+    const char      *tun_ifname;    /* Default:: uptun */
 
     c_uint32_t      pfcp_port;      /* Default: SMF PFCP local port */
     list_t          pfcp_list;      /* SMF PFCP IPv4 Server List */
@@ -64,7 +64,7 @@ typedef struct _upf_context_t {
     int             num_of_p_cscf6;
     int             p_cscf6_index;
 
-    list_t          sgw_s5u_list;  /* SGW GTPU Node List */
+    list_t          enb_s1u_list;  /* ENB GTPU Node List */
     list_t          upf_n4_list;  /* UPF PFCP Node List */
     list_t          far_list;
     list_t          qer_list;
@@ -155,11 +155,11 @@ typedef struct _upf_pdr_t {
     lnode_t         node; /**< A node of list_t */
     index_t         index;
 
-    c_uint32_t      upf_s5u_teid;   /* UPF_S5U is derived from INDEX [from SMF now] */
+    c_uint32_t      upf_s1u_teid;   /* UPF_S1U is derived from INDEX [from SMF now] */
     //c_uint8_t       ebi;
     c_uint8_t       ul_dl;// DL or UL PDR
 
-    c_uint16_t      pdr_id;   /* UPF_S5U is derived from INDEX */
+    c_uint16_t      pdr_id;   /* UPF_S1U is derived from INDEX */
 
 #define SMF_TEID_IP_DESC_IPV4  1
 #define SMF_TEID_IP_DESC_IPV6  2
@@ -327,7 +327,7 @@ CORE_DECLARE(upf_pdr_t*)   upf_dl_pdr_first(upf_sess_t *sess);
 CORE_DECLARE(upf_pdr_t*)   upf_pdr_next(upf_pdr_t *pdr);
 CORE_DECLARE(upf_pdr_t*)   upf_pdr_find(index_t index);
 CORE_DECLARE(upf_pdr_t*)   upf_pdr_find_by_pdr_id(tlv_packet_detection_rule_id_t *pdr_id);
-CORE_DECLARE(upf_pdr_t*)   upf_pdr_find_by_upf_s5u_teid(c_uint32_t teid);
+CORE_DECLARE(upf_pdr_t*)   upf_pdr_find_by_upf_s1u_teid(c_uint32_t teid);
 CORE_DECLARE(upf_far_t*)   upf_far_add(void);
 CORE_DECLARE(status_t)      upf_far_remove(upf_far_t *far);
 CORE_DECLARE(upf_far_t*)   upf_far_find_by_far_id(c_uint32_t far_id);
