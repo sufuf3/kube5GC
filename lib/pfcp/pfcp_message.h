@@ -26,8 +26,8 @@
 /*******************************************************************************
  * This file had been created by gtp_tlv.py script v0.1.0
  * Please do not modify this file but regenerate it via script.
- * Created on: 2018-04-30 14:42:25.888865 by ubuntu
- * from 29244-f00.docx
+ * Created on: 2019-01-02 17:06:04.967693 by wirelab
+ * from 29244-f40.docx
  ******************************************************************************/
 
 #ifndef __PFCP_TLV_H__
@@ -92,6 +92,7 @@ typedef struct _pfcp_header_t {
 #define PFCP_SESSION_DELETION_REQUEST_TYPE 54
 #define PFCP_SESSION_DELETION_RESPONSE_TYPE 55
 #define PFCP_SESSION_REPORT_REQUEST_TYPE 56
+#define PFCP_SESSION_REPORT_RESPONSE_TYPE 57
 
 #define TLV_PFCP_CREATE_PDR_TYPE 1
 #define TLV_PFCP_PDI_TYPE 2
@@ -372,6 +373,7 @@ extern tlv_desc_t tlv_desc_pfcp_session_modification_response;
 extern tlv_desc_t tlv_desc_pfcp_session_deletion_request;
 extern tlv_desc_t tlv_desc_pfcp_session_deletion_response;
 extern tlv_desc_t tlv_desc_pfcp_session_report_request;
+extern tlv_desc_t tlv_desc_pfcp_session_report_response;
 
 /* Structure for Infomration Element */
 typedef tlv_octet_t tlv_cause_t;
@@ -828,6 +830,9 @@ typedef struct _pfcp_association_release_response_t {
     tlv_cause_t cause;
 } pfcp_association_release_response_t;
 
+typedef struct _pfcp_version_not_supported_response_t {
+} pfcp_version_not_supported_response_t;
+
 typedef struct _pfcp_node_report_request_t {
     tlv_node_id_t node_id;
     tlv_node_report_type_t node_report_type;
@@ -915,7 +920,6 @@ typedef struct _pfcp_session_modification_response_t {
 } pfcp_session_modification_response_t;
 
 typedef struct _pfcp_session_deletion_request_t {
-    tlv_f_seid_t cp_f_seid;
 } pfcp_session_deletion_request_t;
 
 typedef struct _pfcp_session_deletion_response_t {
@@ -935,6 +939,13 @@ typedef struct _pfcp_session_report_request_t {
     tlv_overload_control_informationp_t overload_control_information;
 } pfcp_session_report_request_t;
 
+typedef struct _pfcp_session_report_response_t {
+    tlv_cause_t cause;
+    tlv_offending_ie_t offending_ie;
+    tlv_update_bar_pfcp_session_report_response_t update_bar;
+    tlv_pfcpsrrsp_flags_t pfcpsrrsp_flags;
+} pfcp_session_report_response_t;
+
 typedef struct _pfcp_message_t {
    pfcp_header_t h;
    union {
@@ -946,6 +957,7 @@ typedef struct _pfcp_message_t {
         pfcp_association_update_response_t pfcp_association_update_response;
         pfcp_association_release_request_t pfcp_association_release_request;
         pfcp_association_release_response_t pfcp_association_release_response;
+        pfcp_version_not_supported_response_t pfcp_version_not_supported_response;
         pfcp_node_report_request_t pfcp_node_report_request;
         pfcp_node_report_response_t pfcp_node_report_response;
         pfcp_session_set_deletion_request_t pfcp_session_set_deletion_request;
@@ -957,6 +969,7 @@ typedef struct _pfcp_message_t {
         pfcp_session_deletion_request_t pfcp_session_deletion_request;
         pfcp_session_deletion_response_t pfcp_session_deletion_response;
         pfcp_session_report_request_t pfcp_session_report_request;
+        pfcp_session_report_response_t pfcp_session_report_response;
    };
 } pfcp_message_t;
 

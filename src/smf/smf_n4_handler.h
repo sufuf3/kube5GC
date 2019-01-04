@@ -32,6 +32,8 @@ CORE_DECLARE(void) smf_n4_handle_session_modification_response(
         pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_modification_response_t *rsp);
 CORE_DECLARE(void) smf_n4_handle_session_deletion_response(
         pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_deletion_response_t *rsp);
+CORE_DECLARE(void) smf_n4_handle_session_report_request(
+        pfcp_xact_t* xact, smf_sess_t *sess, pfcp_session_report_request_t *req);
 
 #ifdef __cplusplus
 }

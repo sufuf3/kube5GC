@@ -14,7 +14,7 @@
 #include "s1ap_path.h"
 #include "nas_path.h"
 #include "amf4g_fd_path.h"
-#include "amf4g_gtp_path.h"
+#include "amf_n11_path.h"
 
 #include "emm_handler.h"
 

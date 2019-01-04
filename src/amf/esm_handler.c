@@ -6,7 +6,7 @@
 
 #include "amf4g_context.h"
 #include "nas_path.h"
-#include "amf4g_gtp_path.h"
+#include "amf_n11_path.h"
 
 #include "esm_build.h"
 
@@ -88,7 +88,7 @@ status_t esm_handle_pdn_connectivity_request(amf4g_bearer_t *bearer,
     if (sess->pdn)
     {
         d_trace(5, "    APN[%s]\n", sess->pdn->apn);
-        rv = amf4g_gtp_send_create_session_request(sess);
+        rv = amf_n11_send_create_session_request(sess);
         d_assert(rv == CORE_OK, return CORE_ERROR, "gtp send failed");
     }
     else
@@ -138,7 +138,7 @@ status_t esm_handle_information_response(amf4g_sess_t *sess,
         }
         else
         {
-            rv = amf4g_gtp_send_create_session_request(sess);
+            rv = amf_n11_send_create_session_request(sess);
             d_assert(rv == CORE_OK, return CORE_ERROR, "gtp send failed");
         }
     }

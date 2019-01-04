@@ -266,7 +266,7 @@ static c_uint32_t _tlv_add_compound(tlv_t **root, tlv_t *parent_tlv,
 status_t tlv_build_msg(pkbuf_t **pkbuf, tlv_desc_t *desc, void *msg, int mode)
 {
     tlv_t *root = NULL;
-    c_uint32_t r, length, rendlen;
+    c_uint32_t length, rendlen;
 
     d_assert(pkbuf, return CORE_ERROR, "Null param");
     d_assert(desc, return CORE_ERROR, "Null param");
@@ -274,15 +274,11 @@ status_t tlv_build_msg(pkbuf_t **pkbuf, tlv_desc_t *desc, void *msg, int mode)
 
     d_assert(desc->ctype == TLV_MESSAGE, return CORE_ERROR,
             "Not TLV message descriptor");
-    d_assert(desc->child_descs[0], return CORE_ERROR,
-            "TLV message descriptor has no members");
     
     d_trace2(25, "\n");
     d_trace2(25, "[GTP] Build %s\n", desc->name);
 
-    r = _tlv_add_compound(&root, NULL, desc, msg, 0);
-    d_assert(r > 0 && root, tlv_free_all(root); return CORE_ERROR,
-            "Can't build TLV message");
+    _tlv_add_compound(&root, NULL, desc, msg, 0);
 
     length = tlv_calc_length(root, mode);
     *pkbuf = pkbuf_alloc(TLV_MAX_HEADROOM, length);

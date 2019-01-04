@@ -204,7 +204,7 @@ typedef struct _upf_far_t {
     c_uint8_t       create;  //$ has created or not
     c_uint8_t       apply_action;
     c_uint8_t       destination_interface;
-    //pfcp_outer_hdr_t outer_hdr;
+
     c_uint32_t      upf_n3_teid;
         
     upf_bar_t       *bar;

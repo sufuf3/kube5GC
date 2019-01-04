@@ -1435,34 +1435,27 @@ upf_pdr_t* upf_pdr_find_by_upf_s5u_teid(c_uint32_t teid)
         upf_sess_t *sess = upf_sess_this(hi);
         d_assert(sess, return NULL,);
 
+        upf_pdr_t *pdr = NULL;
+        upf_pdr_t *default_pdr = NULL;
+        
+        /* Save the default pdr */
+        default_pdr = list_first(&sess->ul_pdr_list);
+        d_assert(default_pdr, return NULL, "No default PDR");
+        
+        /* Found */
+        pdr = default_pdr;
+        /* Find the bearer with matched */
+        for (; pdr; pdr = upf_pdr_next(pdr))
         {
-            upf_pdr_t *pdr = NULL;
-            upf_pdr_t *default_pdr = NULL;
-            //c_uint32_t max_presence = 0;
-            
-            /* Save the default pdr */
-            default_pdr = list_first(&sess->ul_pdr_list);//upf_default_ul_pdr_in_sess(sess);
-            d_assert(default_pdr, return NULL, "No default PDR");
-            
-            /* Found */
-//            d_trace(5, "[UPF] Found Session : EBI[%d]\n", default_pdr->ebi);
-            
-            //pdr = upf_pdr_next(default_pdr);
-            pdr = default_pdr;
-            /* Find the bearer with matched */
-            for (; pdr; pdr = upf_pdr_next(pdr))
+            if (pdr->source_interface != PFCP_SRC_INTF_ACCESS)
             {
-                if (pdr->source_interface!=PFCP_SRC_INTF_ACCESS) //UL
-                {
-                    /* Not DL PDR*/
-                    continue;
-                }
-                
-                if (pdr->upf_s5u_teid == teid)
-                {
-                    return pdr;
-                }
-             }
+                continue;
+            }
+            
+            if (pdr->upf_s5u_teid == teid)
+            {
+                return pdr;
+            }
         }
     }
     return NULL;

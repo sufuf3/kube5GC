@@ -12,7 +12,7 @@
 #include "esm_handler.h"
 #include "amf4g_s11_handler.h"
 #include "nas_path.h"
-#include "amf4g_gtp_path.h"
+#include "amf_n11_path.h"
 
 void esm_state_initial(fsm_t *s, event_t *e)
 {
@@ -104,7 +104,7 @@ void esm_state_inactive(fsm_t *s, event_t *e)
                      *          E-RAB Setup Response is received */
                     if (AMF4G_HAVE_ENB_S1U_PATH(bearer))
                     {
-                        rv = amf4g_gtp_send_modify_bearer_request(bearer, 0);
+                        rv = amf_n11_send_modify_bearer_request(bearer, 0);
                         d_assert(rv == CORE_OK,, "gtp send failed");
                     }
 
@@ -207,9 +207,9 @@ void esm_state_active(fsm_t *s, event_t *e)
                             amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
                     if (AMF4G_HAVE_SGW_S1U_PATH(sess))
                     {
-                        rv = amf4g_gtp_send_delete_session_request(sess);
+                        rv = amf_n11_send_delete_session_request(sess);
                         d_assert(rv == CORE_OK, return,
-                                "amf4g_gtp_send_delete_session_request error");
+                                "amf_n11_send_delete_session_request error");
                     }
                     else
                     {
@@ -226,9 +226,9 @@ void esm_state_active(fsm_t *s, event_t *e)
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
                             amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
 
-                    // rv = amf4g_gtp_send_update_bearer_response(bearer);
+                    // rv = amf_n11_send_update_bearer_response(bearer);
                     // d_assert(rv == CORE_OK, return,
-                    //         "amf4g_gtp_send_update_session_request error");
+                    //         "amf_n11_send_update_session_request error");
                     break;
                 }
                 case NAS_DEACTIVATE_EPS_BEARER_CONTEXT_ACCEPT:
@@ -237,9 +237,9 @@ void esm_state_active(fsm_t *s, event_t *e)
                             "context accept\n");
                     d_trace(5, "    IMSI[%s] PTI[%d] EBI[%d]\n",
                             amf4g_ue->imsi_bcd, sess->pti, bearer->ebi);
-                    // rv = amf4g_gtp_send_delete_bearer_response(bearer);
+                    // rv = amf_n11_send_delete_bearer_response(bearer);
                     // d_assert(rv == CORE_OK, return,
-                    //         "amf4g_gtp_send_delete_session_request error");
+                    //         "amf_n11_send_delete_session_request error");
                     FSM_TRAN(s, esm_state_bearer_deactivated);
                     break;
                 }

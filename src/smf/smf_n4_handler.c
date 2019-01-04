@@ -343,3 +343,33 @@ void smf_n4_handle_session_deletion_response(
         d_assert(rv == CORE_OK, return, "xact_commit error");    
     }
 }
+
+void smf_n4_handle_session_report_request(
+        pfcp_xact_t *xact, smf_sess_t *sess, pfcp_session_report_request_t *req)
+{
+    status_t rv;
+
+    d_trace(3, "[SMF] Session Report Request\n");
+    
+    pfcp_report_type_t report_type;
+    do {
+        if (!req->report_type.presence)
+        {
+            d_error("session_report_request error: no Report Type");
+            break;
+        }
+        report_type = *(pfcp_report_type_t *)req->report_type.data;
+        if (report_type.DLDR)
+        {
+            rv = smf_pfcp_send_session_report_response(sess);
+            d_assert(rv == CORE_OK, return, "Send N4 PFCP Session Report Request Failed");
+            // Send N1N3 Message to AMF to trigger paging
+        }
+    }while(0);
+    
+    if (xact)
+    {
+        rv = pfcp_xact_commit(xact);
+        d_assert(rv == CORE_OK, return, "xact_commit error");    
+    }
+}

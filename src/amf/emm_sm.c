@@ -15,7 +15,7 @@
 #include "esm_handler.h"
 #include "nas_path.h"
 #include "s1ap_path.h"
-#include "amf4g_gtp_path.h"
+#include "amf_n11_path.h"
 #include "amf4g_path.h"
 #include "amf4g_sm.h"
 
@@ -288,9 +288,9 @@ static void common_register_state(fsm_t *s, event_t *e)
             {
                 if (SESSION_CONTEXT_IS_AVAILABLE(amf4g_ue))
                 {
-                    rv = amf4g_gtp_send_delete_all_sessions(amf4g_ue);
+                    rv = amf_n11_send_delete_all_sessions(amf4g_ue);
                     d_assert(rv == CORE_OK,,
-                        "amf4g_gtp_send_delete_all_sessions() failed");
+                        "amf_n11_send_delete_all_sessions() failed");
                 }
                 else
                 {
@@ -489,9 +489,9 @@ void emm_state_authentication(fsm_t *s, event_t *e)
                     if (SESSION_CONTEXT_IS_AVAILABLE(amf4g_ue))
                     {
                         d_info("%s %d start", __FUNCTION__, __LINE__);
-                        rv = amf4g_gtp_send_delete_all_sessions(amf4g_ue);
+                        rv = amf_n11_send_delete_all_sessions(amf4g_ue);
                         d_assert(rv == CORE_OK,,
-                            "amf4g_gtp_send_delete_all_sessions() failed");
+                            "amf_n11_send_delete_all_sessions() failed");
                         d_info("%s %d end", __FUNCTION__, __LINE__);
                     }
                     else

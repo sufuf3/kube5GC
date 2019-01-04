@@ -140,7 +140,7 @@ void upf_n4_handle_create_far(tlv_create_far_t *create_far, upf_far_t **rt_far)
                     context_self()->parameter.prefer_ipv4);
                 
                 d_assert(node, upf_far_remove(far);return, "GTP node create fail for create_far");
-                //$ 20180615 bug:    
+                //$ 20180615 bug:
                 rv = gtp_client(node);
                 d_assert(rv == CORE_OK, return,);
             }
@@ -270,30 +270,36 @@ void upf_n4_handle_session_modification_request(
     {
         upf_far_t *target_far = upf_far_find_by_far_id(ntohl(*(c_uint32_t *) req->update_far.far_id.data));
         if (target_far)
-        {
-            /* Update eNB S1U-TEID */
-            ip_t ip;
-            gtp_node_t *node = NULL;
-            pfcp_outer_hdr_t *outer_header;
-            outer_header = req->update_far.update_forwarding_parameters.outer_header_creation.data;
-            target_far->upf_n3_teid = ntohl(outer_header->teid);
-            rv = pfcp_outer_hdr_to_ip(outer_header, &ip);
-            d_assert(rv == CORE_OK, upf_far_remove(target_far);return, "Outer hdr IP convert fail for crdate_far");
+        {   /* Update eNB S1U-TEID */
+            if (req->update_far.update_forwarding_parameters.presence) {
+                ip_t ip;
+                gtp_node_t *node = NULL;
+                pfcp_outer_hdr_t *outer_header;
+                outer_header = req->update_far.update_forwarding_parameters.outer_header_creation.data;
+                target_far->upf_n3_teid = ntohl(outer_header->teid);
+                rv = pfcp_outer_hdr_to_ip(outer_header, &ip);
+                d_assert(rv == CORE_OK, upf_far_remove(target_far);return, "Outer hdr IP convert fail for crdate_far");
 
-            node = gtp_find_node_by_ip(&upf_self()->sgw_s5u_list, &ip);
-            if (!node)
-            {
-                node = gtp_add_node_with_ip(&upf_self()->sgw_s5u_list, &ip,
-                    upf_self()->gtpu_port, 
-                    context_self()->parameter.no_ipv4,
-                    context_self()->parameter.no_ipv6,
-                    context_self()->parameter.prefer_ipv4);
-                
-                d_assert(node, upf_far_remove(target_far);return, "GTP node create fail for crdate_far");
-                rv = gtp_client(node);
-                d_assert(rv == CORE_OK, return,);
+                node = gtp_find_node_by_ip(&upf_self()->sgw_s5u_list, &ip);
+                if (!node)
+                {
+                    node = gtp_add_node_with_ip(&upf_self()->sgw_s5u_list, &ip,
+                        upf_self()->gtpu_port, 
+                        context_self()->parameter.no_ipv4,
+                        context_self()->parameter.no_ipv6,
+                        context_self()->parameter.prefer_ipv4);
+                    
+                    d_assert(node, upf_far_remove(target_far);return, "GTP node create fail for crdate_far");
+                    rv = gtp_client(node);
+                    d_assert(rv == CORE_OK, return,);
+                }
+                target_far->gnode = node;
             }
-            target_far->gnode = node;
+
+            if (req->update_far.apply_action.presence)
+            {
+                target_far->apply_action = *(c_int8_t *)req->update_far.apply_action.data;
+            }
         }
         else
         {
@@ -349,6 +355,19 @@ void upf_n4_handle_session_deletion_request(
     }
     
     upf_sess_remove(sess);
+}
+
+void upf_n4_handle_session_report_response(
+        upf_sess_t *sess, pfcp_xact_t *xact, pfcp_session_report_response_t *req)
+{
+    status_t rv;
+    d_assert(sess, return, "Null param");
+    d_assert(xact, return, "Null param");
+
+    d_assert(req->cause.presence, return, "session_report_response error: no Cause");
+
+    rv = pfcp_xact_commit(xact);
+    d_assert(rv == CORE_OK, return, "xact_commit error");     
 }
 
 void upf_n4_handle_association_setup_request(
