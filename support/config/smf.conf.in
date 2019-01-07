@@ -14,10 +14,6 @@ parameter:
 smf:
     freeDiameter: smf.conf
 
-    gtpc:
-      addr:
-        - 127.0.0.2
-        - ::1
     pfcp:
         - 127.0.0.10
         - ::1

@@ -105,14 +105,14 @@ static void handover_test1(abts_case *tc, void *data)
 
     amf4g_self()->mme_ue_s1ap_id = 16777689;
 
-    /* Two eNB connects to MME */
+    /* Two eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     rv = tests1ap_enb_connect(&sock2);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB connects to SGW */
+    /* eNB connects to UPF */
     rv = testgtpu_enb_connect(&gtpu1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -326,14 +326,14 @@ static void handover_test1(abts_case *tc, void *data)
 
     mongoc_collection_destroy(collection);
 
-    /* Two eNB disonncect from MME */
+    /* Two eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     rv = tests1ap_enb_close(sock2);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB disonncect from SGW */
+    /* eNB disonncect from UPF */
     rv = testgtpu_enb_close(gtpu1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -434,14 +434,14 @@ static void handover_test2(abts_case *tc, void *data)
 
     amf4g_self()->mme_ue_s1ap_id = 33554627;
 
-    /* Two eNB connects to MME */
+    /* Two eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     rv = tests1ap_enb_connect(&sock2);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB connects to SGW */
+    /* eNB connects to UPF */
     rv = testgtpu_enb_connect(&gtpu1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -619,7 +619,7 @@ static void handover_test2(abts_case *tc, void *data)
     rv = tests1ap_enb_send(sock1, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* Receive MME configuration transfer */
+    /* Receive AMF configuration transfer */
     recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock2, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -631,7 +631,7 @@ static void handover_test2(abts_case *tc, void *data)
     rv = tests1ap_enb_send(sock2, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* Receive MME configuration transfer */
+    /* Receive AMF configuration transfer */
     recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock1, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -675,7 +675,7 @@ static void handover_test2(abts_case *tc, void *data)
     rv = tests1ap_enb_send(sock1, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* Receive MME Status Transfer */
+    /* Receive AMF Status Transfer */
     recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock2, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -756,7 +756,7 @@ static void handover_test2(abts_case *tc, void *data)
     rv = tests1ap_enb_send(sock2, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* Receive MME Status Transfer */
+    /* Receive AMF Status Transfer */
     recvbuf = pkbuf_alloc(0, MAX_SDU_LEN);
     rv = tests1ap_enb_read(sock1, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -854,14 +854,14 @@ out:
 
     mongoc_collection_destroy(collection);
 
-    /* Two eNB disonncect from MME */
+    /* Two eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
     rv = tests1ap_enb_close(sock2);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB disonncect from SGW */
+    /* eNB disonncect from UPF */
     rv = testgtpu_enb_close(gtpu1);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 

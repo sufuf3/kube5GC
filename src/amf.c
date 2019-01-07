@@ -23,14 +23,14 @@ status_t app_initialize(const char *config_path, const char *log_path)
         d_trace_level(&_amf_main, app);
     }
 
-    d_trace(1, "MME try to initialize\n");
+    d_trace(1, "AMF try to initialize\n");
     rv = amf4g_initialize();
     if (rv != CORE_OK)
     {
-        d_error("Failed to intialize MME");
+        d_error("Failed to intialize AMF");
         return rv;
     }
-    d_trace(1, "MME initialize...done\n");
+    d_trace(1, "AMF initialize...done\n");
 
     rv = app_did_initialize();
     if (rv != CORE_OK) return rv;
@@ -42,9 +42,9 @@ void app_terminate(void)
 {
     app_will_terminate();
 
-    d_trace(1, "MME try to terminate\n");
+    d_trace(1, "AMF try to terminate\n");
     amf4g_terminate();
-    d_trace(1, "MME terminate...done\n");
+    d_trace(1, "AMF terminate...done\n");
 
     app_did_terminate();
 }

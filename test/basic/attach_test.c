@@ -99,11 +99,11 @@ static void attach_test1(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB connects to SGW */
+    /* eNB connects to UPF */
     rv = testgtpu_enb_connect(&gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -457,11 +457,11 @@ static void attach_test1(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB disonncect from SGW */
+    /* eNB disonncect from UPF */
     rv = testgtpu_enb_close(gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -479,11 +479,11 @@ out:
 
     core_sleep(time_from_msec(300));
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB disonncect from SGW */
+    /* eNB disonncect from UPF */
     rv = testgtpu_enb_close(gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 }
@@ -591,7 +591,7 @@ static void attach_test2(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -844,7 +844,7 @@ static void attach_test2(abts_case *tc, void *data)
 
     mongoc_collection_destroy(collection);
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 }
@@ -942,7 +942,7 @@ static void attach_test3(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -1277,7 +1277,7 @@ out:
 
     mongoc_collection_destroy(collection);
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1349,11 +1349,11 @@ static void attach_test4(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB connects to SGW */
+    /* eNB connects to UPF */
     rv = testgtpu_enb_connect(&gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -1475,11 +1475,11 @@ static void attach_test4(abts_case *tc, void *data)
 
     mongoc_collection_destroy(collection);
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB disonncect from SGW */
+    /* eNB disonncect from UPF */
     rv = testgtpu_enb_close(gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 }
@@ -1545,7 +1545,7 @@ static void attach_test5(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -1843,7 +1843,7 @@ out:
 
     mongoc_collection_destroy(collection);
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 }

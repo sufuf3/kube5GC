@@ -53,4 +53,4 @@ void esm_state_exception(fsm_t *s, event_t *e);
 }
 #endif /* __cplusplus */
 
-#endif /* !__MME_SM_H__ */
+#endif /* !__AMF4G_SM_H__ */

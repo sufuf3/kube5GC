@@ -74,7 +74,7 @@ void smf_gx_send_ccr(smf_sess_t *sess, c_uint32_t cc_request_type)
     d_assert(sess, return,);
     d_assert(sess->ipv4 || sess->ipv6, return,);
 
-    d_trace(3, "[PGW] Credit-Control-Request\n");
+    d_trace(3, "[SMF] Credit-Control-Request\n");
 
     /* Create the request */
     ret = fd_msg_new(gx_cmd_ccr, MSGFL_ALLOC_ETEID, &req);
@@ -120,7 +120,7 @@ void smf_gx_send_ccr(smf_sess_t *sess, c_uint32_t cc_request_type)
         sess_data = new_state(sid);
         d_assert(sess_data, return,);
 
-        /* Save Session-Id to PGW Session Context */
+        /* Save Session-Id to SMF Session Context */
         sess->gx_sid = (c_int8_t *)sess_data->gx_sid;
     }
 
@@ -438,7 +438,7 @@ static void smf_gx_cca_cb(void *data, struct msg **msg)
     gx_message_t *gx_message = NULL;
     c_uint16_t gxbuf_len = 0;
 
-    d_trace(3, "[PGW] Credit-Control-Answer\n");
+    d_trace(3, "[SMF] Credit-Control-Answer\n");
     
     ret = clock_gettime(CLOCK_REALTIME, &ts);
     d_assert(ret == 0, return,);
@@ -792,7 +792,7 @@ static int smf_gx_rar_cb( struct msg **msg, struct avp *avp,
 	
     d_assert(msg, return EINVAL,);
 
-    d_trace(3, "[PGW] Re-Auth-Request\n");
+    d_trace(3, "[SMF] Re-Auth-Request\n");
 
     gxbuf_len = sizeof(gx_message_t);
     d_assert(gxbuf_len < 8192, return EINVAL,
@@ -918,7 +918,7 @@ static int smf_gx_rar_cb( struct msg **msg, struct avp *avp,
         fd_msg_browse(avp, MSG_BRW_NEXT, &avp, NULL);
     }
 
-    /* Send Gx Event to PGW State Machine */
+    /* Send Gx Event to SMF State Machine */
     event_set(&e, SMF_EVT_GX_MESSAGE);
     event_set_param1(&e, (c_uintptr_t)sess->index);
     event_set_param2(&e, (c_uintptr_t)gxbuf);
@@ -946,7 +946,7 @@ static int smf_gx_rar_cb( struct msg **msg, struct avp *avp,
 	ret = fd_msg_send(msg, NULL, NULL);
     d_assert(ret == 0,,);
 
-    d_trace(3, "[PGW] Re-Auth-Answer\n");
+    d_trace(3, "[SMF] Re-Auth-Answer\n");
 
 	/* Add this value to the stats */
 	d_assert(pthread_mutex_lock(&fd_logger_self()->stats_lock) == 0,,);

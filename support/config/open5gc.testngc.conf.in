@@ -66,19 +66,6 @@ amf:
     s1ap:
 
 #
-#  <GTP-C Server>>
-#
-#  o GTP-C Server(all address avaiable)
-#    gtpc:
-#
-#  o GTP-C Server(127.0.0.1:2123, [::1]:2123)
-#    gtpc:
-#      - addr: 127.0.0.1
-#      - addr: ::1
-#
-    gtpc:
-
-#
 #  <GUMMEI>
 #
 #  o Multiple GUMMEI

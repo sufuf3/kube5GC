@@ -21,8 +21,6 @@ amf:
     s1ap:
       addr: 192.188.2.2
 
-    gtpc:
-
     gummei: 
       plmn_id:
         mcc: 208

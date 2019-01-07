@@ -1,5 +1,5 @@
-#ifndef __PGW_FD_PATH_H__
-#define __PGW_FD_PATH_H__
+#ifndef __SMF_FD_PATH_H__
+#define __SMF_FD_PATH_H__
 
 #include "core_errno.h"
 
@@ -18,5 +18,5 @@ CORE_DECLARE(void) smf_gx_send_ccr(smf_sess_t *sess, c_uint32_t cc_request_type)
 }
 #endif /* __cplusplus */
 
-#endif /* __PGW_FD_PATH_H__ */
+#endif /* __SMF_FD_PATH_H__ */
 

@@ -562,8 +562,8 @@ struct _amf4g_ue_t {
     } nas_eps;
 
     /* UE identity */
-#define AMF4G_UE_HAVE_IMSI(__mME) \
-    ((__mME) && ((__mME)->imsi_len))
+#define AMF4G_UE_HAVE_IMSI(__aMF4g) \
+    ((__aMF4g) && ((__aMF4g)->imsi_len))
     c_uint8_t       imsi[MAX_IMSI_LEN];
     int             imsi_len;
     c_int8_t        imsi_bcd[MAX_IMSI_BCD_LEN+1];
@@ -582,17 +582,17 @@ struct _amf4g_ue_t {
     e_cgi_t         e_cgi;
     plmn_id_t       visited_plmn_id;
 
-#define SECURITY_CONTEXT_IS_VALID(__mME) \
-    ((__mME) && \
-    ((__mME)->security_context_available == 1) && \
-     ((__mME)->mac_failed == 0) && \
-     ((__mME)->nas_eps.ksi != NAS_KSI_NO_KEY_IS_AVAILABLE))
-#define CLEAR_SECURITY_CONTEXT(__mME) \
+#define SECURITY_CONTEXT_IS_VALID(__aMF4g) \
+    ((__aMF4g) && \
+    ((__aMF4g)->security_context_available == 1) && \
+     ((__aMF4g)->mac_failed == 0) && \
+     ((__aMF4g)->nas_eps.ksi != NAS_KSI_NO_KEY_IS_AVAILABLE))
+#define CLEAR_SECURITY_CONTEXT(__aMF4g) \
     do { \
-        d_assert((__mME), break, "Null param"); \
-        (__mME)->security_context_available = 0; \
-        (__mME)->mac_failed = 0; \
-        (__mME)->nas_eps.ksi = 0; \
+        d_assert((__aMF4g), break, "Null param"); \
+        (__aMF4g)->security_context_available = 0; \
+        (__aMF4g)->mac_failed = 0; \
+        (__aMF4g)->nas_eps.ksi = 0; \
     } while(0)
     int             security_context_available;
     int             mac_failed;
@@ -643,18 +643,18 @@ struct _amf4g_ue_t {
 #define MIN_EPS_BEARER_ID           5
 #define MAX_EPS_BEARER_ID           15
 
-#define CLEAR_EPS_BEARER_ID(__mME) \
+#define CLEAR_EPS_BEARER_ID(__aMF4g) \
     do { \
-        d_assert((__mME), break, "Null param"); \
-        (__mME)->ebi = MIN_EPS_BEARER_ID - 1; \
+        d_assert((__aMF4g), break, "Null param"); \
+        (__aMF4g)->ebi = MIN_EPS_BEARER_ID - 1; \
     } while(0)
     c_uint8_t       ebi; /* EPS Bearer ID generator */
     list_t          sess_list;
 
-#define ECM_CONNECTED(__mME) \
-    ((__mME) && ((__mME)->enb_ue != NULL) && \
-     enb_ue_find((__mME)->enb_ue->index))
-#define ECM_IDLE(__mME) (!ECM_CONNECTED(__mME))
+#define ECM_CONNECTED(__aMF4g) \
+    ((__aMF4g) && ((__aMF4g)->enb_ue != NULL) && \
+     enb_ue_find((__aMF4g)->enb_ue->index))
+#define ECM_IDLE(__aMF4g) (!ECM_CONNECTED(__aMF4g))
     /* S1 UE context */
     enb_ue_t        *enb_ue;
 
@@ -662,17 +662,17 @@ struct _amf4g_ue_t {
     nas_esm_message_container_t pdn_connectivity_request;
 
     /* Paging */
-#define CLEAR_PAGING_INFO(__mME) \
+#define CLEAR_PAGING_INFO(__aMF4g) \
     do { \
-        d_assert((__mME), break, "Null param"); \
+        d_assert((__aMF4g), break, "Null param"); \
         \
-        tm_stop((__mME)->t3413); \
-        if ((__mME)->last_paging_msg) \
+        tm_stop((__aMF4g)->t3413); \
+        if ((__aMF4g)->last_paging_msg) \
         { \
-            pkbuf_free((__mME)->last_paging_msg); \
-            (__mME)->last_paging_msg = NULL; \
+            pkbuf_free((__aMF4g)->last_paging_msg); \
+            (__aMF4g)->last_paging_msg = NULL; \
         } \
-        (__mME)->max_paging_retry = 0; \
+        (__aMF4g)->max_paging_retry = 0; \
     } while(0);
     pkbuf_t         *last_paging_msg;
     tm_block_id     t3413;
@@ -690,22 +690,22 @@ struct _amf4g_ue_t {
     OCTET_STRING_t container;
 
     /* GTP Request/Response Counter */
-#define GTP_COUNTER_INCREMENT(__mME, __tYPE) \
+#define GTP_COUNTER_INCREMENT(__aMF4g, __tYPE) \
         do { \
-            d_assert((__mME), break,); \
-            ((__mME)->gtp_counter[__tYPE].request)++; \
+            d_assert((__aMF4g), break,); \
+            ((__aMF4g)->gtp_counter[__tYPE].request)++; \
         } while(0);
 
-#define GTP_COUNTER_CHECK(__mME, __tYPE, __eXPR) \
+#define GTP_COUNTER_CHECK(__aMF4g, __tYPE, __eXPR) \
         do { \
-            d_assert((__mME), break,); \
-            if ((__mME)->gtp_counter[__tYPE].request == 0) break; \
-            ((__mME)->gtp_counter[__tYPE].response)++; \
-            if (((__mME)->gtp_counter[__tYPE].request) == \
-                ((__mME)->gtp_counter[__tYPE].response)) \
+            d_assert((__aMF4g), break,); \
+            if ((__aMF4g)->gtp_counter[__tYPE].request == 0) break; \
+            ((__aMF4g)->gtp_counter[__tYPE].response)++; \
+            if (((__aMF4g)->gtp_counter[__tYPE].request) == \
+                ((__aMF4g)->gtp_counter[__tYPE].response)) \
             { \
-                ((__mME)->gtp_counter[__tYPE].request) = 0; \
-                ((__mME)->gtp_counter[__tYPE].response) = 0; \
+                ((__aMF4g)->gtp_counter[__tYPE].request) = 0; \
+                ((__aMF4g)->gtp_counter[__tYPE].response) = 0; \
                 __eXPR \
             } \
         } while(0);
@@ -739,13 +739,13 @@ struct _amf4g_ue_t {
         __bEARER->upf_s1u_teid = 0; \
     } while(0)
 
-#define SESSION_CONTEXT_IS_AVAILABLE(__mME) \
-     ((__mME) && ((__mME)->smf_s11_teid))
+#define SESSION_CONTEXT_IS_AVAILABLE(__aMF4g) \
+     ((__aMF4g) && ((__aMF4g)->smf_s11_teid))
 
-#define CLEAR_SESSION_CONTEXT(__mME) \
+#define CLEAR_SESSION_CONTEXT(__aMF4g) \
     do { \
-        d_assert((__mME), break, "Null param"); \
-        (__mME)->smf_s11_teid = 0; \
+        d_assert((__aMF4g), break, "Null param"); \
+        (__aMF4g)->smf_s11_teid = 0; \
     } while(0)
 
 typedef struct _amf4g_sess_t {
@@ -763,9 +763,9 @@ typedef struct _amf4g_sess_t {
     /* Related Context */
     amf4g_ue_t        *amf4g_ue;
 
-#define AMF4G_UE_HAVE_APN(__mME) \
-    ((__mME) && (amf4g_sess_first(__mME)) && \
-    ((amf4g_sess_first(__mME))->pdn))
+#define AMF4G_UE_HAVE_APN(__aMF4g) \
+    ((__aMF4g) && (amf4g_sess_first(__aMF4g)) && \
+    ((amf4g_sess_first(__aMF4g))->pdn))
     pdn_t           *pdn;
 
     /* Save Protocol Configuration Options from UE */
@@ -778,10 +778,10 @@ typedef struct _amf4g_sess_t {
     tlv_octet_t     pgw_pco;
 } amf4g_sess_t;
 
-#define BEARER_CONTEXT_IS_ACTIVE(__mME)  \
-    (amf4g_bearer_is_inactive(__mME) == 0)
-#define CLEAR_BEARER_CONTEXT(__mME)   \
-    amf4g_bearer_set_inactive(__mME)
+#define BEARER_CONTEXT_IS_ACTIVE(__aMF4g)  \
+    (amf4g_bearer_is_inactive(__aMF4g) == 0)
+#define CLEAR_BEARER_CONTEXT(__aMF4g)   \
+    amf4g_bearer_set_inactive(__aMF4g)
 
 #define AMF4G_HAVE_ENB_S1U_PATH(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_s1u_teid))
