@@ -7,6 +7,6 @@ fi
 
 systemctl $1 nextepc-hssd
 systemctl $1 nextepc-pcrfd
-systemctl $1 open5gc-amfd
-systemctl $1 open5gc-upfd
-systemctl $1 open5gc-smfd
+systemctl $1 nctu5gc-amfd
+systemctl $1 nctu5gc-upfd
+systemctl $1 nctu5gc-smfd

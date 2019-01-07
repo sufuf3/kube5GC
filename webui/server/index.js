@@ -1,4 +1,4 @@
-process.env.DB_URI = process.env.DB_URI || 'mongodb://localhost/open5gc';
+process.env.DB_URI = process.env.DB_URI || 'mongodb://localhost/nctu5gc';
 
 const co = require('co');
 const next = require('next');

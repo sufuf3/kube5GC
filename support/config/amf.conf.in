@@ -1,8 +1,8 @@
-### For reference, see `open5gc.conf`
-db_uri: mongodb://localhost/open5gc
+### For reference, see `nctu5gc.conf`
+db_uri: mongodb://localhost/nctu5gc
 
 logger:
-    file: @LOCALSTATE_DIR@/log/open5gc/amf.log
+    file: @LOCALSTATE_DIR@/log/nctu5gc/amf.log
     trace: 
         app: 1
         s1ap: 1
@@ -39,4 +39,4 @@ amf:
         ciphering_order : [ EEA0, EEA1, EEA2 ]
 
     network_name:
-        full: Open5GC
+        full: NCTU5GC

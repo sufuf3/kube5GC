@@ -1,0 +1,20 @@
+[Unit]
+Description=NCTU5GC SMF Daemon
+After=networking.service
+
+[Service]
+Type=simple
+
+User=nctu5gc
+Group=nctu5gc
+
+RuntimeDirectory=nctu5gc-smfd
+PIDFile=@LIB_DIR@/run/nctu5gc-smfd/pid
+
+Restart=always
+ExecStart=@BIN_DIR@/nctu5gc-smfd -f @SYSCONF_DIR@/nctu5gc/smf.conf
+RestartSec=2
+RestartPreventExitStatus=1
+
+[Install]
+WantedBy=multi-user.target

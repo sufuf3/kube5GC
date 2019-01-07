@@ -1,7 +1,7 @@
-db_uri: mongodb://localhost/open5gc
+db_uri: mongodb://localhost/nctu5gc
 
 logger:
-    file: @LOCALSTATE_DIR@/log/open5gc/open5gc.log
+    file: @LOCALSTATE_DIR@/log/nctu5gc/nctu5gc.log
     trace: 
         app: 1
         s1ap: 1
@@ -138,12 +138,12 @@ amf:
 #
 #  <Network Name>
 #    network_name:
-#        full: Open5GC
+#        full: NCTU5GC
 #        short: Next
 #
 
     network_name:
-        full: Open5GC
+        full: NCTU5GC
 
 hss:
     freeDiameter: hss.conf
