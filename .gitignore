@@ -15,9 +15,9 @@ lib/freeDiameter-*/include/freeDiameter/version.h
 lib/freeDiameter-*/include/freeDiameter/config.h.in
 lib/freeDiameter-*/include/freeDiameter/freeDiameter-host.h
 lib/nextepc/core/include/core.h
-support/systemd/open5gc-*.service
+support/systemd/nctu5gc-*.service
 support/systemd/nextepc-*.service
-support/logrotate/open5gc
+support/logrotate/nctu5gc
 
 # autotools
 stamp-h1
@@ -48,10 +48,10 @@ test/testvolte
 test/testngc
 nextepc-pcrfd
 nextepc-hssd
-open5gc-upfd
-open5gc-smfd
-open5gc-amfd
-open5gc-ngcd
+nctu5gc-upfd
+nctu5gc-smfd
+nctu5gc-amfd
+nctu5gc-ngcd
 
 # webui
 webui/.next/
