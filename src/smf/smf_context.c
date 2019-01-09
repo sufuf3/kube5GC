@@ -815,7 +815,7 @@ smf_sess_t* smf_sess_add(
     else
         d_assert(0, return NULL, "Unsupported PDN Type(%d)", pdn_type);
     
-    sess->smf_n4_seid = sess->index;
+    sess->smf_n4_seid = 0;
     
     /* Generate Hash Key : IMSI + APN */
     sess_hash_keygen(sess->hash_keybuf, &sess->hash_keylen,
@@ -1435,6 +1435,11 @@ smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(create_session_t *createSe
             createSession->ebi);
         d_assert(sess, return NULL, "No Session Context");
     }
+    else 
+    {
+        sess->dl_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
+    } 
+
     return sess;
 }
 

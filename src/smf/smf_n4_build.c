@@ -220,6 +220,18 @@ status_t smf_n4_build_session_establishment_request(
     req->node_id.len = PFPC_NODE_ID_LEN(smf_self()->pfcp_node_id);
 
     /* Set CP F-SEID, mandatory */
+    if(sess->smf_n4_seid == 0) 
+    {
+        sess->smf_n4_seid = sess->index;
+        pfcp_message.h.seid_p = 0;
+        pfcp_message.h.seid = 0;
+    }
+    else
+    {
+        pfcp_message.h.seid_p = 1;
+        pfcp_message.h.seid = sess->smf_n4_seid;
+    }
+
     req->cp_f_seid.presence = 1;
     req->cp_f_seid.data = &smf_f_seid;
     smf_f_seid.seid = htobe64(sess->smf_n4_seid);
@@ -256,7 +268,7 @@ status_t smf_n4_build_session_establishment_request(
     req->user_plane_inactivity_timer.presence = 0;
     
     pfcp_message.h.type = PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE;
-    pfcp_message.h.seid_p = 0;
+    
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
 
     smf_n4_free_create_pdr(&req->create_pdr);
