@@ -164,14 +164,14 @@ smf:
 #  <UE Pool>
 #
 #  o IPv4 Pool
-#    $ sudo ip addr add 45.45.0.1/16 dev pgwtun
+#    $ sudo ip addr add 45.45.0.1/16 dev uptun
 #
 #    ue_pool:
 #      addr: 45.45.0.1/16
 #
 #  o IPv4/IPv6 Pool
-#    $ sudo ip addr add 45.45.0.1/16 dev pgwtun
-#    $ sudo ip addr add cafe:1::1/64 dev pgwtun
+#    $ sudo ip addr add 45.45.0.1/16 dev uptun
+#    $ sudo ip addr add cafe:1::1/64 dev uptun
 #
 #    ue_pool:
 #      - addr: 45.45.0.1/16
@@ -180,10 +180,10 @@ smf:
 #
 #  o Specific APN(e.g 'volte') uses 45.46.0.1/16, cafe:2::1/64
 #    All other APNs use 45.45.0.1/16, cafe:1::1/64
-#    $ sudo ip addr add 45.45.0.1/16 dev pgwtun
-#    $ sudo ip addr add 45.46.0.1/16 dev pgwtun
-#    $ sudo ip addr add cafe:1::1/64 dev pgwtun
-#    $ sudo ip addr add cafe:2::1/64 dev pgwtun
+#    $ sudo ip addr add 45.45.0.1/16 dev uptun
+#    $ sudo ip addr add 45.46.0.1/16 dev uptun
+#    $ sudo ip addr add cafe:1::1/64 dev uptun
+#    $ sudo ip addr add cafe:2::1/64 dev uptun
 #
 #    ue_pool:
 #      - addr: 45.45.0.1/16
@@ -193,22 +193,22 @@ smf:
 #      - addr: cafe:2::1/64
 #        apn: volte
 #
-#  o Multiple Devices (default: pgwtun)
-#    $ sudo ip addr add 45.45.0.1/16 dev pgwtun
-#    $ sudo ip addr add cafe:1::1/64 dev pgwtun2
-#    $ sudo ip addr add 45.46.0.1/16 dev pgwtun3
-#    $ sudo ip addr add cafe:2::1/64 dev pgwtun3
+#  o Multiple Devices (default: uptun)
+#    $ sudo ip addr add 45.45.0.1/16 dev uptun
+#    $ sudo ip addr add cafe:1::1/64 dev uptun2
+#    $ sudo ip addr add 45.46.0.1/16 dev uptun3
+#    $ sudo ip addr add cafe:2::1/64 dev uptun3
 #
 #    ue_pool:
 #      - addr: 45.45.0.1/16
 #      - addr: cafe:1::1/64
-#        dev: pgwtun2
+#        dev: uptun2
 #      - addr: 45.46.0.1/16
 #        apn: volte
-#        dev: pgwtun3
+#        dev: uptun3
 #      - addr: cafe:2::1/64
 #        apn: volte
-#        dev: pgwtun3
+#        dev: uptun3
 #
     ue_pool:
       - addr: 45.45.0.1/16

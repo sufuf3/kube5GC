@@ -3,18 +3,18 @@
 SYSTEM=`uname`;
 
 if [ "$SYSTEM" = "Linux" ]; then
-    if ! grep "pgwtun" /proc/net/dev > /dev/null; then
-        ip tuntap add name pgwtun mode tun
+    if ! grep "uptun" /proc/net/dev > /dev/null; then
+        ip tuntap add name uptun mode tun
     fi
-	if test "x`sysctl -n net.ipv6.conf.pgwtun.disable_ipv6`" = x1; then
-		echo "net.ipv6.conf.pgwtun.disable_ipv6=0" > /etc/sysctl.d/30-nctu5gc.conf
+	if test "x`sysctl -n net.ipv6.conf.uptun.disable_ipv6`" = x1; then
+		echo "net.ipv6.conf.uptun.disable_ipv6=0" > /etc/sysctl.d/30-nctu5gc.conf
 		sysctl -p /etc/sysctl.d/30-nctu5gc.conf
 	fi
-    ip addr del 45.45.0.1/16 dev pgwtun 2> /dev/null
-    ip addr add 45.45.0.1/16 dev pgwtun
-    ip addr del cafe::1/64 dev pgwtun 2> /dev/null
-    ip addr add cafe::1/64 dev pgwtun
-    ip link set pgwtun up
+    ip addr del 45.45.0.1/16 dev uptun 2> /dev/null
+    ip addr add 45.45.0.1/16 dev uptun
+    ip addr del cafe::1/64 dev uptun 2> /dev/null
+    ip addr add cafe::1/64 dev uptun
+    ip link set uptun up
 else
     sysctl -w net.inet.ip.forwarding=1
     ifconfig lo0 alias 127.0.0.2 netmask 255.255.255.255
