@@ -1,5 +1,5 @@
 [Match]
-Name=pgwtun
+Name=uptun
 
 [Network]
 Address=45.45.0.1/16
