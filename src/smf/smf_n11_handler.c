@@ -33,6 +33,8 @@ void smf_n11_handle_update_session_request(smf_sess_t *sess, modify_bearer_t *pM
             bearer->enb_s1u_teid = ntohl(pModifyBearer->enb_s1u_teid);
             bearer->addr = pModifyBearer->enb_s1u_ip.addr;
 
+            sess->dl_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
+
             d_trace(5, "    ENB_S1U_TEID[%d] UPF_S1U_TEID[%d]\n",
                 bearer->upf_s1u_teid, bearer->enb_s1u_teid);
 

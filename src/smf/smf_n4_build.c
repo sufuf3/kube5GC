@@ -220,6 +220,18 @@ status_t smf_n4_build_session_establishment_request(
     req->node_id.len = PFPC_NODE_ID_LEN(smf_self()->pfcp_node_id);
 
     /* Set CP F-SEID, mandatory */
+    if(sess->smf_n4_seid == 0) 
+    {
+        sess->smf_n4_seid = sess->index;
+        pfcp_message.h.seid_p = 0;
+        pfcp_message.h.seid = 0;
+    }
+    else
+    {
+        pfcp_message.h.seid_p = 1;
+        pfcp_message.h.seid = sess->smf_n4_seid;
+    }
+
     req->cp_f_seid.presence = 1;
     req->cp_f_seid.data = &smf_f_seid;
     smf_f_seid.seid = htobe64(sess->smf_n4_seid);
@@ -256,7 +268,7 @@ status_t smf_n4_build_session_establishment_request(
     req->user_plane_inactivity_timer.presence = 0;
     
     pfcp_message.h.type = PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE;
-    pfcp_message.h.seid_p = 0;
+    
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
 
     smf_n4_free_create_pdr(&req->create_pdr);
@@ -303,7 +315,9 @@ status_t smf_n4_build_session_modification_request_for_setup_downlink(
     req->update_far.update_forwarding_parameters.destination_interface.presence = 1;
     req->update_far.update_forwarding_parameters.destination_interface.len = 1;
     req->update_far.update_forwarding_parameters.destination_interface.data = &sess->dl_pdr->far->destination_interface;
-        
+    req->update_far.apply_action.presence = 1;
+    req->update_far.apply_action.data = &sess->dl_pdr->far->apply_action;
+    req->update_far.apply_action.len = sizeof(sess->dl_pdr->far->apply_action); 
     smf_bearer_t *bearer = NULL;
 
     bearer = smf_default_bearer_in_sess(sess);
