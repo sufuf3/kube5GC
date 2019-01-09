@@ -303,7 +303,9 @@ status_t smf_n4_build_session_modification_request_for_setup_downlink(
     req->update_far.update_forwarding_parameters.destination_interface.presence = 1;
     req->update_far.update_forwarding_parameters.destination_interface.len = 1;
     req->update_far.update_forwarding_parameters.destination_interface.data = &sess->dl_pdr->far->destination_interface;
-        
+    req->update_far.apply_action.presence = 1;
+    req->update_far.apply_action.data = &sess->dl_pdr->far->apply_action;
+    req->update_far.apply_action.len = sizeof(sess->dl_pdr->far->apply_action); 
     smf_bearer_t *bearer = NULL;
 
     bearer = smf_default_bearer_in_sess(sess);
