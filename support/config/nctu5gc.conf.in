@@ -148,7 +148,6 @@ amf:
 hss:
     freeDiameter: hss.conf
 
-
 pcrf:
     freeDiameter: pcrf.conf
 
