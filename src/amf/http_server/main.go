@@ -126,7 +126,6 @@ func handleSMContextCreate() {
 }
 
 func handleSMContextUpdate() {
-	log.Println("AMF SM Context Update")
 	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/modify"
 	var buf []byte
 	buf = make([]byte, 4096)

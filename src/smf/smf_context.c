@@ -18,6 +18,7 @@
 #include "smf_context.h"
 
 static smf_context_t self;
+static fd_config_t s_fd_conf;
 static int context_initialized = 0;
 
 index_declare(smf_sess_pool, smf_sess_t, MAX_POOL_OF_SESS);
@@ -36,8 +37,12 @@ status_t smf_context_init()
     d_assert(context_initialized == 0, return CORE_ERROR,
             "SMF context already has been initialized");
 
+    /* Initialize FreeDiameter Config */
+    memset(&s_fd_conf, 0, sizeof(fd_config_t));
+
     /* Initialize SMF context */
     memset(&self, 0, sizeof(smf_context_t));
+    self.fd_config = &s_fd_conf;
 
     index_init(&smf_sess_pool, MAX_POOL_OF_SESS);
     index_init(&smf_bearer_pool, MAX_POOL_OF_BEARER);
@@ -111,12 +116,23 @@ smf_context_t* smf_self()
 static status_t smf_context_prepare()
 {
     self.pfcp_port = PFCP_UDP_PORT;
+    self.fd_config->cnf_port = DIAMETER_PORT;
+    self.fd_config->cnf_port_tls = DIAMETER_SECURE_PORT;
 
     return CORE_OK;
 }
 
 static status_t smf_context_validation()
 {
+    if (self.fd_conf_path == NULL &&
+        (self.fd_config->cnf_diamid == NULL ||
+        self.fd_config->cnf_diamrlm == NULL ||
+        self.fd_config->cnf_addr == NULL))
+    {
+        d_error("No smf.freeDiameter in '%s'",
+                context_self()->config.path);
+        return CORE_ERROR;
+    }
     if (list_first(&self.subnet_list) == NULL)
     {
         d_error("No smf.ue_pool in '%s'",
@@ -474,7 +490,7 @@ status_t smf_context_parse_config()
                             d_assert(fd_key, return CORE_ERROR,);
                             if (!strcmp(fd_key, "identity"))
                             {
-                                self.fd_config->cnf_diamid = 
+                                self.fd_config->cnf_diamid =
                                     yaml_iter_value(&fd_iter);
                             }
                             else if (!strcmp(fd_key, "realm"))
@@ -634,6 +650,7 @@ status_t smf_context_parse_config()
                                     }
                                 } while(yaml_iter_type(&conn_array) ==
                                         YAML_SEQUENCE_NODE);
+                                
                             }
                             else
                                 d_warn("unknown key `%s`", fd_key);
