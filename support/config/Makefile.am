@@ -1,6 +1,5 @@
 configfiles = \
 	nctu5gc.conf \
-	nctu5gc.testngc.conf \
 	hss.conf \
 	pcrf.conf \
 	upf.conf \

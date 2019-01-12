@@ -51,7 +51,7 @@ static void test_fd_logger_handler(enum fd_hook_type type, struct msg * msg,
 
 void test_terminate(void)
 {
-    printf("Memory Free ...\n");
+    printf("Freeing memory...\n");
     core_sleep(9 * 1000 * 1000);
     testpacket_final();
     app_terminate();
