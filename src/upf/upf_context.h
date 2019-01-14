@@ -201,7 +201,7 @@ typedef struct _upf_far_t {
     index_t         index;
     c_uint32_t      far_id;
     c_uint16_t      ref_cnt;
-    c_uint8_t       create;  //$ has created or not
+    c_uint8_t       create;  // has created or not
     c_uint8_t       apply_action;
     c_uint8_t       destination_interface;
 
@@ -321,7 +321,7 @@ CORE_DECLARE(upf_subnet_t*) upf_subnet_first();
 CORE_DECLARE(upf_subnet_t*) upf_subnet_next(upf_subnet_t *subnet);
 
 CORE_DECLARE(upf_pdr_t*)   upf_pdr_add(upf_sess_t *sess);
-CORE_DECLARE(status_t)      upf_pdr_remove(upf_pdr_t *pdr);
+CORE_DECLARE(status_t)     upf_pdr_remove(upf_pdr_t *pdr);
 CORE_DECLARE(upf_pdr_t*)   upf_default_pdr_in_sess(upf_sess_t *sess);
 CORE_DECLARE(upf_pdr_t*)   upf_dl_pdr_first(upf_sess_t *sess);
 CORE_DECLARE(upf_pdr_t*)   upf_pdr_next(upf_pdr_t *pdr);
@@ -329,7 +329,7 @@ CORE_DECLARE(upf_pdr_t*)   upf_pdr_find(index_t index);
 CORE_DECLARE(upf_pdr_t*)   upf_pdr_find_by_pdr_id(tlv_packet_detection_rule_id_t *pdr_id);
 CORE_DECLARE(upf_pdr_t*)   upf_pdr_find_by_upf_s1u_teid(c_uint32_t teid);
 CORE_DECLARE(upf_far_t*)   upf_far_add(void);
-CORE_DECLARE(status_t)      upf_far_remove(upf_far_t *far);
+CORE_DECLARE(status_t)     upf_far_remove(upf_far_t *far);
 CORE_DECLARE(upf_far_t*)   upf_far_find_by_far_id(c_uint32_t far_id);
 
 #ifdef __cplusplus

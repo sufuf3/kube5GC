@@ -13,7 +13,6 @@
 
 #include "upf_context.h"
 
-
 status_t upf_n4_build_session_establishment_response(
         pkbuf_t **pkbuf, c_uint8_t type, upf_sess_t *sess,
         pfcp_session_establishment_request_t *pfcp_req)
@@ -208,7 +207,7 @@ status_t upf_n4_build_association_setup_response(
     }
     else
     {
-        //$ if up_fun all zero, should not present
+        // If up_fun all zero, should not present
         rsp->up_function_features.presence = 0;
     }
     

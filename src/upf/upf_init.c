@@ -10,8 +10,6 @@
 #include "upf_event.h"
 #include "upf_sm.h"
 
-//#include "upf_fd_path.h"
-
 static thread_id upf_thread;
 static void *THREAD_FUNC upf_main(thread_id id, void *data);
 
@@ -67,7 +65,7 @@ static void *THREAD_FUNC upf_main(thread_id id, void *data)
     tm_service_init(&upf_self()->tm_service);
     
     pfcp_xact_init(&upf_self()->tm_service,
-            UPF_EVT_N4_T3_RESPONSE, UPF_EVT_N4_T3_HOLDING);//$ fixme: wrong event!
+            UPF_EVT_N4_T3_RESPONSE, UPF_EVT_N4_T3_HOLDING); //$ fixme: wrong event!
 
     fsm_create(&upf_sm, upf_state_initial, upf_state_final);
     fsm_init(&upf_sm, 0);

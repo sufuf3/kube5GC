@@ -12,7 +12,7 @@
 #include "upf_gtp_path.h"
 #include "upf_ipfw.h"
 
-#define UPF_GTP_HANDLED     1
+#define UPF_GTP_HANDLED 1
 
 c_uint16_t in_cksum(c_uint16_t *addr, int len);
 static status_t upf_gtp_handle_multicast(pkbuf_t *recvbuf);
@@ -49,20 +49,19 @@ static int _gtpv1_tun_recv_cb(sock_id sock, void *data)
     {
         /* Unicast */
         rv = upf_gtp_send_to_pdr(pdr, recvbuf);
-        d_assert(rv == CORE_OK,, "upf_gtp_send_to_pdr() failed");
+        d_assert(rv == CORE_OK, , "upf_gtp_send_to_pdr() failed");
     }
     else
     {
         if (context_self()->parameter.multicast)
         {
             rv = upf_gtp_handle_multicast(recvbuf);
-            d_assert(rv != CORE_ERROR,, "upf_gtp_handle_multicast() failed");
+            d_assert(rv != CORE_ERROR, , "upf_gtp_handle_multicast() failed");
         }
     }
 
     pkbuf_free(recvbuf);
     return 0;
-
 }
 
 static int _gtpv1_u_recv_cb(sock_id sock, void *data)
@@ -93,13 +92,14 @@ static int _gtpv1_u_recv_cb(sock_id sock, void *data)
         return -1;
     }
 
-    d_assert(pkbuf, return 0,);
-    d_assert(pkbuf->payload, goto cleanup,);
+    d_assert(pkbuf, return 0, );
+    d_assert(pkbuf->payload, goto cleanup, );
     d_trace(50, "[UPF] RECV : ");
     d_trace_hex(50, pkbuf->payload, pkbuf->len);
 
     gtp_h = pkbuf->payload;
-    if (gtp_h->flags & GTPU_FLAGS_S) size += 4;
+    if (gtp_h->flags & GTPU_FLAGS_S)
+        size += 4;
 
     if (gtp_h->type == GTPU_MSGTYPE_ECHO_REQ)
     {
@@ -117,7 +117,7 @@ static int _gtpv1_u_recv_cb(sock_id sock, void *data)
                     CORE_ADDR(&from, buf));
 
             sent = core_sendto(sock,
-                    echo_rsp->payload, echo_rsp->len, 0, &from);
+                               echo_rsp->payload, echo_rsp->len, 0, &from);
             if (sent < 0 || sent != echo_rsp->len)
             {
                 d_error("core_sendto failed(%d:%s)", errno, strerror(errno));
@@ -125,55 +125,54 @@ static int _gtpv1_u_recv_cb(sock_id sock, void *data)
             pkbuf_free(echo_rsp);
         }
     }
-    else if (gtp_h->type == GTPU_MSGTYPE_GPDU || 
-                gtp_h->type == GTPU_MSGTYPE_END_MARKER)
+    else if (gtp_h->type == GTPU_MSGTYPE_GPDU ||
+             gtp_h->type == GTPU_MSGTYPE_END_MARKER)
     {
-		teid = ntohl(gtp_h->teid);
+        teid = ntohl(gtp_h->teid);
 
-		d_trace(3, "[UPF] RECV GPU-U from ENB : TEID[0x%x]\n", teid);
+        d_trace(3, "[UPF] RECV GPU-U from ENB : TEID[0x%x]\n", teid);
 
-		/* Remove GTP header and send packets to TUN interface */
-		d_assert(pkbuf_header(pkbuf, -size) == CORE_OK, goto cleanup,);
+        /* Remove GTP header and send packets to TUN interface */
+        d_assert(pkbuf_header(pkbuf, -size) == CORE_OK, goto cleanup, );
 
-		ip_h = pkbuf->payload;
-		d_assert(ip_h, goto cleanup,);
+        ip_h = pkbuf->payload;
+        d_assert(ip_h, goto cleanup, );
 
-		pdr = upf_pdr_find_by_upf_s1u_teid(teid);
-		d_assert(pdr, goto cleanup,);
-		sess = pdr->sess;
-		d_assert(sess, goto cleanup,);
+        pdr = upf_pdr_find_by_upf_s1u_teid(teid);
+        d_assert(pdr, goto cleanup, );
+        sess = pdr->sess;
+        d_assert(sess, goto cleanup, );
 
-		if (ip_h->ip_v == 4 && sess->ipv4)
-			subnet = sess->ipv4->subnet;
-		else if (ip_h->ip_v == 6 && sess->ipv6)
-			subnet = sess->ipv6->subnet;
+        if (ip_h->ip_v == 4 && sess->ipv4)
+            subnet = sess->ipv4->subnet;
+        else if (ip_h->ip_v == 6 && sess->ipv6)
+            subnet = sess->ipv6->subnet;
 
-		if (!subnet)
-		{
-			d_trace_hex(9, pkbuf->payload, pkbuf->len);
-			d_trace(9, "[DROP] Cannot find subnet V:%d, IPv4:%p, IPv6:%p\n",
-					ip_h->ip_v, sess->ipv4, sess->ipv6);
-			goto cleanup;
-		}
+        if (!subnet)
+        {
+            d_trace_hex(9, pkbuf->payload, pkbuf->len);
+            d_trace(9, "[DROP] Cannot find subnet V:%d, IPv4:%p, IPv6:%p\n",
+                    ip_h->ip_v, sess->ipv4, sess->ipv6);
+            goto cleanup;
+        }
 
-		/* Check IPv6 */
-		if (context_self()->parameter.no_slaac == 0 && ip_h->ip_v == 6)
-		{
-			rv = upf_gtp_handle_slaac(sess, pkbuf);
-			if (rv == UPF_GTP_HANDLED)
-			{
-				pkbuf_free(pkbuf);
-				return 0;
-			}
-			d_assert(rv == CORE_OK,, "upf_gtp_handle_slaac() failed");
-		}
+        /* Check IPv6 */
+        if (context_self()->parameter.no_slaac == 0 && ip_h->ip_v == 6)
+        {
+            rv = upf_gtp_handle_slaac(sess, pkbuf);
+            if (rv == UPF_GTP_HANDLED)
+            {
+                pkbuf_free(pkbuf);
+                return 0;
+            }
+            d_assert(rv == CORE_OK, , "upf_gtp_handle_slaac() failed");
+        }
 
-		dev = subnet->dev;
-		d_assert(dev, goto cleanup,);
-		if (sock_write(dev->sock, pkbuf->payload, pkbuf->len) <= 0)
-			d_error("sock_write() failed");
-	}
-
+        dev = subnet->dev;
+        d_assert(dev, goto cleanup, );
+        if (sock_write(dev->sock, pkbuf->payload, pkbuf->len) <= 0)
+            d_error("sock_write() failed");
+    }
 
 cleanup:
     pkbuf_free(pkbuf);
@@ -188,9 +187,9 @@ status_t upf_gtp_open()
     int rc;
 
     rv = gtp_server_list(&upf_self()->gtpu_list, _gtpv1_u_recv_cb);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
+    d_assert(rv == CORE_OK, return CORE_ERROR, );
     rv = gtp_server_list(&upf_self()->gtpu_list6, _gtpv1_u_recv_cb);
-    d_assert(rv == CORE_OK, return CORE_ERROR,);
+    d_assert(rv == CORE_OK, return CORE_ERROR, );
 
     upf_self()->gtpu_sock = gtp_local_sock_first(&upf_self()->gtpu_list);
     upf_self()->gtpu_sock6 = gtp_local_sock_first(&upf_self()->gtpu_list6);
@@ -198,7 +197,7 @@ status_t upf_gtp_open()
     upf_self()->gtpu_addr6 = gtp_local_addr_first(&upf_self()->gtpu_list6);
 
     d_assert(upf_self()->gtpu_addr || upf_self()->gtpu_addr6,
-            return CORE_ERROR, "No GTP Server");
+             return CORE_ERROR, "No GTP Server");
 
     /* NOTE : tun device can be created via following command.
      *
@@ -243,7 +242,7 @@ status_t upf_gtp_open()
      * Note that Linux will skip this configuration */
     for (subnet = upf_subnet_first(); subnet; subnet = upf_subnet_next(subnet))
     {
-        d_assert(subnet->dev, return CORE_ERROR,);
+        d_assert(subnet->dev, return CORE_ERROR, );
         rc = tun_set_ip(subnet->dev->sock, &subnet->gw, &subnet->sub);
         if (rc != 0)
         {
@@ -282,7 +281,7 @@ static status_t upf_gtp_handle_multicast(pkbuf_t *recvbuf)
     ip_h = (struct ip *)recvbuf->payload;
     if (ip_h->ip_v == 6)
     {
-#if COMPILE_ERROR_IN_MAC_OS_X  /* Compiler error in Mac OS X platform */
+#if COMPILE_ERROR_IN_MAC_OS_X /* Compiler error in Mac OS X platform */
         ip6_h = (struct ip6_hdr *)recvbuf->payload;
         if (IN6_IS_ADDR_MULTICAST(&ip6_h->ip6_dst))
 #else
@@ -320,12 +319,14 @@ static status_t upf_gtp_handle_multicast(pkbuf_t *recvbuf)
 
 static status_t upf_gtp_handle_slaac(upf_sess_t *sess, pkbuf_t *recvbuf)
 {
-    //status_t rv;
-    //struct ip *ip_h = NULL;
 #if 0
+    // status_t rv;
+    // struct ip *ip_h = NULL;
+    
     d_assert(sess, return CORE_ERROR,);
     d_assert(recvbuf, return CORE_ERROR,);
     d_assert(recvbuf->payload, return CORE_ERROR,);
+    
     ip_h = (struct ip *)recvbuf->payload;
     if (ip_h->ip_v == 6)
     {
@@ -358,18 +359,18 @@ static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
     gtp_header_t *gtp_h = NULL;
     upf_far_t *far;
 
-    d_assert(pdr, pkbuf_free(sendbuf); return CORE_ERROR,);
-    d_assert(pdr->far, pkbuf_free(sendbuf); return CORE_ERROR,);
+    d_assert(pdr, pkbuf_free(sendbuf); return CORE_ERROR, );
+    d_assert(pdr->far, pkbuf_free(sendbuf); return CORE_ERROR, );
     far = pdr->far;
-    d_assert(far->gnode, pkbuf_free(sendbuf); return CORE_ERROR,);
-    d_assert(far->gnode->sock, pkbuf_free(sendbuf); return CORE_ERROR,);
+    d_assert(far->gnode, pkbuf_free(sendbuf); return CORE_ERROR, );
+    d_assert(far->gnode->sock, pkbuf_free(sendbuf); return CORE_ERROR, );
 
     if (far->apply_action == PFCP_FAR_APPLY_ACTION_DROP)
     {
         return CORE_OK;
     }
-    
-    if(!far->upf_n3_teid)
+
+    if (!far->upf_n3_teid)
     {
         return CORE_ERROR;
     }
@@ -382,7 +383,7 @@ static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
         pkbuf_free(sendbuf);
         return CORE_ERROR;
     }
-    
+
     gtp_h = (gtp_header_t *)sendbuf->payload;
     /* Bits    8  7  6  5  4  3  2  1
      *        +--+--+--+--+--+--+--+--+
@@ -399,8 +400,8 @@ static status_t upf_gtp_send_to_pdr(upf_pdr_t *pdr, pkbuf_t *sendbuf)
     d_trace_hex(50, sendbuf->payload, sendbuf->len);
 
     d_trace(3, "[UPF] SEND GPU-U to ENB[%s] : TEID[0x%x]\n",
-        CORE_ADDR(sock_remote_addr(far->gnode->sock), buf),
-        far->upf_n3_teid);
+            CORE_ADDR(sock_remote_addr(far->gnode->sock), buf),
+            far->upf_n3_teid);
     rv = gtp_send(far->gnode, sendbuf);
 
     return rv;
@@ -518,7 +519,7 @@ c_uint16_t in_cksum(c_uint16_t *addr, int len)
     // If an odd byte is left
     if (nleft == 1)
     {
-        *(c_uint8_t *) (&answer) = *(c_uint8_t *) w;
+        *(c_uint8_t *)(&answer) = *(c_uint8_t *)w;
         sum += answer;
     }
 
