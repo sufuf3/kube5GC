@@ -420,8 +420,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -437,8 +435,6 @@
    fun:fd_conf_parse
    fun:fd_core_parseconf
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -452,8 +448,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -466,8 +460,6 @@
    fun:fd_log_threadname
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -483,8 +475,6 @@
    fun:fd_ext_load
    fun:fd_core_parseconf
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -498,8 +488,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -514,8 +502,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -531,8 +517,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -550,8 +534,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
 }
 {
    <insert_a_suppression_name_here>
@@ -567,8 +549,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
 }
 {
    <insert_a_suppression_name_here>
@@ -585,7 +565,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
 }
 {
    <insert_a_suppression_name_here>
@@ -598,8 +577,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -615,8 +592,6 @@
    fun:fd_conf_parse
    fun:fd_core_parseconf
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -633,8 +608,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
 }
 {
@@ -648,8 +621,6 @@
    fun:fd_ext_load
    fun:fd_core_parseconf
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:main
 }
@@ -1803,8 +1774,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
    fun:main
@@ -1821,8 +1790,6 @@
    fun:fd_conf_parse
    fun:fd_core_parseconf
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
 }
@@ -1836,8 +1803,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
    fun:main
@@ -1851,8 +1816,6 @@
    fun:fd_log_threadname
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
    fun:main
@@ -1869,8 +1832,6 @@
    fun:fd_ext_load
    fun:fd_core_parseconf
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
 }
@@ -1884,8 +1845,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
    fun:main
@@ -1901,8 +1860,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
    fun:main
@@ -1919,8 +1876,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
 }
@@ -1935,8 +1890,6 @@
    fun:gnutls_global_init
    fun:fd_core_initialize
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
    fun:main
@@ -1953,8 +1906,6 @@
    fun:fd_conf_parse
    fun:fd_core_parseconf
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
 }
@@ -1969,8 +1920,6 @@
    fun:fd_ext_load
    fun:fd_core_parseconf
    fun:fd_init
-   fun:mme_s6a_init
-   fun:mme_initialize
    fun:app_initialize
    fun:test_initialize
    fun:main
