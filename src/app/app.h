@@ -26,9 +26,6 @@ CORE_DECLARE(void) config_terminate(void);
 CORE_DECLARE(status_t) app_logger_restart(void);
 CORE_DECLARE(status_t) app_log_pid(const char *pid_path);
 
-CORE_DECLARE(status_t) mme_initialize();
-CORE_DECLARE(void) mme_terminate(void);
-
 CORE_DECLARE(status_t) amf4g_initialize();
 CORE_DECLARE(void) amf4g_terminate(void);
 
