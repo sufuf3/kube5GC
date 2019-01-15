@@ -168,6 +168,12 @@ void amf_start_server()
     }
 }
 
+static void kill_server_on_signal(int signo)
+{
+    kill(amf4g_self()->server_pid, SIGKILL);
+    exit(EXIT_FAILURE);
+}
+
 status_t amf_sbi_server_open()
 {
     status_t rv;
@@ -213,6 +219,9 @@ status_t amf_sbi_server_open()
     smContextRetrieveRemoteAddr.sun.sun_family = AF_UNIX;
 
     amf_start_server();
+
+    signal(SIGSEGV, kill_server_on_signal);
+
     return CORE_OK;
 }
 
