@@ -34,6 +34,9 @@ typedef struct _smf_context_t {
     c_uint32_t          pfcp_port;      /* Default: SMF PFCP local port */
     c_uint8_t           cp_function_features;
 
+    char                rest_api_addr[100];
+    char                rest_api_port[6];
+
     list_t              pfcp_list;      /* SMF PFCP IPv4 Server List */
     list_t              pfcp_list6;     /* SMF PFCP IPv6 Server List */
     sock_id             pfcp_sock;      /* SMF PFCP IPv4 Socket */

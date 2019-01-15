@@ -11,6 +11,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -45,6 +46,6 @@ func main() {
 
 	http2.ConfigureServer(&server, &http2.Server{})
 
-	server.ListenAndServeTLS(certFile, keyFile)
+	log.Println(server.ListenAndServeTLS(certFile, keyFile))
 
 }

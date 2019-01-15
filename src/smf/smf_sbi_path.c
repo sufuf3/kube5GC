@@ -9,6 +9,9 @@
 #include <unistd.h>
 #include <signal.h>
 
+#define SMF_HTTP_SERVER_BIN PREFIX "http_server/smf_http_server"
+#define SMF_HTTP_CERT_KEY_DIR SYSCONF_DIR PACKAGE "/https/"
+
 c_sockaddr_t smContextCreateLocalAddr,
         smContextCreateRemoteAddr,
         smContextUpdateLocalAddr,
@@ -146,7 +149,13 @@ void smf_start_server()
             exit(EXIT_FAILURE);
         } else
         {
-            rv = execl("./http_server/smf_http_server", "smf_http_server", NULL);
+            d_trace(-1, "Server on: %d:%d", smf_self()->rest_api_addr, smf_self()->rest_api_port);
+            rv = execl(SMF_HTTP_SERVER_BIN, "smf_http_server",
+                        "--ip", smf_self()->rest_api_addr,
+                        "--port", smf_self()->rest_api_port,
+                        "--cert", SMF_HTTP_CERT_KEY_DIR "smf.cert",
+                        "--key", SMF_HTTP_CERT_KEY_DIR "smf.key"
+                        , NULL);
             d_assert(rv != -1, return, "exec server error: %s", strerror(errno));
         }
     } else if (rv > 0)
