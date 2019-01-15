@@ -80,5 +80,11 @@ AM_CFLAGS = \
 	-Wall -Werror \
 	$(NULL)
 
+DEFS = \
+   	@DEFS@ \
+   	-DSYSCONF_DIR=\"$(sysconfdir)/\" \
+	-DPREFIX=\"$(prefix)/\"
+   	$(NULL)
+
 MAINTAINERCLEANFILES = Makefile.in
 MOSTLYCLEANFILES = core *.stackdump

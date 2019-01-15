@@ -40,3 +40,8 @@ amf:
 
     network_name:
         full: NCTU5GC
+
+smf:
+    http:
+      addr: 127.0.0.1
+      port: 8080
