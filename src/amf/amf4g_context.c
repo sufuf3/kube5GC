@@ -1297,6 +1297,33 @@ status_t amf4g_context_parse_config()
                     d_warn("unknown key `%s`", amf4g_key);
             }
         }
+        else if (!strcmp(root_key, "smf"))
+        {
+            yaml_iter_t smf_iter;
+            yaml_iter_recurse(&root_iter, &smf_iter);
+            while(yaml_iter_next(&smf_iter))
+            {
+                const char *smf_key = yaml_iter_key(&smf_iter);
+                d_assert(smf_key, return CORE_ERROR,);
+                if (!strcmp(smf_key, "http"))
+                {
+                    yaml_iter_t http_iter;
+                    yaml_iter_recurse(&smf_iter, &http_iter);
+                    while(yaml_iter_next(&http_iter))
+                    {
+                        const char *http_key = yaml_iter_key(&http_iter);
+                        if (!strcmp(http_key, "addr"))
+                        {
+                            strcpy(self.rest_api_addr, yaml_iter_value(&http_iter));
+                        }
+                        else if (!strcmp(http_key, "port"))
+                        {
+                            strcpy(self.rest_api_port, yaml_iter_value(&http_iter));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     rv = amf4g_context_validation();

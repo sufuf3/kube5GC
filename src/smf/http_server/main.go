@@ -11,10 +11,12 @@ package main
 
 import (
 	"flag"
+	"log"
 	"net/http"
 	"strconv"
 
 	"golang.org/x/net/http2"
+	"golang.org/x/sys/unix"
 )
 
 var (
@@ -38,6 +40,10 @@ func init() {
 }
 
 func main() {
+	if err := unix.Prctl(unix.PR_SET_PDEATHSIG, uintptr(unix.SIGKILL), 0, 0, 0); err != nil {
+		log.Fatal("Prctl Fail")
+		return
+	}
 	var server http.Server
 	server.Addr = ip + ":" + strconv.Itoa(int(port))
 	router := NewRouter()
@@ -45,6 +51,6 @@ func main() {
 
 	http2.ConfigureServer(&server, &http2.Server{})
 
-	server.ListenAndServeTLS(certFile, keyFile)
+	log.Println(server.ListenAndServeTLS(certFile, keyFile))
 
 }

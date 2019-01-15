@@ -704,6 +704,23 @@ status_t smf_context_parse_config()
                         yaml_iter_type(&dns_iter) ==
                             YAML_SEQUENCE_NODE);
                 }
+                else if (!strcmp(smf_key, "http"))
+                {
+                    yaml_iter_t http_iter;
+                    yaml_iter_recurse(&smf_iter, &http_iter);
+                    while(yaml_iter_next(&http_iter))
+                    {
+                        const char *http_key = yaml_iter_key(&http_iter);
+                        if (!strcmp(http_key, "addr"))
+                        {
+                            strcpy(self.rest_api_addr, yaml_iter_value(&http_iter));
+                        }
+                        else if (!strcmp(http_key, "port"))
+                        {
+                            strcpy(self.rest_api_port, yaml_iter_value(&http_iter));
+                        }
+                    }
+                }
             }
         }
     }

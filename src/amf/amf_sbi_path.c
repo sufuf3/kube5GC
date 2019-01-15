@@ -10,6 +10,8 @@
 #include <signal.h>
 #include <error.h>
 
+#define AMF_HTTP_SERVER_BIN PREFIX "http_server/amf_http_server"
+
 c_sockaddr_t smContextCreateLocalAddr,
         smContextCreateRemoteAddr,
         smContextUpdateLocalAddr,
@@ -49,8 +51,6 @@ static int _amf_sbi_message_amf_smContextCreate(sock_id sock, void *data)
         return 0;
     }
 
-    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
-
     return CORE_OK;
 }
 
@@ -78,8 +78,6 @@ static int _amf_sbi_message_amf_smContextUpdate(sock_id sock, void *data)
 	    pkbuf_free(pkbuf);
 	    return CORE_ERROR;
     }
-
-    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
 
     return CORE_OK;
 }
@@ -109,8 +107,6 @@ static int _amf_sbi_message_amf_smContextRelease(sock_id sock, void *data)
 	    return CORE_ERROR;
     }
 
-    d_trace(10, "%s %d Leave", __FUNCTION__, __LINE__);
-
     return CORE_OK;
 }
 
@@ -137,8 +133,6 @@ static int _amf_sbi_message_amf_smContextRetrieve(sock_id sock, void *data)
 	    pkbuf_free(pkbuf);
 	    return CORE_ERROR;
     }
-    
-    d_trace(10, "%s %d Leave \n", __FUNCTION__, __LINE__);
 
     return CORE_OK;
 }
@@ -161,13 +155,23 @@ void amf_start_server()
             exit(EXIT_FAILURE);
         } else
         {
-            rv = execl("./http_server/amf_http_server", "amf_http_server", NULL);
+            d_trace(-1, "Connect SMF %d:%d", amf4g_self()->rest_api_addr, amf4g_self()->rest_api_port);
+            rv = execl(AMF_HTTP_SERVER_BIN, "amf_http_server",
+                        "--smf_addr", amf4g_self()->rest_api_addr,
+                        "--smf_port", amf4g_self()->rest_api_port
+                        , NULL);
             d_assert(rv != -1, return, "exec server error: %s", strerror(errno));
         }
     } else if (rv > 0)
     {
         amf4g_self()->server_pid = rv;
     }
+}
+
+static void kill_server_on_signal(int signo)
+{
+    kill(amf4g_self()->server_pid, SIGKILL);
+    exit(EXIT_FAILURE);
 }
 
 status_t amf_sbi_server_open()
@@ -215,13 +219,15 @@ status_t amf_sbi_server_open()
     smContextRetrieveRemoteAddr.sun.sun_family = AF_UNIX;
 
     amf_start_server();
+
+    signal(SIGSEGV, kill_server_on_signal);
+
     return CORE_OK;
 }
 
 status_t amf_sbi_send_sm_context_create(pkbuf_t *pkbuf)
 {
     status_t rv;
-    d_trace(10, "%s %d \n", __FUNCTION__, __LINE__);
     rv = unixgram_sendto(smContextCreateSock, pkbuf, &smContextCreateRemoteAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Create Send Failed!");
     return CORE_OK;
@@ -230,7 +236,6 @@ status_t amf_sbi_send_sm_context_create(pkbuf_t *pkbuf)
 status_t amf_sbi_send_sm_context_update(pkbuf_t *pkbuf)
 {
     status_t rv;
-    d_trace(10, "%s %d \n", __FUNCTION__, __LINE__);
     rv = unixgram_sendto(smContextUpdateSock, pkbuf, &smContextUpdateRemoteAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Update Send Failed!");
     return CORE_OK;
@@ -239,7 +244,6 @@ status_t amf_sbi_send_sm_context_update(pkbuf_t *pkbuf)
 status_t amf_sbi_send_sm_context_release(pkbuf_t *pkbuf)
 {
     status_t rv;
-    d_trace(10, "%s %d \n", __FUNCTION__, __LINE__);
     rv = unixgram_sendto(smContextReleaseSock, pkbuf, &smContextReleaseRemoteAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Release Send Failed!");
     return CORE_OK;
@@ -248,7 +252,6 @@ status_t amf_sbi_send_sm_context_release(pkbuf_t *pkbuf)
 status_t amf_sbi_send_sm_context_retrieve(pkbuf_t *pkbuf)
 {
     status_t rv;
-    d_trace(10, "%s %d \n", __FUNCTION__, __LINE__);
     rv = unixgram_sendto(smContextRetrieveSock, pkbuf, &smContextRetrieveRemoteAddr);
     d_assert(rv == CORE_OK, return CORE_ERROR, "SM Context Retrieve Send Failed!");
     return CORE_OK;

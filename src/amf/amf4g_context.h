@@ -212,7 +212,8 @@ typedef struct _amf_context_t {
 
     c_uint16_t      ngap_port;      /* Default NGAP Port */ 
 
-
+    char            rest_api_addr[100];
+    char            rest_api_port[6];
 
     list_t          s1ap_list;      /* AMF S1AP IPv4 Server List */
     list_t          s1ap_list6;     /* AMF S1AP IPv6 Server List */
