@@ -262,7 +262,7 @@ status_t smf_n4_build_session_establishment_request(
     else if (sess->ipv6)
         pdn_type = PFCP_PDN_TYPE_IPV6;
     else
-        pdn_type = PFCP_PDN_TYPE_NONIP;//$ not support yet
+        pdn_type = PFCP_PDN_TYPE_NONIP; // not support yet
     
     /* Set User Plane Inactivity Timer */
     req->user_plane_inactivity_timer.presence = 0;
@@ -519,9 +519,9 @@ status_t smf_n4_build_create_pdr(
     else
         d_assert(0, return CORE_ERROR, "No IP Pool");
     if (pdr->source_interface == PFCP_SRC_INTF_ACCESS)
-        ue_ip->sd = PFCP_UE_IP_ADDR_SOURCE; //$ for UL
+        ue_ip->sd = PFCP_UE_IP_ADDR_SOURCE; // for UL
     else
-        ue_ip->sd = PFCP_UE_IP_ADDR_DESITINATION; //$ for DL
+        ue_ip->sd = PFCP_UE_IP_ADDR_DESITINATION; // for DL
     
     /* [Create PDR] Outer Header Removal */
     if (pdr->outer_header_removal != PFCP_OUTER_HDR_RMV_DESC_NULL)

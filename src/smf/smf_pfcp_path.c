@@ -24,7 +24,7 @@ static int _smf_pfcp_recv_cb(sock_id sock, void *data)
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
 
     pfcp_h = (pfcp_header_t*)pkbuf->payload;
-    //$ check version 
+    // Check version
     if (pfcp_h->version > PFCP_VERSION)
     {
         unsigned char v_fail[8];

@@ -12,8 +12,6 @@
 #include "upf_pfcp_path.h"
 #include "upf_n4_build.h"
 
-
-
 static int _pfcp_recv_cb(sock_id sock, void *data)
 {    
     event_t e;
@@ -22,7 +20,6 @@ static int _pfcp_recv_cb(sock_id sock, void *data)
     c_sockaddr_t from;
     pfcp_node_t *upf;
     pfcp_header_t *pfcp_h = NULL;
-    
 
     d_assert(sock, return -1, "Null param");
 
@@ -35,10 +32,11 @@ static int _pfcp_recv_cb(sock_id sock, void *data)
         return -1;
     }
 
-    d_assert(from.sin.sin_family == AF_INET, return -1,);//$ IPv4 only now
+    d_assert(from.sin.sin_family == AF_INET, return -1,); // IPv4 only now
     
     pfcp_h = (pfcp_header_t*)pkbuf->payload;
-    //$ check version 
+    
+    // Check version 
     if (pfcp_h->version > PFCP_VERSION)
     {
         unsigned char v_fail[8];
@@ -60,7 +58,7 @@ static int _pfcp_recv_cb(sock_id sock, void *data)
         pfcp_f_seid_t f_seid;
         memset(&f_seid, 0, sizeof(f_seid));
         f_seid.ipv4 = 1;
-        //f_seid.seid = ?
+        // f_seid.seid = ?
         f_seid.addr = from.sin.sin_addr.s_addr; 
         upf = pfcp_add_node_with_seid(&upf_self()->upf_n4_list, &f_seid,
             upf_self()->pfcp_port,
@@ -69,10 +67,10 @@ static int _pfcp_recv_cb(sock_id sock, void *data)
             context_self()->parameter.prefer_ipv4);
         d_assert(upf, return CORE_ERROR,);
             
-        //list_append(&upf_self()->upf_n4_list, upf);//0518 debug
+        // list_append(&upf_self()->upf_n4_list, upf);//0518 debug
             
-        //rv = pfcp_client(upf);
-        //d_assert(rv == CORE_OK, return CORE_ERROR,);   
+        // rv = pfcp_client(upf);
+        // d_assert(rv == CORE_OK, return CORE_ERROR,);   
         upf->sock = upf_self()->pfcp_sock;
     }
 
@@ -101,7 +99,7 @@ static int _pfcp_recv_cb(sock_id sock, void *data)
                 }
                 pkbuf_free(heartbeat_rsp);                
             }
-            //$ finish handling heartbeat here
+            // Finish handling heartbeat here
             pkbuf_free(pkbuf);
             return 0;
         }        
@@ -127,10 +125,6 @@ static int _pfcp_recv_cb(sock_id sock, void *data)
 status_t upf_pfcp_open()
 {
     status_t rv;
-    //upf_dev_t *dev = NULL;
-    //upf_subnet_t *subnet = NULL;
-    //int rc;
-    //pfcp_node_t *upf;
 
     rv = pfcp_server_list(&upf_self()->pfcp_list, _pfcp_recv_cb);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
