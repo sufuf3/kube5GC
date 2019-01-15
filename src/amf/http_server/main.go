@@ -12,6 +12,8 @@ import (
 	"sync"
 	"syscall"
 
+	"golang.org/x/sys/unix"
+
 	"golang.org/x/net/http2"
 )
 
@@ -227,6 +229,11 @@ func main() {
 	go handleSMContextUpdate()
 	go handleSMContextRelease()
 	go handleSMContextRetrieve()
+
+	if err := unix.Prctl(unix.PR_SET_PDEATHSIG, uintptr(unix.SIGKILL), 0, 0, 0); err != nil {
+		log.Fatal("Prctl Fail")
+		return
+	}
 
 	wg.Wait()
 }

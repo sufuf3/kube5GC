@@ -16,6 +16,7 @@ import (
 	"strconv"
 
 	"golang.org/x/net/http2"
+	"golang.org/x/sys/unix"
 )
 
 var (
@@ -39,6 +40,10 @@ func init() {
 }
 
 func main() {
+	if err := unix.Prctl(unix.PR_SET_PDEATHSIG, uintptr(unix.SIGKILL), 0, 0, 0); err != nil {
+		log.Fatal("Prctl Fail")
+		return
+	}
 	var server http.Server
 	server.Addr = ip + ":" + strconv.Itoa(int(port))
 	router := NewRouter()
