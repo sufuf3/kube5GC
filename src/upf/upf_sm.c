@@ -52,6 +52,7 @@ void upf_state_operational(fsm_t *s, event_t *e)
             }
             break;
         }
+
         case FSM_EXIT_SIG:
         {
             rv = upf_gtp_close();
@@ -92,9 +93,10 @@ void upf_state_operational(fsm_t *s, event_t *e)
 
             rv = pfcp_parse_msg(message, recvbuf);
             d_assert(rv == CORE_OK,
-                    pkbuf_free(recvbuf); pkbuf_free(copybuf); break,
-                    "parse error");
-                        
+                    pkbuf_free(recvbuf);
+                    pkbuf_free(copybuf); break,
+                                        "parse error");
+
             if (!message->h.seid_p)
             {
                 rv = pfcp_xact_receive(upf, &message->h, &xact);
@@ -104,17 +106,17 @@ void upf_state_operational(fsm_t *s, event_t *e)
                     pkbuf_free(copybuf);
                     break;
                 }
-                
-                switch(message->h.type)
+
+                switch (message->h.type)
                 {
-                    case PFCP_HEARTBEAT_REQUEST_TYPE:
+                case PFCP_HEARTBEAT_REQUEST_TYPE:
                         upf_n4_handle_heartbeat_request(
                             xact, &message->pfcp_heartbeat_request);
-                        break;        
+                        break;
                     case PFCP_HEARTBEAT_RESPONSE_TYPE:
                         upf_n4_handle_heartbeat_response(
                             xact, &message->pfcp_heartbeat_response);
-                        break; 
+                        break;
                     case PFCP_ASSOCIATION_SETUP_REQUEST_TYPE:
                         upf_n4_handle_association_setup_request(
                             xact, &message->pfcp_association_setup_request);
@@ -127,41 +129,40 @@ void upf_state_operational(fsm_t *s, event_t *e)
                         upf_n4_handle_association_release_request(
                             xact, &message->pfcp_association_release_request);
                         break;
-                    //case PFCP_VERSION_NOT_SUPPORTED_RESPONSE_TYPE:
-                    //    upf_n4_handle_session_establishment_response(
-                    //        xact, &message->pfcp_version_not_supported_response);
-                    //    break;    
+                    // case PFCP_VERSION_NOT_SUPPORTED_RESPONSE_TYPE:
+                    //     upf_n4_handle_session_establishment_response(
+                    //         xact, &message->pfcp_version_not_supported_response);
+                    //     break;
                     default:
                         d_error("Not implemented PFCP message type (%d)", message->h.type);
                         break;
-                }            
+                }
                 pkbuf_free(recvbuf);
                 pkbuf_free(copybuf);
                 break;
             }
-                      
+
             d_assert(message->h.seid_p, pkbuf_free(recvbuf); pkbuf_free(copybuf); break,
-                    "No Session seid");            
+                                                                                "No Session seid");
             if (!message->h.seid)
             {
-                if (message->h.type==PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE)
-                    sess = upf_sess_add_by_message(message);            
+                if (message->h.type == PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE)
+                    sess = upf_sess_add_by_message(message);
                 else
                     d_assert(0, pkbuf_free(recvbuf); pkbuf_free(copybuf); return,
-                        "Session seid 0 but not session establish");
+                                                                                "Session seid 0 but not session establish");
             }
             else
             {
                 sess = upf_sess_find_by_seid(message->h.seid);
-                 d_trace(-1, "upf_sess_smf_seid : %lu, upf_sess_upf_seid: %lu", sess->smf_seid,  sess->upf_seid);
+                d_trace(-1, "upf_sess_smf_seid : %lu, upf_sess_upf_seid: %lu", sess->smf_seid, sess->upf_seid);
             }
-            //sess = upf_sess_find_by_seid(message->h.seid);
-            //if (!sess && message->h.type==PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE)
-            //{
-            //    sess = upf_sess_add_by_message(message);            
-            //}            
-            d_assert(sess, pkbuf_free(recvbuf); pkbuf_free(copybuf); break,
-                    "No Session Context");
+            // sess = upf_sess_find_by_seid(message->h.seid);
+            // if (!sess && message->h.type==PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE)
+            // {
+            //     sess = upf_sess_add_by_message(message);
+            // }
+            d_assert(sess, pkbuf_free(recvbuf); pkbuf_free(copybuf); break, "No Session Context");
             sess->pnode = upf;
 
             rv = pfcp_xact_receive(sess->pnode, &message->h, &xact);
@@ -172,7 +173,7 @@ void upf_state_operational(fsm_t *s, event_t *e)
                 break;
             }
 
-            switch(message->h.type)
+            switch (message->h.type)
             {
                 case PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE:
                     upf_n4_handle_session_establishment_request(
@@ -185,14 +186,20 @@ void upf_state_operational(fsm_t *s, event_t *e)
                 case PFCP_SESSION_DELETION_REQUEST_TYPE:
                     upf_n4_handle_session_deletion_request(
                         sess, xact, &message->pfcp_session_deletion_request);
-                    break;                                
+                    break;
+                case PFCP_SESSION_REPORT_RESPONSE_TYPE:
+                    upf_n4_handle_session_report_response(
+                        sess, xact, &message->pfcp_session_report_response);
+                    break;
                 default:
                     break;
             }
+            
             pkbuf_free(recvbuf);
-            pkbuf_free(copybuf); 
+            pkbuf_free(copybuf);
             break;
         }
+
         case UPF_EVT_N4_T3_RESPONSE:
         case UPF_EVT_N4_T3_HOLDING:
         {
@@ -200,7 +207,7 @@ void upf_state_operational(fsm_t *s, event_t *e)
             pfcp_xact_timeout(event_get_param1(e), event_get(e), &type);
             break;
         }
-        
+
         default:
         {
             d_error("No handler for event %s", upf_event_get_name(e));

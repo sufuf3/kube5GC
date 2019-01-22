@@ -1,9 +1,9 @@
-### For reference, see `open5gc.conf`
+### For reference, see `nctu5gc.conf`
 
-db_uri: mongodb://localhost/open5gc
+db_uri: mongodb://localhost/nctu5gc
 
 logger:
-    file: @LOCALSTATE_DIR@/log/open5gc/hss.log
+    file: @LOCALSTATE_DIR@/log/nctu5gc/hss.log
     trace: 
         app: 1
         diameter: 1

@@ -26,9 +26,13 @@ CORE_DECLARE(status_t) smf_n4_build_association_release_response(
 
 CORE_DECLARE(status_t) smf_n4_build_session_establishment_request(
         pkbuf_t **pkbuf, smf_sess_t *sess);
-CORE_DECLARE(status_t) smf_n4_build_session_modification_request(
+CORE_DECLARE(status_t) smf_n4_build_session_modification_request_for_setup_downlink(
+        pkbuf_t **pkbuf, smf_sess_t *sess);
+CORE_DECLARE(status_t) smf_n4_build_session_modification_request_for_an_release(
         pkbuf_t **pkbuf, smf_sess_t *sess);
 CORE_DECLARE(status_t) smf_n4_build_session_deletion_request(
+        pkbuf_t **pkbuf, smf_sess_t *sess);
+CORE_DECLARE(status_t) smf_n4_build_session_report_response(
         pkbuf_t **pkbuf, smf_sess_t *sess);
 
 CORE_DECLARE(status_t) smf_n4_build_create_pdr(

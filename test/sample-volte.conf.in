@@ -1,4 +1,4 @@
-db_uri: mongodb://localhost/open5gc
+db_uri: mongodb://localhost/nctu5gc
 
 logger:
     trace: 
@@ -6,14 +6,15 @@ logger:
         s1ap: 1
         nas: 1
         diameter: 1
-        gtpv2: 1
         gtp: 1
+        pfcp: 1
+        sbi: 1
 
 parameter:
 
-mme:
+amf:
     freeDiameter:
-      identity: mme.open-ims.test
+      identity: amf.open-ims.test
       realm: open-ims.test
       no_sctp: true
 #      port: 3868
@@ -35,7 +36,6 @@ mme:
 #          port: 3868
 
     s1ap:
-    gtpc:
     gummei: 
       plmn_id:
         mcc: 001
@@ -50,6 +50,8 @@ mme:
     security:
         integrity_order : [ EIA1, EIA2, EIA0 ]
         ciphering_order : [ EEA0, EEA1, EEA2 ]
+    network_name:
+        full: NCTU5GC
 
 hss:
     freeDiameter:
@@ -70,18 +72,13 @@ hss:
         - module: @abs_top_builddir@/lib/@FREEDIAMETER_DIR@/extensions/dict_dcca_3gpp/.libs/dict_dcca_3gpp.so
         - module: @abs_top_builddir@/lib/@FREEDIAMETER_DIR@/extensions/dict_s6a/.libs/dict_s6a.so
       connect:
-        - identity: mme.open-ims.test
+        - identity: amf.open-ims.test
           addr: 127.0.0.2
 #          port: 3868
 
-sgw:
-    gtpc:
-      addr: 127.0.0.2
-    gtpu:
-
-pgw:
+smf:
     freeDiameter:
-      identity: pgw.open-ims.test
+      identity: smf.open-ims.test
       realm: open-ims.test
       no_sctp: true
 #      port: 3868
@@ -101,21 +98,43 @@ pgw:
           addr: 127.0.0.5
 #          port: 3868
 
-    gtpc:
-      addr:
-        - 127.0.0.3
+    pfcp:
+        - 127.0.0.2
         - ::1
-    gtpu:
+
+    upf:
       - addr: 127.0.0.3
-      - addr: ::1
+
     ue_pool:
       - addr: 45.45.0.1/16
       - addr: cafe::1/64
+    
     dns:
       - 8.8.8.8
       - 8.8.4.4
       - 2001:4860:4860::8888
       - 2001:4860:4860::8844
+upf:
+    pfcp:
+      addr:
+        - 127.0.0.3
+        - ::1
+
+    gtpu:
+      - addr: 127.0.0.3
+      - addr: ::1
+
+    ue_pool:
+      - addr: 45.45.0.1/16
+      - addr: cafe::1/64
+
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 2001:4860:4860::8888
+      - 2001:4860:4860::8844
+
+
 #
 #  <P-CSCF>
 #
@@ -144,7 +163,7 @@ pcrf:
         - module: @abs_top_builddir@/lib/@FREEDIAMETER_DIR@/extensions/dict_dcca/.libs/dict_dcca.so
         - module: @abs_top_builddir@/lib/@FREEDIAMETER_DIR@/extensions/dict_dcca_3gpp/.libs/dict_dcca_3gpp.so
       connect:
-        - identity: pgw.open-ims.test
+        - identity: smf.open-ims.test
           addr: 127.0.0.3
         - identity: pcscf.open-ims.test
           addr: 127.0.0.1

@@ -7,7 +7,7 @@ keyfiles = \
 	$(NULL)
 
 
-freeDiameterdir = ${sysconfdir}/open5gc/https
+freeDiameterdir = ${sysconfdir}/nctu5gc/https
 
 freeDiameter_DATA = ${certfiles} ${keyfiles}
 

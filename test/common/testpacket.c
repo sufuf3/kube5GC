@@ -36,10 +36,8 @@ static c_sockaddr_t *test_enb2_addr6 = NULL;
 
 static list_t s1ap_list;
 static list_t s1ap_list6;
-/*****************add by HU*************/
 static list_t ngap_list;
 static list_t ngap_list6;
-/***************************************/
 
 status_t testpacket_init()
 {
@@ -67,13 +65,11 @@ status_t testpacket_init()
     rv = sock_probe_node(&s1ap_list, &s1ap_list6, NULL, 36412);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
 
-    /*****************add by HU*************/
     list_init(&ngap_list);
     list_init(&ngap_list6);
 
     rv = sock_probe_node(&ngap_list, &ngap_list6, NULL, 38412);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
-    /***************************************/
 
 
     return CORE_OK;
@@ -101,10 +97,8 @@ status_t testpacket_final()
 
     sock_remove_all_nodes(&s1ap_list);
     sock_remove_all_nodes(&s1ap_list6);
-    /*****************add by HU*************/
     sock_remove_all_nodes(&ngap_list);
     sock_remove_all_nodes(&ngap_list6);
-    /***************************************/
 
     return CORE_OK;
 }
@@ -1511,7 +1505,6 @@ status_t tests1ap_build_e_rab_modification_indication(pkbuf_t **pkbuf, c_uint32_
     ie->value.present = S1AP_E_RABModificationIndicationIEs__value_PR_ENB_UE_S1AP_ID;
 
     ENB_UE_S1AP_ID = &ie->value.choice.ENB_UE_S1AP_ID;
-///////////////////////////////////////////////////////////////////////////////////////////
     /*ie = core_calloc(1, sizeof(S1AP_E_RABModificationIndicationIEs_t));
     ASN_SEQUENCE_ADD(&E_RABModificationIndication->protocolIEs, ie);
 
@@ -2642,22 +2635,22 @@ status_t testgtpu_enb_send(pkbuf_t *sendbuf)
 
     memset(&sgw, 0, sizeof(c_sockaddr_t));
     sgw.c_sa_port = htons(GTPV1_U_UDP_PORT);
-    if (bearer->sgw_s1u_ip.ipv6)
+    if (bearer->upf_s1u_ip.ipv6)
     {
         sgw.c_sa_family = AF_INET6;
-        if (bearer->sgw_s1u_ip.ipv4)
+        if (bearer->upf_s1u_ip.ipv4)
             memcpy(sgw.sin6.sin6_addr.s6_addr,
-                    bearer->sgw_s1u_ip.both.addr6, IPV6_LEN);
+                    bearer->upf_s1u_ip.both.addr6, IPV6_LEN);
         else
             memcpy(sgw.sin6.sin6_addr.s6_addr,
-                    bearer->sgw_s1u_ip.addr6, IPV6_LEN);
+                    bearer->upf_s1u_ip.addr6, IPV6_LEN);
         rv = sock_fill_scope_id_in_local(&sgw);
         d_assert(rv == CORE_OK, return CORE_ERROR,);
     }
     else
     {
         sgw.c_sa_family = AF_INET;
-        sgw.sin.sin_addr.s_addr = bearer->sgw_s1u_ip.addr;
+        sgw.sin.sin_addr.s_addr = bearer->upf_s1u_ip.addr;
     }
 
     rv = udp_client(&sock, &sgw);
@@ -3442,7 +3435,6 @@ status_t tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf)
     return CORE_OK;
 }
 
-/******************** Added by Chi ********************/
 status_t tests1ap_build_enb_direct_information_transfer(
     pkbuf_t **s1apbuf)
 {
@@ -3494,7 +3486,6 @@ status_t tests1ap_build_enb_direct_information_transfer(
 
     return CORE_OK;
 }
-/******************************************************/
 
 status_t testngap_ran_connect(sock_id *new)
 {

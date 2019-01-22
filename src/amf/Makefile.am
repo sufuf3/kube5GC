@@ -15,7 +15,7 @@ libamf_la_SOURCES = \
 	emm_handler.h emm_build.h \
 	esm_handler.h esm_build.h \
 	amf_json_build.h amf_json_handler.h\
-	amf4g_gtp_path.h amf4g_s11_build.h amf4g_s11_handler.h \
+	amf_n11_path.h \
 	amf4g_sm.h amf4g_path.h \
 	amf4g_kdf.c kasumi.c snow_3g.c zuc.c \
 	amf4g_init.c amf4g_event.c amf4g_context.c \
@@ -27,10 +27,11 @@ libamf_la_SOURCES = \
 	emm_sm.c emm_handler.c emm_build.c \
 	esm_sm.c esm_handler.c esm_build.c \
 	amf_json_build.c amf_json_handler.c\
-	amf4g_gtp_path.c amf4g_s11_build.c amf4g_s11_handler.c \
+	amf_n11_path.c \
 	amf4g_sm.c amf4g_path.c \
 	amf_sbi_path.h amf_sbi_path.c \
 	JsonTransform.h \
+	amf_n11_handler.c amf_n11_handler.h \
 	$(NULL)
 
 if USRSCTP
@@ -44,7 +45,7 @@ libamf_la_DEPENDENCIES = \
 	$(top_srcdir)/lib/nextepc/s1ap/libs1ap.la \
 	$(top_srcdir)/lib/ngap/libngap.la \
 	$(top_srcdir)/lib/nextepc/nas/libnas.la \
-	$(top_srcdir)/lib/nextepc/fd/libfd.la \
+$(top_srcdir)/lib/nextepc/fd/libfd.la \
 	$(top_srcdir)/lib/nextepc/gtp/libgtp.la \
 	$(top_srcdir)/lib/cJSON/libcJSON.la \
 	$(top_srcdir)/lib/sbiJson/libsbiJson.la \
@@ -78,6 +79,12 @@ AM_CPPFLAGS = \
 AM_CFLAGS = \
 	-Wall -Werror \
 	$(NULL)
+
+DEFS = \
+   	@DEFS@ \
+   	-DSYSCONF_DIR=\"$(sysconfdir)/\" \
+	-DPREFIX=\"$(prefix)/\"
+   	$(NULL)
 
 MAINTAINERCLEANFILES = Makefile.in
 MOSTLYCLEANFILES = core *.stackdump

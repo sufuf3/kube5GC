@@ -1,9 +1,7 @@
 #ifndef __AMF4G_CONTEXT__
 #define __AMF4G_CONTEXT__
 
-/******************** Added by Chi ********************/
 #include <stdbool.h>
-/******************************************************/
 
 #include "core_list.h"
 #include "core_index.h"
@@ -48,7 +46,6 @@ extern "C" {
 
 #define MAX_OF_SLICE                1024
 
-/******************** Added by Chi ********************/
 #define OVERLOAD_THRESHOLD          0.8    /* Threshold for triggering overload_start/stop */
 
 /**
@@ -60,7 +57,6 @@ extern "C" {
  * Ref: TS23.401 Ch4.3.7.4.1
  */
 #define OVERLOAD_NOTIFY_ENB_RATIO   0.7
-/******************************************************/
 
 typedef struct _enb_ue_t enb_ue_t;
 typedef struct _amf4g_ue_t amf4g_ue_t;
@@ -130,29 +126,14 @@ typedef struct _supported_ta_t{
 
 
 typedef struct _amf4g_context_t {
-    const char      *fd_conf_path;  /* MME freeDiameter conf path */
-    fd_config_t     *fd_config;     /* MME freeDiameter config */
+    const char      *fd_conf_path;  /* AMF freeDiameter conf path */
+    fd_config_t     *fd_config;     /* AMF freeDiameter config */
 
     c_uint16_t      s1ap_port;      /* Default S1AP Port */
-    c_uint16_t      gtpc_port;      /* Default GTPC Port */
 
-    list_t          s1ap_list;      /* MME S1AP IPv4 Server List */
-    list_t          s1ap_list6;     /* MME S1AP IPv6 Server List */
-
-    list_t          gtpc_list;      /* MME GTPC IPv4 Server List */
-    list_t          gtpc_list6;     /* MME GTPC IPv6 Server List */
-    sock_id         gtpc_sock;      /* MME GTPC IPv4 Socket */
-    sock_id         gtpc_sock6;     /* MME GTPC IPv6 Socket */
-    c_sockaddr_t    *gtpc_addr;     /* MME GTPC IPv4 Address */
-    c_sockaddr_t    *gtpc_addr6;    /* MME GTPC IPv6 Address */
-
-    list_t          sgw_list;       /* SGW GTPC Client List */
-    gtp_node_t      *sgw;           /* Iterator for SGW round-robin */
-
-    list_t          pgw_list;       /* PGW GTPC Client List */
-    c_sockaddr_t    *pgw_addr;      /* First IPv4 Address Selected */
-    c_sockaddr_t    *pgw_addr6;     /* First IPv6 Address Selected */
-
+    list_t          s1ap_list;      /* AMF S1AP IPv4 Server List */
+    list_t          s1ap_list6;     /* AMF S1AP IPv6 Server List */
+    
     /* Served GUMME */
     c_uint8_t       max_num_of_served_gummei;
     served_gummei_t served_gummei[MAX_NUM_OF_SERVED_GUMMEI];
@@ -182,10 +163,8 @@ typedef struct _amf4g_context_t {
     /* S1SetupResponse */
     c_uint8_t       relative_capacity;
 
-    /******************** Added by Chi ********************/
     /* Timer */
     tm_block_id     overloading_checking_timer; /* For firing MME_EVT_CHECK_OVERLOAD event periodically */
-    /******************************************************/
 
     /* Timer value */
     c_uint32_t      t3413_value;            /* Paging retry timer value */
@@ -218,49 +197,29 @@ typedef struct _amf4g_context_t {
     nas_network_name_t short_name; /* Network short name */
     nas_network_name_t full_name; /* Network Full Name */
 
-    /******************** Added by Chi ********************/
     /* Status */
     bool overload_started;
-    /******************************************************/
     
 } amf4g_context_t;
 
 
-/****************************add by AMF team***********************************/
 
 typedef struct _amf_context_t {
-    const char      *fd_conf_path;  /* MME freeDiameter conf path */
-    fd_config_t     *fd_config;     /* MME freeDiameter config */
+    const char      *fd_conf_path;  /* AMF freeDiameter conf path */
+    fd_config_t     *fd_config;     /* AMF freeDiameter config */
 
     c_uint16_t      s1ap_port;      /* Default S1AP Port */
 
-    /***********************add by Hu********************************/
     c_uint16_t      ngap_port;      /* Default NGAP Port */ 
-    /****************************************************************/
 
-    c_uint16_t      gtpc_port;      /* Default GTPC Port */
+    char            rest_api_addr[100];
+    char            rest_api_port[6];
 
-    list_t          s1ap_list;      /* MME S1AP IPv4 Server List */
-    list_t          s1ap_list6;     /* MME S1AP IPv6 Server List */
+    list_t          s1ap_list;      /* AMF S1AP IPv4 Server List */
+    list_t          s1ap_list6;     /* AMF S1AP IPv6 Server List */
 
-    /***********************add by Hu********************************/
-    list_t          ngap_list;      /* MME NGAP IPv4 Server List */
-    list_t          ngap_list6;     /* MME NGAP IPv6 Server List */
-    /****************************************************************/
-
-    list_t          gtpc_list;      /* MME GTPC IPv4 Server List */
-    list_t          gtpc_list6;     /* MME GTPC IPv6 Server List */
-    sock_id         gtpc_sock;      /* MME GTPC IPv4 Socket */
-    sock_id         gtpc_sock6;     /* MME GTPC IPv6 Socket */
-    c_sockaddr_t    *gtpc_addr;     /* MME GTPC IPv4 Address */
-    c_sockaddr_t    *gtpc_addr6;    /* MME GTPC IPv6 Address */
-
-    list_t          sgw_list;       /* SGW GTPC Client List */
-    gtp_node_t      *sgw;           /* Iterator for SGW round-robin */
-
-    list_t          pgw_list;       /* PGW GTPC Client List */
-    c_sockaddr_t    *pgw_addr;      /* First IPv4 Address Selected */
-    c_sockaddr_t    *pgw_addr6;     /* First IPv6 Address Selected */
+    list_t          ngap_list;      /* AMF NGAP IPv4 Server List */
+    list_t          ngap_list6;     /* AMF NGAP IPv6 Server List */
 
     pid_t           server_pid;
 
@@ -306,10 +265,8 @@ typedef struct _amf_context_t {
     /* S1SetupResponse */
     c_uint8_t       relative_capacity;
 
-    /******************** Added by Chi ********************/
     /* Timer */
     tm_block_id     overloading_checking_timer; /* For firing MME_EVT_CHECK_OVERLOAD event periodically */
-    /******************************************************/
 
     /* Timer value */
     c_uint32_t      t3413_value;            /* Paging retry timer value */
@@ -319,9 +276,7 @@ typedef struct _amf_context_t {
     /* Generator for unique identification */
     c_uint32_t      mme_ue_s1ap_id;         /* mme_ue_s1ap_id generator */
 
-    /***********************add by Hu********************************/
     c_uint32_t      amf_ue_ngap_id;         /* amf_ue_ngap_id generator */
-    /****************************************************************/
 
     c_uint16_t      ostream_id;             /* ostream_id generator */
 
@@ -338,12 +293,10 @@ typedef struct _amf_context_t {
     hash_t          *enb_id_hash;           /* hash table for ENB-ID */
     hash_t          *mme_ue_s1ap_id_hash;   /* hash table for MME-UE-S1AP-ID */
 
-    /***********************add by Hu********************************/
     hash_t          *ran_sock_hash;         /* hash table for RAN Socket */
     hash_t          *ran_addr_hash;         /* hash table for RAN Address */
     hash_t          *ran_id_hash;           /* hash table for RAN-ID */
     hash_t          *amf_ue_ngap_id_hash;   /* hash table for AMF-UE-NGAP-ID */
-    /****************************************************************/
 
     hash_t          *imsi_ue_hash;          /* hash table (IMSI : MME_UE) */
     hash_t          *guti_ue_hash;          /* hash table (GUTI : MME_UE) */
@@ -356,10 +309,8 @@ typedef struct _amf_context_t {
     nas_network_name_t short_name; /* Network short name */
     nas_network_name_t full_name; /* Network Full Name */
 
-    /******************** Added by Chi ********************/
     /* Status */
     bool overload_started;
-    /******************************************************/
 
 } amf_context_t;
 
@@ -516,7 +467,6 @@ struct _amf_ue_t {
 
 };
 
-/************************************************************************/
 
 typedef struct _amf4g_enb_t {
     index_t         index;  /* An index of this node */
@@ -613,8 +563,8 @@ struct _amf4g_ue_t {
     } nas_eps;
 
     /* UE identity */
-#define AMF4G_UE_HAVE_IMSI(__mME) \
-    ((__mME) && ((__mME)->imsi_len))
+#define AMF4G_UE_HAVE_IMSI(__aMF4g) \
+    ((__aMF4g) && ((__aMF4g)->imsi_len))
     c_uint8_t       imsi[MAX_IMSI_LEN];
     int             imsi_len;
     c_int8_t        imsi_bcd[MAX_IMSI_BCD_LEN+1];
@@ -624,7 +574,7 @@ struct _amf4g_ue_t {
     int             guti_present;
 
     c_uint32_t      amf4g_s11_teid;   /* MME-S11-TEID is derived from INDEX */
-    c_uint32_t      sgw_s11_teid;   /* SGW-S11-TEID is received from SGW */
+    c_uint32_t      smf_s11_teid;
 
     c_uint16_t      ostream_id;     /* SCTP output stream identification */
 
@@ -633,17 +583,17 @@ struct _amf4g_ue_t {
     e_cgi_t         e_cgi;
     plmn_id_t       visited_plmn_id;
 
-#define SECURITY_CONTEXT_IS_VALID(__mME) \
-    ((__mME) && \
-    ((__mME)->security_context_available == 1) && \
-     ((__mME)->mac_failed == 0) && \
-     ((__mME)->nas_eps.ksi != NAS_KSI_NO_KEY_IS_AVAILABLE))
-#define CLEAR_SECURITY_CONTEXT(__mME) \
+#define SECURITY_CONTEXT_IS_VALID(__aMF4g) \
+    ((__aMF4g) && \
+    ((__aMF4g)->security_context_available == 1) && \
+     ((__aMF4g)->mac_failed == 0) && \
+     ((__aMF4g)->nas_eps.ksi != NAS_KSI_NO_KEY_IS_AVAILABLE))
+#define CLEAR_SECURITY_CONTEXT(__aMF4g) \
     do { \
-        d_assert((__mME), break, "Null param"); \
-        (__mME)->security_context_available = 0; \
-        (__mME)->mac_failed = 0; \
-        (__mME)->nas_eps.ksi = 0; \
+        d_assert((__aMF4g), break, "Null param"); \
+        (__aMF4g)->security_context_available = 0; \
+        (__aMF4g)->mac_failed = 0; \
+        (__aMF4g)->nas_eps.ksi = 0; \
     } while(0)
     int             security_context_available;
     int             mac_failed;
@@ -694,18 +644,18 @@ struct _amf4g_ue_t {
 #define MIN_EPS_BEARER_ID           5
 #define MAX_EPS_BEARER_ID           15
 
-#define CLEAR_EPS_BEARER_ID(__mME) \
+#define CLEAR_EPS_BEARER_ID(__aMF4g) \
     do { \
-        d_assert((__mME), break, "Null param"); \
-        (__mME)->ebi = MIN_EPS_BEARER_ID - 1; \
+        d_assert((__aMF4g), break, "Null param"); \
+        (__aMF4g)->ebi = MIN_EPS_BEARER_ID - 1; \
     } while(0)
     c_uint8_t       ebi; /* EPS Bearer ID generator */
     list_t          sess_list;
 
-#define ECM_CONNECTED(__mME) \
-    ((__mME) && ((__mME)->enb_ue != NULL) && \
-     enb_ue_find((__mME)->enb_ue->index))
-#define ECM_IDLE(__mME) (!ECM_CONNECTED(__mME))
+#define ECM_CONNECTED(__aMF4g) \
+    ((__aMF4g) && ((__aMF4g)->enb_ue != NULL) && \
+     enb_ue_find((__aMF4g)->enb_ue->index))
+#define ECM_IDLE(__aMF4g) (!ECM_CONNECTED(__aMF4g))
     /* S1 UE context */
     enb_ue_t        *enb_ue;
 
@@ -713,17 +663,17 @@ struct _amf4g_ue_t {
     nas_esm_message_container_t pdn_connectivity_request;
 
     /* Paging */
-#define CLEAR_PAGING_INFO(__mME) \
+#define CLEAR_PAGING_INFO(__aMF4g) \
     do { \
-        d_assert((__mME), break, "Null param"); \
+        d_assert((__aMF4g), break, "Null param"); \
         \
-        tm_stop((__mME)->t3413); \
-        if ((__mME)->last_paging_msg) \
+        tm_stop((__aMF4g)->t3413); \
+        if ((__aMF4g)->last_paging_msg) \
         { \
-            pkbuf_free((__mME)->last_paging_msg); \
-            (__mME)->last_paging_msg = NULL; \
+            pkbuf_free((__aMF4g)->last_paging_msg); \
+            (__aMF4g)->last_paging_msg = NULL; \
         } \
-        (__mME)->max_paging_retry = 0; \
+        (__aMF4g)->max_paging_retry = 0; \
     } while(0);
     pkbuf_t         *last_paging_msg;
     tm_block_id     t3413;
@@ -741,22 +691,22 @@ struct _amf4g_ue_t {
     OCTET_STRING_t container;
 
     /* GTP Request/Response Counter */
-#define GTP_COUNTER_INCREMENT(__mME, __tYPE) \
+#define GTP_COUNTER_INCREMENT(__aMF4g, __tYPE) \
         do { \
-            d_assert((__mME), break,); \
-            ((__mME)->gtp_counter[__tYPE].request)++; \
+            d_assert((__aMF4g), break,); \
+            ((__aMF4g)->gtp_counter[__tYPE].request)++; \
         } while(0);
 
-#define GTP_COUNTER_CHECK(__mME, __tYPE, __eXPR) \
+#define GTP_COUNTER_CHECK(__aMF4g, __tYPE, __eXPR) \
         do { \
-            d_assert((__mME), break,); \
-            if ((__mME)->gtp_counter[__tYPE].request == 0) break; \
-            ((__mME)->gtp_counter[__tYPE].response)++; \
-            if (((__mME)->gtp_counter[__tYPE].request) == \
-                ((__mME)->gtp_counter[__tYPE].response)) \
+            d_assert((__aMF4g), break,); \
+            if ((__aMF4g)->gtp_counter[__tYPE].request == 0) break; \
+            ((__aMF4g)->gtp_counter[__tYPE].response)++; \
+            if (((__aMF4g)->gtp_counter[__tYPE].request) == \
+                ((__aMF4g)->gtp_counter[__tYPE].response)) \
             { \
-                ((__mME)->gtp_counter[__tYPE].request) = 0; \
-                ((__mME)->gtp_counter[__tYPE].response) = 0; \
+                ((__aMF4g)->gtp_counter[__tYPE].request) = 0; \
+                ((__aMF4g)->gtp_counter[__tYPE].response) = 0; \
                 __eXPR \
             } \
         } while(0);
@@ -778,25 +728,25 @@ struct _amf4g_ue_t {
     ue_application_layer_measurement_capability_t ue_application_layer_measurement_capability;
 };
 
-#define AMF4G_HAVE_SGW_S1U_PATH(__sESS) \
+#define AMF4G_HAVE_UPF_S1U_PATH(__sESS) \
     ((__sESS) && (amf4g_bearer_first(__sESS)) && \
-    ((amf4g_default_bearer_in_sess(__sESS)->sgw_s1u_teid)))
+    ((amf4g_default_bearer_in_sess(__sESS)->upf_s1u_teid)))
 
-#define CLEAR_SGW_S1U_PATH(__sESS) \
+#define CLEAR_UPF_S1U_PATH(__sESS) \
     do { \
         amf4g_bearer_t *__bEARER = NULL; \
         d_assert((__sESS), break, "Null param"); \
         __bEARER = amf4g_default_bearer_in_sess(__sESS); \
-        __bEARER->sgw_s1u_teid = 0; \
+        __bEARER->upf_s1u_teid = 0; \
     } while(0)
 
-#define SESSION_CONTEXT_IS_AVAILABLE(__mME) \
-     ((__mME) && ((__mME)->sgw_s11_teid))
+#define SESSION_CONTEXT_IS_AVAILABLE(__aMF4g) \
+     ((__aMF4g) && ((__aMF4g)->smf_s11_teid))
 
-#define CLEAR_SESSION_CONTEXT(__mME) \
+#define CLEAR_SESSION_CONTEXT(__aMF4g) \
     do { \
-        d_assert((__mME), break, "Null param"); \
-        (__mME)->sgw_s11_teid = 0; \
+        d_assert((__aMF4g), break, "Null param"); \
+        (__aMF4g)->smf_s11_teid = 0; \
     } while(0)
 
 typedef struct _amf4g_sess_t {
@@ -814,9 +764,9 @@ typedef struct _amf4g_sess_t {
     /* Related Context */
     amf4g_ue_t        *amf4g_ue;
 
-#define AMF4G_UE_HAVE_APN(__mME) \
-    ((__mME) && (amf4g_sess_first(__mME)) && \
-    ((amf4g_sess_first(__mME))->pdn))
+#define AMF4G_UE_HAVE_APN(__aMF4g) \
+    ((__aMF4g) && (amf4g_sess_first(__aMF4g)) && \
+    ((amf4g_sess_first(__aMF4g))->pdn))
     pdn_t           *pdn;
 
     /* Save Protocol Configuration Options from UE */
@@ -829,10 +779,10 @@ typedef struct _amf4g_sess_t {
     tlv_octet_t     pgw_pco;
 } amf4g_sess_t;
 
-#define BEARER_CONTEXT_IS_ACTIVE(__mME)  \
-    (amf4g_bearer_is_inactive(__mME) == 0)
-#define CLEAR_BEARER_CONTEXT(__mME)   \
-    amf4g_bearer_set_inactive(__mME)
+#define BEARER_CONTEXT_IS_ACTIVE(__aMF4g)  \
+    (amf4g_bearer_is_inactive(__aMF4g) == 0)
+#define CLEAR_BEARER_CONTEXT(__aMF4g)   \
+    amf4g_bearer_set_inactive(__aMF4g)
 
 #define AMF4G_HAVE_ENB_S1U_PATH(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_s1u_teid))
@@ -846,17 +796,17 @@ typedef struct _amf4g_sess_t {
     ((__bEARER) && ((__bEARER)->enb_dl_teid))
 #define AMF4G_HAVE_ENB_UL_INDIRECT_TUNNEL(__bEARER) \
     ((__bEARER) && ((__bEARER)->enb_ul_teid))
-#define AMF4G_HAVE_SGW_DL_INDIRECT_TUNNEL(__bEARER) \
-    ((__bEARER) && ((__bEARER)->sgw_dl_teid))
-#define AMF4G_HAVE_SGW_UL_INDIRECT_TUNNEL(__bEARER) \
-    ((__bEARER) && ((__bEARER)->sgw_ul_teid))
+#define AMF4G_HAVE_UPF_DL_INDIRECT_TUNNEL(__bEARER) \
+    ((__bEARER) && ((__bEARER)->upf_dl_teid))
+#define AMF4G_HAVE_UPF_UL_INDIRECT_TUNNEL(__bEARER) \
+    ((__bEARER) && ((__bEARER)->upf_ul_teid))
 #define CLEAR_INDIRECT_TUNNEL(__bEARER) \
     do { \
         d_assert((__bEARER), break, "Null param"); \
         (__bEARER)->enb_dl_teid = 0; \
         (__bEARER)->enb_ul_teid = 0; \
-        (__bEARER)->sgw_dl_teid = 0; \
-        (__bEARER)->sgw_ul_teid = 0; \
+        (__bEARER)->upf_dl_teid = 0; \
+        (__bEARER)->upf_ul_teid = 0; \
     } while(0)
 typedef struct _amf4g_bearer_t {
     lnode_t         node;           /* A node of list_t */
@@ -867,8 +817,8 @@ typedef struct _amf4g_bearer_t {
 
     c_uint32_t      enb_s1u_teid;
     ip_t            enb_s1u_ip;
-    c_uint32_t      sgw_s1u_teid;
-    ip_t            sgw_s1u_ip;
+    c_uint32_t      upf_s1u_teid;
+    ip_t            upf_s1u_ip;
 
     c_uint32_t      target_s1u_teid;    /* Target S1U TEID from HO-Req-Ack */
     ip_t            target_s1u_ip;      /* Target S1U ADDR from HO-Req-Ack */
@@ -878,10 +828,10 @@ typedef struct _amf4g_bearer_t {
     c_uint32_t      enb_ul_teid;
     ip_t            enb_ul_ip;
 
-    c_uint32_t      sgw_dl_teid;
-    ip_t            sgw_dl_ip;
-    c_uint32_t      sgw_ul_teid;
-    ip_t            sgw_ul_ip;
+    c_uint32_t      upf_dl_teid;
+    ip_t            upf_dl_ip;
+    c_uint32_t      upf_ul_teid;
+    ip_t            upf_ul_ip;
 
     qos_t           qos;
     tlv_octet_t     tft;   /* Saved TFT */
@@ -928,7 +878,6 @@ CORE_DECLARE(enb_ue_t*)     enb_ue_find_by_mme_ue_s1ap_id(
 CORE_DECLARE(enb_ue_t*)     enb_ue_first_in_enb(amf4g_enb_t *enb);
 CORE_DECLARE(enb_ue_t*)     enb_ue_next_in_enb(enb_ue_t *enb_ue);
 
-/*************************add by HU***************************/
 CORE_DECLARE(amf_ran_t*)    amf_ran_add(sock_id sock, c_sockaddr_t *addr);
 CORE_DECLARE(status_t)      amf_ran_remove(amf_ran_t *ran);
 CORE_DECLARE(status_t)      amf_ran_remove_all(void);
@@ -960,7 +909,6 @@ CORE_DECLARE(ran_ue_t*)     ran_ue_find_by_amf_ue_ngap_id(
                                 c_uint32_t amf_ue_ngap_id);
 CORE_DECLARE(ran_ue_t*)     ran_ue_first_in_ran(amf_ran_t *ran);
 CORE_DECLARE(ran_ue_t*)     ran_ue_next_in_ran(ran_ue_t *ran_ue);
-/*************************************************************/
 
 CORE_DECLARE(amf4g_ue_t*)     amf4g_ue_add(enb_ue_t *enb_ue);
 CORE_DECLARE(status_t)      amf4g_ue_remove(amf4g_ue_t *amf4g_ue);
@@ -1029,9 +977,7 @@ CORE_DECLARE(status_t)      amf4g_ue_clear_indirect_tunnel(amf4g_ue_t *amf4g_ue)
  */
 CORE_DECLARE(status_t)      amf4g_ue_associate_enb_ue(
                                 amf4g_ue_t *amf4g_ue, enb_ue_t *enb_ue);
-/*************************add by HU***************************/
 CORE_DECLARE(status_t)      ran_ue_deassociate(ran_ue_t *ran_ue);
-/*************************************************************/
 
 CORE_DECLARE(status_t)      enb_ue_deassociate(enb_ue_t *enb_ue);
 CORE_DECLARE(status_t)      amf4g_ue_deassociate(amf4g_ue_t *amf4g_ue);
@@ -1088,17 +1034,13 @@ CORE_DECLARE(status_t)     amf4g_m_tmsi_pool_generate();
 CORE_DECLARE(amf4g_m_tmsi_t *) amf4g_m_tmsi_alloc();
 CORE_DECLARE(status_t)      amf4g_m_tmsi_free(amf4g_m_tmsi_t *tmsi);
 
-/******************** Added by Chi ********************/
 CORE_DECLARE(status_t)      amf4g_overload_checking_init(void);
-/******************************************************/
 
-/******************** Added by Dobie ********************/
 CORE_DECLARE(status_t)      amf_ue_deassociate(amf_ue_t *amf_ue);
 CORE_DECLARE(status_t)      amf_ue_remove(amf_ue_t *amf_ue);
 CORE_DECLARE(status_t)      source_ue_deassociate_target_ue_5g(ran_ue_t *ran_ue);
 CORE_DECLARE(status_t)      source_ue_associate_target_5g(ran_ue_t *source_ue, ran_ue_t *target_ue);
 CORE_DECLARE(status_t)      amf_ue_associate_ran_ue(amf_ue_t *amf_ue, ran_ue_t *ran_ue);
-/******************************************************/
 
 #ifdef __cplusplus
 }

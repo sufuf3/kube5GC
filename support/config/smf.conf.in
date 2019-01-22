@@ -1,7 +1,7 @@
-### For reference, see `open5gc.conf`
+### For reference, see `nctu5gc.conf`
 
 logger:
-    file: @LOCALSTATE_DIR@/log/open5gc/smf.log
+    file: @LOCALSTATE_DIR@/log/nctu5gc/smf.log
     trace: 
         app: 1
         diameter: 1
@@ -12,12 +12,8 @@ logger:
 parameter:
 
 smf:
-    freeDiameter: pgw.conf
+    freeDiameter: smf.conf
 
-    gtpc:
-      addr:
-        - 127.0.0.2
-        - ::1
     pfcp:
         - 127.0.0.10
         - ::1

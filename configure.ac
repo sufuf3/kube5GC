@@ -8,7 +8,7 @@ dnl This program is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_INIT([Open5GC], [1.0.0], [nctuwirelab@gmail.com])
+AC_INIT([NCTU5GC], [1.0.0], [nctuwirelab@gmail.com])
 
 AC_SUBST(LIBVERSION)
 LIBVERSION=1:0:0
@@ -47,8 +47,8 @@ AC_SUBST(IPFW_CPPFLAGS)
 AC_SUBST(LO_DEV)
 
 AH_TOP([
-#ifndef __OPEN5GC_CONFIG_H__
-#define __OPEN5GC_CONFIG_H__
+#ifndef __NCTU5GC_CONFIG_H__
+#define __NCTU5GC_CONFIG_H__
 /* need this, because some autoconf tests rely on this (e.g. stpcpy)
  * and it should be used for new programs  */
 #define _DEFAULT_SOURCE 1
@@ -56,7 +56,7 @@ AH_TOP([
 ])
 
 AH_BOTTOM([
-#endif /* __OPEN5GC_CONFIG_H__ */
+#endif /* __NCTU5GC_CONFIG_H__ */
 ])
 
 AH_VERBATIM([_REENTRANT],
@@ -453,37 +453,38 @@ AC_CONFIG_FILES([src/nextepc/pcrf/Makefile])
 AC_CONFIG_FILES([src/nextepc/Makefile])
 AC_CONFIG_FILES([src/Makefile])
 
-AC_CONFIG_FILES([support/config/open5gc.conf])
-AC_CONFIG_FILES([support/config/open5gc.testngc.conf])
+AC_CONFIG_FILES([support/config/nctu5gc.conf])
 AC_CONFIG_FILES([support/config/hss.conf])
 AC_CONFIG_FILES([support/config/pcrf.conf])
 AC_CONFIG_FILES([support/config/smf.conf])
+AC_CONFIG_FILES([support/config/amf.conf])
 AC_CONFIG_FILES([support/config/upf.conf])
 AC_CONFIG_FILES([support/config/Makefile])
-AC_CONFIG_FILES([support/freeDiameter/mme.conf])
-AC_CONFIG_FILES([support/freeDiameter/pgw.conf])
+AC_CONFIG_FILES([support/freeDiameter/amf.conf])
+AC_CONFIG_FILES([support/freeDiameter/smf.conf])
 AC_CONFIG_FILES([support/freeDiameter/hss.conf])
 AC_CONFIG_FILES([support/freeDiameter/pcrf.conf])
 AC_CONFIG_FILES([support/freeDiameter/Makefile])
-AC_CONFIG_FILES([support/systemd/open5gc-amfd.service])
+AC_CONFIG_FILES([support/systemd/nctu5gc-amfd.service])
 AC_CONFIG_FILES([support/systemd/nextepc-hssd.service])
 AC_CONFIG_FILES([support/systemd/nextepc-pcrfd.service])
-AC_CONFIG_FILES([support/systemd/open5gc-upfd.service])
+AC_CONFIG_FILES([support/systemd/nctu5gc-upfd.service])
 AC_CONFIG_FILES([support/systemd/Makefile])
-AC_CONFIG_FILES([support/logrotate/open5gc])
+AC_CONFIG_FILES([support/logrotate/nctu5gc])
 AC_CONFIG_FILES([support/logrotate/Makefile])
-AC_CONFIG_FILES([support/newsyslog/open5gc.conf])
+AC_CONFIG_FILES([support/newsyslog/nctu5gc.conf])
 AC_CONFIG_FILES([support/newsyslog/Makefile])
 AC_CONFIG_FILES([support/https/Makefile])
 AC_CONFIG_FILES([support/Makefile])
 AC_CONFIG_FILES([test/sample.conf])
 AC_CONFIG_FILES([test/sample-volte.conf])
+AC_CONFIG_FILES([test/nctu5gc.testngc.conf])
 AC_CONFIG_FILES([test/Makefile])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
 echo "
-Open5GC configuration
+NCTU5GC configuration
 --------------------
 version                 : ${PACKAGE_VERSION}
 host                    : ${host}
@@ -492,7 +493,7 @@ compiler                : ${CC}
 compiler flags          : ${CFLAGS} ${YAML_CFLAGS} ${MONGOC_CFLAGS} 
 linker flags            : ${LDFLAGS} ${LIBS} ${YAML_LIBS} ${MONGOC_LIBS}
 bin directory           : ${BIN_DIR}
-lib directory           : ${LIB_DIR}/open5gc
-config directory        : ${SYSCONF_DIR}/open5gc
-log directory           : ${LOCALSTATE_DIR}/log/open5gc
+lib directory           : ${LIB_DIR}/nctu5gc
+config directory        : ${SYSCONF_DIR}/nctu5gc
+log directory           : ${LOCALSTATE_DIR}/log/nctu5gc
 "

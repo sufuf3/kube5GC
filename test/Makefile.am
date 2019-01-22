@@ -2,8 +2,8 @@
 
 bin_PROGRAMS = testngc testvolte
 
-configdir = ${sysconfdir}/open5gc/test
-config_DATA = sample.conf sample-volte.conf
+configdir = ${sysconfdir}/nctu5gc/test
+config_DATA = sample.conf sample-volte.conf nctu5gc.testngc.conf
 
 testngc_SOURCES = \
 	common/abts.h common/abts.c \

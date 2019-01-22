@@ -30,7 +30,6 @@ char* amf4g_event_get_name(event_t *e)
             return "AMF4G_EVT_S1AP_S1_HOLDING_TIMER";
 
             
-    /******************** Added by Hu ********************/
         case AMF_EVT_NGAP_MESSAGE:
             return "AMF_EVT_NGAP_MESSAGE";
         case AMF_EVT_NGAP_DELAYED_SEND:
@@ -43,7 +42,6 @@ char* amf4g_event_get_name(event_t *e)
             return "AMF_EVT_NGAP_LO_CONNREFUSED";
         case AMF_EVT_NGAP_NG_HOLDING_TIMER:
             return "AMF_EVT_NGAP_NG_HOLDING_TIMER";
-    /*****************************************************/
 
 
         case AMF4G_EVT_EMM_MESSAGE:
@@ -64,10 +62,8 @@ char* amf4g_event_get_name(event_t *e)
         case AMF4G_EVT_S6A_MESSAGE:
             return "AMF4G_EVT_S6A_MESSAGE";
 
-        /******************** Added by Chi ********************/
         case AMF4G_EVT_CHECK_OVERLOAD:
             return "AMF4G_EVT_CHECK_OVERLOAD";
-        /******************************************************/
         
         case AMF_EVT_N11_MESSAGE:
             return "AMF_EVT_N11_MESSAGE";

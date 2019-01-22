@@ -17,8 +17,11 @@ CORE_DECLARE(status_t) smf_pfcp_send_association_update_request(pfcp_node_t *pno
 CORE_DECLARE(status_t) smf_pfcp_send_association_release_request(pfcp_node_t *pnode);
 
 CORE_DECLARE(status_t) smf_pfcp_send_session_establishment_request(smf_sess_t *sess);
-CORE_DECLARE(status_t) smf_pfcp_send_session_modification_request(smf_sess_t *sess);
+CORE_DECLARE(status_t) smf_pfcp_send_an_release_session_modification_request(smf_sess_t *sess);
+CORE_DECLARE(status_t) smf_pfcp_send_setup_donwlink_session_modification_request(smf_sess_t *sess);
 CORE_DECLARE(status_t) smf_pfcp_send_session_deletion_request(smf_sess_t *sess);
+CORE_DECLARE(status_t) smf_pfcp_send_session_report_response(smf_sess_t *sess);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

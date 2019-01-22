@@ -62,10 +62,8 @@ CORE_DECLARE(void) s1ap_handle_ue_context_release_request(
 CORE_DECLARE(void) s1ap_handle_ue_context_release_complete(
         amf4g_enb_t *enb, s1ap_message_t *message);
 
-/*************Add by Steven Lee*****************/
 CORE_DECLARE(void) s1ap_handle_ue_context_resume_request(
         amf4g_enb_t *enb, s1ap_message_t *message);
-/******************************************/
 
 CORE_DECLARE(void) s1ap_handle_ue_context_modification_response(
         amf4g_enb_t *enb, s1ap_message_t *message);

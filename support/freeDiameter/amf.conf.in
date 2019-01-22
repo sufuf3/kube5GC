@@ -16,7 +16,7 @@
 # This must be a valid FQDN that resolves to the local host.
 # Default: hostname's FQDN
 #Identity = "aaa.koganei.freediameter.net";
-Identity = "pgw.localdomain";
+Identity = "amf.localdomain";
 
 # The Diameter Realm of this daemon.
 # Default: the domain part of Identity (after the first dot).
@@ -80,7 +80,7 @@ No_SCTP;
 #ListenOn = "202.249.37.5";
 #ListenOn = "2001:200:903:2::202:1";
 #ListenOn = "fe80::21c:5ff:fe98:7d62%eth0";
-ListenOn = "127.0.0.3";
+ListenOn = "127.0.0.2";
 
 
 ##############################################################
@@ -107,7 +107,7 @@ ListenOn = "127.0.0.3";
 # Default : NO DEFAULT
 #TLS_Cred = "<x509 certif file.PEM>" , "<x509 private key file.PEM>";
 #TLS_Cred = "/etc/ssl/certs/freeDiameter.pem", "/etc/ssl/private/freeDiameter.key";
-TLS_Cred = "@SYSCONF_DIR@/open5gc/freeDiameter/pgw.cert.pem", "@SYSCONF_DIR@/open5gc/freeDiameter/pgw.key.pem";
+TLS_Cred = "@SYSCONF_DIR@/nctu5gc/freeDiameter/amf.cert.pem", "@SYSCONF_DIR@/nctu5gc/freeDiameter/amf.key.pem";
 
 # Certificate authority / trust anchors
 # The file containing the list of trusted Certificate Authorities (PEM list)
@@ -115,7 +115,7 @@ TLS_Cred = "@SYSCONF_DIR@/open5gc/freeDiameter/pgw.cert.pem", "@SYSCONF_DIR@/ope
 # The directive can appear several times to specify several files.
 # Default : GNUTLS default behavior
 #TLS_CA = "<file.PEM>";
-TLS_CA = "@SYSCONF_DIR@/open5gc/freeDiameter/cacert.pem";
+TLS_CA = "@SYSCONF_DIR@/nctu5gc/freeDiameter/cacert.pem";
 
 # Certificate Revocation List file
 # The information about revoked certificates.
@@ -230,6 +230,7 @@ LoadExtension = "dict_nasreq.so";
 LoadExtension = "dict_nas_mipv6.so";
 LoadExtension = "dict_dcca.so";
 LoadExtension = "dict_dcca_3gpp.so";
+LoadExtension = "dict_s6a.so";
 
 
 ##############################################################
@@ -261,7 +262,7 @@ LoadExtension = "dict_dcca_3gpp.so";
 # Examples:
 #ConnectPeer = "aaa.wide.ad.jp";
 #ConnectPeer = "old.diameter.serv" { TcTimer = 60; TLS_old_method; No_SCTP; Port=3868; } ;
-ConnectPeer = "pcrf.localdomain" { ConnectTo = "127.0.0.5"; No_TLS; };
+ConnectPeer = "hss.localdomain" { ConnectTo = "127.0.0.4"; No_TLS; };
 
 
 ##############################################################

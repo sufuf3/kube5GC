@@ -20,14 +20,12 @@ typedef enum {
     AMF4G_EVT_S1AP_LO_CONNREFUSED,
     AMF4G_EVT_S1AP_S1_HOLDING_TIMER,
 
- /******************** Added by Hu ********************/
     AMF_EVT_NGAP_MESSAGE,
     AMF_EVT_NGAP_DELAYED_SEND,
     AMF_EVT_NGAP_LO_ACCEPT,
     AMF_EVT_NGAP_LO_SCTP_COMM_UP,
     AMF_EVT_NGAP_LO_CONNREFUSED,
     AMF_EVT_NGAP_NG_HOLDING_TIMER,
-  /******************************************************/
 
     AMF4G_EVT_EMM_MESSAGE,
     AMF4G_EVT_EMM_T3413,
@@ -40,9 +38,7 @@ typedef enum {
 
     AMF4G_EVT_S6A_MESSAGE,
 
-    /******************** Added by Chi ********************/
     AMF4G_EVT_CHECK_OVERLOAD,
-    /******************************************************/
     
     AMF_EVT_N11_MESSAGE,
     

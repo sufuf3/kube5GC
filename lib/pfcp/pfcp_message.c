@@ -26,8 +26,8 @@
 /*******************************************************************************
  * This file had been created by gtp_tlv.py script v0.1.0
  * Please do not modify this file but regenerate it via script.
- * Created on: 2018-04-30 14:42:25.895262 by ubuntu
- * from 29244-f00.docx
+ * Created on: 2019-01-02 17:06:04.978258 by wirelab
+ * from 29244-f40.docx
  ******************************************************************************/
 
 #define TRACE_MODULE _pfcp_message
@@ -1793,6 +1793,14 @@ tlv_desc_t tlv_desc_pfcp_association_release_response =
     NULL,
 }};
 
+tlv_desc_t tlv_desc_pfcp_version_not_supported_response =
+{
+    TLV_MESSAGE,
+    "PFCP Version Not Supported Response",
+    0, 0, 0, 0, {
+    NULL,
+}};
+
 tlv_desc_t tlv_desc_pfcp_node_report_request =
 {
     TLV_MESSAGE,
@@ -1924,7 +1932,6 @@ tlv_desc_t tlv_desc_pfcp_session_deletion_request =
     TLV_MESSAGE,
     "PFCP Session Deletion Request",
     0, 0, 0, 0, {
-        &tlv_desc_f_seid_0,
     NULL,
 }};
 
@@ -1952,6 +1959,18 @@ tlv_desc_t tlv_desc_pfcp_session_report_request =
         &tlv_desc_error_indication_report_0,
         &tlv_desc_load_control_informationp_0,
         &tlv_desc_overload_control_informationp_0,
+    NULL,
+}};
+
+tlv_desc_t tlv_desc_pfcp_session_report_response =
+{
+    TLV_MESSAGE,
+    "PFCP Session Report Response",
+    0, 0, 0, 0, {
+        &tlv_desc_pfcpcause_0,
+        &tlv_desc_offending_ie_0,
+        &tlv_desc_update_bar_pfcp_session_report_response_0,
+        &tlv_desc_pfcpsrrsp_flags_0,
     NULL,
 }};
 
@@ -2028,6 +2047,10 @@ status_t pfcp_parse_msg(pfcp_message_t *pfcp_message, pkbuf_t *pkbuf)
             rv = tlv_parse_msg(&pfcp_message->pfcp_association_release_response,
                     &tlv_desc_pfcp_association_release_response, pkbuf, TLV_MODE_T2_L2);
             break;
+        case PFCP_VERSION_NOT_SUPPORTED_RESPONSE_TYPE:
+            rv = tlv_parse_msg(&pfcp_message->pfcp_version_not_supported_response,
+                    &tlv_desc_pfcp_version_not_supported_response, pkbuf, TLV_MODE_T2_L2);
+            break;
         case PFCP_NODE_REPORT_REQUEST_TYPE:
             rv = tlv_parse_msg(&pfcp_message->pfcp_node_report_request,
                     &tlv_desc_pfcp_node_report_request, pkbuf, TLV_MODE_T2_L2);
@@ -2071,6 +2094,10 @@ status_t pfcp_parse_msg(pfcp_message_t *pfcp_message, pkbuf_t *pkbuf)
         case PFCP_SESSION_REPORT_REQUEST_TYPE:
             rv = tlv_parse_msg(&pfcp_message->pfcp_session_report_request,
                     &tlv_desc_pfcp_session_report_request, pkbuf, TLV_MODE_T2_L2);
+            break;
+        case PFCP_SESSION_REPORT_RESPONSE_TYPE:
+            rv = tlv_parse_msg(&pfcp_message->pfcp_session_report_response,
+                    &tlv_desc_pfcp_session_report_response, pkbuf, TLV_MODE_T2_L2);
             break;
         default:
             d_warn("Not implmeneted(type:%d)", pfcp_message->h.type);
@@ -2119,6 +2146,10 @@ status_t pfcp_build_msg(pkbuf_t **pkbuf, pfcp_message_t *pfcp_message)
             rv = tlv_build_msg(pkbuf, &tlv_desc_pfcp_association_release_response,
                     &pfcp_message->pfcp_association_release_response, TLV_MODE_T2_L2);
             break;
+        case PFCP_VERSION_NOT_SUPPORTED_RESPONSE_TYPE:
+            rv = tlv_build_msg(pkbuf, &tlv_desc_pfcp_version_not_supported_response,
+                    &pfcp_message->pfcp_version_not_supported_response, TLV_MODE_T2_L2);
+            break;
         case PFCP_NODE_REPORT_REQUEST_TYPE:
             rv = tlv_build_msg(pkbuf, &tlv_desc_pfcp_node_report_request,
                     &pfcp_message->pfcp_node_report_request, TLV_MODE_T2_L2);
@@ -2162,6 +2193,10 @@ status_t pfcp_build_msg(pkbuf_t **pkbuf, pfcp_message_t *pfcp_message)
         case PFCP_SESSION_REPORT_REQUEST_TYPE:
             rv = tlv_build_msg(pkbuf, &tlv_desc_pfcp_session_report_request,
                     &pfcp_message->pfcp_session_report_request, TLV_MODE_T2_L2);
+            break;
+        case PFCP_SESSION_REPORT_RESPONSE_TYPE:
+            rv = tlv_build_msg(pkbuf, &tlv_desc_pfcp_session_report_response,
+                    &pfcp_message->pfcp_session_report_response, TLV_MODE_T2_L2);
             break;
         default:
             d_warn("Not implmeneted(type:%d)", pfcp_message->h.type);

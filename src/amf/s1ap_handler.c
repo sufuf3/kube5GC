@@ -8,9 +8,9 @@
 #include "s1ap_conv.h"
 #include "s1ap_path.h"
 #include "nas_path.h"
-#include "amf4g_gtp_path.h"
+#include "amf_n11_path.h"
 
-#include "amf4g_s11_build.h"
+
 #include "s1ap_build.h"
 #include "s1ap_handler.h"
 
@@ -1240,7 +1240,7 @@ void s1ap_handle_initial_context_setup_response(
                 d_trace(5, "    ### ULI PRESENT ###\n");
                 uli_presence = 1;
             }
-            rv = amf4g_gtp_send_modify_bearer_request(bearer, uli_presence);
+            rv = amf_n11_send_modify_bearer_request(bearer, uli_presence);
             d_assert(rv == CORE_OK, return, "gtp send failed");
         }
         
@@ -1659,7 +1659,7 @@ void s1ap_handle_e_rab_setup_response(
 
             if (bearer->ebi == linked_bearer->ebi)
             {
-                rv = amf4g_gtp_send_modify_bearer_request(bearer, 0);
+                rv = amf_n11_send_modify_bearer_request(bearer, 0);
                 d_assert(rv == CORE_OK, return, "gtp send failed");
             }
             else
@@ -1753,16 +1753,16 @@ void s1ap_handle_e_rab_modify_response(
         if (FSM_CHECK(&bearer->sm, esm_state_active))
         {
             status_t rv;
-            if (bearer->enb_s1u_teid != bearer->sgw_s1u_teid)
+            if (bearer->enb_s1u_teid != bearer->upf_s1u_teid)
             {
                 //if(SecondaryRATDataUsageReportList != NULL)
                 {
-                    //rv = amf4g_gtp_send_change_notification_request(amf4g_ue, NULL);
+                    //rv = amf_n11_send_change_notification_request(amf4g_ue, NULL);
                     //d_assert(rv == CORE_OK, return, "gtp send failed");
                 }
         //else
         {
-            rv = amf4g_gtp_send_delete_session_request(bearer->sess);
+            rv = amf_n11_send_delete_session_request(bearer->sess);
             d_assert(rv == CORE_OK, return, "gtp send failed");
         } 
             }
@@ -2016,7 +2016,6 @@ void s1ap_handle_ue_context_release_complete(
     }
 }
 
-/*************Add by Steven Lee*****************/
 // Handle UE Context Resume Request
 void s1ap_handle_ue_context_resume_request(
         amf4g_enb_t *enb, s1ap_message_t *message)
@@ -2071,7 +2070,6 @@ void s1ap_handle_ue_context_resume_request(
     d_assert(s1ap_send_to_enb(enb, s1apbuf, S1AP_NON_UE_SIGNALLING) == CORE_OK,,
             "s1ap_send_to_enb() failed");
 }
-/****************************************************/
 
 void s1ap_handle_ue_context_modification_response(
         amf4g_enb_t *enb, s1ap_message_t *message)
@@ -2507,7 +2505,7 @@ void s1ap_handle_path_switch_request(
         GTP_COUNTER_INCREMENT(
                 amf4g_ue, GTP_COUNTER_MODIFY_BEARER_BY_PATH_SWITCH);
 
-        rv = amf4g_gtp_send_modify_bearer_request(bearer, 1);
+        rv = amf_n11_send_modify_bearer_request(bearer, 1);
         d_assert(rv == CORE_OK, return, "gtp send failed");
     }
 
@@ -3239,7 +3237,7 @@ void s1ap_handle_handover_notification(amf4g_enb_t *enb, s1ap_message_t *message
             GTP_COUNTER_INCREMENT(
                     amf4g_ue, GTP_COUNTER_MODIFY_BEARER_BY_HANDOVER_NOTIFY);
 
-            rv = amf4g_gtp_send_modify_bearer_request(bearer, 1);
+            rv = amf_n11_send_modify_bearer_request(bearer, 1);
             d_assert(rv == CORE_OK, return, "gtp send failed");
 
             bearer = amf4g_bearer_next(bearer);

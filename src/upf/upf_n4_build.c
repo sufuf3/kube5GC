@@ -13,7 +13,6 @@
 
 #include "upf_context.h"
 
-
 status_t upf_n4_build_session_establishment_response(
         pkbuf_t **pkbuf, c_uint8_t type, upf_sess_t *sess,
         pfcp_session_establishment_request_t *pfcp_req)
@@ -116,6 +115,52 @@ status_t upf_n4_build_session_deletion_response(
     return CORE_OK;
 }
 
+status_t upf_n4_build_session_report_request_downlink_data_report(
+        pkbuf_t **pkbuf, c_uint8_t type, upf_sess_t *sess, c_int16_t pdr_id,
+        pfcp_session_report_request_t *pfcp_req)
+{
+    status_t rv;
+    pfcp_message_t pfcp_message;
+    pfcp_session_report_request_t *req = NULL;
+    pfcp_report_type_t report_type;
+    pfcp_downlink_data_service_information_t downlink_data_service_information_data;
+
+    req = &pfcp_message.pfcp_session_report_request;
+    memset(&pfcp_message, 0, sizeof(pfcp_message_t));
+
+    memset(&report_type, 0, sizeof(pfcp_report_type_t));
+    memset(&downlink_data_service_information_data, 0, sizeof(pfcp_downlink_data_service_information_t));
+
+    report_type.DLDR = 1;
+
+    req->report_type.presence = 1;
+    req->report_type.data = &report_type;
+    req->report_type.len = sizeof(pfcp_report_type_t);
+
+    tlv_downlink_data_report_t *downlink_data_report = &req->downlink_data_report;
+    downlink_data_report->presence = 1;
+
+    downlink_data_report->pdr_id.presence = 1;
+    downlink_data_report->pdr_id.data = &pdr_id;
+    downlink_data_report->pdr_id.len = sizeof(pdr_id);
+
+    tlv_downlink_data_service_information_t *downlink_data_service_information = 
+            &downlink_data_report->downlink_data_service_information;
+
+    downlink_data_service_information_data.PPI = 0;
+    downlink_data_service_information_data.QFII = 0;
+    downlink_data_service_information->presence = 1;
+    downlink_data_service_information->data = &downlink_data_service_information_data;
+    downlink_data_service_information->len = 
+        PFCP_DOWNLINK_DATA_SERVICE_INFORMATION_LEN(downlink_data_service_information_data);
+
+    pfcp_message.h.type = type;
+    rv = pfcp_build_msg(pkbuf, &pfcp_message);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
+
+    return CORE_OK;
+}
+
 status_t upf_n4_build_association_setup_response(
         pkbuf_t **pkbuf, c_uint8_t type)
 {
@@ -162,7 +207,7 @@ status_t upf_n4_build_association_setup_response(
     }
     else
     {
-        //$ if up_fun all zero, should not present
+        // If up_fun all zero, should not present
         rsp->up_function_features.presence = 0;
     }
     
@@ -181,7 +226,6 @@ status_t upf_n4_build_association_release_response(
     pfcp_association_release_response_t *rsp = NULL;
     pfcp_node_id_t node_id;
     c_uint8_t cause;
-//#include<sys/time.h>    
     
     rsp = &pfcp_message.pfcp_association_release_response;
     memset(&pfcp_message, 0, sizeof(pfcp_message_t));

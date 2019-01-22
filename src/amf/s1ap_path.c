@@ -56,7 +56,6 @@ static status_t s1ap_server_list(list_t *list, int type)
     return CORE_OK;
 }
 
-/*************Add by Steven*******************/
 status_t s1ap_send_mme_configuration_update(
     amf4g_enb_t *target_enb)
 {
@@ -72,9 +71,7 @@ status_t s1ap_send_mme_configuration_update(
     return CORE_OK;
 }
 
-/**************************************************/
 
-/*************Add by Steven*******************/
 status_t s1ap_send_mme_cp_relocation_indication(
         enb_ue_t *source_ue)
 {
@@ -359,7 +356,6 @@ status_t s1ap_send_mme_configuration_transfer(
     return rv;
 }
 
-/////////////////////////////////////////pan
 status_t s1ap_send_mme_direct_information_transfer(
 	amf4g_enb_t *target_enb)
 {
@@ -394,7 +390,6 @@ status_t s1ap_send_ERAB_release_command(amf4g_enb_t *enb,
     
     return rv;
 }
-/////////////////////////////////////////
 
 status_t s1ap_send_path_switch_ack(amf4g_ue_t *amf4g_ue)
 {

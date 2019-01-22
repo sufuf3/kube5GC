@@ -18,6 +18,7 @@
 #include "smf_context.h"
 
 static smf_context_t self;
+static fd_config_t s_fd_conf;
 static int context_initialized = 0;
 
 index_declare(smf_sess_pool, smf_sess_t, MAX_POOL_OF_SESS);
@@ -36,8 +37,12 @@ status_t smf_context_init()
     d_assert(context_initialized == 0, return CORE_ERROR,
             "SMF context already has been initialized");
 
+    /* Initialize FreeDiameter Config */
+    memset(&s_fd_conf, 0, sizeof(fd_config_t));
+
     /* Initialize SMF context */
     memset(&self, 0, sizeof(smf_context_t));
+    self.fd_config = &s_fd_conf;
 
     index_init(&smf_sess_pool, MAX_POOL_OF_SESS);
     index_init(&smf_bearer_pool, MAX_POOL_OF_BEARER);
@@ -71,7 +76,7 @@ status_t smf_context_final()
 {
     d_assert(context_initialized == 1, return CORE_ERROR,
             "SMF context already has been finalized");
-
+            
     smf_sess_remove_all();
 
     d_assert(self.sess_hash, , "Null param");
@@ -86,6 +91,7 @@ status_t smf_context_final()
     index_final(&smf_urr_pool);
     index_final(&smf_qer_pool);
     
+    pfcp_remove_all_nodes(&self.upf_n4_list);
     sock_remove_all_nodes(&self.pfcp_list);
     sock_remove_all_nodes(&self.pfcp_list6);
     pfcp_node_final();
@@ -110,12 +116,23 @@ smf_context_t* smf_self()
 static status_t smf_context_prepare()
 {
     self.pfcp_port = PFCP_UDP_PORT;
+    self.fd_config->cnf_port = DIAMETER_PORT;
+    self.fd_config->cnf_port_tls = DIAMETER_SECURE_PORT;
 
     return CORE_OK;
 }
 
 static status_t smf_context_validation()
 {
+    if (self.fd_conf_path == NULL &&
+        (self.fd_config->cnf_diamid == NULL ||
+        self.fd_config->cnf_diamrlm == NULL ||
+        self.fd_config->cnf_addr == NULL))
+    {
+        d_error("No smf.freeDiameter in '%s'",
+                context_self()->config.path);
+        return CORE_ERROR;
+    }
     if (list_first(&self.subnet_list) == NULL)
     {
         d_error("No smf.ue_pool in '%s'",
@@ -473,7 +490,7 @@ status_t smf_context_parse_config()
                             d_assert(fd_key, return CORE_ERROR,);
                             if (!strcmp(fd_key, "identity"))
                             {
-                                self.fd_config->cnf_diamid = 
+                                self.fd_config->cnf_diamid =
                                     yaml_iter_value(&fd_iter);
                             }
                             else if (!strcmp(fd_key, "realm"))
@@ -633,6 +650,7 @@ status_t smf_context_parse_config()
                                     }
                                 } while(yaml_iter_type(&conn_array) ==
                                         YAML_SEQUENCE_NODE);
+                                
                             }
                             else
                                 d_warn("unknown key `%s`", fd_key);
@@ -685,6 +703,23 @@ status_t smf_context_parse_config()
                     } while(
                         yaml_iter_type(&dns_iter) ==
                             YAML_SEQUENCE_NODE);
+                }
+                else if (!strcmp(smf_key, "http"))
+                {
+                    yaml_iter_t http_iter;
+                    yaml_iter_recurse(&smf_iter, &http_iter);
+                    while(yaml_iter_next(&http_iter))
+                    {
+                        const char *http_key = yaml_iter_key(&http_iter);
+                        if (!strcmp(http_key, "addr"))
+                        {
+                            strcpy(self.rest_api_addr, yaml_iter_value(&http_iter));
+                        }
+                        else if (!strcmp(http_key, "port"))
+                        {
+                            strcpy(self.rest_api_port, yaml_iter_value(&http_iter));
+                        }
+                    }
                 }
             }
         }
@@ -758,8 +793,6 @@ smf_sess_t* smf_sess_add(
     smf_bearer_t *bearer = NULL;
 
     index_alloc(&smf_sess_pool, &sess);
-
-    sess->s11_xact = NULL;
     
     /* Set IMSI */
     sess->imsi_len = imsi_len;
@@ -816,7 +849,7 @@ smf_sess_t* smf_sess_add(
     else
         d_assert(0, return NULL, "Unsupported PDN Type(%d)", pdn_type);
     
-    sess->smf_n4_seid = sess->index;
+    sess->smf_n4_seid = 0;
     
     /* Generate Hash Key : IMSI + APN */
     sess_hash_keygen(sess->hash_keybuf, &sess->hash_keylen,
@@ -824,7 +857,7 @@ smf_sess_t* smf_sess_add(
     hash_set(self.sess_hash, sess->hash_keybuf, sess->hash_keylen, sess);
     
     sess->upf_node = list_first(&smf_self()->upf_n4_list);
-    bearer->sgw_s1u_teid = bearer->index;
+    bearer->upf_s1u_teid = bearer->index;
     
     smf_pdr_t *ul_pdr = smf_pdr_add(bearer);
     sess->ul_pdr = ul_pdr;
@@ -940,7 +973,6 @@ smf_bearer_t* smf_bearer_add(smf_sess_t *sess)
     list_init(&bearer->pf_list);
     
     bearer->sess = sess;
-    bearer->gnode = NULL;
 
     list_append(&sess->bearer_list, bearer);
 
@@ -1437,6 +1469,11 @@ smf_sess_t *smf_sess_add_or_find_by_JsonCreateSession(create_session_t *createSe
             createSession->ebi);
         d_assert(sess, return NULL, "No Session Context");
     }
+    else 
+    {
+        sess->dl_pdr->far->apply_action = PFCP_FAR_APPLY_ACTION_FORW;
+    } 
+
     return sess;
 }
 

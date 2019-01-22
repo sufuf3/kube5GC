@@ -2,7 +2,7 @@
 
 #include "s1ap_path.h"
 #include "nas_path.h"
-#include "amf4g_gtp_path.h"
+#include "amf_n11_path.h"
 #include "amf4g_path.h"
 
 status_t amf4g_send_delete_session_or_detach(amf4g_ue_t *amf4g_ue)
@@ -13,9 +13,9 @@ status_t amf4g_send_delete_session_or_detach(amf4g_ue_t *amf4g_ue)
 
     if (SESSION_CONTEXT_IS_AVAILABLE(amf4g_ue))
     {
-        rv = amf4g_gtp_send_delete_all_sessions(amf4g_ue);
+        rv = amf_n11_send_delete_all_sessions(amf4g_ue);
         d_assert(rv == CORE_OK,,
-            "amf4g_gtp_send_delete_all_sessions failed");
+            "amf_n11_send_delete_all_sessions failed");
     }
     else
     {
@@ -37,9 +37,9 @@ status_t amf4g_send_delete_session_or_ue_context_release(
 
     if (SESSION_CONTEXT_IS_AVAILABLE(amf4g_ue))
     {
-        rv = amf4g_gtp_send_delete_all_sessions(amf4g_ue);
+        rv = amf_n11_send_delete_all_sessions(amf4g_ue);
         d_assert(rv == CORE_OK,,
-            "amf4g_gtp_send_delete_all_sessions failed");
+            "amf_n11_send_delete_all_sessions failed");
     }
     else
     {
@@ -61,7 +61,7 @@ status_t amf4g_send_release_access_bearer_or_ue_context_release(
 
     if (BEARER_CONTEXT_IS_ACTIVE(amf4g_ue))
     {
-        rv = amf4g_gtp_send_release_access_bearers_request(amf4g_ue);
+        rv = amf_n11_send_release_access_bearers_request(amf4g_ue);
         d_assert(rv == CORE_OK,, "gtp send failed");
     }
     else
