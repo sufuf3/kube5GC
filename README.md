@@ -28,6 +28,9 @@
 - 🔨 pgw
 - 🔨 hss
 - 🔨 pcrf
+- AMF
+- SMF
+- UPF
 
 ### Docker images
 
