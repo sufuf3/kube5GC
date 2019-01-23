@@ -1,7 +1,8 @@
 # From: https://raw.githubusercontent.com/acetcom/nextepc/7c7cfd1cbf5a0899535ee468096c3471ab48b4a8/support/docker/ubuntu/bionic/base/Dockerfile
 ARG dist=ubuntu
 ARG tag=latest
-FROM ${dist}:${tag}
+#FROM ${dist}:${tag}
+FROM golang:1.11-stretch
 
 MAINTAINER Sukchan Lee <acetcom@gmail.com>
 
