@@ -15,21 +15,28 @@
 
 ## NCTU-5GC Components
 
+### Components
+
 - 🚧 mongodb
     - pv, statefulset, service
 - 🚧 webui
-    - Docker: [nextepc-webui](https://cloud.docker.com/repository/docker/sufuf3/nextepc-webui)
     - service, deployment
-- 🔨 nextepc-base
-- 🔨 nextepc-build
 - 🔨 mme
 - 🚧 u1-u2
-    - Docker: [nextepc-ubuntu](https://cloud.docker.com/repository/docker/sufuf3/nextepc-ubuntu)
     - deployment
 - 🔨 sgw
 - 🔨 pgw
 - 🔨 hss
 - 🔨 pcrf
+
+### Docker images
+
+- 🚧 webui
+    - Docker: [nextepc-webui](https://cloud.docker.com/repository/docker/sufuf3/nextepc-webui)
+- 🚧 nextepc-base
+    - Docker: [nextepc-base](https://cloud.docker.com/repository/registry-1.docker.io/sufuf3/nextepc-base)
+- 🚧 nextepc-build
+    - Docker: [nextepc-build](https://cloud.docker.com/repository/registry-1.docker.io/sufuf3/nextepc-build)
 
 ## Prepare
 
