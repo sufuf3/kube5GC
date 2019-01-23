@@ -4,18 +4,18 @@ kind: Service
 metadata:
   labels:
     environment: testing
-    service: mongo
-  name: mongo-external
+    app: webui
+  name: webui-np
   namespace: nctu5gc
 spec:
   externalTrafficPolicy: Cluster
   ports:
-  - name: mongo
-    nodePort: 31717
-    port: 27017
+  - name: webui
+    nodePort: 31727
+    port: 3000
     protocol: TCP
-    targetPort: 27017
+    targetPort: 3000
   selector:
-    service: mongo
+    app: webui
   sessionAffinity: None
   type: NodePort
