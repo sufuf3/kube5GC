@@ -4,13 +4,30 @@
 
 ## Table of Contents
 
+- [NCTU-5GC Components](#nctu5gc-components)
 - [Prepare](#prepare)
     - [1. Using kubeCORD deploy Kubernetes](#1-using-kubecord-deploy-kubernetes)
     - [2. Install NFS Server](#2-install-nfs-server)
     - [3. Install helm](#3-install-helm)
 - [Deploy NCTU5GC](#deploy-nctu5gc)
-    - [Method 1 - Using yaml](#method-1-using-yaml)
-    - [Method 2 - Using Helm](#method-2-using-helm)
+    - [Method 1 - Using yaml](#method-1---using-yaml)
+    - [Method 2 - Using Helm](#method-2---using-helm)
+
+## NCTU-5GC Components
+
+- 🚧 mongodb
+    - pv, statefulset, service
+- 🚧 webui
+    - service, deployment
+- 🔨 nextepc-base
+- 🔨 nextepc-build
+- 🔨 mme
+- 🚧 u1-u2
+    - deployment
+- 🔨 sgw
+- 🔨 pgw
+- 🔨 hss
+- 🔨 pcrf
 
 ## Prepare
 
