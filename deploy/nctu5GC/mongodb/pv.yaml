@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-storage
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs: 
+    path: /nfsshare
+    server: 192.168.26.11
+  persistentVolumeReclaimPolicy: Recycle
