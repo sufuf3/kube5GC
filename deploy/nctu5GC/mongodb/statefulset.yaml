@@ -1,0 +1,39 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mongo
+  namespace: nctu5gc
+spec:
+  serviceName: "mongo"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: mongo
+        role: db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: nextepc-mongodb
+          resources:
+            requests:
+              cpu: 100m
+          image: mongo:4.1-xenial
+          command:
+            - mongod
+            - "--bind_ip"
+            - 0.0.0.0
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb
+              mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb
+    spec:
+      accessModes: [ "ReadWriteMany" ]
+      storageClassName: "slow-many"
+      resources:
+        requests:
+          storage: 10Gi

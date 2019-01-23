@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: testing
+  name: mongo-external
+  namespace: nctu5gc
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: mongo
+    nodePort: 31717
+    port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    service: mongo
+  sessionAffinity: None
+  type: NodePort
