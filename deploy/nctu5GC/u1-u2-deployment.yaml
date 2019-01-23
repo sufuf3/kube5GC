@@ -19,14 +19,14 @@ spec:
       - name: nextepc-u1
         stdin: true
         tty: true
-        image: sufuf3/nextepc-ubuntu:latest
+        image: ubuntu:latest
         securityContext:
           capabilities:
             add: ["NET_ADMIN", "SYS_TIME"]
       - name: nextepc-u2
         stdin: true
         tty: true
-        image: sufuf3/nextepc-ubuntu:latest
+        image: ubuntu:latest
         securityContext:
           capabilities:
             add: ["NET_ADMIN", "SYS_TIME"]
