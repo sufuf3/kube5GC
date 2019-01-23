@@ -21,6 +21,7 @@ spec:
         tty: true
         image: ubuntu:latest
         securityContext:
+          privileged: true
           capabilities:
             add: ["NET_ADMIN", "SYS_TIME"]
       - name: nextepc-u2
@@ -28,5 +29,6 @@ spec:
         tty: true
         image: ubuntu:latest
         securityContext:
+          privileged: true
           capabilities:
             add: ["NET_ADMIN", "SYS_TIME"]
