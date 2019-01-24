@@ -168,7 +168,7 @@ const Login = ({
 }) => (
   <div>
     <Head>
-    <title>NCTU5GC - Login</title>
+    <title>free5GC - Login</title>
     </Head>
     <Wrapper id='nprogress-base-login' width={width}>
       <ErrorBar 

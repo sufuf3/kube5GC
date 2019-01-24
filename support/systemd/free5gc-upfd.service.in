@@ -1,0 +1,20 @@
+[Unit]
+Description=free5GC UPF Daemon
+After=networking.service
+
+[Service]
+Type=simple
+
+User=free5gc
+Group=free5gc
+
+RuntimeDirectory=free5gc-upfd
+PIDFile=@LIB_DIR@/run/free5gc-upfd/pid
+
+Restart=always
+ExecStart=@BIN_DIR@/free5gc-upfd -f @SYSCONF_DIR@/free5gc/upf.conf
+RestartSec=2
+RestartPreventExitStatus=1
+
+[Install]
+WantedBy=multi-user.target

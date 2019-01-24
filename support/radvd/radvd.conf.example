@@ -39,7 +39,7 @@ interface uptun
 	AdvHomeAgentFlag off;
 
 #
-# NCTU5GC uptun prefix
+# free5GC uptun prefix
 #
 	prefix cafe::/64
 	{

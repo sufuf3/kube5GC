@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = lib src support test
 
-bin_PROGRAMS = nextepc-hssd nextepc-pcrfd nctu5gc-amfd nctu5gc-smfd nctu5gc-upfd nctu5gc-ngcd
+bin_PROGRAMS = nextepc-hssd nextepc-pcrfd free5gc-amfd free5gc-smfd free5gc-upfd free5gc-ngcd
 
 dist_nextepc_hssd_SOURCES = main.c
 nextepc_hssd_LDADD = $(top_srcdir)/src/nextepc/libhss.la
@@ -12,17 +12,17 @@ nextepc_hssd_LDADD = $(top_srcdir)/src/nextepc/libhss.la
 dist_nextepc_pcrfd_SOURCES = main.c
 nextepc_pcrfd_LDADD = $(top_srcdir)/src/nextepc/libpcrf.la
 
-dist_nctu5gc_amfd_SOURCES = main.c
-nctu5gc_amfd_LDADD = $(top_srcdir)/src/libamf.la
+dist_free5gc_amfd_SOURCES = main.c
+free5gc_amfd_LDADD = $(top_srcdir)/src/libamf.la
 
-dist_nctu5gc_smfd_SOURCES = main.c
-nctu5gc_smfd_LDADD = $(top_srcdir)/src/libsmf.la
+dist_free5gc_smfd_SOURCES = main.c
+free5gc_smfd_LDADD = $(top_srcdir)/src/libsmf.la
 
-dist_nctu5gc_upfd_SOURCES = main.c
-nctu5gc_upfd_LDADD = $(top_srcdir)/src/libupf.la
+dist_free5gc_upfd_SOURCES = main.c
+free5gc_upfd_LDADD = $(top_srcdir)/src/libupf.la
 
-dist_nctu5gc_ngcd_SOURCES = main.c
-nctu5gc_ngcd_LDADD = $(top_srcdir)/src/libngc.la
+dist_free5gc_ngcd_SOURCES = main.c
+free5gc_ngcd_LDADD = $(top_srcdir)/src/libngc.la
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/nextepc/core/include \
@@ -30,13 +30,13 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 install-data-hook:
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/log/nctu5gc
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/log/free5gc
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-hssd
 	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nextepc-pcrfd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nctu5gc-amfd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nctu5gc-smfd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nctu5gc-upfd
-	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/nctu5gc-ngcd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/free5gc-amfd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/free5gc-smfd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/free5gc-upfd
+	$(MKDIR_P) $(DESTDIR)/$(localstatedir)/run/free5gc-ngcd
 
 CLEANFILES = -R data
 DISTCLEANFILES = $(DIST_ARCHIVES)

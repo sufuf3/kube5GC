@@ -1,5 +1,5 @@
 configfiles = \
-	nctu5gc.conf \
+	free5gc.conf \
 	hss.conf \
 	pcrf.conf \
 	upf.conf \
@@ -7,7 +7,7 @@ configfiles = \
 	smf.conf \
 	$(NULL)
 
-configdir = ${sysconfdir}/nctu5gc
+configdir = ${sysconfdir}/free5gc
 
 config_DATA = ${configfiles}
 

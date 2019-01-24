@@ -1,0 +1,16 @@
+@LOCALSTATE_DIR@/log/free5gc/*.log {
+    daily
+    sharedscripts
+    missingok
+    compress
+    rotate 14
+    create 640 free5gc free5gc
+
+    postrotate
+        for i in pcrfd hssd amfd smf upf ngcd; do
+            if [ -e @LOCALSTATE_DIR@/run/free5gc-$i/pid ] ; then
+                kill -HUP `cat @LOCALSTATE_DIR@/run/free5gc-$i/pid`
+            fi
+        done
+    endscript
+}
