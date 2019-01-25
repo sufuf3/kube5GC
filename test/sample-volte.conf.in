@@ -1,4 +1,4 @@
-db_uri: mongodb://localhost/nctu5gc
+db_uri: mongodb://localhost/free5gc
 
 logger:
     trace: 
@@ -51,7 +51,7 @@ amf:
         integrity_order : [ EIA1, EIA2, EIA0 ]
         ciphering_order : [ EEA0, EEA1, EEA2 ]
     network_name:
-        full: NCTU5GC
+        full: free5GC
 
 hss:
     freeDiameter:

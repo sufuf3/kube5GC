@@ -1,0 +1,20 @@
+[Unit]
+Description=free5GC SMF Daemon
+After=networking.service
+
+[Service]
+Type=simple
+
+User=free5gc
+Group=free5gc
+
+RuntimeDirectory=free5gc-smfd
+PIDFile=@LIB_DIR@/run/free5gc-smfd/pid
+
+Restart=always
+ExecStart=@BIN_DIR@/free5gc-smfd -f @SYSCONF_DIR@/free5gc/smf.conf
+RestartSec=2
+RestartPreventExitStatus=1
+
+[Install]
+WantedBy=multi-user.target

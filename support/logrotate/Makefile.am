@@ -1,4 +1,4 @@
-EXTRA_DIST = nctu5gc.in
+EXTRA_DIST = free5gc.in
 
 MAINTAINERCLEANFILES = Makefile.in 
 MOSTLYCLEANFILES = *.stackdump

@@ -1,7 +1,7 @@
-### For reference, see `nctu5gc.conf`
+### For reference, see `free5gc.conf`
 
 logger:
-    file: @LOCALSTATE_DIR@/log/nctu5gc/upf.log
+    file: @LOCALSTATE_DIR@/log/free5gc/upf.log
     trace: 
         app: 1
         diameter: 1

@@ -36,15 +36,15 @@ pgwtun    Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
           ...
 ```
 
-The NextEPC service is registered in `systemd` environment, and is started automatically during the installation phase. The service names are *nctu5gc-mmed*, *nctu5gc-sgwd*, *nctu5gc-pgwd*, *nextepc-hssd*, and *nextepc-pcrfd*. You can use the `systemctl` command to control specific services.
+The NextEPC service is registered in `systemd` environment, and is started automatically during the installation phase. The service names are *free5gc-mmed*, *free5gc-sgwd*, *free5gc-pgwd*, *nextepc-hssd*, and *nextepc-pcrfd*. You can use the `systemctl` command to control specific services.
 
 ```bash
-sudo systemctl status nctu5gc-mmed (Check the service status)
-sudo systemctl stop nctu5gc-mmed (Stop the service)
-sudo systemctl disable nctu5gc-mmed (Will not be started after rebooting)
-sudo systemctl enable nctu5gc-mmed (Will be started after rebooting)
-sudo systemctl start nctu5gc-mmed (Start the service)
-sudo systemctl restart nctu5gc-mmed (Stop and start)
+sudo systemctl status free5gc-amfd (Check the service status)
+sudo systemctl stop free5gc-amfd (Stop the service)
+sudo systemctl disable free5gc-amfd (Will not be started after rebooting)
+sudo systemctl enable free5gc-amfd (Will be started after rebooting)
+sudo systemctl start free5gc-amfd (Start the service)
+sudo systemctl restart free5gc-amfd (Stop and start)
 ```
 
 

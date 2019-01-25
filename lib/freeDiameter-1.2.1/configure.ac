@@ -8,7 +8,7 @@ dnl This program is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_INIT([NCTU5GC], [1.2.1], [nctuwirelab@gmail.com])
+AC_INIT([free5GC], [1.2.1], [nctuwirelab@gmail.com])
 
 AC_SUBST(LIBVERSION)
 LIBVERSION=1:0:0
@@ -123,11 +123,11 @@ adl_RECURSIVE_EVAL(["${libdir}"], [LIB_DIR])
 adl_RECURSIVE_EVAL(["${sysconfdir}"], [SYSCONF_DIR])
 
 AC_SUBST(extlibdir)
-extlibdir=${libdir}/nctu5gc/freeDiameter
+extlibdir=${libdir}/free5gc/freeDiameter
 AC_DEFINE_UNQUOTED([DEFAULT_CONF_PATH],
-        ["${SYSCONF_DIR}/nctu5gc/freeDiameter"], [Default Configuration Path])
+        ["${SYSCONF_DIR}/free5gc/freeDiameter"], [Default Configuration Path])
 AC_DEFINE_UNQUOTED([DEFAULT_EXTENSIONS_PATH],
-        ["${LIB_DIR}/nctu5gc/freeDiameter"], [Default Extensions Path])
+        ["${LIB_DIR}/free5gc/freeDiameter"], [Default Extensions Path])
 AC_SUBST(PREFIX)
 
 AC_CHECK_FUNCS([strndup])
@@ -218,6 +218,6 @@ source code location    : ${srcdir}
 compiler                : ${CC}
 compiler flags          : ${CFLAGS}
 linker flags            : ${LDFLAGS} ${LIBS}
-config directory        : ${SYSCONF_DIR}/nctu5gc/freeDiameter
-extensions directory    : ${LIB_DIR}/nctu5gc
+config directory        : ${SYSCONF_DIR}/free5gc/freeDiameter
+extensions directory    : ${LIB_DIR}/free5gc
 "

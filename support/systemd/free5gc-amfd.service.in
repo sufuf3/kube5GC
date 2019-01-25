@@ -1,0 +1,20 @@
+[Unit]
+Description=free5GC AMF Daemon
+After=networking.service
+
+[Service]
+Type=simple
+
+User=free5gc
+Group=free5gc
+
+RuntimeDirectory=free5gc-amfd
+PIDFile=@LIB_DIR@/run/free5gc-amfd/pid
+
+Restart=always
+ExecStart=@BIN_DIR@/free5gc-amfd -f @SYSCONF_DIR@/free5gc/amf.conf
+RestartSec=2
+RestartPreventExitStatus=1
+
+[Install]
+WantedBy=multi-user.target

@@ -1,7 +1,7 @@
-db_uri: mongodb://localhost/nctu5gc
+db_uri: mongodb://localhost/free5gc
 
 logger:
-    file: @LOCALSTATE_DIR@/log/nctu5gc/nctu5gc.log
+    file: @LOCALSTATE_DIR@/log/free5gc/free5gc.log
     trace: 
         app: 1
         s1ap: 1
@@ -64,7 +64,6 @@ amf:
 #      dev: eth0
 #
     s1ap:
-      addr: 192.188.2.2
 
 #
 #  <GUMMEI>
@@ -88,9 +87,9 @@ amf:
 #
     gummei: 
       plmn_id:
-        mcc: 208
-        mnc: 93
-      mme_gid: 1
+        mcc: 001
+        mnc: 01
+      mme_gid: 2
       mme_code: 1
 
 #
@@ -127,9 +126,9 @@ amf:
 #
     tai:
       plmn_id:
-        mcc: 208
-        mnc: 93
-      tac: 1
+        mcc: 001
+        mnc: 01
+      tac: 12345
 
     security:
         integrity_order : [ EIA1, EIA2, EIA0 ]
@@ -138,12 +137,12 @@ amf:
 #
 #  <Network Name>
 #    network_name:
-#        full: NCTU5GC
-#        short: Next
+#        full: free5GC
+#        short: free
 #
 
     network_name:
-        full: NCTU5GC
+        full: free5GC
 
 hss:
     freeDiameter: hss.conf
@@ -159,7 +158,7 @@ smf:
       - addr: ::1
 
     upf:
-      - addr: 192.188.2.2
+      - addr: 127.0.0.3
 
     http:
       addr: 127.0.0.1
@@ -233,7 +232,7 @@ smf:
 upf:
     pfcp:
       addr:
-        - 192.188.2.2
+        - 127.0.0.3
         - ::1
 
 #
@@ -249,7 +248,7 @@ upf:
 #      name: localhost
 #
     gtpu:
-      - addr: 192.188.2.2
+      - addr: 127.0.0.3
       - addr: ::1
 
     ue_pool:
