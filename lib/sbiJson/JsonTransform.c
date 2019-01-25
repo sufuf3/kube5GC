@@ -597,26 +597,26 @@ status_t JSONTRANSFORM_JsToSt_modify_bearer_request(modify_bearer_t *pModifyBear
     return CORE_OK;
 }
 
-void _add_sgw_ipt_to_struct(cJSON* json_key, ip_t *pIP)
+void _add_upf_ipt_to_struct(cJSON* json_key, ip_t *pIP)
 {
     c_sockaddr_t addr;
-    cJSON *j_sgw_s1u_addr4 = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_SGW_S1U_IP_IPV4);
-    cJSON *j_sgw_s1u_addr6 = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_SGW_S1U_IP_IPV6);
+    cJSON *j_upf_s1u_addr4 = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_SGW_S1U_IP_IPV4);
+    cJSON *j_upf_s1u_addr6 = cJSON_GetObjectItemCaseSensitive(json_key, JSONKEY_4G_SGW_S1U_IP_IPV6);
 
-    if (j_sgw_s1u_addr4 && j_sgw_s1u_addr6) {
+    if (j_upf_s1u_addr4 && j_upf_s1u_addr6) {
         pIP->ipv6 = 1; pIP->ipv4 = 1;
-        core_inet_pton(AF_INET, j_sgw_s1u_addr4->valuestring, &addr);
+        core_inet_pton(AF_INET, j_upf_s1u_addr4->valuestring, &addr);
         memcpy((void *)&pIP->both.addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
-        core_inet_pton(AF_INET6, j_sgw_s1u_addr6->valuestring, &addr);
+        core_inet_pton(AF_INET6, j_upf_s1u_addr6->valuestring, &addr);
         memcpy((void *)&pIP->both.addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
     }
-    else if (j_sgw_s1u_addr4) {
-        core_inet_pton(AF_INET, j_sgw_s1u_addr4->valuestring, &addr);
+    else if (j_upf_s1u_addr4) {
+        core_inet_pton(AF_INET, j_upf_s1u_addr4->valuestring, &addr);
         pIP->ipv6 = 0; pIP->ipv4 = 1;
         memcpy((void *)&pIP->addr, (void *)&addr.sin.sin_addr.s_addr, IPV4_LEN);
     }
-    else if (j_sgw_s1u_addr6) {
-        core_inet_pton(AF_INET6, j_sgw_s1u_addr6->valuestring, &addr);
+    else if (j_upf_s1u_addr6) {
+        core_inet_pton(AF_INET6, j_upf_s1u_addr6->valuestring, &addr);
         pIP->ipv6 = 1; pIP->ipv4 = 0;
         memcpy((void *)&pIP->addr6, (void *)&addr.sin6.sin6_addr.__in6_u.__u6_addr8, IPV6_LEN);
     }
@@ -637,9 +637,9 @@ status_t JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJ
         d_trace(15, "\tParse IMSI\n");
         _add_imsi_to_struct(pJson, sess->imsi, &sess->imsi_len);
 
-        /* sgw_s1u_teid */
-        d_trace(15, "\tParse SGW_S1U_TEID\n");
-        _add_json_to_struct_ui32_by_key(pJson, &sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
+        /* upf_s1u_teid */
+        d_trace(15, "\tParse UPF_S1U_TEID\n");
+        _add_json_to_struct_ui32_by_key(pJson, &sess->upf_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
 
         /* protocol_configuration_options(nas) */
         d_trace(15, "\tParse PCO\n");
@@ -664,9 +664,9 @@ status_t JSONTRANSFORM_JsToSt_create_session_response(create_session_t *sess, cJ
         ebi = atoi(j_ebi->valuestring);
         sess->ebi = ebi;
 
-        /* sgw_ip */
-        d_trace(15, "\tParse SGW_IP\n");
-        _add_sgw_ipt_to_struct(pJson, &sess->sgw_ip);
+        /* upf_ip */
+        d_trace(15, "\tParse upf_IP\n");
+        _add_upf_ipt_to_struct(pJson, &sess->upf_ip);
     } while(0);
     
     return CORE_OK;
@@ -692,9 +692,9 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
         d_trace(15, "\tBuild EBI\n");
         add_uint8_to_json(pJson, sess->ebi, JSONKEY_4G_EBI);
 
-        /* sgw_s1u_teid */
-        d_trace(15, "\tBuild SGW_S1U_TEID\n");
-        add_uint32_to_json(pJson, sess->sgw_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
+        /* upf_s1u_teid */
+        d_trace(15, "\tBuild UPF_S1U_TEID\n");
+        add_uint32_to_json(pJson, sess->upf_s1u_teid, JSONKEY_4G_SGW_S1U_TEID);
         
         /* PCO */
         d_trace(15, "\tBuild PCO\n");
@@ -705,20 +705,20 @@ status_t JSONTRANSFORM_StToJs_create_session_response(create_session_t *sess, cJ
             cJSON_AddStringToObject(pJson, JSONKEY_4G_PCO, conv);
         }
 
-        /* sgw_s1u_ip */
-        d_trace(15, "\tBuild SGW_S1U_IP\n");
-        if(sess->sgw_ip.ipv4 && sess->sgw_ip.ipv6){
-            INET_NTOP(&sess->sgw_ip.both.addr, ip4_buf);
-            INET6_NTOP(&sess->sgw_ip.both.addr6, ip6_buf);
+        /* upf_s1u_ip */
+        d_trace(15, "\tBuild UPF_S1U_IP\n");
+        if(sess->upf_ip.ipv4 && sess->upf_ip.ipv6){
+            INET_NTOP(&sess->upf_ip.both.addr, ip4_buf);
+            INET6_NTOP(&sess->upf_ip.both.addr6, ip6_buf);
             cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
             cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
         }
-        else if(sess->sgw_ip.ipv4){
-            INET_NTOP(&sess->sgw_ip.addr, ip4_buf);
+        else if(sess->upf_ip.ipv4){
+            INET_NTOP(&sess->upf_ip.addr, ip4_buf);
             cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV4, ip4_buf);
         }
-        else if(sess->sgw_ip.ipv6){
-            INET6_NTOP(&sess->sgw_ip.addr6, ip6_buf);
+        else if(sess->upf_ip.ipv6){
+            INET6_NTOP(&sess->upf_ip.addr6, ip6_buf);
             cJSON_AddStringToObject(pJson, JSONKEY_4G_SGW_S1U_IP_IPV6, ip6_buf);
         }
 

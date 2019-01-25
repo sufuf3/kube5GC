@@ -111,15 +111,11 @@ CORE_DECLARE(status_t) tests1ap_build_nas_delivery_indication(pkbuf_t **pkbuf, c
 CORE_DECLARE(status_t) tests1ap_build_nas_non_delivery_indication(pkbuf_t **pkbuf, c_uint32_t mme_ue_s1ap_id, c_uint32_t enb_ue_s1ap_id);
 CORE_DECLARE(status_t) tests1ap_build_retrieve_ue_information(pkbuf_t **pkbuf);
 
-/******************** Added by Chi ********************/
 CORE_DECLARE(status_t) tests1ap_build_enb_direct_information_transfer(
     pkbuf_t **s1apbuf);
-/******************************************************/
 
-/******************** Added by Hu ********************/
 CORE_DECLARE(status_t) tests1ap_build_enb_cp_relocation_indication(pkbuf_t **pkbuf, 
         c_uint32_t enb_ue_s1ap_id);
-/******************************************************/
 
 CORE_DECLARE(status_t) testngap_ran_connect(sock_id *new);
 CORE_DECLARE(status_t) testngap_ran_close(sock_id id);

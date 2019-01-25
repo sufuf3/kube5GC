@@ -5,11 +5,9 @@
 
 #include <yaml.h>
 
-/******************** Added by Chi ********************/
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-/******************************************************/
 
 typedef struct {
     yaml_document_t *document;

@@ -8,7 +8,7 @@
 # NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE 
 #
 
-interface pgwtun
+interface uptun
 {
 	AdvSendAdvert on;
 
@@ -39,7 +39,7 @@ interface pgwtun
 	AdvHomeAgentFlag off;
 
 #
-# Open5GC pgwtun prefix
+# free5GC uptun prefix
 #
 	prefix cafe::/64
 	{

@@ -24,7 +24,7 @@ static int _smf_pfcp_recv_cb(sock_id sock, void *data)
     if (rv != CORE_OK) return errno == EAGAIN ? 0 : -1;
 
     pfcp_h = (pfcp_header_t*)pkbuf->payload;
-    //$ check version 
+    // Check version
     if (pfcp_h->version > PFCP_VERSION)
     {
         unsigned char v_fail[8];
@@ -237,7 +237,7 @@ status_t smf_pfcp_send_session_establishment_request(smf_sess_t *sess)
     return CORE_OK;
 }
 
-status_t smf_pfcp_send_session_modification_request(smf_sess_t *sess)
+status_t smf_pfcp_send_setup_donwlink_session_modification_request(smf_sess_t *sess)
 {
     status_t rv;
 
@@ -249,7 +249,32 @@ status_t smf_pfcp_send_session_modification_request(smf_sess_t *sess)
     h.type = PFCP_SESSION_MODIFICATION_REQUEST_TYPE;
     h.seid = sess->upf_n4_seid;
 
-    rv = smf_n4_build_session_modification_request(&pkbuf, sess);
+    rv = smf_n4_build_session_modification_request_for_setup_downlink(&pkbuf, sess);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build error");
+
+    xact = pfcp_xact_local_create(sess->upf_node, &h, pkbuf);
+    d_assert(xact, return CORE_ERROR, "pfcp xact build error");
+
+    rv = pfcp_xact_commit(xact);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
+
+	pkbuf_free(pkbuf);
+    return CORE_OK;
+}
+
+status_t smf_pfcp_send_an_release_session_modification_request(smf_sess_t *sess)
+{
+    status_t rv;
+
+    pfcp_header_t h;
+    pfcp_xact_t *xact;
+    pkbuf_t *pkbuf = NULL;
+
+    memset(&h, 0, sizeof(pfcp_header_t));
+    h.type = PFCP_SESSION_MODIFICATION_REQUEST_TYPE;
+    h.seid = sess->upf_n4_seid;
+
+    rv = smf_n4_build_session_modification_request_for_an_release(&pkbuf, sess);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build error");
 
     xact = pfcp_xact_local_create(sess->upf_node, &h, pkbuf);
@@ -275,6 +300,31 @@ status_t smf_pfcp_send_session_deletion_request(smf_sess_t *sess)
     h.seid = sess->upf_n4_seid;
 
     rv = smf_n4_build_session_deletion_request(&pkbuf, sess);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build error");
+
+    xact = pfcp_xact_local_create(sess->upf_node, &h, pkbuf);
+    d_assert(xact, return CORE_ERROR, "pfcp xact build error");
+
+    rv = pfcp_xact_commit(xact);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "xact_commit error");
+
+	pkbuf_free(pkbuf);
+    return CORE_OK;
+}
+
+status_t smf_pfcp_send_session_report_response(smf_sess_t *sess)
+{
+    status_t rv;
+
+    pfcp_header_t h;
+    pfcp_xact_t *xact;
+    pkbuf_t *pkbuf = NULL;
+
+    memset(&h, 0, sizeof(pfcp_header_t));
+    h.type = PFCP_SESSION_REPORT_RESPONSE_TYPE;
+    h.seid = sess->upf_n4_seid;
+
+    rv = smf_n4_build_session_report_response(&pkbuf, sess);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build error");
 
     xact = pfcp_xact_local_create(sess->upf_node, &h, pkbuf);

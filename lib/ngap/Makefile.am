@@ -9,21 +9,21 @@ libngap_la_SOURCES = \
 	$(NULL)
 
 libngap_la_DEPENDENCIES = \
-    $(top_srcdir)/lib/core/src/libcore.la \
-    $(top_srcdir)/lib/ngap/asn1c/libngapasn1c.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
+	$(top_srcdir)/lib/ngap/asn1c/libngapasn1c.la \
 	$(NULL)
 
 libngap_la_LIBADD = \
-    $(top_srcdir)/lib/core/src/libcore.la \
-    $(top_srcdir)/lib/ngap/asn1c/libngapasn1c.la \
+	$(top_srcdir)/lib/nextepc/core/src/libcore.la \
+	$(top_srcdir)/lib/ngap/asn1c/libngapasn1c.la \
 	$(NULL)
 
 AM_LDFLAGS = \
 	-version-info @LIBVERSION@
 
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/lib/core/include \
-    -I$(top_srcdir)/lib/ngap/asn1c \
+	-I$(top_srcdir)/lib/nextepc/core/include \
+	-I$(top_srcdir)/lib/ngap/asn1c \
 	$(NULL)
 
 AM_CFLAGS = \

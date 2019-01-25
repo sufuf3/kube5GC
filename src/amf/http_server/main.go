@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/tls"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,6 +11,8 @@ import (
 	"net/http"
 	"sync"
 	"syscall"
+
+	"golang.org/x/sys/unix"
 
 	"golang.org/x/net/http2"
 )
@@ -24,6 +27,12 @@ var (
 	smContextUpdateConn   *net.UnixConn
 	smContextReleaseConn  *net.UnixConn
 	smContextRetrieveConn *net.UnixConn
+)
+
+var (
+	smfAddr    string
+	smfPort    uint
+	smfAPIRoot string
 )
 
 var (
@@ -62,6 +71,12 @@ var (
 )
 
 func init() {
+	flag.StringVar(&smfAddr, "smf_addr", "localhost", "ip address of sbi server")
+	flag.UintVar(&smfPort, "smf_port", 8080, "port")
+	flag.Parse()
+
+	smfAPIRoot = fmt.Sprintf("%s:%d", smfAddr, smfPort)
+
 	wg.Add(4)
 	client = http.Client{
 		// Skip TLS dial
@@ -98,7 +113,7 @@ func init() {
 }
 
 func handleSMContextCreate() {
-	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts"
+	url := fmt.Sprintf("https://%s/nsmf-pdusession/v1/sm-contexts", smfAPIRoot)
 	var buf []byte
 	buf = make([]byte, 4096)
 	for {
@@ -126,8 +141,7 @@ func handleSMContextCreate() {
 }
 
 func handleSMContextUpdate() {
-	log.Println("AMF SM Context Update")
-	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/modify"
+	url := fmt.Sprintf("https://%s/nsmf-pdusession/v1/sm-contexts/modify", smfAPIRoot)
 	var buf []byte
 	buf = make([]byte, 4096)
 	for {
@@ -155,7 +169,7 @@ func handleSMContextUpdate() {
 }
 
 func handleSMContextRelease() {
-	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/release"
+	url := fmt.Sprintf("https://%s/nsmf-pdusession/v1/sm-contexts/release", smfAPIRoot)
 	var buf []byte
 	buf = make([]byte, 4096)
 	for {
@@ -183,7 +197,7 @@ func handleSMContextRelease() {
 }
 
 func handleSMContextRetrieve() {
-	url := "https://localhost:8080/nsmf-pdusession/v1/sm-contexts/retrieve"
+	url := fmt.Sprintf("https://%s/nsmf-pdusession/v1/sm-contexts/retrieve", smfAPIRoot)
 	var buf []byte
 	buf = make([]byte, 4096)
 	for {
@@ -215,6 +229,11 @@ func main() {
 	go handleSMContextUpdate()
 	go handleSMContextRelease()
 	go handleSMContextRetrieve()
+
+	if err := unix.Prctl(unix.PR_SET_PDEATHSIG, uintptr(unix.SIGKILL), 0, 0, 0); err != nil {
+		log.Fatal("Prctl Fail")
+		return
+	}
 
 	wg.Wait()
 }

@@ -11,10 +11,6 @@ extern "C" {
 typedef enum {
     SMF_EVT_BASE = FSM_USER_SIG,
 
-    SMF_EVT_S11_MESSAGE,
-    SMF_EVT_S11_T3_RESPONSE,
-    SMF_EVT_S11_T3_HOLDING,
-
     SMF_EVT_GX_MESSAGE,
 
     SMF_EVT_N4_MESSAGE,

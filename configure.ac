@@ -8,7 +8,7 @@ dnl This program is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_INIT([Open5GC], [1.0.0], [nctuwirelab@gmail.com])
+AC_INIT([free5GC], [1.0.0], [nctuwirelab@gmail.com])
 
 AC_SUBST(LIBVERSION)
 LIBVERSION=1:0:0
@@ -47,8 +47,8 @@ AC_SUBST(IPFW_CPPFLAGS)
 AC_SUBST(LO_DEV)
 
 AH_TOP([
-#ifndef __OPEN5GC_CONFIG_H__
-#define __OPEN5GC_CONFIG_H__
+#ifndef __FREE5GC_CONFIG_H__
+#define __FREE5GC_CONFIG_H__
 /* need this, because some autoconf tests rely on this (e.g. stpcpy)
  * and it should be used for new programs  */
 #define _DEFAULT_SOURCE 1
@@ -56,7 +56,7 @@ AH_TOP([
 ])
 
 AH_BOTTOM([
-#endif /* __OPEN5GC_CONFIG_H__ */
+#endif /* __FREE5GC_CONFIG_H__ */
 ])
 
 AH_VERBATIM([_REENTRANT],
@@ -422,65 +422,69 @@ AC_SUBST(FREEDIAMETER_DIR)
 #####################
 
 AC_CONFIG_SUBDIRS([lib/freeDiameter-1.2.1])
-
-AC_CONFIG_FILES([lib/core/include/core.h])
-AC_CONFIG_FILES([lib/core/src/Makefile])
-AC_CONFIG_FILES([lib/core/test/Makefile])
-AC_CONFIG_FILES([lib/core/Makefile])
-AC_CONFIG_FILES([lib/s1ap/asn1c/Makefile])
-AC_CONFIG_FILES([lib/s1ap/Makefile])
-#####################add by Hu#####################
+AC_CONFIG_FILES([lib/ipfw/Makefile])
 AC_CONFIG_FILES([lib/ngap/asn1c/Makefile])
 AC_CONFIG_FILES([lib/ngap/Makefile])
-###################################################
-AC_CONFIG_FILES([lib/nas/Makefile])
-AC_CONFIG_FILES([lib/fd/Makefile])
-AC_CONFIG_FILES([lib/gtp/Makefile])
 AC_CONFIG_FILES([lib/pfcp/Makefile])
-AC_CONFIG_FILES([lib/ipfw/Makefile])
 AC_CONFIG_FILES([lib/cJSON/Makefile])
 AC_CONFIG_FILES([lib/sbiJson/Makefile])
+
+AC_CONFIG_FILES([lib/nextepc/core/include/core.h])
+AC_CONFIG_FILES([lib/nextepc/core/src/Makefile])
+AC_CONFIG_FILES([lib/nextepc/core/test/Makefile])
+AC_CONFIG_FILES([lib/nextepc/core/Makefile])
+AC_CONFIG_FILES([lib/nextepc/s1ap/asn1c/Makefile])
+AC_CONFIG_FILES([lib/nextepc/s1ap/Makefile])
+AC_CONFIG_FILES([lib/nextepc/nas/Makefile])
+AC_CONFIG_FILES([lib/nextepc/fd/Makefile])
+AC_CONFIG_FILES([lib/nextepc/gtp/Makefile])
+AC_CONFIG_FILES([lib/nextepc/Makefile])
 AC_CONFIG_FILES([lib/Makefile])
+
 AC_CONFIG_FILES([src/app/Makefile])
 AC_CONFIG_FILES([src/amf/Makefile])
 AC_CONFIG_FILES([src/amf/http_server/Makefile])
-AC_CONFIG_FILES([src/hss/Makefile])
 AC_CONFIG_FILES([src/smf/Makefile])
 AC_CONFIG_FILES([src/smf/http_server/Makefile])
-AC_CONFIG_FILES([src/pcrf/Makefile])
 AC_CONFIG_FILES([src/upf/Makefile])
+
+AC_CONFIG_FILES([src/nextepc/hss/Makefile])
+AC_CONFIG_FILES([src/nextepc/pcrf/Makefile])
+AC_CONFIG_FILES([src/nextepc/Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([support/config/open5gc.conf])
-AC_CONFIG_FILES([support/config/open5gc.testngc.conf])
+
+AC_CONFIG_FILES([support/config/free5gc.conf])
 AC_CONFIG_FILES([support/config/hss.conf])
 AC_CONFIG_FILES([support/config/pcrf.conf])
 AC_CONFIG_FILES([support/config/smf.conf])
+AC_CONFIG_FILES([support/config/amf.conf])
 AC_CONFIG_FILES([support/config/upf.conf])
 AC_CONFIG_FILES([support/config/Makefile])
-AC_CONFIG_FILES([support/freeDiameter/mme.conf])
-AC_CONFIG_FILES([support/freeDiameter/pgw.conf])
+AC_CONFIG_FILES([support/freeDiameter/amf.conf])
+AC_CONFIG_FILES([support/freeDiameter/smf.conf])
 AC_CONFIG_FILES([support/freeDiameter/hss.conf])
 AC_CONFIG_FILES([support/freeDiameter/pcrf.conf])
 AC_CONFIG_FILES([support/freeDiameter/Makefile])
-AC_CONFIG_FILES([support/systemd/open5gc-amfd.service])
+AC_CONFIG_FILES([support/systemd/free5gc-amfd.service])
 AC_CONFIG_FILES([support/systemd/nextepc-hssd.service])
 AC_CONFIG_FILES([support/systemd/nextepc-pcrfd.service])
-AC_CONFIG_FILES([support/systemd/open5gc-upfd.service])
+AC_CONFIG_FILES([support/systemd/free5gc-upfd.service])
 AC_CONFIG_FILES([support/systemd/Makefile])
-AC_CONFIG_FILES([support/logrotate/open5gc])
+AC_CONFIG_FILES([support/logrotate/free5gc])
 AC_CONFIG_FILES([support/logrotate/Makefile])
-AC_CONFIG_FILES([support/newsyslog/open5gc.conf])
+AC_CONFIG_FILES([support/newsyslog/free5gc.conf])
 AC_CONFIG_FILES([support/newsyslog/Makefile])
 AC_CONFIG_FILES([support/https/Makefile])
 AC_CONFIG_FILES([support/Makefile])
 AC_CONFIG_FILES([test/sample.conf])
 AC_CONFIG_FILES([test/sample-volte.conf])
+AC_CONFIG_FILES([test/free5gc.testngc.conf])
 AC_CONFIG_FILES([test/Makefile])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
 echo "
-Open5GC configuration
+free5GC configuration
 --------------------
 version                 : ${PACKAGE_VERSION}
 host                    : ${host}
@@ -489,7 +493,7 @@ compiler                : ${CC}
 compiler flags          : ${CFLAGS} ${YAML_CFLAGS} ${MONGOC_CFLAGS} 
 linker flags            : ${LDFLAGS} ${LIBS} ${YAML_LIBS} ${MONGOC_LIBS}
 bin directory           : ${BIN_DIR}
-lib directory           : ${LIB_DIR}/open5gc
-config directory        : ${SYSCONF_DIR}/open5gc
-log directory           : ${LOCALSTATE_DIR}/log/open5gc
+lib directory           : ${LIB_DIR}/free5gc
+config directory        : ${SYSCONF_DIR}/free5gc
+log directory           : ${LOCALSTATE_DIR}/log/free5gc
 "

@@ -1,23 +1,23 @@
 configfiles = \
-	mme.conf \
+	amf.conf \
 	hss.conf \
-	pgw.conf \
+	smf.conf \
 	pcrf.conf \
-    $(NULL)
+	$(NULL)
 
 pemfiles = \
 	cacert.pem \
-	mme.key.pem \
-	mme.cert.pem \
+	amf.key.pem \
+	amf.cert.pem \
 	hss.key.pem \
 	hss.cert.pem \
-	pgw.key.pem \
-	pgw.cert.pem \
+	smf.key.pem \
+	smf.cert.pem \
 	pcrf.key.pem \
 	pcrf.cert.pem \
-    $(NULL)
+	$(NULL)
 
-freeDiameterdir = ${sysconfdir}/open5gc/freeDiameter
+freeDiameterdir = ${sysconfdir}/free5gc/freeDiameter
 
 freeDiameter_DATA = ${configfiles} ${pemfiles}
 

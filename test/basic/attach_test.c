@@ -49,8 +49,8 @@ static void attach_test1(abts_case *tc, void *data)
         "0002010000000153 12172c5949640125 006b000518000c00 00004900203311c6"
         "03c6a6d67f695e5a c02bb75b381b693c 3893a6d932fd9182 3544e3e79b";
     char *_emm_information = 
-        "000b403b00000300 000005c00100009d 000800020001001a 002524271f9b491e"
-        "030761430f10004e 0065007800740045 0050004347812072 11240563490100";
+        "000b403b00000300 000005c00100009d 000800020001001a 002524276e110349"
+        "030761430f100066 0072006500650035 0047004347911042 10144523490100";
 
     mongoc_collection_t *collection = NULL;
     bson_t *doc = NULL;
@@ -99,11 +99,11 @@ static void attach_test1(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB connects to SGW */
+    /* eNB connects to UPF */
     rv = testgtpu_enb_connect(&gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -457,11 +457,11 @@ static void attach_test1(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB disonncect from SGW */
+    /* eNB disonncect from UPF */
     rv = testgtpu_enb_close(gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -479,11 +479,11 @@ out:
 
     core_sleep(time_from_msec(300));
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB disonncect from SGW */
+    /* eNB disonncect from UPF */
     rv = testgtpu_enb_close(gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 }
@@ -591,7 +591,7 @@ static void attach_test2(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -844,7 +844,7 @@ static void attach_test2(abts_case *tc, void *data)
 
     mongoc_collection_destroy(collection);
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 }
@@ -888,8 +888,8 @@ static void attach_test3(abts_case *tc, void *data)
         "05ff9c6791b8503a 032c6effa7";
 
     char *_emm_information =
-        "000b403b00000300 000005c0020000c8 000800020002001a 002524276782702a"
-        "030761430f10004e 0065007800740045 0050004347812072 11941563490100";
+        "000b403b00000300 000005c0020000c8 000800020002001a 00252427011b92c8"
+        "030761430f100066 0072006500650035 0047004347911042 10240023490100";
 
     char *_ue_context_release_command = 
         "0017"
@@ -942,7 +942,7 @@ static void attach_test3(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -1074,8 +1074,8 @@ static void attach_test3(abts_case *tc, void *data)
     rv = tests1ap_enb_read(sock, recvbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     CORE_HEX(_emm_information, strlen(_emm_information), tmp);
-    // ABTS_TRUE(tc, memcmp(recvbuf->payload, tmp, 28) == 0);
-    // ABTS_TRUE(tc, memcmp(recvbuf->payload+32, tmp+32, 20) == 0);
+    ABTS_TRUE(tc, memcmp(recvbuf->payload, tmp, 28) == 0);
+    ABTS_TRUE(tc, memcmp(recvbuf->payload+32, tmp+32, 20) == 0);
     pkbuf_free(recvbuf);
 
     /* Retreive M-TMSI */
@@ -1085,13 +1085,11 @@ static void attach_test3(abts_case *tc, void *data)
     d_assert(amf4g_ue, goto out,);
     m_tmsi = amf4g_ue->guti.m_tmsi;
 
-    /******************** Added by Hu ********************/
     /* Send eNB CP relocation indication */
     rv = tests1ap_build_enb_cp_relocation_indication(&sendbuf, enb_ue->enb_ue_s1ap_id);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
-    /******************************************************/
     
 
     /* Send UE Context Release Request */
@@ -1279,7 +1277,7 @@ out:
 
     mongoc_collection_destroy(collection);
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
@@ -1351,11 +1349,11 @@ static void attach_test4(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB connects to SGW */
+    /* eNB connects to UPF */
     rv = testgtpu_enb_connect(&gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -1477,11 +1475,11 @@ static void attach_test4(abts_case *tc, void *data)
 
     mongoc_collection_destroy(collection);
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
-    /* eNB disonncect from SGW */
+    /* eNB disonncect from UPF */
     rv = testgtpu_enb_close(gtpu);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 }
@@ -1547,7 +1545,7 @@ static void attach_test5(abts_case *tc, void *data)
 
     core_sleep(time_from_msec(300));
 
-    /* eNB connects to MME */
+    /* eNB connects to AMF */
     rv = tests1ap_enb_connect(&sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 
@@ -1702,21 +1700,17 @@ static void attach_test5(abts_case *tc, void *data)
     
 
 
-    /******************** Added by Chi ********************/
     /* Send eNB direct information transfer */
     rv = tests1ap_build_enb_direct_information_transfer(&sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
-    /******************************************************/
 
     
-    /******************** Added by Roger Chu ********************/
     rv = tests1ap_build_retrieve_ue_information(&sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
     rv = tests1ap_enb_send(sock, sendbuf);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
-    /************************************************************/
 
 #if 0
     rv = tests1ap_build_s1_reset(&sendbuf, 0);
@@ -1849,7 +1843,7 @@ out:
 
     mongoc_collection_destroy(collection);
 
-    /* eNB disonncect from MME */
+    /* eNB disonncect from AMF */
     rv = tests1ap_enb_close(sock);
     ABTS_INT_EQUAL(tc, CORE_OK, rv);
 }

@@ -6,12 +6,12 @@ dict_nasreq_la_SOURCES = \
 	dict_nasreq.c
 
 dict_nasreq_la_DEPENDENCIES = \
-    $(top_srcdir)/libfdcore/libfdcore.la \
-    $(top_srcdir)/libfdproto/libfdproto.la
+	$(top_srcdir)/libfdcore/libfdcore.la \
+	$(top_srcdir)/libfdproto/libfdproto.la
 
 dict_nasreq_la_LIBADD = \
-    $(top_srcdir)/libfdcore/libfdcore.la \
-    $(top_srcdir)/libfdproto/libfdproto.la
+	$(top_srcdir)/libfdcore/libfdcore.la \
+	$(top_srcdir)/libfdproto/libfdproto.la
 
 AM_LDFLAGS = \
 	-module -avoid-version -shared

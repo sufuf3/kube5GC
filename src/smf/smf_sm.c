@@ -13,7 +13,6 @@
 #include "smf_fd_path.h"
 #include "smf_sm.h"
 
-#include "gtp/gtp_message.h"
 #include "pfcp/pfcp_message.h"
 
 #include "sbiJson/JsonTransform.h"
@@ -178,6 +177,10 @@ void smf_state_operational(fsm_t *s, event_t *e)
                 case PFCP_SESSION_DELETION_RESPONSE_TYPE:
                     smf_n4_handle_session_deletion_response(
                         xact, sess,&message->pfcp_session_deletion_response);
+                    break;
+                case PFCP_SESSION_REPORT_REQUEST_TYPE:
+                    smf_n4_handle_session_report_request(
+                        xact, sess, &message->pfcp_session_report_request);
                     break;
                 default:
                     break;

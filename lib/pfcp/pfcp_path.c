@@ -382,7 +382,7 @@ status_t pfcp_start_heartbeat(pfcp_node_t *gnode, c_uint32_t recovery_time)
     pfcp_header_t h;
     memset(&h, 0, sizeof(pfcp_header_t));
     h.type = PFCP_HEARTBEAT_REQUEST_TYPE;
-    h.seid = 0;//sess->sgw_s5c_teid;
+    h.seid = 0; //sess->upf_teid;
     
     n4_xact = pfcp_xact_local_create(gnode, &h, pkb_req);
     d_assert(n4_xact, return CORE_ERROR, "Null param");

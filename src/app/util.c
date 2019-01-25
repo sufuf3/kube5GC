@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-/******************** Added by Chi ********************/
 int get_cpu_cores()
 {
     return get_nprocs();
@@ -90,4 +89,3 @@ status_t ht_rand_select_non_dup(hash_t *haystack, int select_count, void **sel_i
 
     return CORE_OK;
 }
-/******************************************************/

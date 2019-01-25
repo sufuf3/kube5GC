@@ -8,10 +8,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/******************** Chu ********************/
 CORE_DECLARE(status_t) s1ap_build_overload_stop(pkbuf_t **pkbuf);
-/*********************************************/
-//add by YEE
 CORE_DECLARE(status_t) s1ap_build_reroute_nas_request(
     pkbuf_t **s1apbuf, enb_ue_t *enb_ue);
 CORE_DECLARE(status_t) s1ap_build_ue_radio_capability_match_request(
@@ -21,10 +18,8 @@ CORE_DECLARE(status_t) s1ap_build_e_rab_modification_confirm(
 
 CORE_DECLARE(status_t) s1ap_build_setup_rsp(pkbuf_t **pkbuf);
 
-/******************** Added by Chi ********************/
 CORE_DECLARE(status_t) s1ap_build_overload_start(pkbuf_t **pkbuf);
-/******************************************************/
-/////////////////////////////////////////////////////////////////////////pan
+
 CORE_DECLARE(status_t) s1ap_build_enb_configuration_update_acknowledge(pkbuf_t **pkbuf);
 CORE_DECLARE(status_t) s1ap_build_enb_configuration_update_failure(
     pkbuf_t **pkbuf, S1AP_Cause_PR group, long cause, long time_to_wait);
@@ -62,7 +57,6 @@ CORE_DECLARE(status_t) s1ap_build_e_rab_release_command(pkbuf_t **s1apbuf,
     amf4g_bearer_t *bearer, pkbuf_t *esmbuf, S1AP_Cause_PR group, long cause);
 CORE_DECLARE(status_t) s1ap_build_ue_context_release_command(
     pkbuf_t **s1apbuf, enb_ue_t *enb_ue, S1AP_Cause_PR group, long cause);
-/***************Add by Steven****************/
 CORE_DECLARE(status_t) s1ap_build_ue_context_resume_response(
     pkbuf_t **s1apbuf, 
     S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
@@ -72,7 +66,6 @@ CORE_DECLARE(status_t) s1ap_build_ue_context_resume_failure(
     S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
     S1AP_MME_UE_S1AP_ID_t *mme_ue_s1ap_id,
     S1AP_Cause_t *cause);
-/******************************************/
 CORE_DECLARE(status_t) s1ap_build_paging(pkbuf_t **s1apbuf, amf4g_ue_t *amf4g_ue);
 
 CORE_DECLARE(status_t) s1ap_build_mme_configuration_transfer(

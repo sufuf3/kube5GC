@@ -6,12 +6,12 @@ dict_nas_mipv6_la_SOURCES = \
 	dict_nas_mipv6.c
 
 dict_nas_mipv6_la_DEPENDENCIES = \
-    $(top_srcdir)/libfdcore/libfdcore.la \
-    $(top_srcdir)/libfdproto/libfdproto.la
+	$(top_srcdir)/libfdcore/libfdcore.la \
+	$(top_srcdir)/libfdproto/libfdproto.la
 
 dict_nas_mipv6_la_LIBADD = \
-    $(top_srcdir)/libfdcore/libfdcore.la \
-    $(top_srcdir)/libfdproto/libfdproto.la
+	$(top_srcdir)/libfdcore/libfdcore.la \
+	$(top_srcdir)/libfdproto/libfdproto.la
 
 AM_LDFLAGS = \
 	-module -avoid-version -shared

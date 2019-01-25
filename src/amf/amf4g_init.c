@@ -93,9 +93,7 @@ static void *THREAD_FUNC sm_main(thread_id id, void *data)
     fsm_create(&amf4g_sm, amf4g_state_initial, amf4g_state_final);
     fsm_init(&amf4g_sm, 0);
 
-    /******************** Added by Chi ********************/
     amf4g_overload_checking_init();
-    /******************************************************/
 
     prev_tm = time_now();
 

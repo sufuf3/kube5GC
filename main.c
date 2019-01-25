@@ -18,7 +18,7 @@ static char *compile_time = __DATE__ " " __TIME__;
 
 static void show_version()
 {
-    printf("Open5GC daemon v%s - %s\n",
+    printf("free5GC daemon v%s - %s\n",
             PACKAGE_VERSION, compile_time);
 }
 
@@ -149,15 +149,15 @@ int main(int argc, char *argv[])
         if (rv == CORE_EAGAIN)
             return EXIT_SUCCESS;
 
-        d_fatal("Open5GC initialization failed. Aborted");
+        d_fatal("free5GC initialization failed. Aborted");
         return EXIT_FAILURE;
     }
 
     d_print("\n\n");
-    d_info("Open5GC daemon start");
+    d_info("free5GC daemon start");
     signal_thread(check_signal);
 
-    d_info("Open5GC daemon terminating...");
+    d_info("free5GC daemon terminating...");
 
     return EXIT_SUCCESS;
 }

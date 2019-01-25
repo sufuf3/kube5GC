@@ -5,9 +5,6 @@
 #include "3gpp_types.h"
 
 
-// #include "mme/s1ap_build.h"
-// #include "mme/s1ap_conv.h"
-
 #include "amf/ngap_build.h"
 #include "amf/ngap_conv.h"
 

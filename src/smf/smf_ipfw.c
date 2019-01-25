@@ -271,10 +271,10 @@ smf_bearer_t *smf_bearer_find_by_packet(pkbuf_t *pkt)
     else
         d_error("Invalid IP version = %d\n", ip_h->ip_v);
 
-    d_trace(5, "[PGW] PROTO:%d SRC:%08x %08x %08x %08x\n",
+    d_trace(5, "[SMF] PROTO:%d SRC:%08x %08x %08x %08x\n",
             proto, ntohl(src_addr[0]), ntohl(src_addr[1]),
             ntohl(src_addr[2]), ntohl(src_addr[3]));
-    d_trace(5, "[PGW] HLEN:%d  DST:%08x %08x %08x %08x\n",
+    d_trace(5, "[SMF] HLEN:%d  DST:%08x %08x %08x %08x\n",
             ip_hlen, ntohl(dst_addr[0]), ntohl(dst_addr[1]),
             ntohl(dst_addr[2]), ntohl(dst_addr[3]));
 
@@ -290,10 +290,10 @@ smf_bearer_t *smf_bearer_find_by_packet(pkbuf_t *pkt)
         d_assert(sess, return NULL,);
 
         if (sess->ipv4)
-            d_trace(5, "[PGW] PAA IPv4:%s\n",
+            d_trace(5, "[SMF] PAA IPv4:%s\n",
                     INET_NTOP(&sess->ipv4->addr, buf));
         if (sess->ipv6)
-            d_trace(5, "[PGW] PAA IPv6:%s\n",
+            d_trace(5, "[SMF] PAA IPv6:%s\n",
                     INET6_NTOP(&sess->ipv6->addr, buf));
 
         if ((sess->ipv4 && memcmp(dst_addr, sess->ipv4->addr, addr_len) == 0) ||
@@ -307,7 +307,7 @@ smf_bearer_t *smf_bearer_find_by_packet(pkbuf_t *pkt)
             d_assert(default_bearer, return NULL, "No default Bearer");
 
             /* Found */
-            d_trace(5, "[PGW] Found Session : EBI[%d]\n", default_bearer->ebi);
+            d_trace(5, "[SMF] Found Session : EBI[%d]\n", default_bearer->ebi);
 
             bearer = smf_bearer_next(default_bearer);
             /* Find the bearer with matched */

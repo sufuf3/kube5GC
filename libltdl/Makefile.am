@@ -44,10 +44,10 @@ MOSTLYCLEANFILES =
 
 # -I$(srcdir) is needed for user that built libltdl with a sub-Automake
 # (not as a sub-package!) using 'nostdinc':
-AM_CPPFLAGS	       += -DLT_CONFIG_H='<$(LT_CONFIG_H)>' \
+AM_CPPFLAGS		   += -DLT_CONFIG_H='<$(LT_CONFIG_H)>' \
 			  -DLTDL -I. -I$(srcdir) -Ilibltdl \
 			  -I$(srcdir)/libltdl
-AM_LDFLAGS	       += -no-undefined
+AM_LDFLAGS		   += -no-undefined
 LTDL_VERSION_INFO	= -version-info 10:1:3
 
 noinst_LTLIBRARIES	+= $(LT_DLLOADERS)
@@ -57,12 +57,12 @@ ltdlincludedir		= $(includedir)/libltdl
 ltdlinclude_HEADERS	= libltdl/lt_system.h \
 			  libltdl/lt_error.h \
 			  libltdl/lt_dlloader.h
-include_HEADERS	       += ltdl.h
-lib_LTLIBRARIES	       += libltdl.la
+include_HEADERS		   += ltdl.h
+lib_LTLIBRARIES		   += libltdl.la
 endif
 
 if CONVENIENCE_LTDL
-noinst_LTLIBRARIES     += libltdlc.la
+noinst_LTLIBRARIES	 += libltdlc.la
 endif
 
 libltdl_la_SOURCES = libltdl/lt__alloc.h \
@@ -82,7 +82,7 @@ libltdl_la_SOURCES = libltdl/lt__alloc.h \
 			  ltdl.h \
 			  slist.c
 
-EXTRA_DIST	       += lt__dirent.c \
+EXTRA_DIST		   += lt__dirent.c \
 			  lt__strl.c
 
 libltdl_la_CPPFLAGS	= -DLTDLOPEN=$(LTDLOPEN) $(AM_CPPFLAGS)
@@ -100,7 +100,7 @@ libltdlc_la_DEPENDENCIES= $(libltdl_la_DEPENDENCIES)
 ## pic-objects (either as a shared library, or a convenience library),
 ## so the loaders themselves must be made from pic-objects too.  We
 ## use convenience libraries for that purpose:
-EXTRA_LTLIBRARIES	       += dlopen.la \
+EXTRA_LTLIBRARIES		   += dlopen.la \
 				  dld_link.la \
 				  dyld.la \
 				  load_add_on.la \
@@ -129,15 +129,15 @@ shl_load_la_LDFLAGS	= -module -avoid-version
 shl_load_la_LIBADD	= $(LIBADD_SHL_LOAD)
 
 ## Make sure these will be cleaned even when they're not built by default:
-CLEANFILES		       += libltdl.la \
+CLEANFILES			   += libltdl.la \
 				  libltdlc.la \
 				  libdlloader.la
 
 ## Automake-1.9.6 doesn't clean subdir AC_LIBOBJ compiled objects
 ## automatically:
-CLEANFILES	       += $(LIBOBJS) $(LTLIBOBJS)
+CLEANFILES		   += $(LIBOBJS) $(LTLIBOBJS)
 
-EXTRA_DIST	       += COPYING.LIB \
+EXTRA_DIST		   += COPYING.LIB \
 			  README
 
 ## --------------------------- ##
@@ -156,4 +156,4 @@ libltdl/lt__argz.h: libltdl/lt__argz_.h
 	$(AM_V_GEN)cp $(srcdir)/libltdl/lt__argz_.h $@-t
 	$(AM_V_at)mv $@-t $@
 MOSTLYCLEANFILES += libltdl/lt__argz.h \
-		    libltdl/lt__argz.h-t
+			libltdl/lt__argz.h-t

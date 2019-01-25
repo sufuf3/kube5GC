@@ -23,19 +23,21 @@ typedef struct _create_session_t {
     tai_t           tai;
     e_cgi_t         e_cgi;
     plmn_id_t       visited_plmn_id;
-    c_uint32_t      sgw_s1u_teid;
+    c_uint32_t      upf_s1u_teid;
     ue_pco_t        ue_pco;
     c_int8_t        apn[MAX_APN_LEN+1];
     pdn_t           pdn;
     c_uint8_t       ebi;
     guti_t          guti;
-    ip_t            sgw_ip;
+    ip_t            upf_ip;
     c_uint8_t       rat_type[10];
 } create_session_t;
 
 typedef struct _modify_bearer_t {
-    #define SM_CONTEXT_UPDATE_TYPE_MODIFY            0x01
-    #define SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS    0x02
+    #define SM_CONTEXT_UPDATE_TYPE_MODIFY                           0x01
+    #define SM_CONTEXT_UPDATE_TYPE_RELEASE_ACCESS                   0x02
+    #define SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION       0x03
+    #define SM_CONTEXT_UPDATE_TYPE_DOWNLINK_DATA_NOTIFICATION_ACK   0x04
     c_uint8_t       sm_context_update_type;
     c_uint8_t       imsi[MAX_IMSI_LEN];
     c_int32_t       imsi_len;

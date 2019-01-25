@@ -52,8 +52,8 @@ typedef struct _context_t {
     struct {
         /* Element */
         int no_hss;
-        int no_sgw;
-        int no_pgw;
+        int no_smf;
+        int no_upf;
         int no_pcrf;
 
         /* Network */

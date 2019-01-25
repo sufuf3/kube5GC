@@ -14,13 +14,6 @@ char* smf_event_get_name(event_t *e)
         case FSM_EXIT_SIG: 
             return FSM_NAME_EXIT_SIG;
 
-        case SMF_EVT_S11_MESSAGE:
-            return "SMF_EVT_S11_MESSAGE";
-        case SMF_EVT_S11_T3_HOLDING:
-            return "SMF_EVT_S11_T3_HOLDING";
-        case SMF_EVT_S11_T3_RESPONSE:
-            return "SMF_EVT_S11_T3_RESPONSE";
-
         case SMF_EVT_GX_MESSAGE:
             return "SMF_EVT_GX_MESSAGE";
 

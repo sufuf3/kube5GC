@@ -16,6 +16,8 @@ CORE_DECLARE(void) upf_n4_handle_session_modification_request(
         upf_sess_t *sess, pfcp_xact_t *xact, pfcp_session_modification_request_t *req);
 CORE_DECLARE(void) upf_n4_handle_session_deletion_request(
         upf_sess_t *sess, pfcp_xact_t *xact, pfcp_session_deletion_request_t *req);
+CORE_DECLARE(void) upf_n4_handle_session_report_response(
+        upf_sess_t *sess, pfcp_xact_t *xact, pfcp_session_report_response_t *req);
 CORE_DECLARE(void) upf_n4_handle_association_setup_request(
         pfcp_xact_t *xact, pfcp_association_setup_request_t *req);
 CORE_DECLARE(void) upf_n4_handle_association_update_request(

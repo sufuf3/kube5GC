@@ -1,5 +1,6 @@
 #define TRACE_MODULE _smf_n11_build
 #include "gtp/gtp_conv.h"
+#include "gtp/gtp_types.h"
 #include "smf_n11_build.h"
 
 static c_int16_t smf_sbi_pco_build(c_uint8_t *pco_buf, c_uint8_t *pco_ori, c_uint32_t pco_ori_len)
@@ -167,9 +168,8 @@ status_t smf_n11_build_create_session_response(
     gtp_f_teid_t s1_u_enodeb_f_teid;
     c_int32_t f_teid_len;
 
-    // Send Control Plane(UL) : SGW-S11
     bearer = smf_default_bearer_in_sess(sess);
-    createSession.sgw_s1u_teid = bearer->sgw_s1u_teid;
+    createSession.upf_s1u_teid = bearer->upf_s1u_teid;
 
     // PDN
     memcpy(&createSession.pdn, &sess->pdn, sizeof(sess->pdn));
@@ -199,12 +199,11 @@ status_t smf_n11_build_create_session_response(
     gtp_sockaddr_to_f_teid(
             s1_u_enodeb_addr, NULL, &s1_u_enodeb_f_teid, 
             &f_teid_len);
-    gtp_f_teid_to_ip(&s1_u_enodeb_f_teid, &createSession.sgw_ip);
+    gtp_f_teid_to_ip(&s1_u_enodeb_f_teid, &createSession.upf_ip);
 
     JSONTRANSFORM_StToJs_create_session_response(&createSession, j_createSession);
     
     string = cJSON_Print(j_createSession);
-    d_info(string);
     length = strlen(string) + 1;
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;
@@ -233,7 +232,6 @@ status_t smf_n11_build_update_session_response(
     JSONTRANSFORM_StToJs_update_session_response(&modifyBearer, j_updateSession);
     
     string = cJSON_Print(j_updateSession);
-    d_info(string);
     length = strlen(string) + 1;
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;
@@ -261,12 +259,40 @@ CORE_DECLARE(status_t) smf_n11_build_delete_session_response(
     JSONTRANSFORM_StToJs_delete_session_response(&deleteSession, j_deleteSession);
     
     string = cJSON_Print(j_deleteSession);
-    d_info(string);
     length = strlen(string) + 1;
     *pkbuf = pkbuf_alloc(0, length);
     (*pkbuf)->len = length;
     memcpy((*pkbuf)->payload, string, length -1);
     free(string);
     cJSON_Delete(j_deleteSession);
+    return CORE_OK;
+}
+
+status_t smf_n11_build_update_session_downlink_data_notification_request(
+    pkbuf_t **pkbuf, smf_sess_t *sess)
+{
+    char *string = NULL;
+    cJSON *j_updateSession = cJSON_CreateObject();
+    modify_bearer_t modifyBearer = {0};
+     c_uint32_t length = 0;
+     // IMSI
+    memcpy(modifyBearer.imsi, sess->imsi, sess->imsi_len);
+    modifyBearer.imsi_len = sess->imsi_len;
+
+    modifyBearer.sm_context_update_type = sess->sm_context_update_type;
+    d_trace(-1, "smf_n11_build_update_session_downlink_data_notification_request SM %d\n", modifyBearer.sm_context_update_type);
+    d_trace(-1, "smf_n11_build_update_session_downlink_data_notification_request SM %d\n", sess);
+
+    JSONTRANSFORM_StToJs_update_session_response(&modifyBearer, j_updateSession);
+    
+    string = cJSON_Print(j_updateSession);
+    d_info(string);
+    length = strlen(string) + 1;
+    *pkbuf = pkbuf_alloc(0, length);
+    (*pkbuf)->len = length;
+    memcpy((*pkbuf)->payload, string, length -1);
+    free(string);
+    cJSON_Delete(j_updateSession);
+
     return CORE_OK;
 }

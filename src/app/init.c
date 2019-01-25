@@ -9,7 +9,7 @@
 
 #include "app.h"
 
-#define DEFAULT_CONFIG_FILE_PATH SYSCONF_DIR PACKAGE "/open5gc.conf"
+#define DEFAULT_CONFIG_FILE_PATH SYSCONF_DIR PACKAGE "/free5gc.conf"
 #define DEFAULT_RUNTIME_DIR_PATH LOCALSTATE_DIR "run/"
 
 static status_t app_logger_init();
@@ -102,7 +102,7 @@ status_t app_log_pid(const char *pid_path)
     if (pid_path == NULL)
     {
         snprintf(default_pid_path, sizeof(default_pid_path),
-                "%sopen5gc-%sd/pid", DEFAULT_RUNTIME_DIR_PATH, app_name);
+                "%sfree5gc-%sd/pid", DEFAULT_RUNTIME_DIR_PATH, app_name);
         pid_path = default_pid_path;
     }
 
@@ -111,7 +111,7 @@ status_t app_log_pid(const char *pid_path)
         && file_stat(&finfo, pid_path, FILE_INFO_MTIME) == CORE_OK)
     {
         d_warn("pid file %s overwritten -- Unclean "
-                "shutdown of previous Open5GC run?", pid_path);
+                "shutdown of previous free5GC run?", pid_path);
     }
 
     if ((rv = file_open(&pid_file, pid_path,

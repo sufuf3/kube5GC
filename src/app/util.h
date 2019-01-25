@@ -8,7 +8,6 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/******************** Added by Chi ********************/
 int get_cpu_cores();
 
 float get_cpu_load();
@@ -39,7 +38,6 @@ status_t rand_select_non_dup(int haystack_count, int select_count, int *sel_indi
  */
 status_t ht_rand_select_non_dup(hash_t *haystack, int select_count, void **sel_items);
 
-/******************************************************/
 
 #ifdef __cplusplus
 }

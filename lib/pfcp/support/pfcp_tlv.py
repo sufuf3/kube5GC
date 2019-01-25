@@ -138,7 +138,7 @@ def get_cells(cells):
         elif comment.find('7.5.9.2-1') != -1:
             ie_type = "Update BAR PFCP Session Report Response"
         else:
-             assert False, "Unknown IE type : [Usage Report]"
+             assert False, "Unknown IE type : [Update BAR]"
     
     if ie_type == 'Metric' or ie_type == 'FQ-CSID' or ie_type == 'PDN Type':
         ie_type = ie_type + 'p'        
@@ -397,7 +397,7 @@ msg_list["PFCP Association Update Request"]["table"] = 14
 msg_list["PFCP Association Update Response"]["table"] = 15
 msg_list["PFCP Association Release Request"]["table"] = 16
 msg_list["PFCP Association Release Response"]["table"] = 17
-#msg_list["PFCP Version Not Supported Response"]["table"] = 
+msg_list["PFCP Version Not Supported Response"]["table"] = 11
 msg_list["PFCP Node Report Request"]["table"] = 18
 msg_list["PFCP Node Report Response"]["table"] = 20
 msg_list["PFCP Session Set Deletion Request"]["table"] = 21
@@ -409,6 +409,7 @@ msg_list["PFCP Session Modification Response"]["table"] = 51
 msg_list["PFCP Session Deletion Request"]["table"] = 53
 msg_list["PFCP Session Deletion Response"]["table"] = 54
 msg_list["PFCP Session Report Request"]["table"] = 56
+msg_list["PFCP Session Report Response"]["table"] = 57
 
 for key in msg_list.keys():
     if "table" in msg_list[key].keys():

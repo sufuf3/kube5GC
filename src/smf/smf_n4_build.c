@@ -220,6 +220,18 @@ status_t smf_n4_build_session_establishment_request(
     req->node_id.len = PFPC_NODE_ID_LEN(smf_self()->pfcp_node_id);
 
     /* Set CP F-SEID, mandatory */
+    if(sess->smf_n4_seid == 0) 
+    {
+        sess->smf_n4_seid = sess->index;
+        pfcp_message.h.seid_p = 0;
+        pfcp_message.h.seid = 0;
+    }
+    else
+    {
+        pfcp_message.h.seid_p = 1;
+        pfcp_message.h.seid = sess->smf_n4_seid;
+    }
+
     req->cp_f_seid.presence = 1;
     req->cp_f_seid.data = &smf_f_seid;
     smf_f_seid.seid = htobe64(sess->smf_n4_seid);
@@ -250,13 +262,13 @@ status_t smf_n4_build_session_establishment_request(
     else if (sess->ipv6)
         pdn_type = PFCP_PDN_TYPE_IPV6;
     else
-        pdn_type = PFCP_PDN_TYPE_NONIP;//$ not support yet
+        pdn_type = PFCP_PDN_TYPE_NONIP; // not support yet
     
     /* Set User Plane Inactivity Timer */
     req->user_plane_inactivity_timer.presence = 0;
     
     pfcp_message.h.type = PFCP_SESSION_ESTABLISHMENT_REQUEST_TYPE;
-    pfcp_message.h.seid_p = 0;
+    
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
 
     smf_n4_free_create_pdr(&req->create_pdr);
@@ -270,7 +282,7 @@ status_t smf_n4_build_session_establishment_request(
     return CORE_OK;
 }
 
-status_t smf_n4_build_session_modification_request(
+status_t smf_n4_build_session_modification_request_for_setup_downlink(
         pkbuf_t **pkbuf, smf_sess_t *sess)
 {
     status_t rv;
@@ -303,7 +315,9 @@ status_t smf_n4_build_session_modification_request(
     req->update_far.update_forwarding_parameters.destination_interface.presence = 1;
     req->update_far.update_forwarding_parameters.destination_interface.len = 1;
     req->update_far.update_forwarding_parameters.destination_interface.data = &sess->dl_pdr->far->destination_interface;
-        
+    req->update_far.apply_action.presence = 1;
+    req->update_far.apply_action.data = &sess->dl_pdr->far->apply_action;
+    req->update_far.apply_action.len = sizeof(sess->dl_pdr->far->apply_action); 
     smf_bearer_t *bearer = NULL;
 
     bearer = smf_default_bearer_in_sess(sess);
@@ -334,28 +348,85 @@ status_t smf_n4_build_session_modification_request(
     return CORE_OK;
 }
 
-status_t smf_n4_build_session_deletion_request(
+status_t smf_n4_build_session_modification_request_for_an_release(
         pkbuf_t **pkbuf, smf_sess_t *sess)
 {
     status_t rv;
     pfcp_message_t pfcp_message;
-    pfcp_session_deletion_request_t *req = NULL;
+    pfcp_session_modification_request_t *req = NULL;
     pfcp_f_seid_t smf_f_seid;
+    uint32_t *far_id = NULL;
 
-    req = &pfcp_message.pfcp_session_deletion_request;
+    far_id = malloc(sizeof(c_uint32_t));
+    *far_id = htonl(sess->dl_pdr->far->far_id);
+
+    req = &pfcp_message.pfcp_session_modification_request;
     memset(&pfcp_message, 0, sizeof(pfcp_message_t));
     
     /* Set CP F-SEID, mandatory */
     req->cp_f_seid.presence = 1;
     req->cp_f_seid.data = &smf_f_seid;
-    smf_f_seid.seid = sess->smf_n4_seid;
+    smf_f_seid.seid = htobe64(sess->smf_n4_seid);
     rv = pfcp_sockaddr_to_f_seid(smf_self()->pfcp_addr, smf_self()->pfcp_addr6,
             &smf_f_seid, (c_int32_t *)&req->cp_f_seid.len);
+
+    req->update_far.presence = 1;
+    req->update_far.far_id.presence = 1;
+    req->update_far.far_id.data = far_id;
+    req->update_far.far_id.len = sizeof(c_uint32_t);
+
+    smf_bearer_t *bearer = NULL;
+
+    bearer = smf_default_bearer_in_sess(sess);
+    d_assert(bearer, return CORE_ERROR, "No Bearer Context");
+
+    req->update_far.apply_action.presence = 1;   
+    req->update_far.apply_action.data = &sess->dl_pdr->far->apply_action;
+    req->update_far.apply_action.len = sizeof(sess->dl_pdr->far->apply_action);
+    
+    pfcp_message.h.type = PFCP_SESSION_MODIFICATION_REQUEST_TYPE;
+    rv = pfcp_build_msg(pkbuf, &pfcp_message);
+    free(far_id);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
+    
+    return CORE_OK;
+}
+
+status_t smf_n4_build_session_deletion_request(
+        pkbuf_t **pkbuf, smf_sess_t *sess)
+{
+    status_t rv;
+    pfcp_message_t pfcp_message;
+
+    memset(&pfcp_message, 0, sizeof(pfcp_message_t));
     
     pfcp_message.h.type = PFCP_SESSION_DELETION_REQUEST_TYPE;
     rv = pfcp_build_msg(pkbuf, &pfcp_message);
     d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
 
+    return CORE_OK;
+}
+
+status_t smf_n4_build_session_report_response(
+        pkbuf_t **pkbuf, smf_sess_t *sess)
+{
+    status_t rv;
+    pfcp_message_t pfcp_message;
+    pfcp_session_report_response_t *rsp = NULL;
+    c_uint8_t cause;
+
+    memset(&pfcp_message, 0, sizeof(pfcp_message_t));
+    rsp = &pfcp_message.pfcp_session_report_response;
+
+    /* Set cause, mandatory */
+    rsp->cause.presence = 1;
+    cause = PFCP_CAUSE_SUCCESS;
+    rsp->cause.data = &cause;
+    rsp->cause.len = 1;
+    
+    pfcp_message.h.type = PFCP_SESSION_REPORT_RESPONSE_TYPE;
+    rv = pfcp_build_msg(pkbuf, &pfcp_message);
+    d_assert(rv == CORE_OK, return CORE_ERROR, "pfcp build failed");
     return CORE_OK;
 }
 
@@ -403,7 +474,7 @@ status_t smf_n4_build_create_pdr(
         memset(upf_f_teid, 0, sizeof(pfcp_f_teid_t));
         pdi->local_f_teid.presence = 1;    
         pdi->local_f_teid.data = upf_f_teid;
-        upf_f_teid->teid = htonl(bearer->sgw_s1u_teid);
+        upf_f_teid->teid = htonl(bearer->upf_s1u_teid);
         if (sess->upf_node->sa_list->next)
             rv = pfcp_sockaddr_to_f_teid(sess->upf_node->sa_list,
                     sess->upf_node->sa_list->next,
@@ -448,9 +519,9 @@ status_t smf_n4_build_create_pdr(
     else
         d_assert(0, return CORE_ERROR, "No IP Pool");
     if (pdr->source_interface == PFCP_SRC_INTF_ACCESS)
-        ue_ip->sd = PFCP_UE_IP_ADDR_SOURCE; //$ for UL
+        ue_ip->sd = PFCP_UE_IP_ADDR_SOURCE; // for UL
     else
-        ue_ip->sd = PFCP_UE_IP_ADDR_DESITINATION; //$ for DL
+        ue_ip->sd = PFCP_UE_IP_ADDR_DESITINATION; // for DL
     
     /* [Create PDR] Outer Header Removal */
     if (pdr->outer_header_removal != PFCP_OUTER_HDR_RMV_DESC_NULL)

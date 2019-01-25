@@ -1,13 +1,13 @@
 configfiles = \
-	open5gc.conf \
-	open5gc.testngc.conf \
+	free5gc.conf \
 	hss.conf \
 	pcrf.conf \
 	upf.conf \
+	amf.conf \
 	smf.conf \
 	$(NULL)
 
-configdir = ${sysconfdir}/open5gc
+configdir = ${sysconfdir}/free5gc
 
 config_DATA = ${configfiles}
 

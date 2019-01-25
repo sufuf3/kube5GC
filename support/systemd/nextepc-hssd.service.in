@@ -6,14 +6,14 @@ After=networking.service mongodb.service
 [Service]
 Type=simple
 
-User=open5gc
-Group=open5gc
+User=free5gc
+Group=free5gc
 
 RuntimeDirectory=nextepc-hssd
 PIDFile=@LIB_DIR@/run/nextepc-hssd/pid
 
 Restart=always
-ExecStart=@BIN_DIR@/nextepc-hssd -f @SYSCONF_DIR@/open5gc/hss.conf
+ExecStart=@BIN_DIR@/nextepc-hssd -f @SYSCONF_DIR@/free5gc/hss.conf
 RestartSec=2
 RestartPreventExitStatus=1
 

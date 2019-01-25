@@ -10,7 +10,6 @@
 #include "s1ap_build.h"
 #include "s1ap_conv.h"
 
-//add by YEE
 status_t s1ap_build_ue_radio_capability_match_request(
     pkbuf_t **s1apbuf, enb_ue_t *enb_ue)
 {
@@ -98,7 +97,6 @@ status_t s1ap_build_ue_radio_capability_match_request(
     return CORE_OK;
 }
 
-//add by YEE 
 status_t s1ap_build_e_rab_modification_confirm(
             pkbuf_t **s1apbuf, enb_ue_t *enb_ue)
 {
@@ -165,9 +163,7 @@ status_t s1ap_build_e_rab_modification_confirm(
 
     return CORE_OK;
 }
-/*********************************************/
 
-/***************Add by Steven****************/
 status_t s1ap_build_mme_cp_relocation_indication(
         pkbuf_t **s1apbuf, enb_ue_t *source_ue)
 {
@@ -240,9 +236,7 @@ status_t s1ap_build_mme_cp_relocation_indication(
 
     return CORE_OK;
 }
-/******************************************/
 
-//add by YEE
 status_t s1ap_build_reroute_nas_request(
             pkbuf_t **s1apbuf, enb_ue_t *enb_ue)
 {
@@ -778,7 +772,6 @@ status_t s1ap_build_setup_rsp(pkbuf_t **pkbuf)
     return CORE_OK;
 }
 
-/******************** Added by Chi ********************/
 status_t s1ap_build_overload_start(pkbuf_t **pkbuf)
 {
     status_t rv;
@@ -833,9 +826,7 @@ status_t s1ap_build_overload_start(pkbuf_t **pkbuf)
 
     return CORE_OK;
 }
-/******************************************************/
 
-/******************** Chu ********************/
 status_t s1ap_build_overload_stop(pkbuf_t **pkbuf){
 
     status_t rv;
@@ -880,9 +871,7 @@ status_t s1ap_build_overload_stop(pkbuf_t **pkbuf){
 
     return CORE_OK;
 }
-/*********************************************/
 
-/*************************** Qiu ***************************/
 status_t s1ap_build_write_replace_warning_request(pkbuf_t **pkbuf)
 {
 	status_t rv;
@@ -1348,8 +1337,8 @@ status_t s1ap_build_initial_context_setup_request(
             e_rab->e_RAB_ID = bearer->ebi;
             e_rab->e_RABlevelQoSParameters.qCI = bearer->qos.qci;
 
-            d_trace(5, "    EBI[%d] QCI[%d] SGW-S1U-TEID[%d]\n",
-                    bearer->ebi, bearer->qos.qci, bearer->sgw_s1u_teid);
+            d_trace(5, "    EBI[%d] QCI[%d] UPF-S1U-TEID[%d]\n",
+                    bearer->ebi, bearer->qos.qci, bearer->upf_s1u_teid);
 
             e_rab->e_RABlevelQoSParameters.allocationRetentionPriority.
                 priorityLevel = bearer->qos.arp.priority_level;
@@ -1387,9 +1376,9 @@ status_t s1ap_build_initial_context_setup_request(
             }
 
             rv = s1ap_ip_to_BIT_STRING(
-                    &bearer->sgw_s1u_ip, &e_rab->transportLayerAddress);
+                    &bearer->upf_s1u_ip, &e_rab->transportLayerAddress);
             d_assert(rv == CORE_OK, return CORE_ERROR,);
-            s1ap_uint32_to_OCTET_STRING(bearer->sgw_s1u_teid, &e_rab->gTP_TEID);
+            s1ap_uint32_to_OCTET_STRING(bearer->upf_s1u_teid, &e_rab->gTP_TEID);
 
             if (emmbuf && emmbuf->len)
             {
@@ -1610,10 +1599,10 @@ status_t s1ap_build_e_rab_setup_request(
     }
 
     rv = s1ap_ip_to_BIT_STRING(
-            &bearer->sgw_s1u_ip, &e_rab->transportLayerAddress);
+            &bearer->upf_s1u_ip, &e_rab->transportLayerAddress);
     d_assert(rv == CORE_OK, return CORE_ERROR,);
-    s1ap_uint32_to_OCTET_STRING(bearer->sgw_s1u_teid, &e_rab->gTP_TEID);
-    d_trace(5, "    SGW-S1U-TEID[%d]\n", bearer->sgw_s1u_teid);
+    s1ap_uint32_to_OCTET_STRING(bearer->upf_s1u_teid, &e_rab->gTP_TEID);
+    d_trace(5, "    UPF-S1U-TEID[%d]\n", bearer->upf_s1u_teid);
 
     nasPdu = &e_rab->nAS_PDU;
     nasPdu->size = esmbuf->len;
@@ -2001,7 +1990,6 @@ status_t s1ap_build_ue_context_release_command(
     return CORE_OK;
 }
 
-/***************Add by Steven****************/
 status_t s1ap_build_ue_context_resume_response(
         pkbuf_t **s1apbuf, 
         S1AP_ENB_UE_S1AP_ID_t *enb_ue_s1ap_id,
@@ -2543,7 +2531,6 @@ status_t s1ap_build_mme_configuration_transfer(
 
     return CORE_OK;
 }
-////////////////////////////////////pan
 status_t s1ap_build_mme_direct_information_transfer(
             pkbuf_t **s1apbuf)
 {
@@ -2598,7 +2585,6 @@ status_t s1ap_build_mme_direct_information_transfer(
     return CORE_OK;
 	
 }
-////////////////////////////////////
 status_t s1ap_build_path_switch_ack(pkbuf_t **s1apbuf, amf4g_ue_t *amf4g_ue)
 {
     status_t rv;
@@ -2855,8 +2841,8 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
         {
             S1AP_E_RABDataForwardingItem_t *e_rab = NULL;
 
-            if (AMF4G_HAVE_SGW_DL_INDIRECT_TUNNEL(bearer) ||
-                AMF4G_HAVE_SGW_UL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_UPF_DL_INDIRECT_TUNNEL(bearer) ||
+                AMF4G_HAVE_UPF_UL_INDIRECT_TUNNEL(bearer))
             {
                 S1AP_E_RABDataForwardingItemIEs_t *item = NULL;
 
@@ -2892,38 +2878,38 @@ status_t s1ap_build_handover_command(pkbuf_t **s1apbuf, enb_ue_t *source_ue)
                 e_rab->e_RAB_ID = bearer->ebi;
             }
 
-            if (AMF4G_HAVE_SGW_DL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_UPF_DL_INDIRECT_TUNNEL(bearer))
             {
                 d_assert(e_rab, return CORE_ERROR,);
                 e_rab->dL_transportLayerAddress =
                     (S1AP_TransportLayerAddress_t *)
                     core_calloc(1, sizeof(S1AP_TransportLayerAddress_t));
                 rv = s1ap_ip_to_BIT_STRING(
-                        &bearer->sgw_dl_ip, e_rab->dL_transportLayerAddress);
+                        &bearer->upf_dl_ip, e_rab->dL_transportLayerAddress);
                 d_assert(rv == CORE_OK, return CORE_ERROR,);
 
                 e_rab->dL_gTP_TEID = (S1AP_GTP_TEID_t *)
                     core_calloc(1, sizeof(S1AP_GTP_TEID_t));
                 s1ap_uint32_to_OCTET_STRING(
-                        bearer->sgw_dl_teid, e_rab->dL_gTP_TEID);
-                d_trace(5, "    SGW-DL-TEID[%d]\n", bearer->sgw_dl_teid);
+                        bearer->upf_dl_teid, e_rab->dL_gTP_TEID);
+                d_trace(5, "    UPF-DL-TEID[%d]\n", bearer->upf_dl_teid);
             }
 
-            if (AMF4G_HAVE_SGW_UL_INDIRECT_TUNNEL(bearer))
+            if (AMF4G_HAVE_UPF_UL_INDIRECT_TUNNEL(bearer))
             {
                 d_assert(e_rab, return CORE_ERROR,);
                 e_rab->uL_TransportLayerAddress =
                     (S1AP_TransportLayerAddress_t *)
                     core_calloc(1, sizeof(S1AP_TransportLayerAddress_t));
                 rv = s1ap_ip_to_BIT_STRING(
-                    &bearer->sgw_ul_ip, e_rab->uL_TransportLayerAddress);
+                    &bearer->upf_ul_ip, e_rab->uL_TransportLayerAddress);
                 d_assert(rv == CORE_OK, return CORE_ERROR,);
 
                 e_rab->uL_GTP_TEID = (S1AP_GTP_TEID_t *)
                     core_calloc(1, sizeof(S1AP_GTP_TEID_t));
                 s1ap_uint32_to_OCTET_STRING(
-                        bearer->sgw_ul_teid, e_rab->uL_GTP_TEID);
-                d_trace(5, "    SGW-UL-TEID[%d]\n", bearer->sgw_dl_teid);
+                        bearer->upf_ul_teid, e_rab->uL_GTP_TEID);
+                d_trace(5, "    UPF-UL-TEID[%d]\n", bearer->upf_dl_teid);
             }
 
             bearer = amf4g_bearer_next(bearer);
@@ -3243,12 +3229,11 @@ status_t s1ap_build_handover_request(
                 e_rab->e_RABlevelQosParameters.gbrQosInformation =
                         gbrQosInformation;
             }
-
             rv = s1ap_ip_to_BIT_STRING(
-                    &bearer->sgw_s1u_ip, &e_rab->transportLayerAddress);
+                    &bearer->upf_s1u_ip, &e_rab->transportLayerAddress);
             d_assert(rv == CORE_OK, return CORE_ERROR,);
-            s1ap_uint32_to_OCTET_STRING(bearer->sgw_s1u_teid, &e_rab->gTP_TEID);
-            d_trace(5, "    SGW-S1U-TEID[%d]\n", bearer->sgw_s1u_teid);
+            s1ap_uint32_to_OCTET_STRING(bearer->upf_s1u_teid, &e_rab->gTP_TEID);
+            d_trace(5, "    UPF-S1U-TEID[%d]\n", bearer->upf_s1u_teid);
 
             bearer = amf4g_bearer_next(bearer);
         }

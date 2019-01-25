@@ -19,12 +19,10 @@ void s1ap_state_final(fsm_t *s, event_t *e);
 void s1ap_state_operational(fsm_t *s, event_t *e);
 void s1ap_state_exception(fsm_t *s, event_t *e);
 
-/********************add by HU*****************/
 void ngap_state_initial(fsm_t *s, event_t *e);
 void ngap_state_final(fsm_t *s, event_t *e);
 void ngap_state_operational(fsm_t *s, event_t *e);
 void ngap_state_exception(fsm_t *s, event_t *e);
-/***********************************************/
 
 void emm_state_initial(fsm_t *s, event_t *e);
 void emm_state_final(fsm_t *s, event_t *e);
@@ -55,4 +53,4 @@ void esm_state_exception(fsm_t *s, event_t *e);
 }
 #endif /* __cplusplus */
 
-#endif /* !__MME_SM_H__ */
+#endif /* !__AMF4G_SM_H__ */
