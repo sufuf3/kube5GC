@@ -77,7 +77,7 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 AM_CFLAGS = \
-	-Wall -Werror \
+	-Wall -Werror -Wno-error=format-overflow -Wno-error=restrict -Wno-error=array-bounds \
 	$(NULL)
 
 DEFS = \

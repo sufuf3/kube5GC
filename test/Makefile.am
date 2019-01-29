@@ -44,7 +44,7 @@ AM_CPPFLAGS = \
 
 AM_CFLAGS = \
 	-Wall -Werror \
-	-Wno-unused-function -Wno-unused-variable \
+	-Wno-unused-function -Wno-unused-variable -Wno-error=format-overflow \
 	@OSCPPFLAGS@ \
 	$(NULL)
 

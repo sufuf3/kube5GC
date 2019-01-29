@@ -48,7 +48,7 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 AM_CFLAGS = \
-	-Wall -Werror \
+	-Wall -Werror -Wno-error=format-overflow \
 	@OSCPPFLAGS@ \
 	$(NULL)
 

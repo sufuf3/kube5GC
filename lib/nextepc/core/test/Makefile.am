@@ -20,7 +20,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/nextepc/core/include
 
 AM_CFLAGS = \
-	-Wall -Werror @OSCPPFLAGS@ \
+	-Wall -Werror -Wno-error=format-overflow -Wno-error=restrict @OSCPPFLAGS@ \
 	-Wno-unused-function -Wno-unused-variable
 
 TESTS = testcore

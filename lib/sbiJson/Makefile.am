@@ -16,7 +16,7 @@ libsbiJson_la_LIBADD = \
 	$(NULL)
 
 AM_CFLAGS = \
-	-Wall -Werror \
+	-Wall -Werror -Wno-error=restrict \
 	$(NULL)
 
 AM_CPPFLAGS = \
