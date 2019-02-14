@@ -6,7 +6,7 @@ metadata:
     environment: testing
     service: mongo
   name: mongo-external
-  namespace: nctu5gc
+  namespace: free5gc
 spec:
   externalTrafficPolicy: Cluster
   ports:

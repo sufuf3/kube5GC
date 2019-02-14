@@ -1,10 +1,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mongo-storage
+  name: mongo-nfs
 spec:
+  storageClassName: mongo
   capacity:
-    storage: 2Gi
+    storage: 20Gi
   accessModes:
   - ReadWriteMany
   nfs: 

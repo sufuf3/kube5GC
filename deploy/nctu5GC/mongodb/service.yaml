@@ -6,7 +6,7 @@ metadata:
   labels:
     name: mongo
     service: mongo
-  namespace: nctu5gc
+  namespace: free5gc
 spec:
   ports:
   - port: 27017

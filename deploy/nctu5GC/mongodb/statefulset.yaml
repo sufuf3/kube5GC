@@ -2,7 +2,7 @@ apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
   name: mongo
-  namespace: nctu5gc
+  namespace: free5gc
 spec:
   serviceName: "mongo"
   replicas: 1
@@ -33,7 +33,7 @@ spec:
       name: mongodb
     spec:
       accessModes: [ "ReadWriteMany" ]
-      storageClassName: "slow-many"
+      storageClassName: mongo
       resources:
         requests:
           storage: 10Gi
