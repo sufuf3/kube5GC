@@ -2,10 +2,10 @@
 
 FROM node:carbon
 
-ARG PACKAGE=nextepc
+ARG PACKAGE=free5gc
 
-RUN cd /usr/src && git clone https://github.com/sufuf3/kube5GC.git free5gc
-RUN cd /usr/src/free5gc && git checkout free5gc
+RUN cd /usr/src && git clone https://github.com/sufuf3/kube5GC.git /usr/src/free5gc
+RUN cd /usr/src/free5gc && git checkout nctu5gc
 
 WORKDIR /usr/src/free5gc/webui
 RUN npm install && \
