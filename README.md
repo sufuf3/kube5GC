@@ -9,7 +9,7 @@
     - [1. Using kubeCORD deploy Kubernetes](#1-using-kubecord-deploy-kubernetes)
     - [2. Install NFS Server](#2-install-nfs-server)
     - [3. Install helm](#3-install-helm)
-- [Deploy NCTU5GC](#deploy-nctu5gc)
+- [Deploy free5GC](#deploy-free5gc)
     - [Method 1 - Using yaml](#method-1---using-yaml)
     - [Method 2 - Using Helm](#method-2---using-helm)
 
@@ -71,14 +71,35 @@ kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admi
 kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
 ```
 
-## Deploy NCTU5GC
+## Deploy free5GC
 
 ### Method 1 - Using yaml
 
-#### 1. Update `deploy/nctu5GC/mongodb/pv.yaml`
+#### 1. Create namespace
 
+```sh
+kubectl create -f deploy/nctu5GC/namespace.yaml
+```
+#### 2. Create mongodb
+1. Update `deploy/nctu5GC/mongodb/pv.yaml`
 ```sh
 sed -i "s/192.168.26.11/${NFS_SERVER_IP}/g" deploy/nctu5GC/mongodb/pv.yaml
 ```
+2. Create mongodb
+```sh
+kubectl create -f deploy/nctu5GC/mongodb/pv.yaml
+kubectl create -f deploy/nctu5GC/mongodb/statefulset.yaml
+kubectl create -f deploy/nctu5GC/mongodb/service-NP.yaml
+```
+
+#### 3. Create webui
+
+```sh
+kubectl create -f deploy/nctu5GC/webui-deployment.yaml
+kubectl create -f deploy/nctu5GC/webui-service-NP.yaml
+```
+PS. Using NodePort
+
+Access NODE_IP:31727 via web browser.
 
 ### Method 2 - Using Helm
