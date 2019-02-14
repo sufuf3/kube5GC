@@ -5,7 +5,7 @@ metadata:
   name: webui
   labels:
     app: webui
-  namespace: nctu5gc
+  namespace: free5gc
 spec:
   ports:
   - port: 3000
