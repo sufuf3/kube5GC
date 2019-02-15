@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hss
+  labels:
+    app: hss
+  namespace: free5gc
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: hss
