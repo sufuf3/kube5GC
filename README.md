@@ -45,7 +45,13 @@
 
 ### 1. Using [kubeCORD](https://github.com/sufuf3/kubecord-installer) deploy Kubernetes
 
-### 2. Install NFS Server
+### 2. Update `/etc/kubernetes/kubelet.env`
+
+1. Add `--allowed-unsafe-sysctls 'kernel.msg*,net.ipv4.*,net.ipv6.*' \` into `/etc/kubernetes/kubelet.env`.
+2. `sudo systemctl restart kubelet`
+3. `sudo systemctl status kubelet`
+
+### 3. Install NFS Server
 
 On node-1.
 
@@ -57,7 +63,7 @@ sudo exportfs -r
 sudo showmount -e
 ```
 
-### 3. Install helm
+### 4. Install helm
 
 On node-1.
 
@@ -102,4 +108,30 @@ PS. Using NodePort
 
 Access NODE_IP:31727 via web browser.
 
+#### 4. Create AMF
+
+#### 5. Create HSS
+
+> HSS IP: 10.233.71.203
+
+1. Update `deploy/nctu5GC/hss-freediameter-configmap.yaml`
+https://hackmd.io/s/S1baJOeEE#Setup-HSS
+
+2. Deploy
+```sh
+kubectl create -f deploy/nctu5GC/hss-nextepc-configmap.yaml
+kubectl create -f deploy/nctu5GC/hss-freediameter-configmap.yaml
+kubectl create -f deploy/nctu5GC/hss-service.yaml
+kubectl create -f deploy/nctu5GC/hss-nextepc-deployment.yaml
+```
+
+#### 6. Create UPF
+
+#### 7. Create SMF
+
+#### 8. Create PCRF
+
+
 ### Method 2 - Using Helm
+
+To be continued...
