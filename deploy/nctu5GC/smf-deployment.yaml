@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smf-deployment
+  namespace: free5gc
+  labels:
+    app: smf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smf
+  template:
+    metadata:
+      labels:
+        app: smf
+      annotations:
+        cni.projectcalico.org/ipAddrs: "[\"10.233.71.204\"]"
+    spec:
+      containers:
+      - name: smf
+        image: sufuf3/nextepc-build:latest
+        command: ["/bin/bash"]
+        args: ["-c", "/usr/src/free5gc/install/bin/free5gc-smfd"]
+        ports:
+          - containerPort: 8080
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: DB_URI
+            value: mongodb://mongo-external.free5gc.svc.cluster.local/nextepc
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc
+        - name: freediameter-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc/freediameter
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["NET_ADMIN", "SYS_TIME"]
+      securityContext:
+        sysctls:
+          - name: net.ipv6.conf.all.disable_ipv6
+            value: "0"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: free5gc-config
+            items:
+            - key: config.file
+              path: free5gc.conf
+        - name: freediameter-volume
+          configMap:
+            name: freediameter-smf-config
+            items:
+            - key: config.file
+              path: smf.conf
