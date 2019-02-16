@@ -22,6 +22,8 @@ spec:
         image: sufuf3/nextepc-build:latest
         command: ["/bin/bash"]
         args: ["-c", "/usr/src/free5gc/nextepc-hssd"]
+        ports:
+          - containerPort: 80
         imagePullPolicy: IfNotPresent
         env:
           - name: DB_URI
