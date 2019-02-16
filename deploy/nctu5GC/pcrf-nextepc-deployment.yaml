@@ -21,7 +21,7 @@ spec:
       - name: nextepc-pcrf
         image: sufuf3/nextepc-build:latest
         command: ["/bin/bash"]
-        args: ["-c", "/usr/src/free5gc/nextepc-pcrfd"]
+        args: ["-c", "/usr/src/free5gc/install/bin/nextepc-pcrfd"]
         ports:
           - containerPort: 80
         imagePullPolicy: IfNotPresent
