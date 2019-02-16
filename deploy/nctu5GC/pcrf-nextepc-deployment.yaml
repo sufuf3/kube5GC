@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pcrf-nextepc-deployment
+  namespace: free5gc
+  labels:
+    app: nextepc-pcrf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextepc-pcrf
+  template:
+    metadata:
+      labels:
+        app: nextepc-pcrf
+      annotations:
+        cni.projectcalico.org/ipAddrs: "[\"10.233.71.205\"]"
+    spec:
+      containers:
+      - name: nextepc-pcrf
+        image: sufuf3/nextepc-build:latest
+        command: ["/bin/bash"]
+        args: ["-c", "/usr/src/free5gc/nextepc-pcrfd"]
+        ports:
+          - containerPort: 80
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: DB_URI
+            value: mongodb://mongo-external.free5gc.svc.cluster.local/nextepc
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc
+        - name: freediameter-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc/freediameter
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["NET_ADMIN", "SYS_TIME"]
+      securityContext:
+        sysctls:
+          - name: net.ipv6.conf.all.disable_ipv6
+            value: "0"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: pcrf-config
+            items:
+            - key: config.file
+              path: pcrf.conf
+        - name: freediameter-volume
+          configMap:
+            name: freediameter-pcrf-config
+            items:
+            - key: config.file
+              path: pcrf.conf

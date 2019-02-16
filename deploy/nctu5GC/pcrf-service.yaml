@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcrf
+  labels:
+    app: pcrf
+  namespace: free5gc
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: pcrf
