@@ -18,10 +18,10 @@ spec:
         cni.projectcalico.org/ipAddrs: "[\"10.233.71.204\"]"
     spec:
       containers:
-      - name: smf
+      - name: smf-container
         image: sufuf3/nextepc-build:latest
         command: ["/bin/bash"]
-        args: ["-c", "/usr/src/free5gc/install/bin/free5gc-smfd"]
+        args: ["-c", "/usr/src/free5gc/install/bin/open5gc-smfd"]
         ports:
           - containerPort: 8080
         imagePullPolicy: IfNotPresent
