@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upf-deployment
+  namespace: free5gc
+  labels:
+    app: upf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: upf
+  template:
+    metadata:
+      labels:
+        app: upf
+      annotations:
+        cni.projectcalico.org/ipAddrs: "[\"10.233.71.206\"]"
+        k8s.v1.cni.cncf.io/networks: vhostuser-networkobj, vhostuser-networkobj
+    spec:
+      containers:
+      - name: upf-container
+        image: sufuf3/nextepc-build:latest
+        command: ["/bin/bash"]
+        args: ["-c", "/usr/src/free5gc/install/bin/open5gc-upfd"]
+        stdin: true
+        tty: true
+        ports:
+          - containerPort: 8080
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: DB_URI
+            value: mongodb://mongo-external.free5gc.svc.cluster.local/nextepc
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc
+        - name: uptun-path
+          mountPath: /dev/net/tun
+        - name: socket
+          mountPath: /vhu/
+        - name: hugepage
+          mountPath: /mnt/huge
+        resources:
+          limits:
+            hugepages-1Gi: 1Gi
+          requests:
+            memory: 1024Mi 
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["NET_ADMIN", "SYS_TIME"]
+      #hostNetwork: true
+      securityContext:
+        sysctls:
+          - name: net.ipv6.conf.all.disable_ipv6
+            value: "0"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: free5gc-config
+            items:
+            - key: config.file
+              path: free5gc.conf
+        - name: uptun-path
+          hostPath:
+            path: /dev/net/tun
+        - name: socket
+          hostPath:
+            path: /var/lib/cni/vhostuser/
+        - name: hugepage
+          emptyDir:
+            medium: HugePages
