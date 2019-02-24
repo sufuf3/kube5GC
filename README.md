@@ -77,6 +77,28 @@ kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admi
 kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
 ```
 
+### 5. Network Setup
+
+```sh
+sudo sh -c "cat << EOF > /etc/systemd/network/99-free5gc.netdev
+[NetDev]
+Name=uptun
+Kind=tun
+EOF"
+
+sudo systemctl enable systemd-networkd
+sudo systemctl restart systemd-networkd
+
+sudo sh -c "echo 'net.ipv6.conf.uptun.disable_ipv6=0' > /etc/sysctl.d/30-free5gc.conf"
+sudo sysctl -p /etc/sysctl.d/30-free5gc.conf
+sudo sh -c "cat << EOF > /etc/systemd/network/99-free5gc.network
+[Match]
+Name=uptun
+[Network]
+Address=45.45.0.1/16
+EOF"
+```
+
 ## Deploy free5GC
 
 ### Method 1 - Using yaml
@@ -108,14 +130,22 @@ PS. Using NodePort
 
 Access NODE_IP:31727 via web browser.
 
-#### 4. Create AMF
+**以下請按照 IP 順序 deploy**
 
-#### 5. Create HSS
+#### 4. Deploy free5gc-configmap
+
+```sh
+kubectl create -f deploy/nctu5GC/free5gc-configmap.yaml
+```
+
+#### 5. Create AMF
+
+#### 6. Create HSS
 
 > HSS IP: 10.233.71.203
 
 1. Update `deploy/nctu5GC/hss-freediameter-configmap.yaml`
-https://hackmd.io/s/S1baJOeEE#Setup-HSS
+   https://hackmd.io/s/S1baJOeEE#Setup-HSS
 
 2. Deploy
 ```sh
@@ -125,12 +155,32 @@ kubectl create -f deploy/nctu5GC/hss-service.yaml
 kubectl create -f deploy/nctu5GC/hss-nextepc-deployment.yaml
 ```
 
-#### 6. Create UPF
 
 #### 7. Create SMF
 
+> SMF IP: 10.233.71.204
+
+```sh
+kubectl create -f deploy/nctu5GC/smf-freediameter-configmap.yaml
+kubectl create -f deploy/nctu5GC/smf-service-NP.yaml
+kubectl create -f deploy/nctu5GC/smf-deployment.yaml
+```
+
 #### 8. Create PCRF
 
+> PCRF IP: 10.233.71.205
+
+1. Update `deploy/nctu5GC/pcrf-freediameter-configmap.yaml`
+   https://hackmd.io/s/S1baJOeEE#Setup-PCRF
+
+2. Deploy
+```sh
+kubectl create -f deploy/nctu5GC/pcrf-freediameter-configmap.yaml
+kubectl create -f deploy/nctu5GC/pcrf-nextepc-configmap.yaml
+kubectl create -f deploy/nctu5GC/pcrf-service.yaml
+kubectl create -f deploy/nctu5GC/pcrf-nextepc-deployment.yaml
+```
+#### 9. Create UPF
 
 ### Method 2 - Using Helm
 
