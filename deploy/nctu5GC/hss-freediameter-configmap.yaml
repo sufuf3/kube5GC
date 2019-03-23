@@ -114,7 +114,7 @@ data:
     # Default : NO DEFAULT
     #TLS_Cred = "<x509 certif file.PEM>" , "<x509 private key file.PEM>";
     #TLS_Cred = "/etc/ssl/certs/freeDiameter.pem", "/etc/ssl/private/freeDiameter.key";
-    TLS_Cred = "/home/win/free5gc/install/etc/free5gc/freeDiameter/hss.cert.pem", "/home/win/free5gc/install/etc/free5gc/freeDiameter/hss.key.pem";
+    TLS_Cred = "/usr/src/free5gc/install/etc/free5gc/freeDiameter/hss.cert.pem", "/usr/src/free5gc/install/etc/free5gc/freeDiameter/hss.key.pem";
 
     # Certificate authority / trust anchors
     # The file containing the list of trusted Certificate Authorities (PEM list)
@@ -122,7 +122,7 @@ data:
     # The directive can appear several times to specify several files.
     # Default : GNUTLS default behavior
     #TLS_CA = "<file.PEM>";
-    TLS_CA = "/home/win/free5gc/install/etc/free5gc/freeDiameter/cacert.pem";
+    TLS_CA = "/usr/src/free5gc/install/etc/free5gc/freeDiameter/cacert.pem";
 
     # Certificate Revocation List file
     # The information about revoked certificates.
