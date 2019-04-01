@@ -79,6 +79,8 @@ kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"templat
 
 ### 5. Network Setup
 
+#### 1. Config free5gc.network
+
 ```sh
 sudo sh -c "cat << EOF > /etc/systemd/network/99-free5gc.netdev
 [NetDev]
@@ -97,6 +99,73 @@ Name=uptun
 [Network]
 Address=45.45.0.1/16
 EOF"
+```
+
+#### 2. SR-IOV serup
+
+**a. Setup VF num on SR-IOV device & create CRD**
+
+```sh
+$ ip a
+5: ens11f3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq portid 8cea1b30da42 state UP group default qlen 1000
+    link/ether 8c:ea:1b:30:da:42 brd ff:ff:ff:ff:ff:ff
+    inet 192.188.2.99/24 brd 192.188.2.255 scope global ens11f3
+       valid_lft forever preferred_lft forever
+    inet6 fe80::8eea:1bff:fe30:da42/64 scope link
+       valid_lft forever preferred_lft forever
+$ echo 30 | sudo tee -a /sys/class/net/ens11f3/device/sriov_numvfs
+$ kubectl createa -f deploy/crdnetwork.yaml
+$ kubectl create -f deployments/sriov-crd.yaml
+$ kubectl get net-attach-def
+NAME                   AGE
+sriov-net1             4h
+```
+
+**b. Build and run SRIOV network device plugin**  
+
+Ref: https://github.com/intel/sriov-network-device-plugin#build-and-run-sriov-network-device-plugin  
+
+```sh
+$ git clone https://github.com/intel/sriov-network-device-plugin.git && cd sriov-network-device-plugin
+$ make
+$ make image
+```
+
+**c. Setup /etc/pcidp/config.json**  
+
+First, use `lspci | grep -i Ethernet` to check interface's sysfs pci address.  
+Then, edit /etc/pcidp/config.json as following:  
+```sh
+{
+    "resourceList":
+    [
+        {
+            "resourceName": "sriov_net",
+            "rootDevices": ["01:00.3"],
+            "sriovMode": true,
+            "deviceType": "netdevice"
+        }
+    ]
+}
+```
+
+**d. Deploy sriov-network-device-plugin on k8s**  
+
+```sh
+$ kubectl create -f deploy/sriovdp-deploy.yaml
+```
+
+**e. Check**  
+```sh
+$ kubectl get node kubecord-a -o json | jq '.status.allocatable'
+{
+  "cpu": "31800m",
+  "ephemeral-storage": "226240619760",
+  "hugepages-1Gi": "8Gi",
+  "intel.com/sriov_net": "30",
+  "memory": "56931140Ki",
+  "pods": "110"
+}
 ```
 
 ## Deploy free5GC
@@ -140,6 +209,17 @@ kubectl create -f deploy/nctu5GC/free5gc-configmap.yaml
 
 #### 5. Create AMF
 
+> AMF IP: 10.233.71.202
+
+1. Update `deploy/nctu5GC/amf-freediameter-configmap.yaml`
+   https://hackmd.io/s/S1baJOeEE#Setup-AMF
+
+2. Deploy
+```sh
+kubectl create -f deploy/nctu5GC/amf-freediameter-configmap.yaml
+kubectl create -f deploy/nctu5GC/amf-deployment-SRIOV.yaml
+```
+
 #### 6. Create HSS
 
 > HSS IP: 10.233.71.203
@@ -182,6 +262,17 @@ kubectl create -f deploy/nctu5GC/pcrf-nextepc-deployment.yaml
 ```
 #### 9. Create UPF
 
+> UPF IP: 10.233.71.206
+
 ### Method 2 - Using Helm
 
 To be continued...
+
+---
+
+## Network
+```sh
+
+kubectl get network-attachment-definitions
+```
+
