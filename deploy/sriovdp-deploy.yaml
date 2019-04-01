@@ -1,0 +1,48 @@
+# https://github.com/intel/sriov-network-device-plugin/blob/master/deployments/pod-sriovdp.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sriov-device-plugin
+  labels:
+    app: sriovdp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sriovdp
+  template:
+    metadata:
+      labels:
+        app: sriovdp
+    spec:
+      containers:
+      - name: sriov-device-plugin 
+        image: nfvpe/sriov-device-plugin:latest
+        imagePullPolicy: IfNotPresent
+        command: [ "/bin/sh", "-c", "--" ]
+        args: [ "sriovdp --logtostderr 10;" ]
+        volumeMounts:
+        - mountPath: /var/lib/kubelet/device-plugins/ 
+          name: devicesock 
+          readOnly: false
+        - mountPath: /sys
+          name: net
+          readOnly: true
+        - mountPath: /etc/pcidp/
+          name: config
+          readOnly: true
+      volumes:
+        - name: devicesock 
+          hostPath:
+          # directory location on host
+            path: /var/lib/kubelet/device-plugins/
+        - name: net
+          hostPath:
+            path: /sys
+        - name: config
+          hostPath:
+            path: /etc/pcidp/
+      hostNetwork: true
+      hostPID: true
+

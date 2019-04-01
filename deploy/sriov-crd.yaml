@@ -1,0 +1,23 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: sriov-net1
+  namespace: free5gc
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: intel.com/sriov_net
+spec:
+  config: '{
+  "type": "sriov",
+  "master": "ens11f3",
+  "name": "sriov-network",
+  "ipam": {
+    "type": "host-local",
+    "subnet": "192.188.2.0/24",
+    "rangeStart": "192.188.2.100",
+    "rangeEnd": "192.188.2.200",
+    "routes": [{
+      "dst": "0.0.0.0/0"
+    }],
+    "gateway": "192.188.2.254"
+  }
+}'
