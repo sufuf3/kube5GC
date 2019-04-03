@@ -28,5 +28,6 @@ RUN apt-get update && \
         iproute2 \
         ca-certificates \
         netbase \
+        iptables \
         pkg-config && \
     apt-get clean

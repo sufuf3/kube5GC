@@ -8,19 +8,17 @@ COPY setup.sh /root
 ARG USER=nctucs
 ARG REPO=free5gc
 ARG BRANCH=master
-RUN cd /usr/src && git clone https://github.com/sufuf3/kube5GC.git /usr/src/free5gc
-RUN cd /usr/src/free5gc && git checkout nctu5gc
+RUN cd /usr/src && git clone https://bitbucket.org/nctu_5g/free5gc.git /usr/src/free5gc
+RUN cd /usr/src/free5gc && git checkout v1.0.0
 RUN go get -u -v "github.com/gorilla/mux"
 RUN go get -u -v "golang.org/x/net/http2"
 RUN go get -u -v "golang.org/x/sys/unix"
 ADD https://api.github.com/repos/sufuf3/kube5gc/git/refs/heads/nctu5gc /root/nextepc-ver.json
 
 RUN cd /usr/src/free5gc && \
-    autoreconf -f -i && \
-    ./configure \
-        --prefix=`pwd`/install \
-        --sysconfdir=/etc \
-        --localstatedir=/var && \
-    make -j `nproc` install
+    autoreconf -iv && \
+    ./configure --prefix=`pwd`/install && \
+    make -j `nproc` && \
+    make install
 
 WORKDIR /usr/src/free5gc
