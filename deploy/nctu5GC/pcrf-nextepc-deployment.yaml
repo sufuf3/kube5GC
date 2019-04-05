@@ -30,9 +30,11 @@ spec:
             value: mongodb://mongo-external.free5gc.svc.cluster.local/nextepc
         volumeMounts:
         - name: config-volume
-          mountPath: /usr/src/free5gc/install/etc/free5gc
+          mountPath: /usr/src/free5gc/install/etc/free5gc/free5gc.conf
+          subPath: free5gc.conf
         - name: freediameter-volume
-          mountPath: /usr/src/free5gc/install/etc/free5gc/freediameter
+          mountPath: /usr/src/free5gc/install/etc/free5gc/freeDiameter/pcrf.conf
+          subPath: pcrf.conf
         securityContext:
           privileged: true
           capabilities:
@@ -44,10 +46,10 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: pcrf-config
+            name: free5gc-config
             items:
             - key: config.file
-              path: pcrf.conf
+              path: free5gc.conf
         - name: freediameter-volume
           configMap:
             name: freediameter-pcrf-config

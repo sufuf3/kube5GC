@@ -23,12 +23,12 @@ data:
     # This must be a valid FQDN that resolves to the local host.
     # Default: hostname's FQDN
     #Identity = "aaa.koganei.freediameter.net";
-    Identity = "amf.free5gc.svc.cluster.local";
+    Identity = "amf.localdomain";
 
     # The Diameter Realm of this daemon.
     # Default: the domain part of Identity (after the first dot).
     #Realm = "koganei.freediameter.net";
-    Realm = "free5gc.svc.cluster.local";
+    Realm = "localdomain";
 
     ##############################################################
     ##  Transport protocol configuration
@@ -114,7 +114,7 @@ data:
     # Default : NO DEFAULT
     #TLS_Cred = "<x509 certif file.PEM>" , "<x509 private key file.PEM>";
     #TLS_Cred = "/etc/ssl/certs/freeDiameter.pem", "/etc/ssl/private/freeDiameter.key";
-    TLS_Cred = "/usr/src/free5gc/install/etc/free5gc/freeDiameter/hss.cert.pem", "/usr/src/free5gc/install/etc/free5gc/freeDiameter/hss.key.pem";
+    TLS_Cred = "/home/win/free5gc/install/etc/free5gc/freeDiameter/amf.cert.pem", "/home/win/free5gc/install/etc/free5gc/freeDiameter/amf.key.pem";
 
     # Certificate authority / trust anchors
     # The file containing the list of trusted Certificate Authorities (PEM list)

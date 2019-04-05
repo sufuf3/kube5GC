@@ -23,12 +23,12 @@ data:
     # This must be a valid FQDN that resolves to the local host.
     # Default: hostname's FQDN
     #Identity = "aaa.koganei.freediameter.net";
-    Identity = "hss.free5gc.svc.cluster.local";
+    Identity = "hss.localdomain";
 
     # The Diameter Realm of this daemon.
     # Default: the domain part of Identity (after the first dot).
     #Realm = "koganei.freediameter.net";
-    Realm = "free5gc.svc.cluster.local";
+    Realm = "localdomain";
 
     ##############################################################
     ##  Transport protocol configuration

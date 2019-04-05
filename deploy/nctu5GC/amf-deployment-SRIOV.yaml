@@ -22,7 +22,7 @@ spec:
       - name: amf-container
         image: sufuf3/nextepc-build:latest
         command: ["/bin/bash"]
-        args: ["-c", "/usr/src/free5gc/install/bin/open5gc-amfd"]
+        args: ["-c", "/usr/src/free5gc/install/bin/free5gc-amfd"]
         stdin: true
         tty: true
         imagePullPolicy: IfNotPresent
@@ -31,9 +31,11 @@ spec:
             value: mongodb://mongo-external.free5gc.svc.cluster.local/nextepc
         volumeMounts:
         - name: config-volume
-          mountPath: /usr/src/free5gc/install/etc/free5gc
+          mountPath: /usr/src/free5gc/install/etc/free5gc/free5gc.conf
+          subPath: free5gc.conf
         - name: freediameter-volume
-          mountPath: /usr/src/free5gc/install/etc/free5gc/freediameter
+          mountPath: /usr/src/free5gc/install/etc/free5gc/freeDiameter/amf.conf
+          subPath: amf.conf
         securityContext:
           privileged: true
           capabilities:

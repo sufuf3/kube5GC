@@ -21,18 +21,22 @@ spec:
       - name: smf-container
         image: sufuf3/nextepc-build:latest
         command: ["/bin/bash"]
-        args: ["-c", "/usr/src/free5gc/install/bin/open5gc-smfd"]
+        #args: ["-c", "sleep 36000"]
+        args: ["-c", "/usr/src/free5gc/free5gc-smfd"]
         ports:
           - containerPort: 8080
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
+        #imagePullPolicy: IfNotPresent
         env:
           - name: DB_URI
             value: mongodb://mongo-external.free5gc.svc.cluster.local/nextepc
         volumeMounts:
         - name: config-volume
-          mountPath: /usr/src/free5gc/install/etc/free5gc
+          mountPath: /usr/src/free5gc/install/etc/free5gc/free5gc.conf
+          subPath: free5gc.conf
         - name: freediameter-volume
-          mountPath: /usr/src/free5gc/install/etc/free5gc/freediameter
+          mountPath: /usr/src/free5gc/install/etc/free5gc/freeDiameter/smf.conf
+          subPath: smf.conf
         securityContext:
           privileged: true
           capabilities:

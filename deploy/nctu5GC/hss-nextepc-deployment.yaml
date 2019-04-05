@@ -21,7 +21,7 @@ spec:
       - name: nextepc-hss
         image: sufuf3/nextepc-build:latest
         command: ["/bin/bash"]
-        args: ["-c", "/usr/src/free5gc/install/bin/nextepc-hssd"]
+        args: ["-c", "/usr/src/free5gc/nextepc-hssd"]
         ports:
           - containerPort: 80
         imagePullPolicy: IfNotPresent
@@ -30,9 +30,14 @@ spec:
             value: mongodb://mongo-external.free5gc.svc.cluster.local/nextepc
         volumeMounts:
         - name: config-volume
-          mountPath: /usr/src/free5gc/install/etc/free5gc
+          mountPath: /usr/src/free5gc/install/etc/free5gc/free5gc.conf
+          subPath: free5gc.conf
+        - name: hss-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc/hss.conf
+          subPath: hss.conf
         - name: freediameter-volume
-          mountPath: /usr/src/free5gc/install/etc/free5gc/freediameter
+          mountPath: /usr/src/free5gc/install/etc/free5gc/freeDiameter/hss.conf
+          subPath: hss.conf
         securityContext:
           privileged: true
           capabilities:
@@ -43,6 +48,12 @@ spec:
             value: "0"
       volumes:
         - name: config-volume
+          configMap:
+            name: free5gc-config
+            items:
+            - key: config.file
+              path: free5gc.conf
+        - name: hss-volume
           configMap:
             name: hss-config
             items:
