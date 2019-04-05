@@ -15,33 +15,35 @@ spec:
       labels:
         app: upf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.71.206\"]"
-        k8s.v1.cni.cncf.io/networks: '[
-            { "name": "sriov-conf" }
-        ]'
+        cni.projectcalico.org/ipAddrs: "[\"10.233.84.206\"]"
+        k8s.v1.cni.cncf.io/networks: sriov-net1
     spec:
       containers:
       - name: upf-container
         image: sufuf3/nextepc-build:latest
         command: ["/bin/bash"]
-        args: ["-c", "/usr/src/free5gc/install/bin/open5gc-upfd"]
+        args: ["-c", "/root/setup.sh && /usr/src/free5gc/install/bin/free5gc-upfd"]
         stdin: true
         tty: true
-        ports:
-          - containerPort: 8080
         imagePullPolicy: IfNotPresent
         env:
           - name: DB_URI
             value: mongodb://mongo-external.free5gc.svc.cluster.local/nextepc
         volumeMounts:
         - name: config-volume
-          mountPath: /usr/src/free5gc/install/etc/free5gc
+          mountPath: /usr/src/free5gc/install/etc/free5gc/free5gc.conf
+          subPath: free5gc.conf
         - name: uptun-path
           mountPath: /dev/net/tun
         securityContext:
           privileged: true
           capabilities:
             add: ["NET_ADMIN", "SYS_TIME"]
+        resources:
+          requests:
+            intel.com/sriov_net: '1' 
+          limits:
+            intel.com/sriov_net: '1'
       #hostNetwork: true
       securityContext:
         sysctls:

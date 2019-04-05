@@ -15,7 +15,7 @@ spec:
       labels:
         app: smf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.71.204\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.84.204\"]"
     spec:
       containers:
       - name: smf-container

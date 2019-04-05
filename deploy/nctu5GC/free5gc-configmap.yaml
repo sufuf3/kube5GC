@@ -71,7 +71,7 @@ data:
     #      dev: eth0
     #
         s1ap:
-        addr: 10.233.71.202
+          addr: 10.233.84.202
 
     #
     #  <GUMMEI>
@@ -94,11 +94,11 @@ data:
     #          - 3
     #
         gummei: 
-        plmn_id:
+          plmn_id:
             mcc: 208
             mnc: 93
-        mme_gid: 1
-        mme_code: 1
+          mme_gid: 1
+          mme_code: 1
 
     #
     #  <TAI>
@@ -133,10 +133,10 @@ data:
     #        tac: [9, 10]
     #
         tai:
-        plmn_id:
+          plmn_id:
             mcc: 208
             mnc: 93
-        tac: 1
+          tac: 1
 
         security:
             integrity_order : [ EIA1, EIA2, EIA0 ]
@@ -162,15 +162,15 @@ data:
         freeDiameter: smf.conf
 
         pfcp:
-        - addr: 10.233.71.205
+        - addr: 10.233.84.205
         - addr: ::1
 
         upf:
-        - addr: 10.233.71.206
+        - addr: 10.233.84.206
 
         http:
-        addr: 10.233.71.204
-        port: 8080
+          addr: 10.233.84.204
+          port: 8080
 
     #
     #  <UE Pool>
@@ -240,7 +240,7 @@ data:
     upf:
         pfcp:
         addr:
-            - 10.233.71.206
+            - 10.233.84.206
             - ::1
 
     #
@@ -256,7 +256,7 @@ data:
     #      name: localhost
     #
         gtpu:
-        - addr: 10.233.71.206
+        - addr: 10.233.84.206
         - addr: ::1
 
         ue_pool:

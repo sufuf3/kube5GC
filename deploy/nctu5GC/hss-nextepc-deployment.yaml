@@ -15,7 +15,7 @@ spec:
       labels:
         app: nextepc-hss
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.71.203\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.84.203\"]"
     spec:
       containers:
       - name: nextepc-hss

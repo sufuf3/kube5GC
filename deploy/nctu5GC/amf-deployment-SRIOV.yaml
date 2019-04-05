@@ -15,7 +15,7 @@ spec:
       labels:
         app: amf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.71.202\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.84.202\"]"
         k8s.v1.cni.cncf.io/networks: sriov-net1
     spec:
       containers:

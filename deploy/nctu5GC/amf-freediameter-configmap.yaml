@@ -87,7 +87,7 @@ data:
     #ListenOn = "202.249.37.5";
     #ListenOn = "2001:200:903:2::202:1";
     #ListenOn = "fe80::21c:5ff:fe98:7d62%eth0";
-    ListenOn = "10.233.71.202";
+    ListenOn = "10.233.84.202";
 
 
     ##############################################################
@@ -114,7 +114,7 @@ data:
     # Default : NO DEFAULT
     #TLS_Cred = "<x509 certif file.PEM>" , "<x509 private key file.PEM>";
     #TLS_Cred = "/etc/ssl/certs/freeDiameter.pem", "/etc/ssl/private/freeDiameter.key";
-    TLS_Cred = "/home/win/free5gc/install/etc/free5gc/freeDiameter/amf.cert.pem", "/home/win/free5gc/install/etc/free5gc/freeDiameter/amf.key.pem";
+    TLS_Cred = "/usr/src/free5gc/install/etc/free5gc/freeDiameter/amf.cert.pem", "/usr/src/free5gc/install/etc/free5gc/freeDiameter/amf.key.pem";
 
     # Certificate authority / trust anchors
     # The file containing the list of trusted Certificate Authorities (PEM list)
@@ -269,6 +269,6 @@ data:
     # Examples:
     #ConnectPeer = "aaa.wide.ad.jp";
     #ConnectPeer = "old.diameter.serv" { TcTimer = 60; TLS_old_method; No_SCTP; Port=3868; } ;
-    ConnectPeer = "hss.free5gc.svc.cluster.local" { ConnectTo = "10.233.71.203"; No_TLS; };
+    ConnectPeer = "hss.free5gc.svc.cluster.local" { ConnectTo = "10.233.84.203"; No_TLS; };
 
     ##############################################################

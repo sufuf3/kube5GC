@@ -115,7 +115,7 @@ $ ip a
        valid_lft forever preferred_lft forever
 $ echo 30 | sudo tee -a /sys/class/net/ens11f3/device/sriov_numvfs
 $ kubectl createa -f deploy/crdnetwork.yaml
-$ kubectl create -f deployments/sriov-crd.yaml
+$ kubectl create -f deploy/sriov-crd.yaml
 $ kubectl get net-attach-def
 NAME                   AGE
 sriov-net1             4h
@@ -209,7 +209,7 @@ kubectl create -f deploy/nctu5GC/free5gc-configmap.yaml
 
 #### 5. Create AMF
 
-> AMF IP: 10.233.71.202
+> AMF IP: 10.233.84.202
 
 1. Update `deploy/nctu5GC/amf-freediameter-configmap.yaml`
    https://hackmd.io/s/S1baJOeEE#Setup-AMF
@@ -222,7 +222,7 @@ kubectl create -f deploy/nctu5GC/amf-deployment-SRIOV.yaml
 
 #### 6. Create HSS
 
-> HSS IP: 10.233.71.203
+> HSS IP: 10.233.84.203
 
 1. Update `deploy/nctu5GC/hss-freediameter-configmap.yaml`
    https://hackmd.io/s/S1baJOeEE#Setup-HSS
@@ -238,7 +238,7 @@ kubectl create -f deploy/nctu5GC/hss-nextepc-deployment.yaml
 
 #### 7. Create SMF
 
-> SMF IP: 10.233.71.204
+> SMF IP: 10.233.84.204
 
 ```sh
 kubectl create -f deploy/nctu5GC/smf-freediameter-configmap.yaml
@@ -248,7 +248,7 @@ kubectl create -f deploy/nctu5GC/smf-deployment.yaml
 
 #### 8. Create PCRF
 
-> PCRF IP: 10.233.71.205
+> PCRF IP: 10.233.84.205
 
 1. Update `deploy/nctu5GC/pcrf-freediameter-configmap.yaml`
    https://hackmd.io/s/S1baJOeEE#Setup-PCRF
@@ -262,7 +262,13 @@ kubectl create -f deploy/nctu5GC/pcrf-nextepc-deployment.yaml
 ```
 #### 9. Create UPF
 
-> UPF IP: 10.233.71.206
+> UPF IP: 10.233.84.206
+
+1. Deploy
+
+```sh
+kubectl create -f deploy/nctu5GC/upf-deployment-SRIOV.yaml
+```
 
 ### Method 2 - Using Helm
 

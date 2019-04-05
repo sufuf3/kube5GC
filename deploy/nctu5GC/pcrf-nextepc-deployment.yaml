@@ -15,7 +15,7 @@ spec:
       labels:
         app: nextepc-pcrf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.71.205\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.84.205\"]"
     spec:
       containers:
       - name: nextepc-pcrf
