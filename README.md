@@ -1,10 +1,10 @@
 # kube5GC
 
-> This project is for deploying NCTU5GC on [kubeCORD](https://github.com/sufuf3/kubecord-installer).
+> This project is for deploying Free5GC on [kubeCORD](https://github.com/sufuf3/kubecord-installer).
 
 ## Table of Contents
 
-- [NCTU-5GC Components](#nctu5gc-components)
+- [Free5GC Components](#Free5gc-components)
 - [Prepare](#prepare)
     - [1. Using kubeCORD deploy Kubernetes](#1-using-kubecord-deploy-kubernetes)
     - [2. Install NFS Server](#2-install-nfs-server)
@@ -12,22 +12,16 @@
 - [Deploy free5GC](#deploy-free5gc)
     - [Method 1 - Using yaml](#method-1---using-yaml)
     - [Method 2 - Using Helm](#method-2---using-helm)
+- [Verification](#verification)
 
-## NCTU-5GC Components
+## Free5GC Components
 
 ### Components
 
-- 🚧 mongodb
-    - pv, statefulset, service
-- 🚧 webui
-    - service, deployment
-- 🔨 mme
-- 🚧 u1-u2
-    - deployment
-- 🔨 sgw
-- 🔨 pgw
-- 🔨 hss
-- 🔨 pcrf
+- mongodb
+- webui
+- HSS
+- PCRF
 - AMF
 - SMF
 - UPF
@@ -277,8 +271,22 @@ To be continued...
 ---
 
 ## Network
+
 ```sh
 
 kubectl get network-attachment-definitions
 ```
 
+## Verification
+
+```sh
+$ kubectl get po -n free5gc -o wide
+NAME                                       READY   STATUS    RESTARTS   AGE     IP              NODE         NOMINATED NODE
+amf-deployment-587f78dc7b-vkbcf            1/1     Running   0          3h53m   10.233.84.202   kubecord-a   <none>
+mongo-0                                    1/1     Running   0          2d9h    10.233.69.141   kubecord-a   <none>
+nextepc-hss-deployment-77bbb7f986-wj9vf    1/1     Running   0          3h53m   10.233.84.203   kubecord-a   <none>
+pcrf-nextepc-deployment-7f6c776d66-6k4b5   1/1     Running   0          3h53m   10.233.84.205   kubecord-a   <none>
+smf-deployment-66d85dcd5b-dcvnt            1/1     Running   0          3h53m   10.233.84.204   kubecord-a   <none>
+upf-deployment-644d8d8f6-7494d             1/1     Running   5          3h52m   10.233.84.206   kubecord-a   <none>
+webui-deployment-6bcfdf7dc9-54khc          1/1     Running   0          2d9h    10.233.69.142   kubecord-a   <none>
+```
