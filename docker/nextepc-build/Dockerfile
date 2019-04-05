@@ -4,6 +4,7 @@ FROM sufuf3/nextepc-base:latest
 
 WORKDIR /root
 COPY setup.sh /root
+RUN chmod 777 /root/setup.sh
 
 ARG USER=nctucs
 ARG REPO=free5gc
