@@ -15,7 +15,7 @@ spec:
       labels:
         app: upf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.71.206\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.92.206\"]"
         k8s.v1.cni.cncf.io/networks: vhostuser-networkobj, vhostuser-networkobj
     spec:
       containers:

@@ -87,7 +87,7 @@ data:
     #ListenOn = "202.249.37.5";
     #ListenOn = "2001:200:903:2::202:1";
     #ListenOn = "fe80::21c:5ff:fe98:7d62%eth0";
-    ListenOn = "10.233.84.202";
+    ListenOn = "10.233.92.202";
 
 
     ##############################################################
@@ -269,6 +269,7 @@ data:
     # Examples:
     #ConnectPeer = "aaa.wide.ad.jp";
     #ConnectPeer = "old.diameter.serv" { TcTimer = 60; TLS_old_method; No_SCTP; Port=3868; } ;
-    ConnectPeer = "hss.free5gc.svc.cluster.local" { ConnectTo = "10.233.84.203"; No_TLS; };
+    # HSS IP
+    ConnectPeer = "hss.localdomain" { ConnectTo = "10.233.92.203"; No_TLS; };
 
     ##############################################################

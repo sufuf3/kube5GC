@@ -15,8 +15,26 @@ spec:
       labels:
         app: nextepc-hss
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.84.203\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.92.203\"]"
     spec:
+      hostname: hss
+      subdomain: localdomain
+      hostAliases:
+      - ip: "10.233.92.202"
+        hostnames:
+        - "amf.localdomain"
+      - ip: "10.233.92.203"
+        hostnames:
+        - "hss.localdomain"
+      - ip: "10.233.92.204"
+        hostnames:
+        - "smf.localdomain"
+      - ip: "10.233.92.205"
+        hostnames:
+        - "pcrf.localdomain"
+      - ip: "10.233.92.206"
+        hostnames:
+        - "upf.localdomain"
       containers:
       - name: nextepc-hss
         image: sufuf3/nextepc-build:latest
@@ -24,6 +42,11 @@ spec:
         args: ["-c", "/usr/src/free5gc/nextepc-hssd"]
         ports:
           - containerPort: 80
+            name: api
+          - containerPort: 5868
+            name: api1
+          - containerPort: 3868
+            name: api2
         imagePullPolicy: IfNotPresent
         env:
           - name: DB_URI

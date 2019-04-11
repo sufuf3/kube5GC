@@ -15,14 +15,32 @@ spec:
       labels:
         app: upf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.84.206\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.92.206\"]"
         k8s.v1.cni.cncf.io/networks: sriov-net1
     spec:
+      hostname: upf
+      subdomain: localdomain
+      hostAliases:
+      - ip: "10.233.92.202"
+        hostnames:
+        - "amf.localdomain"
+      - ip: "10.233.92.203"
+        hostnames:
+        - "hss.localdomain"
+      - ip: "10.233.92.204"
+        hostnames:
+        - "smf.localdomain"
+      - ip: "10.233.92.205"
+        hostnames:
+        - "pcrf.localdomain"
+      - ip: "10.233.92.206"
+        hostnames:
+        - "upf.localdomain"
       containers:
       - name: upf-container
         image: sufuf3/nextepc-build:latest
         command: ["/bin/bash"]
-        args: ["-c", "/root/setup.sh && /usr/src/free5gc/install/bin/free5gc-upfd"]
+        args: ["-c", "/root/setup.sh && /usr/src/free5gc/free5gc-upfd"]
         stdin: true
         tty: true
         imagePullPolicy: IfNotPresent

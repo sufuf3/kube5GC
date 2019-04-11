@@ -15,8 +15,26 @@ spec:
       labels:
         app: smf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.84.204\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.92.204\"]"
     spec:
+      hostname: smf
+      subdomain: localdomain
+      hostAliases:
+      - ip: "10.233.92.202"
+        hostnames:
+        - "amf.localdomain"
+      - ip: "10.233.92.203"
+        hostnames:
+        - "hss.localdomain"
+      - ip: "10.233.92.204"
+        hostnames:
+        - "smf.localdomain"
+      - ip: "10.233.92.205"
+        hostnames:
+        - "pcrf.localdomain"
+      - ip: "10.233.92.206"
+        hostnames:
+        - "upf.localdomain"
       containers:
       - name: smf-container
         image: sufuf3/nextepc-build:latest
@@ -25,6 +43,11 @@ spec:
         args: ["-c", "/usr/src/free5gc/free5gc-smfd"]
         ports:
           - containerPort: 8080
+            name: api
+          - containerPort: 5868
+            name: api1
+          - containerPort: 3868
+            name: api2
         imagePullPolicy: Always
         #imagePullPolicy: IfNotPresent
         env:

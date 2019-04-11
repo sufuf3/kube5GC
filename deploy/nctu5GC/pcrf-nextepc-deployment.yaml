@@ -15,15 +15,38 @@ spec:
       labels:
         app: nextepc-pcrf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.84.205\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.92.205\"]"
     spec:
+      hostname: pcrf
+      subdomain: localdomain
+      hostAliases:
+      - ip: "10.233.92.202"
+        hostnames:
+        - "amf.localdomain"
+      - ip: "10.233.92.203"
+        hostnames:
+        - "hss.localdomain"
+      - ip: "10.233.92.204"
+        hostnames:
+        - "smf.localdomain"
+      - ip: "10.233.92.205"
+        hostnames:
+        - "pcrf.localdomain"
+      - ip: "10.233.92.206"
+        hostnames:
+        - "upf.localdomain"
       containers:
       - name: nextepc-pcrf
         image: sufuf3/nextepc-build:latest
         command: ["/bin/bash"]
-        args: ["-c", "/usr/src/free5gc/install/bin/nextepc-pcrfd"]
+        args: ["-c", "/usr/src/free5gc/nextepc-pcrfd"]
         ports:
           - containerPort: 80
+            name: api
+          - containerPort: 5868
+            name: api1
+          - containerPort: 3868
+            name: api2
         imagePullPolicy: IfNotPresent
         env:
           - name: DB_URI
