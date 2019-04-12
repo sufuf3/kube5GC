@@ -87,7 +87,7 @@ data:
     #ListenOn = "202.249.37.5";
     #ListenOn = "2001:200:903:2::202:1";
     #ListenOn = "fe80::21c:5ff:fe98:7d62%eth0";
-    ListenOn = "10.233.92.205";
+    ListenOn = "10.233.95.205";
 
 
     ##############################################################
@@ -269,6 +269,6 @@ data:
     #ConnectPeer = "aaa.wide.ad.jp";
     #ConnectPeer = "old.diameter.serv" { TcTimer = 60; TLS_old_method; No_SCTP; Port=3868; } ;
     # SMF IP
-    ConnectPeer = "smf.localdomain" { ConnectTo = "10.233.92.204"; No_TLS; };
+    ConnectPeer = "smf.localdomain" { ConnectTo = "10.233.95.204"; No_TLS; };
 
     ##############################################################

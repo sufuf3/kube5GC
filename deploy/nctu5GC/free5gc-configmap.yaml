@@ -71,7 +71,7 @@ data:
     #      dev: eth0
     #
         s1ap:
-          addr: 10.233.92.202
+          addr: 192.188.2.100
 
     #
     #  <GUMMEI>
@@ -162,14 +162,14 @@ data:
         freeDiameter: smf.conf
 
         pfcp:
-        - addr: 10.233.92.205
+        - addr: 10.233.95.205
         - addr: ::1
 
         upf:
-        - addr: 10.233.92.206
+        - addr: 10.233.95.206
 
         http:
-          addr: 10.233.92.204
+          addr: 10.233.95.204
           port: 8080
 
     #
@@ -239,7 +239,7 @@ data:
 
     upf:
         pfcp:
-          addr: 10.233.92.206
+          addr: 10.233.95.206
 
     #
     #  <GTP-U Server>>
@@ -254,7 +254,7 @@ data:
     #      name: localhost
     #
         gtpu:
-          - addr: 10.233.92.206
+          - addr: 192.188.2.101
 
         ue_pool:
         - addr: 45.45.0.1/16

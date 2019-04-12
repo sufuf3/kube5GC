@@ -15,24 +15,24 @@ spec:
       labels:
         app: nextepc-pcrf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.92.205\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.95.205\"]"
     spec:
       hostname: pcrf
       subdomain: localdomain
       hostAliases:
-      - ip: "10.233.92.202"
+      - ip: "10.233.95.202"
         hostnames:
         - "amf.localdomain"
-      - ip: "10.233.92.203"
+      - ip: "10.233.95.203"
         hostnames:
         - "hss.localdomain"
-      - ip: "10.233.92.204"
+      - ip: "10.233.95.204"
         hostnames:
         - "smf.localdomain"
-      - ip: "10.233.92.205"
+      - ip: "10.233.95.205"
         hostnames:
         - "pcrf.localdomain"
-      - ip: "10.233.92.206"
+      - ip: "10.233.95.206"
         hostnames:
         - "upf.localdomain"
       containers:
