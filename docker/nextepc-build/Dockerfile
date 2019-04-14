@@ -10,7 +10,8 @@ ARG USER=nctucs
 ARG REPO=free5gc
 ARG BRANCH=master
 RUN cd /usr/src && git clone https://bitbucket.org/nctu_5g/free5gc.git /usr/src/free5gc
-RUN cd /usr/src/free5gc && git checkout v1.0.0
+# Ca't not use v1.0.0, cause the config file is useless for the program
+RUN cd /usr/src/free5gc && git checkout da4e100
 RUN go get -u -v "github.com/gorilla/mux"
 RUN go get -u -v "golang.org/x/net/http2"
 RUN go get -u -v "golang.org/x/sys/unix"
