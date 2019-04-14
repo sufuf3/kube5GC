@@ -15,25 +15,25 @@ spec:
       labels:
         app: upf
       annotations:
-        cni.projectcalico.org/ipAddrs: "[\"10.233.95.206\"]"
+        cni.projectcalico.org/ipAddrs: "[\"10.233.100.206\"]"
         k8s.v1.cni.cncf.io/networks: sriov-net1
     spec:
       hostname: upf
       subdomain: localdomain
       hostAliases:
-      - ip: "10.233.95.202"
+      - ip: "10.233.100.202"
         hostnames:
         - "amf.localdomain"
-      - ip: "10.233.95.203"
+      - ip: "10.233.100.203"
         hostnames:
         - "hss.localdomain"
-      - ip: "10.233.95.204"
+      - ip: "10.233.100.204"
         hostnames:
         - "smf.localdomain"
-      - ip: "10.233.95.205"
+      - ip: "10.233.100.205"
         hostnames:
         - "pcrf.localdomain"
-      - ip: "10.233.95.206"
+      - ip: "10.233.100.206"
         hostnames:
         - "upf.localdomain"
       containers:
