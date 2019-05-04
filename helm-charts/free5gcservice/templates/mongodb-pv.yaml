@@ -1,0 +1,21 @@
+{{- if .Values.mongodb.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-{{- .Values.mongodb.controller.pvc.volumeType }}
+spec:
+  storageClassName: {{ .Values.mongodb.controller.pvc.storageClass }}
+  persistentVolumeReclaimPolicy: {{ .Values.mongodb.controller.pvc.reclaimPolicy }}
+  capacity:
+    storage: {{ .Values.mongodb.controller.pvc.storage }}
+  accessModes:
+    - {{ .Values.mongodb.controller.pvc.accessModes }}
+  {{- if eq .Values.mongodb.controller.pvc.volumeType "local"}}
+  hostPath:
+    path: "/data"
+  {{- else if eq .Values.mongodb.controller.pvc.volumeType "nfs" }}
+  nfs: 
+    path: {{ .Values.mongodb.controller.pvc.nfsPath }}
+    server: {{ .Values.mongodb.controller.pvc.nfsServer }}
+  {{- end }}
+{{- end }}

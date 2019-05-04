@@ -1,0 +1,40 @@
+---
+{{- if .Values.webui.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: webui
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: webui
+spec:
+  selector:
+    app: webui
+  ports:
+  - port: 3000
+    targetPort: 3000
+{{- end }}
+
+---
+
+{{- if and .Values.webui.enabled .Values.webui.service.nodePort }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: webui-external
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: webui
+spec:
+  externalTrafficPolicy: Cluster
+  selector:
+    app: webui
+  type: NodePort
+  ports:
+  - name: webui
+    port: 3000
+    nodePort: {{ .Values.webui.service.nodePortNum }}
+    targetPort: 3000
+    protocol: TCP
+  sessionAffinity: None
+{{- end }}

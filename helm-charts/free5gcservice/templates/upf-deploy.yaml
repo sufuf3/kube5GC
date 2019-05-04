@@ -1,0 +1,81 @@
+{{- if .Values.free5gc.upf.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upf-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: upf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: upf
+  template:
+    metadata:
+      labels:
+        app: upf
+      annotations:
+        cni.projectcalico.org/ipAddrs: "[\"{{ .Values.free5gc.upf.addr }}\"]"
+        k8s.v1.cni.cncf.io/networks: sriov-net1
+    spec:
+      hostname: upf
+      subdomain: localdomain
+      hostAliases:
+      - ip: "{{ .Values.free5gc.amf.addr }}"
+        hostnames:
+        - "amf.localdomain"
+      - ip: "{{ .Values.free5gc.hss.addr }}"
+        hostnames:
+        - "hss.localdomain"
+      - ip: "{{ .Values.free5gc.smf.addr }}"
+        hostnames:
+        - "smf.localdomain"
+      - ip: "{{ .Values.free5gc.pcrf.addr }}"
+        hostnames:
+        - "pcrf.localdomain"
+      - ip: "{{ .Values.free5gc.upf.addr }}"
+        hostnames:
+        - "upf.localdomain"
+      containers:
+      - name: upf-container
+        image: "{{ .Values.free5gc.image.repository }}:{{ .Values.free5gc.image.tag }}"
+        command: ["/bin/bash"]
+        args: ["-c", "ip addr add {{ .Values.free5gc.upf.gtpu }}/24 dev net1 && /root/setup.sh && /usr/src/free5gc/free5gc-upfd"]
+        stdin: true
+        tty: true
+        imagePullPolicy: {{ .Values.free5gc.image.pullPolicy }}
+        env:
+          - name: DB_URI
+            value: mongodb://mongo-external.{{ .Values.namespace }}.svc.cluster.local/nextepc
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc/free5gc.conf
+          subPath: free5gc.conf
+        - name: uptun-path
+          mountPath: /dev/net/tun
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["NET_ADMIN", "SYS_TIME"]
+        resources:
+          requests:
+            intel.com/sriov_net: '1' 
+          limits:
+            intel.com/sriov_net: '1'
+      #hostNetwork: true
+      securityContext:
+        sysctls:
+          - name: net.ipv6.conf.all.disable_ipv6
+            value: "0"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: free5gc-config
+            items:
+            - key: config.file
+              path: free5gc.conf
+        - name: uptun-path
+          hostPath:
+            path: /dev/net/tun
+{{- end }}

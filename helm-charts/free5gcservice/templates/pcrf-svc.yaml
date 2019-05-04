@@ -1,0 +1,15 @@
+{{- if .Values.free5gc.pcrf.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcrf
+  labels:
+    app: pcrf
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: pcrf
+{{- end }}

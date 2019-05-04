@@ -1,0 +1,90 @@
+{{- if .Values.free5gc.amf.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amf-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: amf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: amf
+  template:
+    metadata:
+      labels:
+        app: amf
+      annotations:
+        cni.projectcalico.org/ipAddrs: "[\"{{ .Values.free5gc.amf.addr }}\"]"
+        k8s.v1.cni.cncf.io/networks: sriov-net1
+    spec:
+      hostname: amf
+      subdomain: localdomain
+      hostAliases:
+      - ip: "{{ .Values.free5gc.amf.addr }}"
+        hostnames:
+        - "amf.localdomain"
+      - ip: "{{ .Values.free5gc.hss.addr }}"
+        hostnames:
+        - "hss.localdomain"
+      - ip: "{{ .Values.free5gc.smf.addr }}"
+        hostnames:
+        - "smf.localdomain"
+      - ip: "{{ .Values.free5gc.pcrf.addr }}"
+        hostnames:
+        - "pcrf.localdomain"
+      - ip: "{{ .Values.free5gc.upf.addr }}"
+        hostnames:
+        - "upf.localdomain"
+      containers:
+      - name: amf-container
+        image: "{{ .Values.free5gc.image.repository }}:{{ .Values.free5gc.image.tag }}"
+        command: ["/bin/bash"]
+        args: ["-c", "ip addr add {{ .Values.free5gc.amf.s1ap }}/24 dev net1 && /usr/src/free5gc/free5gc-amfd"]
+        ports:
+          - containerPort: 5868
+            name: api1
+          - containerPort: 3868
+            name: api2
+        stdin: true
+        tty: true
+        imagePullPolicy: {{ .Values.free5gc.image.pullPolicy }}
+        env:
+          - name: DB_URI
+            value: mongodb://mongo-external.{{ .Values.namespace }}.svc.cluster.local/nextepc
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc/free5gc.conf
+          subPath: free5gc.conf
+        - name: freediameter-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc/freeDiameter/amf.conf
+          subPath: amf.conf
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["NET_ADMIN", "SYS_TIME"]
+        resources:
+          requests:
+            intel.com/sriov_net: '1' 
+          limits:
+            intel.com/sriov_net: '1'
+      #hostNetwork: true
+      securityContext:
+        sysctls:
+          - name: net.ipv6.conf.all.disable_ipv6
+            value: "0"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: free5gc-config
+            items:
+            - key: config.file
+              path: free5gc.conf
+        - name: freediameter-volume
+          configMap:
+            name: freediameter-amf-config
+            items:
+            - key: config.file
+              path: amf.conf
+{{- end }}

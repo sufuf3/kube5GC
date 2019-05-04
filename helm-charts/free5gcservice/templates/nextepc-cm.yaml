@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hss-config
+  namespace: {{ .Values.namespace }}
+data:
+  config.file: |
+    db_uri: mongodb://mongo-external.{{ .Values.namespace }}.svc.cluster.local/free5gc
+    logger:
+      file: /usr/src/free5gc/install/var/log/free5gc/hss.log
+      trace: 
+        app: 1
+        diameter: 1
+    parameter:
+    hss:
+      freeDiameter: hss.conf
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pcrf-config
+  namespace: {{ .Values.namespace }}
+data:
+  config.file: |
+    db_uri: mongodb://mongo-external.{{ .Values.namespace }}.svc.cluster.local/free5gc
+    logger:
+      file: /usr/src/free5gc/install/var/log/free5gc/pcrf.log
+      trace: 
+        app: 1
+        diameter: 1
+    parameter:
+    pcrf:
+      freeDiameter: pcrf.conf

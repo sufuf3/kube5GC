@@ -1,0 +1,41 @@
+{{- if .Values.mongodb.enabled }}
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mongo
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceName: "mongo"
+  replicas: {{ .Values.mongodb.controller.replicaCount }}
+  template:
+    metadata:
+      labels:
+        service: mongo
+        role: db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: nextepc-mongodb
+          image: mongo:{{ .Values.mongodb.controller.image.tag }}
+          command:
+            - mongod
+            - "--bind_ip"
+            - 0.0.0.0
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb
+              mountPath: /data/db
+          resources:
+            requests:
+              cpu: {{ .Values.mongodb.controller.cpu }}
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb
+    spec:
+      accessModes: [ {{ .Values.mongodb.controller.pvc.accessModes | quote }} ]
+      storageClassName: {{ .Values.mongodb.controller.pvc.storageClass }}
+      resources:
+        requests:
+          storage: {{ .Values.mongodb.controller.pvc.storage }}
+{{- end }}

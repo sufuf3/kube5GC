@@ -1,0 +1,22 @@
+{{- if .Values.free5gc.smf.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: testing
+    service: smf
+  name: smf
+  namespace: {{ .Values.namespace }}
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: smf
+    nodePort: {{ .Values.free5gc.smf.nodePort }}
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    service: smf
+  sessionAffinity: None
+  type: NodePort
+{{- end }}

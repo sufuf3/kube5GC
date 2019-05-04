@@ -1,0 +1,62 @@
+# Default values for free5gcservice.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+createNamespace: false
+namespace: cn1
+mongodb:
+  enabled: true
+  controller:
+    replicaCount: 1
+    cpu: 200m
+    image:
+      tag: 4.1.1-xenial
+    pvc:
+      volumeType: nfs
+      nfsPath: /nfsshare/mongodb
+      nfsServer: 192.168.26.11
+      reclaimPolicy: Recycle
+      accessModes: ReadWriteMany
+      storageClass: mongo
+      storage: 100Gi
+  service:
+    nodePort: true
+    nodePortNum: 31717
+
+webui:
+  enabled: true
+  controller:
+    replicaCount: 1
+    image:
+      repository: sufuf3/nextepc-webui
+      tag: latest
+      pullPolicy: IfNotPresent
+  service:
+    nodePort: true
+    nodePortNum: 31727
+
+free5gc:
+  image:
+    repository: sufuf3/nextepc-build
+    tag: latest
+    pullPolicy: IfNotPresent
+  amf:
+    enabled: true
+    addr: 10.233.100.202
+    s1ap: 192.188.2.100
+    mcc: 208
+    mnc: 93
+  hss:
+    enabled: true
+    addr: 10.233.100.203
+  smf:
+    enabled: true
+    addr: 10.233.100.204
+    nodePort: 31780
+  pcrf:
+    enabled: true
+    addr: 10.233.100.205
+  upf:
+    enabled: true
+    addr: 10.233.100.206
+    gtpu: 192.188.2.101

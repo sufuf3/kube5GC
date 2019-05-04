@@ -1,0 +1,84 @@
+{{- if .Values.free5gc.smf.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smf-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: smf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smf
+  template:
+    metadata:
+      labels:
+        app: smf
+      annotations:
+        cni.projectcalico.org/ipAddrs: "[\"{{ .Values.free5gc.smf.addr }}\"]"
+    spec:
+      hostname: smf
+      subdomain: localdomain
+      hostAliases:
+      - ip: "{{ .Values.free5gc.amf.addr }}"
+        hostnames:
+        - "amf.localdomain"
+      - ip: "{{ .Values.free5gc.hss.addr }}"
+        hostnames:
+        - "hss.localdomain"
+      - ip: "{{ .Values.free5gc.smf.addr }}"
+        hostnames:
+        - "smf.localdomain"
+      - ip: "{{ .Values.free5gc.pcrf.addr }}"
+        hostnames:
+        - "pcrf.localdomain"
+      - ip: "{{ .Values.free5gc.upf.addr }}"
+        hostnames:
+        - "upf.localdomain"
+      containers:
+      - name: smf-container
+        image: "{{ .Values.free5gc.image.repository }}:{{ .Values.free5gc.image.tag }}"
+        command: ["/bin/bash"]
+        #args: ["-c", "sleep 36000"]
+        args: ["-c", "/usr/src/free5gc/free5gc-smfd"]
+        #ports:
+          #- containerPort: 8080
+          #  name: api
+          #- containerPort: 5868
+          #  name: api1
+          #- containerPort: 3868
+          #  name: api2
+        imagePullPolicy: {{ .Values.free5gc.image.pullPolicy }}
+        env:
+          - name: DB_URI
+            value: mongodb://mongo-external.{{ .Values.namespace }}.svc.cluster.local/nextepc
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc/free5gc.conf
+          subPath: free5gc.conf
+        - name: freediameter-volume
+          mountPath: /usr/src/free5gc/install/etc/free5gc/freeDiameter/smf.conf
+          subPath: smf.conf
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["NET_ADMIN", "SYS_TIME"]
+      securityContext:
+        sysctls:
+          - name: net.ipv6.conf.all.disable_ipv6
+            value: "0"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: free5gc-config
+            items:
+            - key: config.file
+              path: free5gc.conf
+        - name: freediameter-volume
+          configMap:
+            name: freediameter-smf-config
+            items:
+            - key: config.file
+              path: smf.conf
+{{- end }}

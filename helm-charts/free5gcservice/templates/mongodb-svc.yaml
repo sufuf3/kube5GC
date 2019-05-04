@@ -1,0 +1,39 @@
+---
+{{- if .Values.mongodb.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: mongo
+    service: mongo
+spec:
+  selector:
+    service: mongo
+  clusterIP: None
+  type: ClusterIP
+  ports:
+  - port: 27017
+    targetPort: 27017
+{{- end }}
+
+---
+
+{{- if and .Values.mongodb.enabled .Values.mongodb.service.nodePort }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-external
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    service: mongo
+  type: NodePort
+  ports:
+  - port: 27017
+    nodePort: {{ .Values.mongodb.service.nodePortNum }}
+    targetPort: 27017
+    protocol: TCP
+  sessionAffinity: None
+{{- end }}

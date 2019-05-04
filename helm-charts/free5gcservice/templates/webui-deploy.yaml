@@ -1,0 +1,35 @@
+{{- if .Values.webui.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webui-deployment
+  labels:
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: webui
+spec:
+  replicas: {{ .Values.webui.replicaCount }}
+  selector:
+    matchLabels:
+      app: webui
+  template:
+    metadata:
+      labels:
+        app: webui
+    spec:
+      containers:
+        - name: nextepc-webui
+          image: "{{ .Values.webui.controller.image.repository }}:{{ .Values.webui.controller.image.tag }}"
+          command:
+            - npm
+            - run
+            - dev
+          imagePullPolicy: {{ .Values.webui.controller.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: DB_URI
+              value: mongodb://mongo-external.{{ .Values.namespace }}.svc.cluster.local/nextepc
+{{- end }}

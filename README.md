@@ -12,6 +12,7 @@
 - [Deploy free5GC](#deploy-free5gc)
     - [Method 1 - Using yaml](#method-1---using-yaml)
     - [Method 2 - Using Helm](#method-2---using-helm)
+    - [Method 3 - Using CRD](#method-3---using-crd)
 - [Verification](#verification)
 
 ## Free5GC Components
@@ -266,7 +267,19 @@ kubectl create -f deploy/nctu5GC/upf-deployment-SRIOV.yaml
 
 ### Method 2 - Using Helm
 
-To be continued...
+```sh
+helm install --name NAME helm-charts/free5gcservice/
+```
+
+Note. Debug  
+
+```sh
+helm install --name NAME --dry-run --debug helm-charts/free5gcservice/
+```
+
+### Method 3 - Using CRD
+
+Please refer to https://github.com/sufuf3/free5gc-operator
 
 ---
 
